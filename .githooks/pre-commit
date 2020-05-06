@@ -1,0 +1,24 @@
+#!/bin/bash
+
+git show master:ProjectSettings/ProjectVersion.txt > ProjectSettings/LocalProjectVersion.txt
+
+CURRENT_UNITY_PROJECT_VERSION=$(head -n 1 ProjectSettings/ProjectVersion.txt | cut -d ':' -f 2 | tr -d ' ')
+LOCAL_UNITY_PROJECT_VERSION=$(head -n 1 ProjectSettings/LocalProjectVersion.txt | cut -d ':' -f 2 | tr -d ' ')
+
+
+RED='\033[0;31m'
+BLACK="$(tput sgr0)"
+
+echo "*********************** PRE-COMMIT HOOK *********************************"
+
+if [  "$CURRENT_UNITY_PROJECT_VERSION" = "$LOCAL_UNITY_PROJECT_VERSION" ];  then
+   echo -e "Local version and current Unity version are consistent: ${RED} $CURRENT_UNITY_PROJECT_VERSION ${BLACK}."
+   echo "*************************************************************************"
+   exit 0
+else 
+   echo -e "Local Unity project version (${RED}$LOCAL_UNITY_PROJECT_VERSION${BLACK}) differs from"
+   echo -e "master branch's Unity project version (${RED}$CURRENT_UNITY_PROJECT_VERSION${BLACK})!"
+   git stash
+   echo "Your changes have been stashed. Use git stash pop to retrieve (uncommited) changes."
+fi
+cho "*************************************************************************"
