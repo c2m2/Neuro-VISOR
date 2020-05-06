@@ -1,0 +1,59 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3671467348768610599
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3671467348768610593}
+  - component: {fileID: 3671467348768610598}
+  m_Layer: 0
+  m_Name: GameManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3671467348768610593
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3671467348768610599}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.60239065, y: -0.24124438, z: 1.0935814}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3671467348768610598
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3671467348768610599}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 788aab8f91983a94abcd77919a1c26f9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  useCustomRoom: 0
+  roomPrefab: {fileID: 5843646974706866111, guid: 70469a93359ee8b4e98c4c445b157af9,
+    type: 3}
+  rightRaycaster: {fileID: 0}
+  leftRaycaster: {fileID: 0}
+  ovrPlayerController: {fileID: 0}
+  ovrRightHandAnchor: {fileID: 0}
+  ovrLeftHandAnchor: {fileID: 0}
+  nonVRCamera: {fileID: 0}
+  menu: {fileID: 0}
+  raycastKeyboardPrefab: {fileID: 7084696797114052358, guid: 09bf5b5c7d121ff48bf9b2d31594d7f5,
+    type: 3}
+  menuSnapPosition: {fileID: 0}
+  fpsCounter: {fileID: 0}

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 99ebbe84fdbd38d40b62380bc9e03f8b
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - accumulateShader: {fileID: 4800000, guid: 8a0a95cd3b78059498256a2354d7ec67, type: 3}
+  - revealageShader: {fileID: 4800000, guid: 6c585e860a83bdb4489951815355de18, type: 3}
+  - blendShader: {fileID: 4800000, guid: 1953d0d7ed0625d4cb5409c1dcd9f33f, type: 3}
+  - m_camera: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

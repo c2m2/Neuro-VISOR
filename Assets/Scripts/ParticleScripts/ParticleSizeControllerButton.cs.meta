@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 5460e098134e4f341a8dd32f09692f8e
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - valueText: {instanceID: 0}
+  - partSysCon: {instanceID: 0}
+  - menuAudioSource: {instanceID: 0}
+  - buttonPressSound: {fileID: 8300000, guid: b538e6ca05000de4798e60508eb97140, type: 3}
+  - hapticAudioClip: {fileID: 8300000, guid: d4e895601f22c3b48ace241e2f161f89, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

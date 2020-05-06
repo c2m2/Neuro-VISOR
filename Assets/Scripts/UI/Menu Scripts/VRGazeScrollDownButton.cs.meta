@@ -1,0 +1,13 @@
+fileFormatVersion: 2
+guid: 40374b6175a99cb4eae9aa0d2f9ad42e
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - panelScrollRect: {instanceID: 0}
+  - hapticAudioClip: {fileID: 8300000, guid: 0a876c8c0b58f364c9fa537b044998df, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

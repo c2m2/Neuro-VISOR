@@ -1,0 +1,42 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using C2M2;
+
+public class #SCRIPTNAME# : Simulation {
+
+	#region SimulationMethods
+	// Retrieve simulation values as a double array
+	public override double[] GetValues(){
+		#NOTRIM#
+	}
+	
+	// Your simulation will receive new simulation values between 0 and 1 for each point
+	public override void SetValues(double[] newValues){
+		#NOTRIM#
+	}
+
+	// Simulation computation should be contained in this method.
+	// This method will launch in its own thread.
+	protected override void Solve(){
+		#NOTRIM#
+	}
+	#endregion
+	
+	#region UnityMethods	
+	// OnAwake() is called before Simulation's Awake()
+	protected override void OnAwake(){
+		#NOTRIM#
+	}
+	
+	// OnStart() is called before Simulation's Awake()
+	protected override void OnStart(){
+		#NOTRIM#
+	}
+	
+	// OnUpdate() is called before Simulation's Update()
+	protected override void OnUpdate(){
+		#NOTRIM#
+	}
+	#endregion
+}
