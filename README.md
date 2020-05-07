@@ -4,7 +4,7 @@ Repository for Temple University's Center for Computational Mathematics and Mode
 ## Requirements before contributing
 Unity 2019.1.0f2
 
-Git
+Git version 2.26.1 or up
 
 Git LFS 2.10.0 or up
 
