@@ -46,7 +46,7 @@ namespace C2M2
                 foreach (DiameterData diam in accessor)
                 {
                     tempNode.nodeRadius = diam.Diameter / 2;
-                    tempNode.id = Algebra.GetDoFIndex(grid.Vertices[count].Id, ordering);
+                    tempNode.id = grid.Vertices[count].Id;
 
                     tempNode.xcoords = grid.Mesh.vertices[count].x;
                     tempNode.ycoords = grid.Mesh.vertices[count].y;
@@ -57,13 +57,13 @@ namespace C2M2
                     if (grid.Vertices[count].Neighbors.Count == 1)
                     {
 			
-                        boundaryID.Add(Algebra.GetDoFIndex(grid.Vertices[count].Id, ordering));
+                        boundaryID.Add(grid.Vertices[count].Id);
                       
                     }
 
                     for (int i = 0; i < grid.Vertices[count].Neighbors.Count; i++)
                     {
-                        tempNode.neighborIDs.Add(Algebra.GetDoFIndex(grid.Vertices[count].Neighbors[i].Id, ordering));
+                        tempNode.neighborIDs.Add(grid.Vertices[count].Neighbors[i].Id);
                     }
 
                     nodeData.Add(tempNode);
@@ -73,8 +73,8 @@ namespace C2M2
 
                 for (int i = 0; i < grid.Edges.Count(); i++)
                 {
-                    edges.Add((Tuple.Create(Algebra.GetDoFIndex(grid.Edges[i].From.Id, ordering), Algebra.GetDoFIndex(grid.Edges[i].To.Id, ordering))));
-                    edgeLengths.Add(GetEdgeLength(Algebra.GetDoFIndex(grid.Edges[i].From.Id, ordering), Algebra.GetDoFIndex(grid.Edges[i].To.Id, ordering)));
+                    edges.Add((Tuple.Create(grid.Edges[i].From.Id, grid.Edges[i].To.Id)));
+                    edgeLengths.Add(GetEdgeLength(grid.Edges[i].From.Id, grid.Edges[i].To.Id));
                 }
                 this.edgeCount = this.edges.Count();
 
