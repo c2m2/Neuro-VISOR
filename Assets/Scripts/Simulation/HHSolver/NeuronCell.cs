@@ -5,13 +5,11 @@ using System.Data;
 using System;
 using System.IO;
 using UnityEngine;
-//using UGX;
 namespace C2M2
 {
     namespace UGX
     {
         using DiameterAttachment = IAttachment<DiameterData>;
-        using Reordering = System.Collections.Generic.Dictionary<int, int>;
 	
         
         public class NeuronCell
@@ -40,8 +38,6 @@ namespace C2M2
             public NeuronCell(Grid grid)
             {
 
-		Reordering ordering = Algebra.ReorderMatrix(grid);
-	        
                 AttachmentHandler.Available();
                 NodeData tempNode = new NodeData();
                 VertexAttachementAccessor<DiameterData> accessor = new VertexAttachementAccessor<DiameterData>(grid);
