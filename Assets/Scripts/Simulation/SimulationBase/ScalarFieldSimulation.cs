@@ -43,7 +43,7 @@ namespace C2M2
             }
 
             #region Unity Methods
-            protected sealed override void AwakeD()
+            protected sealed override void OnAwake()
             {
                 // Safe check for existing MeshFilter, MeshRenderer
                 mf = GetComponent<MeshFilter>();
@@ -67,16 +67,7 @@ namespace C2M2
                 // Create mesh for visualization
                 Mesh mesh = BuildMesh();
                 mf.sharedMesh = mesh;
-
-                // Let derived classes run Awake
-                AwakeE();
             }
-            protected sealed override void StartD() { StartE(); }
-            protected sealed override void UpdateD() { UpdateE(); }
-            // Allow derived classes to call their own Awake/Start/Update
-            protected virtual void AwakeE() { }
-            protected virtual void StartE() { }
-            protected virtual void UpdateE() { }
             #endregion
         }
     }

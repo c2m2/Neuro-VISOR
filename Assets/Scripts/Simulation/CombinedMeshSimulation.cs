@@ -7,6 +7,7 @@ using GetSocialSdk.Capture.Scripts;
 
 namespace C2M2
 {
+    using InteractionScripts;
     namespace SimulationScripts
     {
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -27,8 +28,10 @@ namespace C2M2
             }
 
             // Your simulation will receive new simulation values between 0 and 1 for each point
-            public override void SetValues(Tuple<int, double>[] newValues)
+            public override void SetValues(RaycastHit hit)
             {
+                Tuple<int, double>[] newValues = RaycastSimHeaterDiscrete.HitToTriangles(hit);
+
                 foreach(Tuple<int, double> value in newValues)
                 {
                     values[value.Item1] = value.Item2;

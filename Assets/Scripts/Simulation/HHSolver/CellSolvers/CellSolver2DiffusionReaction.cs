@@ -72,17 +72,6 @@ namespace C2M2
                 //Set the initial conditions of the solution
                 U.SetSubVector(0, myCell.vertCount, initialConditions(U, myCell.boundaryID));
             }
-            protected override void OnStart1D()
-            {
-                // Access the color manager and have it color the surface based on our preset max/min value
-                Gradient32LUT colorManager = GetComponent<Gradient32LUT>();
-                if (colorManager != null)
-                {
-                    colorManager.extremaMethod = Gradient32LUT.ExtremaMethod.GlobalExtrema;
-                    colorManager.globalMax = 65;
-                    colorManager.globalMin = -15;
-                }
-            }
 
             // Secnd simulation 1D values 
             protected override double[] Get1DValues()
@@ -118,6 +107,16 @@ namespace C2M2
             {
                 TimeUtilities.Timer timer = new TimeUtilities.Timer(nT + 1);
                 timer.StartTimer();
+
+                // Access the color manager and have it color the surface based on our preset max/min value
+                Gradient32LUT colorManager = GetComponent<Gradient32LUT>();
+                if (colorManager != null)
+                {
+                    colorManager.extremaMethod = Gradient32LUT.ExtremaMethod.GlobalExtrema;
+                    colorManager.globalMax = 65;
+                    colorManager.globalMin = -15;
+                }
+
                 // Computer simulation stepping parameters
                 double k = endTime / (double)nT; //Time step size
                 //double h = myCell.edgeLengths.Average();

@@ -3,6 +3,7 @@ using System;
 
 namespace C2M2
 {
+    using InteractionScripts;
     namespace SimulationScripts
     {
         /// <summary>
@@ -14,9 +15,11 @@ namespace C2M2
             private double[] scalars;
 
             public override double[] GetValues() => scalars;
-            public override void SetValues(Tuple<int, double>[] newValues)
+            public override void SetValues(RaycastHit hit)
             {
-                foreach(Tuple<int, double> newVal in newValues)
+                Tuple<int, double>[] newValues = RaycastSimHeaterDiscrete.HitToTriangles(hit);
+
+                foreach (Tuple<int, double> newVal in newValues)
                 {
                     scalars[newVal.Item1] += newVal.Item2;
                 }

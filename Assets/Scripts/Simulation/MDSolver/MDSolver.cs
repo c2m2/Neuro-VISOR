@@ -19,7 +19,7 @@ namespace C2M2
             }
 
             // Scripts will try to affect your simulation values using this function
-            public override void SetValues(Tuple<int, double>[] newValues)
+            public override void SetValues(RaycastHit hit)
             {
                 
             }
