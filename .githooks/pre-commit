@@ -11,6 +11,11 @@ LOCAL_UNITY_PROJECT_VERSION=$(head -n 1 ProjectSettings/LocalProjectVersion.txt 
 LOCAL_VER=$(git lfs env| awk -F ' ' 'FNR == 1 {print $1} ' | awk -F '/' '{print $2}')
 REQ_VER=2.10.0
 
+# colors
+RED='\033[0;31m'
+BLACK="$(tput sgr0)"
+
+# compare version (pure Bash/Sh)
 vercomp () {
     if [[ $1 == $2 ]]
     then
@@ -41,9 +46,6 @@ vercomp () {
     done
     return 0
 }
-
-RED='\033[0;31m'
-BLACK="$(tput sgr0)"
 
 echo "*********************** PRE-COMMIT HOOK *********************************"
 
