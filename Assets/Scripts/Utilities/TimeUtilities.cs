@@ -57,6 +57,15 @@ namespace C2M2
                 }
                 public double StopTimer() => StopTimer("");
 
+
+                // JACOB: JAMES ADDED THIS :D
+                public void ExportCSV_path(string filePath)
+                {
+                    string timerInfo = ToStringPlus();
+                    CSVBuilder csv = new CSVBuilder();
+                    csv.ExportCSV(timerInfo, filePath, overwrite: true);
+                }
+
                 public void ExportCSV(string newFileName, bool buildSimpleStats = false)
                 {
                     string timerInfo = ToStringPlus();
