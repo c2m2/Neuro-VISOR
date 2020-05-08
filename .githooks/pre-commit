@@ -1,6 +1,6 @@
 #!/bin/bash
 
-git show master:ProjectSettings/ProjectVersion.txt > ProjectSettings/LocalProjectVersion.txt
+git show origin/master:ProjectSettings/ProjectVersion.txt > ProjectSettings/LocalProjectVersion.txt
 
 CURRENT_UNITY_PROJECT_VERSION=$(head -n 1 ProjectSettings/ProjectVersion.txt | cut -d ':' -f 2 | tr -d ' ')
 LOCAL_UNITY_PROJECT_VERSION=$(head -n 1 ProjectSettings/LocalProjectVersion.txt | cut -d ':' -f 2 | tr -d ' ')
