@@ -5,6 +5,8 @@ using System.Threading;
 using System;
 namespace C2M2
 {
+    using Utilities;
+    using InteractionScripts;
     namespace SimulationScripts
     {
         /// <summary>
@@ -29,25 +31,93 @@ namespace C2M2
 
             #region Unity Methods
             // TODO: Only allow T to take certain values
-
+ 
             // Allow derived classes to run code in Awake/Start/Update if they choose
-            protected sealed override void AwakeC() { AwakeD(); }
-            protected sealed override void StartC() { StartD(); }
-            protected sealed override void UpdateC()
+            protected virtual void OnAwake() { }
+            protected virtual void OnStart() { }
+            protected virtual void OnUpdate() { }
+            #endregion
+
+            // Don't allow derived classes to override this.Awake/Start/Update
+            public void Awake()
             {
-                UpdateD();
+                OnAwake();
+
+                #region Interaction
+                switch (interactionType)
+                {
+                    case (InteractionType.Discrete): simHeater = gameObject.AddComponent<RaycastSimHeaterDiscrete>(); break;
+                    case (InteractionType.Continuous): simHeater = gameObject.AddComponent<RaycastSimHeaterContinuous>(); break;
+                }
+
+                gameObject.AddComponent<FrameCountTransformReset>();
+
+                RaycastEventManager eventManager = gameObject.AddComponent<RaycastEventManager>();
+
+                GameObject child = new GameObject("HitInteractionEvent");
+                child.transform.parent = transform;
+                child.transform.position = Vector3.zero;
+                child.transform.eulerAngles = Vector3.zero;
+
+                RaycastPressEvents raycastEvents = child.AddComponent<RaycastPressEvents>();
+                raycastEvents.OnHoldPress.AddListener((hit) => simHeater.Hit(hit));
+
+                eventManager.rightTrigger = raycastEvents;
+                eventManager.leftTrigger = raycastEvents;
+                #endregion
+
+                if (startOnAwake) StartSimulation();
+            }
+            public void Start()
+            {
+                OnStart();
+                gameObject.AddComponent<VRGrabbable>();
+            }
+            public void Update()
+            {
+                OnUpdate();
 
                 ValueType simulationValues = GetValues();
-                if(simulationValues != null)
+                if (simulationValues != null)
                 {
                     // Use simulation values to update visuals
                     UpdateVisualization(simulationValues);
                 }
             }
-            // Allow derived classes to run code in Awake/Start/Update if they choose
-            protected virtual void AwakeD() { }
-            protected virtual void StartD() { }
-            protected virtual void UpdateD() { }
+
+            #region Threading
+            public bool startOnAwake = true;
+            private Thread solveThread = null;
+            protected Mutex mutex = new Mutex();
+
+            // Computation code should be contained within Solve(). Simulation.cs will launch Solve() on its own thread.
+            protected abstract void Solve();
+
+            #region Simulation Thread Controls
+            // Stop any current simulation thread and launch a new one
+            public void StartSimulation()
+            {
+                StopSimulation();
+                solveThread = new Thread(Solve);
+                solveThread.Start();
+                Debug.Log("Solve() launched on thread " + solveThread.ManagedThreadId);
+            }
+            // Stop current simulation thread
+            public void StopSimulation() { if (solveThread != null) solveThread.Abort(); }
+
+            #endregion
+
+            #region Unity Methods
+            // Don't allow threads to keep running on pause, quit
+            private void OnApplicationPause(bool pause)
+            {
+                if (pause && solveThread != null) solveThread.Abort();
+            }
+            private void OnApplicationQuit()
+            {
+                if (solveThread != null) solveThread.Abort();
+            }
+            #endregion
             #endregion
         }
     }

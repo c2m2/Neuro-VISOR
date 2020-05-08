@@ -1,8 +1,12 @@
 # virtual-reality
-Repo for Temple University's Center for Computational Mathematics and Modeling's virtual reality project
+Repository for Temple University's Center for Computational Mathematics and Modeling's virtual reality project
 
 ## Requirements before contributing
-Unity 2019.X
-Git
-Git LFS
+Unity 2019.1.0f2
 
+Git version 2.26.1 or up
+
+Git LFS 2.10.0 or up
+
+### Verify you are using Git LFS
+`git lfs env` in a terminal/console.

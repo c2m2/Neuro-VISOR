@@ -26,7 +26,7 @@ namespace C2M2
             /// <summary> 
             /// Derived classes decide how to translate RaycastHit into index/newValue pairings 
             /// </summary>
-            public void Hit(RaycastHit hit) => simulation.SetValues(HitMethod(hit));
+            public void Hit(RaycastHit hit) => simulation.SetValues(hit);
         }
     }
 }

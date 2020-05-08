@@ -7,6 +7,7 @@ namespace C2M2
 {
     using UGX;
     using Utilities;
+    using InteractionScripts;
     namespace SimulationScripts
     {      
         /// <summary>
@@ -29,7 +30,10 @@ namespace C2M2
             public bool visualize1D = false;
             public Color32 color1D = Color.green;
             public float lineWidth1D = 0.005f;
-            TimeUtilities.Timer timer = new TimeUtilities.Timer();
+
+            // List of 1D vertex/new double value pairings. NOTE: 1D vertices may appear more than once in the array
+            protected abstract void Set1DValues(Tuple<int, double>[] newValuess);
+            protected abstract double[] Get1DValues();
 
             protected abstract void SetNeuronCell(Grid grid);
             ///<summary> Lookup a 3D vert and get back two 1D indices and a lambda value for them </summary>
@@ -92,6 +96,7 @@ namespace C2M2
                     return cells;
                 }
             }
+
             /// <summary>
             /// Translate 1D values onto 3D scalar field
             /// </summary>
@@ -99,8 +104,6 @@ namespace C2M2
             public sealed override double[] GetValues()
             {
                 double[] scalars1D = Get1DValues();
-
-                timer.StartTimer();
                       
                 if (scalars1D == null) { return null; }
 
@@ -120,29 +123,16 @@ namespace C2M2
                     scalars3D[i] = newVal;
                 }
 
-                timer.StopTimer("Neuron1DSimulation->GetValues()");
                 return scalars3D;
             }
 
-            #region Unity Methods
-            protected sealed override void AwakeE() { OnAwake1D(); }
-            protected sealed override void StartE() { OnStart1D(); }
-            protected sealed override void UpdateE() { OnUpdate1D(); }
-            // Give derived classes the option of implementing Awake Start, Update
-            protected virtual void OnStart1D() { }
-            protected virtual void OnUpdate1D() { }
-            protected virtual void OnAwake1D() { }
-            #endregion
 
-            // List of 1D vertex/new double value pairings. NOTE: 1D vertices may appear more than once in the array
-            protected abstract void Set1DValues(Tuple<int, double>[] newValuess);
-            protected abstract double[] Get1DValues();
             /// <summary>
             /// Translate 3D scalar values to 1D vertices, then send to simulation
             /// </summary>
-            public sealed override void SetValues(Tuple<int, double>[] newValues)
+            public sealed override void SetValues(RaycastHit hit)
             {
-                timer.StartTimer();
+                Tuple<int, double>[] newValues = RaycastSimHeaterDiscrete.HitToTriangles(hit);
 
                 // Each 3D index will have TWO associated 1D vertices
                 Tuple<int, double>[] new1DValues = new Tuple<int, double>[2 * newValues.Length];
@@ -167,7 +157,6 @@ namespace C2M2
                     // Move up two spots in 1D array
                     j += 2;
                 }
-                timer.StopTimer("Neuron1DSimulation->SetValues()");
 
                 // Send 1D-translated scalars to simulation
                 Set1DValues(new1DValues);

@@ -9,7 +9,7 @@ namespace C2M2
         public abstract class Vector3Simulation : Simulation<Vector3[]>
         {
             private Transform[] transforms;
-            protected override void AwakeD()
+            protected override void OnAwake()
             {
                 transforms = BuildTransforms();
                 // Make each transform a child of this gameobject so the hierarchy isn't flooded

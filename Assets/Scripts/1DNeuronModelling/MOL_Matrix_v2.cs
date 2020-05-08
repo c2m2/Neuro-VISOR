@@ -52,9 +52,6 @@ namespace C2M2
             private double[] newValues;
             // Initialize one end of the rod
             private double vstart = 55;
-            protected override void OnAwake1D() { }
-            protected override void OnStart1D() { }
-            protected override void OnUpdate1D() { }
             /// <summary>
             /// Get the current simulation values
             /// </summary>
