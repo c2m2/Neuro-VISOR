@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # make sure local unity version matches current branch's remote revision
-BRANCH=$(git rev-parse --abbrev-ref HEAD)
-git show origin/$BRANCH:ProjectSettings/ProjectVersion.txt > ProjectSettings/LocalProjectVersion.txt
+BRANCH_ON_REMOTE=$(git rev-parse --abbrev-ref --symbolic-full-name @{u})
+git show $BRANCH_ON_REMOTE:ProjectSettings/ProjectVersion.txt > ProjectSettings/LocalProjectVersion.txt
 
 # Unity version
 CURRENT_UNITY_PROJECT_VERSION=$(head -n 1 ProjectSettings/ProjectVersion.txt | cut -d ':' -f 2 | tr -d ' ')
