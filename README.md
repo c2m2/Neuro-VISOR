@@ -23,3 +23,9 @@ Pre-commit hook will block commits made with inappropriate versions of git LFS o
 - git: `git --version`
 - Unity: see UnityEditor
 
+## Quick Start Guide
+1. Clone project to any location
+2. Ensure the correct version of the Unity Editor is installed
+3. Open project in Unity. 
+4. Open "MainScene", and ensure that "HHSolver" is enabled in the hierarchy. Hodgkin-Huxley simulation code is provided locally within the project along with example 1D and 3D neuron geometries to run on. These should run automatically upon pressing play.
+
