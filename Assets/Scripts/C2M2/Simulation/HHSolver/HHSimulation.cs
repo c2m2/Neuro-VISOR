@@ -7,8 +7,8 @@ namespace C2M2
 {
     using UGX;
     using Utilities;
-    using InteractionScripts;
-    namespace SimulationScripts
+    using Interaction;
+    namespace Simulation
     {      
         /// <summary>
         /// Read in a map associating 1D neuron vertices to 3D mesh vertices.

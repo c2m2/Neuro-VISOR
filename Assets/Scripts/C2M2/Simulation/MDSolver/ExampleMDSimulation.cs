@@ -7,7 +7,7 @@ using MathNet.Numerics.Distributions;
 
 
 namespace C2M2 {
-    namespace SimulationScripts {
+    namespace Simulation {
         public class ExampleMDSimulation : MDSimulation
         {
             // Define number of example spheres

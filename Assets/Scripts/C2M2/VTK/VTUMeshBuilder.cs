@@ -2,7 +2,7 @@
 
 namespace C2M2
 {
-    using InteractionScripts;
+    using Interaction;
     public class VTUMeshBuilder : MonoBehaviour
     {
         [Header("Data Information")]

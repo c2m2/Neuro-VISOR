@@ -6,8 +6,8 @@ using System;
 namespace C2M2
 {
     using Utilities;
-    using InteractionScripts;
-    namespace SimulationScripts
+    using Interaction;
+    namespace Simulation
     {
         /// <summary>
         /// Provides an interface for simulations using a general data type T

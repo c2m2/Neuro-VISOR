@@ -3,10 +3,10 @@ using System;
 
 namespace C2M2
 {
-    namespace InteractionScripts
+    namespace Interaction
     {
         using Utilities;
-        using SimulationScripts;
+        using Simulation;
         public abstract class RaycastSimHeater : MonoBehaviour
         {
             protected Interactable simulation;

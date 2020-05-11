@@ -7,7 +7,7 @@ namespace C2M2
 {
     using Utilities;
     using static Utilities.MathUtilities;
-    namespace InteractionScripts
+    namespace Interaction
     {
         /// <summary>
         /// Create a fast and memory-friendly lookup table of Color32's.

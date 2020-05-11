@@ -6,7 +6,7 @@ using UnityEngine;
 namespace C2M2
 {
     using Readers;
-    namespace SimulationScripts
+    namespace Simulation
     {
         public class MDSolver : MDSimulation
         {

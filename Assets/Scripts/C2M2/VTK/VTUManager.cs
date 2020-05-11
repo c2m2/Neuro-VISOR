@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace C2M2
 {
-    using InteractionScripts;
+    using Interaction;
     
     public class VTUManager : MonoBehaviour
     {

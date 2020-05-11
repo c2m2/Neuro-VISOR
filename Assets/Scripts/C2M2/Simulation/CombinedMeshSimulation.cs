@@ -7,8 +7,8 @@ using GetSocialSdk.Capture.Scripts;
 
 namespace C2M2
 {
-    using InteractionScripts;
-    namespace SimulationScripts
+    using Interaction;
+    namespace Simulation
     {
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary> Run a blank ScalarFieldSimulation using every MeshRenderer childed under this script  </summary>

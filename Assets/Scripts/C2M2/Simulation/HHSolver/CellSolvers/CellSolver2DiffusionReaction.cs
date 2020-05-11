@@ -19,8 +19,8 @@ namespace C2M2
 {
     using UGX;
     using Utilities;
-    using InteractionScripts;
-    namespace SimulationScripts
+    using Interaction;
+    namespace Simulation
     {
         using DiameterAttachment = IAttachment<DiameterData>;
 

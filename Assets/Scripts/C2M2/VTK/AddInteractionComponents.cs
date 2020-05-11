@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace C2M2
 {
-    namespace InteractionScripts
+    namespace Interaction
     {
         /// <summary>
         /// Adds components needed for VR interaction. Use this to build VR-interactable objects at runtime.

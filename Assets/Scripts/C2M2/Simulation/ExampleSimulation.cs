@@ -3,8 +3,8 @@ using System;
 
 namespace C2M2
 {
-    using InteractionScripts;
-    namespace SimulationScripts
+    using Interaction;
+    namespace Simulation
     {
         /// <summary>
         /// Given an existing mesh, store a scalar for each vertex.

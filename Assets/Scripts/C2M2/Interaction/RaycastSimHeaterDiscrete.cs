@@ -3,7 +3,7 @@ using System;
 
 namespace C2M2
 {
-    namespace InteractionScripts
+    namespace Interaction
     {
         public class RaycastSimHeaterDiscrete : RaycastSimHeater
         {

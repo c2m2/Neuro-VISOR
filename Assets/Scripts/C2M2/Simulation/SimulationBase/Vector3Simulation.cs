@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace C2M2
 {
-    namespace SimulationScripts
+    namespace Simulation
     {
         using Readers;
         public abstract class Vector3Simulation : Simulation<Vector3[]>

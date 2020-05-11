@@ -4,7 +4,7 @@ namespace C2M2
 {
     using Utilities;
     using Utilities.VR;
-    using InteractionScripts;
+    using Interaction;
     /// <summary>
     /// Add Rigidbody, Collider, and OVRGrabbable to object
     /// </summary>

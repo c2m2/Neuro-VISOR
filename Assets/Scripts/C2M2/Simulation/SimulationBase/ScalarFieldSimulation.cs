@@ -2,10 +2,10 @@
 
 namespace C2M2
 {
-    namespace SimulationScripts
+    namespace Simulation
     {
         using Utilities;
-        using InteractionScripts;
+        using Interaction;
         /// <summary>
         /// Simulation of type double[] for visualizing scalar fields on meshes
         /// </summary>

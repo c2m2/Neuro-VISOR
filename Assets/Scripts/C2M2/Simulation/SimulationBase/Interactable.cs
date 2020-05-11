@@ -4,9 +4,9 @@ using UnityEngine;
 
 namespace C2M2
 {
-    namespace SimulationScripts
+    namespace Simulation
     { 
-        using InteractionScripts;
+        using Interaction;
         /// <summary>
         /// Manages interaction input to simulations
         /// </summary>

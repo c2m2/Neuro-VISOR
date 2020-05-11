@@ -18,7 +18,7 @@ using solvers = MathNet.Numerics.LinearAlgebra.Double.Solvers;
 namespace C2M2
 {
     using UGX;
-    namespace SimulationScripts
+    namespace Simulation
     {
         using DiameterAttachment = IAttachment<DiameterData>;
 

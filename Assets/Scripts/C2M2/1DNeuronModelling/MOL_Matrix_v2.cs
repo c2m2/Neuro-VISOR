@@ -12,7 +12,7 @@ using Double = MathNet.Numerics.LinearAlgebra.Double;
 using MathNet.Numerics.Data.Text;
 namespace C2M2
 {
-    namespace SimulationScripts
+    namespace Simulation
     {
         using C2M2.UGX;
         using Utilities;
