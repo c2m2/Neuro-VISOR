@@ -1,6 +1,9 @@
 # virtual-reality
 Repository for Temple University's Center for Computational Mathematics and Modeling's virtual reality project
 
+## Documentation
+Our code is documented here (https://c2m2.github.io/)
+
 ## Cloning this repository
 Git users (versions < 2.23.0) should clone the repository by using
 `git lfs clone` all other should use `git clone`.
