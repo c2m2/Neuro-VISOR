@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# make sure local unity version matches current branch's remote revision
+# Make sure local unity version matches current branch's remote revision
 BRANCH_ON_REMOTE=$(git rev-parse --abbrev-ref --symbolic-full-name @{u})
 git show $BRANCH_ON_REMOTE:ProjectSettings/ProjectVersion.txt > ProjectSettings/LocalProjectVersion.txt
 
@@ -53,7 +53,6 @@ vercomp () {
 }
 
 echo "*************************************** PRE-COMMIT HOOK ********************************************"
-
 # if unity version is correct, then we also check for correct git and and git lfs version next
 if [  "$CURRENT_UNITY_PROJECT_VERSION" = "$LOCAL_UNITY_PROJECT_VERSION" ];  then
    echo -e "Local version and current Unity version are consistent: ${RED} $CURRENT_UNITY_PROJECT_VERSION ${BLACK}."
@@ -106,4 +105,3 @@ else
    echo "Your changes have been stashed. Use git stash pop to retrieve (uncommited) changes."
 fi
 echo "*************************************************************************"
-
