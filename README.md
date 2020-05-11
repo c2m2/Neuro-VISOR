@@ -2,7 +2,7 @@
 Repository for Temple University's Center for Computational Mathematics and Modeling's virtual reality project
 
 ## Cloning this repository
-Git users (versions < 2.23.0) should clone the repository 
+Git users (versions < 2.23.0) should clone the repository by using
 `git lfs clone` all other should use `git clone`.
 
 For users of older git versions this remedies the problem that every LFS versioned file will ask the user for their password.
