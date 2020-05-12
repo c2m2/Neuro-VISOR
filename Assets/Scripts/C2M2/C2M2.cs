@@ -3,6 +3,23 @@
 /// </summary>
 namespace C2M2
 {
+    /// <summary> Scripts powering Neuronal Dynamics modeling </summary>
+    namespace NeuronalDynamics
+    {
+        /// <summary> Neuronal Dynamics simulation code </summary>
+        namespace Simulation { }
+        /// <summary> Neuronal Dynamics visualization </summary>
+        namespace Visualization { }
+    }
+    /// <summary> Scripts powering Molecular Dynamics modeling </summary>
+    namespace MolecularDynamics
+    {
+        /// <summary> Neuronal Dynamics simulation code </summary>
+        namespace Simulation { }
+        /// <summary> Neuronal Dynamics visualization </summary>
+        namespace Visualization { }
+    }
+
     /// <summary>
     /// Utility scripts used in many other backend scripts
     /// </summary>
@@ -20,12 +37,12 @@ namespace C2M2
     }
     
     /// <summary>
-    /// All scripts powering the model simulation
+    /// All scripts powering general model simulation
     /// </summary>
     namespace Simulation { }
 
     /// <summary>
-    /// All scripts powering model visualization
+    /// All scripts powering general model visualization
     /// </summary>
     namespace Visualization
     {
@@ -36,7 +53,7 @@ namespace C2M2
     }
 
     /// <summary>
-    /// All scripts powering model interaction
+    /// All scripts powering general model interaction
     /// </summary>
     namespace Interaction
     {

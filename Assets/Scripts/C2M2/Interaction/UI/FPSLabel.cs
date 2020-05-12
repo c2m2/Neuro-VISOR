@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
-namespace C2M2
+namespace C2M2.Interaction.UI
 {
     public class FPSLabel : MonoBehaviour
     {

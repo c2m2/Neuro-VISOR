@@ -2,40 +2,37 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace C2M2
+namespace C2M2.Interaction.UI
 {
-    namespace Utils
+    public class ControlOverlay : MonoBehaviour
     {
-        public class ControlOverlay : MonoBehaviour
+        private KeyCode[] keys;
+        private bool anyRPressed
         {
-            private KeyCode[] keys;
-            private bool anyRPressed
+            get
             {
-                get
+                // If any activation ket is pressed, disable this object
+                foreach (KeyCode key in keys)
                 {
-                    // If any activation ket is pressed, disable this object
-                    foreach (KeyCode key in keys)
-                    {
-                        if (Input.GetKey(key)) return true;
-                    }
-                    if (Input.GetAxis("Horizontal") > 0
-                        || Input.GetAxis("Vertical") > 0) return true;
-
-                    return false;
+                    if (Input.GetKey(key)) return true;
                 }
-            }
-            public void SetActivationKeys(KeyCode[] keys)
-            {
-                this.keys = keys;
-            }
+                if (Input.GetAxis("Horizontal") > 0
+                    || Input.GetAxis("Vertical") > 0) return true;
 
-            // Update is called once per frame
-            void Update()
+                return false;
+            }
+        }
+        public void SetActivationKeys(KeyCode[] keys)
+        {
+            this.keys = keys;
+        }
+
+        // Update is called once per frame
+        void Update()
+        {
+            if (anyRPressed)
             {
-                if (anyRPressed)
-                {
-                    Destroy(gameObject);
-                }
+                Destroy(gameObject);
             }
         }
     }
