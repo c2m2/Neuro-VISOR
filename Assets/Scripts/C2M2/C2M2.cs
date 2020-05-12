@@ -6,7 +6,18 @@ namespace C2M2
     /// <summary>
     /// Utility scripts used in many other backend scripts
     /// </summary>
-    namespace Utils { }
+    namespace Utils
+    {
+        /// <summary>
+        /// Utilities that apply to Unity Mesh objects
+        /// </summary>
+        namespace MeshUtils { }
+
+        /// <summary>
+        /// Utilities used in debugging
+        /// </summary>
+        namespace DebugUtils { }
+    }
     
     /// <summary>
     /// All scripts powering the model simulation
