@@ -4,8 +4,8 @@ using UnityEngine;
 using System;
 namespace C2M2
 {
-    using Utilities;
-    using static Utilities.Math;
+    using Utils;
+    using static Utils.Math;
     /// <summary> Provide a general access point for information regarding a live simulation. Simulations should inherit from this class and match its abstract methods </summary>
     /// TODO: This script should either replace DiffusionManager, or there should be some new SimulationManager script
     /// TODO: Create a get/set values requirement

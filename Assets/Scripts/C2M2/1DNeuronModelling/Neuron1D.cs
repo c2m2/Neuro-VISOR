@@ -7,6 +7,7 @@ using System.Linq;
 using UnityEditor;
 namespace C2M2
 {
+    using Utils.MeshUtils;
     /// <summary>
     /// Read in a map associating 1D neuron vertices to 3D mesh vertices.
     /// </summary>

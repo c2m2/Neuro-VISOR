@@ -4,8 +4,8 @@ using System.Collections.Generic;
 
 namespace C2M2
 {
-    using Utilities;
-    using static Utilities.Math;
+    using Utils;
+    using static Utils.Math;
     /// <summary> Simulate a diffusion over the surface of a given geometry </summary>
     public class ReactionDiffusion : SimulationDiffuseReact
     {

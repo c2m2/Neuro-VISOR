@@ -3,8 +3,9 @@ using System;
 
 namespace C2M2
 {
-    namespace Utilities
+    namespace Utils
     {
+        using MeshUtils;
         [ExecuteInEditMode]
         public class MeshFlipInsideOutComponent : MonoBehaviour
         {

@@ -4,7 +4,7 @@ using System.IO;
 
 namespace C2M2
 {
-    using static Utilities.Math;
+    using static Utils.Math;
     /// <summary>
     /// Overarching manager to control order of events for reading in VTK data, positioning it, rescaling it, building colliders, raycasting, etc
     /// </summary>

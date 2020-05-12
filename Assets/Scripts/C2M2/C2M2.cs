@@ -6,7 +6,7 @@ namespace C2M2
     /// <summary>
     /// Utility scripts used in many other backend scripts
     /// </summary>
-    namespace Utilities { }
+    namespace Utils { }
     
     /// <summary>
     /// All scripts powering the model simulation
@@ -16,7 +16,13 @@ namespace C2M2
     /// <summary>
     /// All scripts powering model visualization
     /// </summary>
-    namespace Visualization { }
+    namespace Visualization
+    {
+        /// <summary>
+        /// All scripts directly related to visualization in virtual reality
+        /// </summary>
+        namespace VR { }
+    }
 
     /// <summary>
     /// All scripts powering model interaction
@@ -24,7 +30,7 @@ namespace C2M2
     namespace Interaction
     {
         /// <summary>
-        /// All scripts directly related to virtual reality
+        /// All scripts directly related to interaction in virtual reality
         /// </summary>
         namespace VR { }
     }

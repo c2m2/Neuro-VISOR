@@ -5,7 +5,7 @@ namespace C2M2
 {
     namespace Interaction
     {
-        using Utilities;
+        using Utils;
         using Simulation;
         public abstract class RaycastSimHeater : MonoBehaviour
         {

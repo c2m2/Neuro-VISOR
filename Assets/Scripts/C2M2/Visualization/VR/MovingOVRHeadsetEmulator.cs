@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace C2M2
 {
-    using Utilities;
+    using Utils;
     namespace Visualization
     {
         namespace VR

@@ -6,7 +6,7 @@ namespace C2M2
     {
         namespace VR
         {
-            using Utilities;
+            using Utils;
             using VR;
             using Interaction;
             /// <summary>

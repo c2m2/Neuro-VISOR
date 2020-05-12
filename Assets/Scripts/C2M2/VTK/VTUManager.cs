@@ -3,8 +3,8 @@ using UnityEngine;
 
 namespace C2M2
 {
-    using Interaction;
-    
+    using Utils.MeshUtils;
+   
     public class VTUManager : MonoBehaviour
     {
         private ObjectManager objectManager;

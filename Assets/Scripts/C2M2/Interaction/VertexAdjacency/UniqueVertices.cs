@@ -31,7 +31,7 @@ namespace C2M2
             uniqueMeshVertLength = uniqueVerts.Length;
             // Build invisible verts and append them to the end of uniqueVerts
             Vector3[] invisibleVerts = BuildInvisibleVerts(subdivisions);
-            uniqueVerts = Utilities.Array.MergeArrays(uniqueVerts, invisibleVerts);
+            uniqueVerts = Utils.Array.MergeArrays(uniqueVerts, invisibleVerts);
             // Build unique vert dictionaries
             uniqueVertReverseLookup = BuildUniqueVertReverseLookup(uniqueVerts);
         }

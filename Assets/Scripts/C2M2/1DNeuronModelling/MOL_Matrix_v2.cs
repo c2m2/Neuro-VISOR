@@ -15,7 +15,7 @@ namespace C2M2
     namespace Simulation
     {
         using C2M2.UGX;
-        using Utilities;
+        using Utils;
         //TODO: The summary/remakrs here should be written more clearly
         /// <summary>
         /// Solve Hodkin-Huxley equations using Method of Lines on a 1D rod

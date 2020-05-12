@@ -3,6 +3,7 @@
 namespace C2M2
 {
     using Interaction;
+    using Utils.MeshUtils;
     public class VTUMeshBuilder : MonoBehaviour
     {
         [Header("Data Information")]

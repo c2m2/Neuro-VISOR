@@ -8,7 +8,7 @@ using UnityEditor;
 
 namespace C2M2
 {
-    using Utilities;
+    using Utils;
     /// <summary> Create and store additional mesh info like an adjacency list, array of unique vertices, unique and mesh vertex Vector3 dictionaries </summary>
     [Obsolete("Separated into separate scripts AdjacencyList, UniqueVertices, ColorManager, etc")]
     public class MeshInfo : MonoBehaviour {
@@ -388,7 +388,7 @@ namespace C2M2
             // Store the current length of uniqueVerts, because we're going to tack our "invisible" vertices onto the end of it, but we still want to know where the "real" mesh vertices are
             uniqueMeshVertLength = uniqueVerts.Length;
             // Find the invisible vertices and attach them to the end of the uniqueVerts array
-            uniqueVerts = Utilities.Array.MergeArrays(uniqueVerts, BuildUniqueInvisibleVerts()); // Up to uniqueVerts.Length - 1 are mesh vertices   
+            uniqueVerts = Utils.Array.MergeArrays(uniqueVerts, BuildUniqueInvisibleVerts()); // Up to uniqueVerts.Length - 1 are mesh vertices   
         }
         /// <summary> Given a raycast hit, find the nearest unqiue mesh vert to the hit </summary>
         /// <returns> uniqueVerts index of the nearest hit vert </returns>

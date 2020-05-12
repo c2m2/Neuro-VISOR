@@ -7,7 +7,7 @@ using System.Threading;
 
 namespace C2M2
 {
-    namespace Utilities
+    namespace Utils
     {
         public class CSVBuilder
         {

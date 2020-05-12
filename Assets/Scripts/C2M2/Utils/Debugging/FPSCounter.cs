@@ -6,7 +6,7 @@ using System;
 
 namespace C2M2
 {
-    namespace Utilities
+    namespace Utils
     {
         using static Math;
         namespace Debugging

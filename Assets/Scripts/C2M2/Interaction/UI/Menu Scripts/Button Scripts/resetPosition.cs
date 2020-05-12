@@ -2,7 +2,7 @@
 
 namespace C2M2
 {
-    namespace Utilities
+    namespace Utils
     {
         public class ResetPositionMono : MonoBehaviour
         {

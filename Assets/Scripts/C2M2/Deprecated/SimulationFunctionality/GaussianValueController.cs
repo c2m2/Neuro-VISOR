@@ -3,8 +3,8 @@ using UnityEngine;
 using System;
 namespace C2M2
 {
-    using Utilities;
-    using static Utilities.Math;
+    using Utils;
+    using static Utils.Math;
     /// <summary> Set a Gaussian width and height, select an area on simulation mesh to add Gaussian values to scaled with time </summary>
     [Obsolete("Replaced by RaycastValueController")]
     public class GaussianValueController

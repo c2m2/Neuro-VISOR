@@ -5,7 +5,7 @@ using System;
 using static VTUColor;
 namespace C2M2
 {
-    using Utilities;
+    using Utils;
     public class VTUObject
     {
         public Mesh mesh;

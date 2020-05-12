@@ -5,7 +5,7 @@ using System.Threading;
 using System;
 namespace C2M2
 {
-    using Utilities;
+    using Utils;
     using Interaction;
     using Interaction.VR;
     namespace Simulation

@@ -2,7 +2,7 @@
 
 namespace C2M2
 {
-    using Utilities;
+    using Utils;
     public abstract class RaycastEventSignaler : PressEventSignaler
     {
         public bool rightHand = true;

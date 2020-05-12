@@ -2,7 +2,7 @@
 
 namespace C2M2
 {
-    using Utilities;
+    using Utils;
 
     /// <summary>
     /// Activate raycast triggers using oculus controller buttons and fingertip distance

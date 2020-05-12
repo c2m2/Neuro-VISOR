@@ -5,7 +5,7 @@ using System;
 using System.Linq;
 namespace C2M2
 {
-    using Utilities;
+    using Utils;
     [Obsolete("Replaced by DijkstraSearch, which does not rely on ObjectManager and simply adds the parts it needs in its constructor")]
     public class DijkstraFindPath
     {

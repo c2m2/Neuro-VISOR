@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace C2M2
 {
-    namespace Utilities
+    namespace Utils
     {
         public static class RigidbodyUtilities
         {

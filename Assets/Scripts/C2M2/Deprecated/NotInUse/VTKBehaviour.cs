@@ -8,8 +8,10 @@ using System.Collections;
 using System.Collections.Generic;
 
 using System.Runtime.Serialization.Formatters.Binary;
+
 namespace C2M2
 {
+    using Utils.MeshUtils;
     /* 
       0. Address TODOs in code and the following bullet points in descending order of priority:
       1. Speed-up and slow-down animations in Update() method.

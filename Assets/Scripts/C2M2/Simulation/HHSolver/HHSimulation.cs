@@ -6,8 +6,10 @@ using System;
 namespace C2M2
 {
     using UGX;
-    using Utilities;
+    using Utils;
+    using Utils.MeshUtils;
     using Interaction;
+
     namespace Simulation
     {      
         /// <summary>

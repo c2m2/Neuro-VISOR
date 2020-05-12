@@ -18,7 +18,7 @@ using MathNet.Numerics.LinearAlgebra.Double.Solvers;
 namespace C2M2
 {
     using UGX;
-    using Utilities;
+    using Utils;
     using Interaction;
     
     namespace Simulation

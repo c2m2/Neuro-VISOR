@@ -5,8 +5,8 @@ using System;
 using System.Text;
 namespace C2M2
 {
-    using Utilities;
-    using static Utilities.Math;
+    using Utils;
+    using static Utils.Math;
     namespace Interaction
     {
         /// <summary>

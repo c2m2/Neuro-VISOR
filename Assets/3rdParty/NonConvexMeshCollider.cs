@@ -18,7 +18,7 @@ using C2M2;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
-using C2M2.Utilities;
+using C2M2.Utils;
 /// <summary>
 /// Generate complex compound colliders based on mesh data
 /// </summary>

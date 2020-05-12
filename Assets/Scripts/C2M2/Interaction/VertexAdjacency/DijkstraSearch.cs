@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace C2M2
 {
-    using Utilities;
+    using Utils;
     public class DijkstraSearch : MonoBehaviour
     {
         // TODO: Use Gaussian width to get distance threshold

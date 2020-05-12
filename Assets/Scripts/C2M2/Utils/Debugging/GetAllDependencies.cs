@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace C2M2
 {
-    namespace Utilities
+    namespace Utils
     {
         namespace Debugging
         {

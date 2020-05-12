@@ -6,7 +6,7 @@ namespace C2M2
 {
     namespace Tests
     {
-        using Utilities;
+        using Utils;
         public class TestTimer : AwakeTest
         {
             public int tickErrorThreshold = 2;

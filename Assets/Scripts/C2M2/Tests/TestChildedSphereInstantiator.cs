@@ -8,7 +8,7 @@ namespace C2M2
     namespace Tests
     {
         using Readers;
-        using Utilities;
+        using Utils;
         public class TestChildedSphereInstantiator : AwakeTest
         {
             public int testCases = 100;

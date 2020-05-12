@@ -7,7 +7,7 @@ using System;
 namespace C2M2
 {
     using UGX;
-    namespace Utilities
+    namespace Utils
     {
         /// <summary>
         /// Draw a series of disjointed lines given a list of edges using the native LineRenderer class

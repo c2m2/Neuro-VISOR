@@ -1,6 +1,6 @@
 ﻿namespace C2M2
 {
-    namespace Utilities
+    namespace Utils
     {
         /// <summary>
         /// Quick, static methods for finding max, min

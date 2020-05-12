@@ -1,9 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using System;
 using System.Threading;
-using GetSocialSdk.Capture.Scripts;
+
 namespace C2M2
 {
     public class GameManager : MonoBehaviour
@@ -36,7 +34,7 @@ namespace C2M2
         public RaycastKeyboard raycastKeyboard { get; set; }
         public Transform menuSnapPosition;
         [Header("FPS Counter")]
-        public Utilities.Debugging.FPSCounter fpsCounter;
+        public Utils.Debugging.FPSCounter fpsCounter;
 
 
         private void Awake()

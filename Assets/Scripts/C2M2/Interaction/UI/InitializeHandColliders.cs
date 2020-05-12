@@ -4,15 +4,9 @@ using UnityEngine;
 using UnityEditor;
 using System;
 
-// TODO: Deprecate this, we don't use it currently
 
 
-/// <summary>
-/// 1. Take in names of of OVR hand components and details of hand component colliders in the editor.
-/// 2. Locate hand components after they are generated at runtime.
-/// 3. Attach colliders and rigidbodies to appropriate hand components and store them in a collider list
-/// 4. Convert collider list to array and send to each hand's OVRGrabber m_grabVolume.
-/// </summary>
+[Obsolete("Hand colliders are not set at runtime anymore")]
 public class InitializeHandColliders : MonoBehaviour
 {
 

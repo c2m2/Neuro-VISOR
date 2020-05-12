@@ -4,7 +4,7 @@ namespace C2M2
 {
     namespace Interaction
     {
-        using Utilities;
+        using Utils;
         [RequireComponent(typeof(MeshFilter))]
         public class VRRaycastable : MonoBehaviour
         {
