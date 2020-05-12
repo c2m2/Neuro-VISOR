@@ -20,9 +20,9 @@ public class InitializeHandColliders : MonoBehaviour
     [Tooltip("Physics layer of all grabber components")]
     public string grabberLayerName = "Grabber";
     [Tooltip("OVRGrabber component of the right hand.")]
-    public C2M2.Utilities.VR.PublicOVRGrabber rightGrabber;
+    public C2M2.Interaction.VR.PublicOVRGrabber rightGrabber;
     [Tooltip("OVRGrabber component of the left hand.")]
-    public C2M2.Utilities.VR.PublicOVRGrabber leftGrabber;
+    public C2M2.Interaction.VR.PublicOVRGrabber leftGrabber;
     [Tooltip("Hierarchy paths and collider info for hand components")]
     public AvatarPaths avatar;
     public enum Direction { XAxis = 0, YAxis = 1, ZAxis = 2}

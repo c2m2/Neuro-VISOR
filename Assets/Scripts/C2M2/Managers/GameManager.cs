@@ -6,16 +6,16 @@ using System.Threading;
 using GetSocialSdk.Capture.Scripts;
 namespace C2M2
 {
-    [RequireComponent(typeof(VirtualRealityEnabled))]
     public class GameManager : MonoBehaviour
     {
-        public GetSocialCapture screenRecorder;
+        public static GameManager instance = null;
+
         public int mainThreadId = -1;
         public string assetsPath = null;
         [HideInInspector]
         public bool useVirtualReality;
 
-        public static GameManager instance = null;
+
         [Header("Environment")]
         public Material defaultMaterial;
         public Material vertexColorationMaterial;
@@ -50,16 +50,7 @@ namespace C2M2
             // Initialize keyboard
             raycastKeyboardPrefab = Instantiate(raycastKeyboardPrefab, new Vector3(50, 50, 50), Quaternion.identity);
             raycastKeyboard = raycastKeyboardPrefab.GetComponent<RaycastKeyboard>();
-            // Make sure VREnabled and GameManager have the same OVRPlayerController/NonVRCamera
-            VirtualRealityEnabled vrEnabled = GetComponent<VirtualRealityEnabled>();
-            // Make sure this vrEnabled and this have the same non-VR camera
-            if (vrEnabled.nonVRCamera != null) { nonVRCamera = vrEnabled.nonVRCamera; }
-            else if (nonVRCamera != null) { vrEnabled.nonVRCamera = nonVRCamera; }
-            // Make sure this vrEnabled and this have the same OVRPlayerController
-            if (vrEnabled.ovrPlayerController != null) { ovrPlayerController = vrEnabled.ovrPlayerController; }
-            else if (ovrPlayerController != null) { vrEnabled.ovrPlayerController = ovrPlayerController; }
 
-            screenRecorder = Camera.main.gameObject.GetComponent<GetSocialCapture>();
 
         }
 

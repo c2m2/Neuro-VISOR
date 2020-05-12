@@ -7,6 +7,7 @@ namespace C2M2
 {
     using Utilities;
     using Interaction;
+    using Interaction.VR;
     namespace Simulation
     {
         /// <summary>

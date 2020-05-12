@@ -45,7 +45,8 @@ namespace C2M2
                 Debug.LogError("No MeshFilter found on " + name);
             }
             // Build compound collider & send result to OVRGrabbable
-            GetComponent<C2M2.Utilities.VR.PublicOVRGrabbable>().M_GrabPoints = NonConvexMeshCollider.Calculate(gameObject, compoundColliderResolution); ;
+            GetComponent<Interaction.VR.PublicOVRGrabbable>().M_GrabPoints = 
+                NonConvexMeshCollider.Calculate(gameObject, compoundColliderResolution); ;
             // Build raycastee mesh collider
             RaycastMeshCollider buildRaycastMeshCollider = gameObject.AddComponent<RaycastMeshCollider>();
             buildRaycastMeshCollider.Build(gameObject);

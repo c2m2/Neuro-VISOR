@@ -15,7 +15,6 @@ namespace C2M2
         ///
         /// <remarks>   Jacob, 4/29/2020. </remarks>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-
         public class CombinedMeshSimulation : ScalarFieldSimulation
         {
             private double[] values;
