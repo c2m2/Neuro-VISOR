@@ -6,12 +6,16 @@ using System.Text;
 namespace C2M2
 {
     using Utilities;
-    using static Utilities.MathUtilities;
+    using static Utilities.Math;
     namespace Interaction
     {
         /// <summary>
-        /// Create a fast and memory-friendly lookup table of Color32's.
+        /// Create a fast and memory-friendly color lookup table from a gradient
         /// </summary>
+        /// <remarks>
+        /// For large applications, like resolving the color of every vertex of a large mesh surface,
+        /// this script will be much faster than Gradient.Evaluate().
+        /// </remarks>
         public class Gradient32LUT : MonoBehaviour
         {
             /// <summary>
@@ -25,31 +29,29 @@ namespace C2M2
             /// <summary>
             /// Resolution of the lookup table. Increase for finer-grained color evaluations
             /// </summary>
-            private int _lutRes = 256;
+            private int lutRes = 256;
             public int LutRes
             {
-                get { return _lutRes; }
+                get { return lutRes; }
                 set
                 {
-                    _lutRes = value;
-                    gradientLUT = BuildLUT(_gradient, _lutRes);
+                    lutRes = value;
+                    gradientLUT = BuildLUT(gradient, lutRes);
                 }
             }
 
-            private Gradient _gradient;
+            private Gradient gradient;
             public Gradient Gradient
             {
-                get { return _gradient; }
+                get { return gradient; }
                 set
                 {
-                    _gradient = value;
-                    gradientLUT = BuildLUT(_gradient, _lutRes);
+                    gradient = value;
+                    gradientLUT = BuildLUT(gradient, lutRes);
                 }
             }
             // Gradient look-up-table greatly reduces time expense and memory
             public Color32[] gradientLUT { get; private set; } = null;
-
-            TimeUtilities.Timer timer = new TimeUtilities.Timer();
 
             /// <summary> Given the extrema method, color an entire array of scalers using the LUT </summary>
             public Color32[] Evaluate(in float[] scalars)
@@ -57,7 +59,7 @@ namespace C2M2
                 if (scalars == null || scalars.Length == 0) return null;
 
                 // If we haven't built the LUT yet, and we have a gradient, build the LUT
-                if (gradientLUT == null && _gradient != null) gradientLUT = BuildLUT(_gradient, _lutRes);
+                if (gradientLUT == null && gradient != null) gradientLUT = BuildLUT(gradient, lutRes);
 
                 // Store a local pointer so we can manipulate scalers
                 float[] scalarsScaled = scalars;
@@ -75,20 +77,18 @@ namespace C2M2
             /// <summary>
             /// Calculate color at a given time.
             /// </summary>
-            public Color32 Evaluate(float time)
-            {
-                // Find and return color
-                return gradientLUT[Clamp((int)time, 0, (_lutRes - 1))];
-            }
-            private Color32[] BuildLUT(in Gradient gradient, in int lutRes)
+            public Color32 Evaluate(float time) => gradientLUT[Clamp((int)time, 0, (lutRes - 1))];
+
+            private Color32[] BuildLUT(Gradient gradient, int lutRes)
             {
                 Color32[] gradientLUT = new Color32[lutRes];
                 int maxInd = lutRes;
-                int denom = lutRes - 1;
+                // Subtract one from lutRes so we can divide across the gradient's range
+                lutRes--;
 
                 for (int i = 0; i < maxInd; i++)
                 {
-                    gradientLUT[i] = gradient.Evaluate((float)i / denom);
+                    gradientLUT[i] = gradient.Evaluate((float)i / lutRes);
                 }
 
                 return gradientLUT;
@@ -124,7 +124,7 @@ namespace C2M2
                         break;
                 }
                 // Rescale based on extrema
-                scalars.RescaleArray(0f, (_lutRes - 1), oldMin, oldMax);
+                scalars.RescaleArray(0f, (lutRes - 1), oldMin, oldMax);
                 return scalars;
             }
         }

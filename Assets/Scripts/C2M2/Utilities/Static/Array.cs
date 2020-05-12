@@ -6,14 +6,14 @@ namespace C2M2
 {
     namespace Utilities
     {
-        public static class ArrayUtilities
+        public static class Array
         {
             /// <summary> Returns a new array with endArray concatenated onto the end of beginningArray </summary>
             public static T[] MergeArrays<T>(this T[] beginningArray, T[] endArray)
             {
                 T[] newArray = new T[beginningArray.Length + endArray.Length];
-                Array.Copy(beginningArray, newArray, beginningArray.Length);
-                Array.Copy(endArray, 0, newArray, beginningArray.Length, endArray.Length);
+                System.Array.Copy(beginningArray, newArray, beginningArray.Length);
+                System.Array.Copy(endArray, 0, newArray, beginningArray.Length, endArray.Length);
                 return newArray;
             }
             #region FillArray

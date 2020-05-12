@@ -9,7 +9,7 @@ namespace C2M2
         public TextMeshProUGUI highFPSLabel;
         public TextMeshProUGUI avgFPSLabel;
         public TextMeshProUGUI lowFPSLabel;
-        private FPSCounter fpsCounter;
+        private Utilities.Debugging.FPSCounter fpsCounter;
 
         // Start is called before the first frame update
         void Start()

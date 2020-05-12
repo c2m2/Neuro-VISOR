@@ -4,14 +4,14 @@ using UnityEngine;
 
 namespace C2M2 {
     namespace Utilities {
-        using static MathUtilities;
+        using static Math;
         /// <summary>
         /// This resets the position, rotation of the object it's attached to at "startFrame".
         /// </summary>
         /// <remarks>
         /// Hacky solution to scripts "nudging" object/child object positions
         /// </remarks>
-        public class FrameCountTransformReset : MonoBehaviour
+        public class TransformResetter : MonoBehaviour
         {
             [Tooltip("Position to reset this transform to.")]
             /// <summary> Position to reset this transform to. </summary>

@@ -6,24 +6,28 @@ using System;
 
 namespace C2M2
 {
-    using static Utilities.MathUtilities;
-    /// <summary>
-    /// 
-    /// </summary>
-    public class FPSCounter : MonoBehaviour
+    namespace Utilities
     {
-        public int sampleSize = 60;
-        public int AverageFPS { get; private set; }
-        public int HighestFPS { get; private set; }
-        public int LowestFPS { get; private set; }
-        public string averageFPSString { get; private set; }
-        public string highestFPSString { get; private set; }
-        public string lowestFPSString { get; private set; }
-        private int[] fpsBuffer;
-        private int fpsBufferIndex;
+        using static Math;
+        namespace Debugging
+        {
+            /// <summary>
+            /// 
+            /// </summary>
+            public class FPSCounter : MonoBehaviour
+            {
+                public int sampleSize = 60;
+                public int AverageFPS { get; private set; }
+                public int HighestFPS { get; private set; }
+                public int LowestFPS { get; private set; }
+                public string averageFPSString { get; private set; }
+                public string highestFPSString { get; private set; }
+                public string lowestFPSString { get; private set; }
+                private int[] fpsBuffer;
+                private int fpsBufferIndex;
 
-        private static string formatString = "High: {0}\nAvg: {1}\nLow: {2}";
-        static string[] staticNumStrings = {
+                private static string formatString = "High: {0}\nAvg: {1}\nLow: {2}";
+                static string[] staticNumStrings = {
             "00", "01", "02", "03", "04", "05", "06", "07", "08", "09",
             "10", "11", "12", "13", "14", "15", "16", "17", "18", "19",
             "20", "21", "22", "23", "24", "25", "26", "27", "28", "29",
@@ -37,49 +41,51 @@ namespace C2M2
             "100+"
         };
 
-        private void Update()
-        {
-            if (fpsBuffer == null || fpsBuffer.Length != sampleSize)
-            {
-                InitializeBuffer();
+                private void Update()
+                {
+                    if (fpsBuffer == null || fpsBuffer.Length != sampleSize)
+                    {
+                        InitializeBuffer();
+                    }
+                    UpdateBuffer();
+                    CalculateFPS();
+                    UpdateTexts();
+                }
+                private void InitializeBuffer()
+                {
+                    if (sampleSize <= 0) sampleSize = 1;
+                    fpsBuffer = new int[sampleSize];
+                    fpsBufferIndex = 0;
+                }
+                private void UpdateBuffer()
+                {
+                    fpsBuffer[fpsBufferIndex++] = (int)(1f / Time.unscaledDeltaTime);
+                    if (fpsBufferIndex >= sampleSize) fpsBufferIndex = 0;
+                }
+                private void CalculateFPS()
+                {
+                    int sum = 0;
+                    int highest = 0;
+                    int lowest = int.MaxValue;
+                    for (int i = 0; i < sampleSize; i++)
+                    {
+                        int fps = fpsBuffer[i];
+                        sum += fps;
+                        highest = Max(highest, fps);
+                        lowest = Min(lowest, fps);
+                    }
+                    AverageFPS = sum / sampleSize;
+                    HighestFPS = highest;
+                    LowestFPS = lowest;
+                }
+                private void UpdateTexts()
+                {
+                    averageFPSString = staticNumStrings[Clamp(AverageFPS, 0, 100)];
+                    highestFPSString = staticNumStrings[Clamp(HighestFPS, 0, 100)];
+                    lowestFPSString = staticNumStrings[Clamp(LowestFPS, 0, 100)];
+                }
+                public override string ToString() => String.Format(formatString, highestFPSString, averageFPSString, lowestFPSString);
             }
-            UpdateBuffer();
-            CalculateFPS();
-            UpdateTexts();
         }
-        private void InitializeBuffer()
-        {
-            if (sampleSize <= 0) sampleSize = 1;
-            fpsBuffer = new int[sampleSize];
-            fpsBufferIndex = 0;
-        }
-        private void UpdateBuffer()
-        {
-            fpsBuffer[fpsBufferIndex++] = (int)(1f / Time.unscaledDeltaTime);
-            if (fpsBufferIndex >= sampleSize) fpsBufferIndex = 0;
-        }
-        private void CalculateFPS()
-        {
-            int sum = 0;
-            int highest = 0;
-            int lowest = int.MaxValue;
-            for (int i = 0; i < sampleSize; i++)
-            {
-                int fps = fpsBuffer[i];
-                sum += fps;
-                highest = Max(highest, fps);
-                lowest = Min(lowest, fps);
-            }
-            AverageFPS = sum / sampleSize;
-            HighestFPS = highest;
-            LowestFPS = lowest;
-        }
-        private void UpdateTexts()
-        {
-            averageFPSString = staticNumStrings[Clamp(AverageFPS, 0, 100)];
-            highestFPSString = staticNumStrings[Clamp(HighestFPS, 0, 100)];
-            lowestFPSString = staticNumStrings[Clamp(LowestFPS, 0, 100)];
-        }
-        public override string ToString() => String.Format(formatString, highestFPSString, averageFPSString, lowestFPSString);
     }
 }

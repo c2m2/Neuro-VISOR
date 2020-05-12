@@ -6,7 +6,7 @@ namespace C2M2
 {
     namespace Utilities
     {
-        using static MathUtilities;
+        using static Math;
         /// <summary> Debugging helpers for meshes </summary>
         public static partial class MeshUtilities
         {

@@ -17,7 +17,7 @@ namespace C2M2
             // Timer should take 0 seconds to run itself
             public override bool RunTest()
             {
-                TimeUtilities.Timer timer = new TimeUtilities.Timer();
+                Timer timer = new Timer();
                 timer.StartTimer();
                 timer.StopTimer();
                 bool succeeded = timer.timerNodes[0].Ticks < tickErrorThreshold;

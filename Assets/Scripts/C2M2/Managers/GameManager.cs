@@ -36,7 +36,7 @@ namespace C2M2
         public RaycastKeyboard raycastKeyboard { get; set; }
         public Transform menuSnapPosition;
         [Header("FPS Counter")]
-        public FPSCounter fpsCounter;
+        public Utilities.Debugging.FPSCounter fpsCounter;
 
 
         private void Awake()

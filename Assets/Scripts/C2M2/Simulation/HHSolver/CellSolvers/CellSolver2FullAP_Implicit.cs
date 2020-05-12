@@ -56,7 +56,7 @@ namespace C2M2
             private NeuronCell myCell;
 
 
-            private TimeUtilities.Timer timer = new TimeUtilities.Timer();
+            private Timer timer = new Timer();
             
             [CustomLabel("Order type of matrix")]
             internal OrderType type =  OrderType.Identity;
@@ -206,7 +206,7 @@ namespace C2M2
                 var tw = new StreamWriter("timesteps.txt");
 
 
-                TimeUtilities.Timer timer = new TimeUtilities.Timer(nT);
+                Timer timer = new Timer(nT);
                 try
                 {
                     for (i = 0; i < nT; i++)

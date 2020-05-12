@@ -105,7 +105,7 @@ namespace C2M2
             
             protected override void Solve()
             {
-                TimeUtilities.Timer timer = new TimeUtilities.Timer(nT + 1);
+                Timer timer = new Timer(nT + 1);
                 timer.StartTimer();
 
                 // Access the color manager and have it color the surface based on our preset max/min value

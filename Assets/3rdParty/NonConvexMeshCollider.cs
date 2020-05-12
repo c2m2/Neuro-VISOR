@@ -120,7 +120,7 @@ public static class NonConvexMeshCollider
                 rb.useGravity = true;
             UnityEngine.Object.Destroy(tempParent);
         }
-        gameObject.AddComponent<FrameCountTransformReset>().targetFrame = 50;
+        gameObject.AddComponent<TransformResetter>().targetFrame = 50;
 
         return boxColliders;
     }

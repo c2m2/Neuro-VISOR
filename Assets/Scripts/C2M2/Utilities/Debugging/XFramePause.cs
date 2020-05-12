@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PauseAfterFrameCount : MonoBehaviour
+public class XFramePause : MonoBehaviour
 {
     [Tooltip("Pause the game after this many frames")]
     public int frameCount = 5;

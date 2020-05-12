@@ -94,7 +94,7 @@ namespace C2M2
 
             private NeuronCell myCell;
 
-            private TimeUtilities.Timer timer = new TimeUtilities.Timer();
+            private Timer timer = new Timer();
 
             // NeuronCellSimulation handles reading the UGX file
             protected override void SetNeuronCell(Grid grid)
@@ -205,7 +205,7 @@ namespace C2M2
                 // Number of time steps
                 nT = (int)System.Math.Floor(endTime / k);
 
-                TimeUtilities.Timer timer = new TimeUtilities.Timer(nT + 1);
+                Timer timer = new Timer(nT + 1);
                 timer.StartTimer();
 
                 // set some constants for the HINES matrix

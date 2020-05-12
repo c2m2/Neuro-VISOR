@@ -5,7 +5,7 @@
         /// <summary>
         /// Quick, static methods for finding max, min
         /// </summary>
-        public static class MathUtilities
+        public static class Math
         {
             /// <summary> Returns the minimum of a and b </summary>
             public static int Min(int a, int b) => (a < b) ? a : b;

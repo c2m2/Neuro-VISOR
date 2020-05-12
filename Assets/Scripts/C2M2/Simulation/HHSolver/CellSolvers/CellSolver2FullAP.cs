@@ -106,7 +106,7 @@ namespace C2M2
 
             protected override void Solve()
             {
-                TimeUtilities.Timer timer = new TimeUtilities.Timer(nT + 1);
+                Timer timer = new Timer(nT + 1);
                 timer.StartTimer();
                 // Computer simulation stepping parameters
                 double k = endTime / ((double)nT * 0.75); //Time step size

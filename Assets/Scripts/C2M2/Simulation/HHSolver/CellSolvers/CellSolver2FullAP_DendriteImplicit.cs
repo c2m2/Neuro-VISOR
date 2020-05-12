@@ -52,8 +52,6 @@ namespace C2M2
 
             private NeuronCell myCell;
 
-            private TimeUtilities.Timer timer = new TimeUtilities.Timer();
-
             // NeuronCellSimulation handles reading the UGX file
             protected override void SetNeuronCell(Grid grid)
             {
@@ -80,14 +78,7 @@ namespace C2M2
             // Secnd simulation 1D values 
             protected override double[] Get1DValues()
             {
-                timer.StartTimer();
-
                 mutex.WaitOne();
-
-                timer.StopTimer("mutex->WaitOne()");
-
-
-                timer.StartTimer();
 
                 double[] curVals = null;
                 if (i > -1)
@@ -100,26 +91,23 @@ namespace C2M2
 
                 mutex.ReleaseMutex();
 
-                timer.StopTimer("CellSolver2FullAP_DendriteImplicit->Get1DValues()");
                 return curVals;
             }
 
             // Receive new simulation 1D index/value pairings
             protected override void Set1DValues(Tuple<int, double>[] newValues)
             {
-                mutex.WaitOne();
                 foreach (Tuple<int, double> newVal in newValues)
                 {
                     int j = newVal.Item1;
                     double val = newVal.Item2 * vstart;
                     U[j] += val;
                 }
-                mutex.ReleaseMutex();
             }
 
             protected override void Solve()
             {
-                TimeUtilities.Timer timer = new TimeUtilities.Timer(nT + 1);
+                Timer timer = new Timer(nT + 1);
                 timer.StartTimer();
                 // Computer simulation stepping parameters
                 double k = endTime / ((double)nT * 0.3); //Time step size min is 0.27

@@ -22,8 +22,6 @@ namespace C2M2
         [Tooltip("Line renderer color when holding a click")]
         public Color pressedColor = new Color(1f, 0.6f, 0f);
 
-        TimeUtilities.Timer timer = new TimeUtilities.Timer();
-
         protected override void OnAwake()
         {
             lineRend = gameObject.GetComponentInChildren<LineRenderer>();

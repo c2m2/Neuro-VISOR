@@ -388,7 +388,7 @@ namespace C2M2
             // Store the current length of uniqueVerts, because we're going to tack our "invisible" vertices onto the end of it, but we still want to know where the "real" mesh vertices are
             uniqueMeshVertLength = uniqueVerts.Length;
             // Find the invisible vertices and attach them to the end of the uniqueVerts array
-            uniqueVerts = Utilities.ArrayUtilities.MergeArrays(uniqueVerts, BuildUniqueInvisibleVerts()); // Up to uniqueVerts.Length - 1 are mesh vertices   
+            uniqueVerts = Utilities.Array.MergeArrays(uniqueVerts, BuildUniqueInvisibleVerts()); // Up to uniqueVerts.Length - 1 are mesh vertices   
         }
         /// <summary> Given a raycast hit, find the nearest unqiue mesh vert to the hit </summary>
         /// <returns> uniqueVerts index of the nearest hit vert </returns>
