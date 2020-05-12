@@ -1,6 +1,9 @@
 # virtual-reality
 Repository for Temple University's Center for Computational Mathematics and Modeling's virtual reality project
 
+## Documentation
+Our code is documented here (https://c2m2.github.io/)
+
 ## Cloning this repository
 Git users (versions < 2.23.0) should clone the repository by using
 `git lfs clone` all other should use `git clone`.
@@ -18,6 +21,14 @@ For users of older git versions this remedies the problem that every LFS version
 The user should install the hooks by calling `./install_git_hooks.sh` after clone from the root directory.
 
 ### Make sure appropriate versions are used
+Pre-commit hook will block commits made with inappropriate versions of git LFS or Unity
 - git lfs: `git lfs env` in a terminal/console.
 - git: `git --version`
 - Unity: see UnityEditor
+
+## Quick Start Guide
+1. Clone project to any location
+2. Ensure the correct version of the Unity Editor is installed
+3. Open project in Unity. 
+4. Open "MainScene", and ensure that "HHSolver" is enabled in the hierarchy. Hodgkin-Huxley simulation code is provided locally within the project along with example 1D and 3D neuron geometries to run on. These should run automatically upon pressing play.
+
