@@ -39,3 +39,9 @@ namespace C2M2
         }
     }
 }
+public class MeshFilterNotFoundException : Exception
+{
+    public MeshFilterNotFoundException() { }
+    public MeshFilterNotFoundException(string message) : base(message) { }
+    public MeshFilterNotFoundException(string message, Exception inner) : base(message, inner) { }
+}

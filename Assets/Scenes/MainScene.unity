@@ -611,7 +611,6 @@ GameObject:
   - component: {fileID: 884125481}
   - component: {fileID: 884125485}
   - component: {fileID: 884125484}
-  - component: {fileID: 884125483}
   m_Layer: 0
   m_Name: HHSolver
   m_TagString: Untagged
@@ -665,7 +664,7 @@ MonoBehaviour:
   extremaMethod: 1
   globalMax: 115
   globalMin: -10
-  visualize1D: 0
+  visualize1D: 1
   color1D:
     serializedVersion: 2
     rgba: 4278251263
@@ -684,18 +683,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &884125483
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 884125480}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7b0980de2c4b33ab5a418578d88e85d2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &884125484
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -725,7 +712,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f4c437bcf3e1fd3b8f30c09117c883c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  name: RevealBackfaces
+  shaderType: RevealBackfaces
 --- !u!1 &905720990 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5843646973417418017, guid: 70469a93359ee8b4e98c4c445b157af9,

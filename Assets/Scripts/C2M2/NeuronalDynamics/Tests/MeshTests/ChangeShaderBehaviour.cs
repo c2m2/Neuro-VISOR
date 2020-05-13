@@ -11,12 +11,11 @@ namespace C2M2 {
     namespace Tests {
         public class ChangeShaderBehaviour : MonoBehaviour
         {
-            [CustomLabel ( "Shader type" )]
-            public string name = "RevealBackfaces";
+            public string shaderType = "RevealBackfaces";
 
             void Start() {
                 Renderer rend =  GetComponent<Renderer> ();
-                Shader shader =  Shader.Find ( $"Custom/{name}" );
+                Shader shader =  Shader.Find ( $"Custom/{shaderType}" );
                 if ( shader == null ) {
                     UnityEngine.Debug.LogError ( "Shader not found" );
                 }

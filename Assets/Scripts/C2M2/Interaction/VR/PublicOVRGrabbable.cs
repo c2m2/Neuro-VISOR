@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System;
 
 namespace C2M2
 {
@@ -18,6 +19,12 @@ namespace C2M2
             public class PublicOVRGrabbable : OVRGrabbable
             {
                 public Collider[] M_GrabPoints { get { return m_grabPoints; } set { m_grabPoints = value; } }
+            }
+            public class GrabbableNotFoundException : Exception
+            {
+                public GrabbableNotFoundException() { }
+                public GrabbableNotFoundException(string message) : base(message) { }
+                public GrabbableNotFoundException(string message, Exception inner) : base(message, inner) { }
             }
         }
     }

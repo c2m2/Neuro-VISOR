@@ -512,8 +512,21 @@ public static class NonConvexMeshCollider
             return string.Format("X: {0}, Y: {1}, Z: {2}", X, Y, Z);
         }
     }
-
 }
+
+public class MeshNotFoundException : Exception
+{
+    public MeshNotFoundException() { }
+    public MeshNotFoundException(string message) : base(message) { }
+    public MeshNotFoundException(string message, Exception inner) : base(message, inner) { }
+}
+public class RigidbodyNotFoundException : Exception
+{
+    public RigidbodyNotFoundException() { }
+    public RigidbodyNotFoundException(string message) : base(message) { }
+    public RigidbodyNotFoundException(string message, Exception inner) : base(message, inner) { }
+}
+
 #if UNITY_EDITOR
 [CustomEditor(typeof(NonConvexMeshCollider))]
 public class NonConvexMeshColliderEditor : Editor

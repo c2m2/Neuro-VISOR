@@ -56,13 +56,12 @@ namespace C2M2.NeuronalDynamics.Simulation
 
         private Timer timer = new Timer();
 
-        [C2M2.Attributes.CustomLabel("Order type of matrix")]
-        internal OrderType type = OrderType.Identity;
+        internal OrderType orderType = OrderType.Identity;
 
         // NeuronCellSimulation handles reading the UGX file
         protected override void SetNeuronCell(Grid grid)
         {
-            grid.Type = type;
+            grid.Type = orderType;
             myCell = new NeuronCell(grid);
 
             //Initialize vector with all zeros
