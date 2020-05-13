@@ -1,8 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-namespace C2M2.Tests {
+using C2M2.Tests;
+namespace C2M2.NeuronalDynamics.Tests
+{
 	[System.Obsolete("This is an obsolete/not required test")]
     public class NormalTest : AwakeTest
     {

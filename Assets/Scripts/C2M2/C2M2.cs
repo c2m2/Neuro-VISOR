@@ -3,14 +3,6 @@
 /// </summary>
 namespace C2M2
 {
-    /// <summary> Scripts powering Neuronal Dynamics modeling </summary>
-    namespace NeuronalDynamics
-    {
-        /// <summary> Neuronal Dynamics simulation code </summary>
-        namespace Simulation { }
-        /// <summary> Neuronal Dynamics visualization </summary>
-        namespace Visualization { }
-    }
     /// <summary> Scripts powering Molecular Dynamics modeling </summary>
     namespace MolecularDynamics
     {
@@ -20,19 +12,25 @@ namespace C2M2
         namespace Visualization { }
     }
 
-    /// <summary>
-    /// Utility scripts used in many other backend scripts
-    /// </summary>
+    /// <summary> Scripts powering Neuronal Dynamics modeling </summary>
+    namespace NeuronalDynamics
+    {
+        /// <summary> Neuronal Dynamics simulation code </summary>
+        namespace Simulation { }
+        /// <summary> Neuronal Dynamics visualization </summary>
+        namespace Visualization { }
+    }
+
+    /// <summary> Scripts that were used during an unsuccessful exploration into implementing order-independent transparency in VR. </summary>
+    namespace OIT { }
+
+    /// <summary> Utility scripts used in many other backend scripts </summary>
     namespace Utils
     {
-        /// <summary>
-        /// Utilities that apply to Unity Mesh objects
-        /// </summary>
+        /// <summary> Utilities that apply to Unity Mesh objects </summary>
         namespace MeshUtils { }
 
-        /// <summary>
-        /// Utilities used in debugging
-        /// </summary>
+        /// <summary> Utilities used in debugging </summary>
         namespace DebugUtils { }
 
         namespace Editor { }
@@ -43,25 +41,17 @@ namespace C2M2
     /// </summary>
     namespace Simulation { }
 
-    /// <summary>
-    /// All scripts powering general model visualization
-    /// </summary>
+    /// <summary> All scripts powering general model visualization </summary>
     namespace Visualization
     {
-        /// <summary>
-        /// All scripts directly related to visualization in virtual reality
-        /// </summary>
+        /// <summary> All scripts directly related to visualization in virtual reality </summary>
         namespace VR { }
     }
 
-    /// <summary>
-    /// All scripts powering general model interaction
-    /// </summary>
+    /// <summary> All scripts powering general model interaction </summary>
     namespace Interaction
     {
-        /// <summary>
-        /// All scripts directly related to interaction in virtual reality
-        /// </summary>
+        /// <summary> All scripts directly related to interaction in virtual reality </summary>
         namespace VR { }
     }
 }

@@ -2,20 +2,26 @@
 using UnityEngine;
 using System.IO;
 using System;
-using C2M2.UGX;
+using C2M2.NeuronalDynamics.UGX;
 using C2M2.Utils;
 using C2M2.Utils.MeshUtils;
 using C2M2.Interaction;
 using C2M2.Simulation;
-using Grid = C2M2.UGX.Grid;
+using Grid = C2M2.NeuronalDynamics.UGX.Grid;
 namespace C2M2.NeuronalDynamics.Simulation
 {
     /// <summary>
-    /// Read in a map associating 1D neuron vertices to 3D mesh vertices.
+    /// Provides base functionality for Hodgkin-Huxley solvers.
     /// </summary>
+    /// <remarks>
+    /// This script automatically reads in ugx files, builds the 3D neuron mesh, and builds a map between 1D and 3D geometries.
+    /// </remarks>
     public abstract class HHSimulation : ScalarFieldSimulation
     {
-        [Tooltip("Name of folder within StreamingAssets")]
+        public bool visualize1D = false;
+        public Color32 color1D = Color.green;
+        public float lineWidth1D = 0.005f;
+
         //public string folderName = "10-6kdv2.CNG";
         //[Tooltip("Name of obj file within folder")]
         //public string fileName3D = "10-6kdv2.CNG";
@@ -27,15 +33,12 @@ namespace C2M2.NeuronalDynamics.Simulation
         private static string spec1D = "_1d";
         private static string specTris = "_tris";
 
-        public bool visualize1D = false;
-        public Color32 color1D = Color.green;
-        public float lineWidth1D = 0.005f;
 
         // List of 1D vertex/new double value pairings. NOTE: 1D vertices may appear more than once in the array
         protected abstract void Set1DValues(Tuple<int, double>[] newValuess);
         protected abstract double[] Get1DValues();
-
         protected abstract void SetNeuronCell(Grid grid);
+
         ///<summary> Lookup a 3D vert and get back two 1D indices and a lambda value for them </summary>
         Dictionary<int, Tuple<int, int, double>> map;
         protected override Mesh BuildMesh()
@@ -47,7 +50,6 @@ namespace C2M2.NeuronalDynamics.Simulation
             SetNeuronCell(mapping.ModelGeometry);
 
             // Tuple<Grid, Grid, Dictionary<int, Tuple<int, int, double>>> mapping = MapUtils.BuildMap(fileName1D, fileName3D, fileNameTris);
-            // Build and rescale our obj mesh
             map = mapping.Data;
 
             Mesh newMesh = mapping.SurfaceGeometry.Mesh;
@@ -78,21 +80,11 @@ namespace C2M2.NeuronalDynamics.Simulation
                     // If this isn't a non-metadata ugx file,
                     if (!file.EndsWith(".meta") && file.EndsWith(ugxExt))
                     {
-                        if (file.EndsWith(cngExt + ugxExt))
-                        { // If it ends with .CNG.ugx, it's the 3D cell
-                            cells[0] = file;
-                        }
-                        else if (file.EndsWith(cngExt + spec1D + ugxExt))
-                        { // If it ends with .CNG_1d.ugx, it's the 3D cell
-                            cells[1] = file;
-                        }
-                        else if (file.EndsWith(cngExt + specTris + ugxExt))
-                        { // If it ends with .CNG_tris.ugx, it's the 3D cell
-                            cells[2] = file;
-                        }
+                        if (file.EndsWith(cngExt + ugxExt)) cells[0] = file;    // 3D cell
+                        else if (file.EndsWith(cngExt + spec1D + ugxExt)) cells[1] = file;  // 1D cell
+                        else if (file.EndsWith(cngExt + specTris + ugxExt)) cells[2] = file;    // Triangles
                     }
                 }
-
                 return cells;
             }
         }
@@ -138,22 +130,18 @@ namespace C2M2.NeuronalDynamics.Simulation
             Tuple<int, double>[] new1DValues = new Tuple<int, double>[2 * newValues.Length];
             int j = 0;
             for(int i = 0; i < newValues.Length; i++)
-            { // For each 3D value,
+            {
                 // Get 3D vertex index
                 int vert3D = newValues[i].Item1;
                 double val3D = newValues[i].Item2;
 
                 // Translate into two 1D vert indices and a lambda weight
-                int vert1Da = map[vert3D].Item1;
-                int vert1Db = map[vert3D].Item2; 
                 double lambda = map[vert3D].Item3;
-
-                // Weight newVal by (1-lambda) for first 1D vert
                 double val1D = (1 - lambda) * val3D;
-                new1DValues[j] = new Tuple<int, double>(vert1Da, val1D);
+                new1DValues[j] = new Tuple<int, double>(map[vert3D].Item1, val1D);
                 // Weight newVal by (lambda) for second 1D vert                    
                 val1D = lambda * val3D;
-                new1DValues[j + 1] = new Tuple<int, double>(vert1Db, val1D);
+                new1DValues[j + 1] = new Tuple<int, double>(map[vert3D].Item2, val1D);
                 // Move up two spots in 1D array
                 j += 2;
             }

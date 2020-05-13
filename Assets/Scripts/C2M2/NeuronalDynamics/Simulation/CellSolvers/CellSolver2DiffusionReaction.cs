@@ -19,7 +19,7 @@ using C2M2.NeuronalDynamics.UGX;
 using C2M2.Utils;
 using C2M2.Interaction;
 using C2M2.Visualization;
-using Grid = C2M2.UGX.Grid;
+using Grid = C2M2.NeuronalDynamics.UGX.Grid;
 namespace C2M2.NeuronalDynamics.Simulation
 {
     public class CellSolver2DiffusionReaction : HHSimulation

@@ -14,8 +14,8 @@ using Vector = MathNet.Numerics.LinearAlgebra.Vector<double>;
 using Double = MathNet.Numerics.LinearAlgebra.Double;
 using MathNet.Numerics.Data.Text;
 using solvers = MathNet.Numerics.LinearAlgebra.Double.Solvers;
-
 using C2M2.NeuronalDynamics.UGX;
+using Grid = C2M2.NeuronalDynamics.UGX.Grid;
 namespace C2M2.NeuronalDynamics.Simulation
 {
     public class CellSolver2 : HHSimulation
@@ -36,7 +36,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         private Matrix U;
         // NeuronCellSimulation handles reading the UGX file
         private NeuronCell myCell;
-        protected override void SetNeuronCell(C2M2.UGX.Grid grid)
+        protected override void SetNeuronCell(Grid grid)
         {
             myCell = new NeuronCell(grid);
         }

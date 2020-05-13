@@ -19,13 +19,9 @@ using CSparse.Storage;
 using CSparse.Double.Factorization;
 using CSparse;
 
-
-using C2M2.Simulation;
-using C2M2.UGX;
 using C2M2.NeuronalDynamics.UGX;
 using C2M2.Utils;
-using C2M2.Interaction;
-using Grid = C2M2.UGX.Grid;
+using Grid = C2M2.NeuronalDynamics.UGX.Grid;
 namespace C2M2.NeuronalDynamics.Simulation
 {
     public class sparse_cholesky_test : HHSimulation

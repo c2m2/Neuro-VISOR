@@ -5,7 +5,7 @@ using Unity.Collections;
 using Unity.Jobs;
 #endregion
 
-namespace C2M2
+namespace C2M2.Tests
 {
     /// SimpleBurst
     /// <summary>

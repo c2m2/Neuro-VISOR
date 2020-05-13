@@ -16,7 +16,7 @@ using MathNet.Numerics.Data.Text;
 using solvers = MathNet.Numerics.LinearAlgebra.Double.Solvers;
 
 using C2M2.NeuronalDynamics.UGX;
-using Grid = C2M2.UGX.Grid;
+using Grid = C2M2.NeuronalDynamics.UGX.Grid;
 namespace C2M2.NeuronalDynamics.Simulation
 {
     public class CellSolver2SimpleFE : HHSimulation

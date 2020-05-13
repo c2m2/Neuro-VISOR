@@ -3,16 +3,13 @@ using UnityEngine;
 using System;
 using System.IO;
 using System.Collections.Generic;
-using C2M2.UGX;
+using C2M2.NeuronalDynamics.UGX;
 
-namespace C2M2 
-{
-    namespace Tests
-    {
-	
+namespace C2M2.NeuronalDynamics.Tests
+{	
 	using DiameterAttachment = IAttachment<DiameterData>;
 	using MappingAttachment = IAttachment<MappingData>;
-	using Grid = C2M2.UGX.Grid;
+	using Grid = C2M2.NeuronalDynamics.UGX.Grid;
       
 	/// <summary>
 	/// Behaviour can be attached to test mesh consistency
@@ -212,5 +209,4 @@ namespace C2M2
 		return cells;
 	    }
 	}
-    }
 }

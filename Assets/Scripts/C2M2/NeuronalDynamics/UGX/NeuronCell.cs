@@ -1,12 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Data;
 using System;
-using System.IO;
-using UnityEngine;
-using C2M2.UGX;
-using Grid = C2M2.UGX.Grid;
+
 namespace C2M2.NeuronalDynamics.UGX
 {
     using DiameterAttachment = IAttachment<DiameterData>;

@@ -1,4 +1,4 @@
-﻿namespace C2M2
+﻿namespace C2M2.Utils
 {
     /// <summary>
     /// Stores the indices of a trinagle in a simpler to understand way

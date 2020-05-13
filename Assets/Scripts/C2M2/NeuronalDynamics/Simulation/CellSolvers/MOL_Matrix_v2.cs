@@ -10,7 +10,8 @@ using Matrix = MathNet.Numerics.LinearAlgebra.Matrix<double>;
 using Vector = MathNet.Numerics.LinearAlgebra.Vector<double>;
 using Double = MathNet.Numerics.LinearAlgebra.Double;
 using MathNet.Numerics.Data.Text;
-using C2M2.UGX;
+
+using Grid = C2M2.NeuronalDynamics.UGX.Grid;
 namespace C2M2.NeuronalDynamics.Simulation
 {
     //TODO: The summary/remakrs here should be written more clearly
@@ -70,7 +71,7 @@ namespace C2M2.NeuronalDynamics.Simulation
                 U[j, i] = val;
             }
         }
-        protected override void SetNeuronCell(C2M2.UGX.Grid grid) { }
+        protected override void SetNeuronCell(Grid grid) { }
         protected override void Solve()
         {
             // Compute step sizes

@@ -14,10 +14,9 @@ using Vector = MathNet.Numerics.LinearAlgebra.Vector<double>;
 using Double = MathNet.Numerics.LinearAlgebra.Double;
 using MathNet.Numerics.Data.Text;
 using solvers = MathNet.Numerics.LinearAlgebra.Double.Solvers;
-using C2M2.Simulation;
-using C2M2.UGX;
+
 using C2M2.NeuronalDynamics.UGX;
-using Grid = C2M2.UGX.Grid;
+using Grid = C2M2.NeuronalDynamics.UGX.Grid;
 namespace C2M2.NeuronalDynamics.Simulation
 {
     using DiameterAttachment = IAttachment<DiameterData>;
