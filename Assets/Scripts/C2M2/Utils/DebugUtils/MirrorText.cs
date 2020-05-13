@@ -3,26 +3,29 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
-[RequireComponent(typeof(TextMeshProUGUI))]
-public class MirrorText : MonoBehaviour
+namespace C2M2.Utils.DebugUtils
 {
-    public TextMeshProUGUI textToMirror;
-    public int fps = 10;
-    private TextMeshProUGUI personalText;
-    private void Awake()
+    [RequireComponent(typeof(TextMeshProUGUI))]
+    public class MirrorText : MonoBehaviour
     {
-        personalText = GetComponent<TextMeshProUGUI>();
-    }
-    void Start()
-    {
-        StartCoroutine(UpdateSlow(1 / fps));
-    }
-    private IEnumerator UpdateSlow(float delayTime)
-    {
-        while (true)
+        public TextMeshProUGUI textToMirror;
+        public int fps = 10;
+        private TextMeshProUGUI personalText;
+        private void Awake()
         {
-            personalText.text = textToMirror.text;
-            yield return new WaitForSeconds(delayTime);
+            personalText = GetComponent<TextMeshProUGUI>();
+        }
+        void Start()
+        {
+            StartCoroutine(UpdateSlow(1 / fps));
+        }
+        private IEnumerator UpdateSlow(float delayTime)
+        {
+            while (true)
+            {
+                personalText.text = textToMirror.text;
+                yield return new WaitForSeconds(delayTime);
+            }
         }
     }
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
-namespace C2M2.Visualization.VTK
+namespace C2M2.NeuronalDynamics.Visualization.VTK
 {
     public static class VTUColor
     {

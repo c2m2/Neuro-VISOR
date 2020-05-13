@@ -2,7 +2,7 @@
 using UnityEngine;
 using System.IO;
 
-namespace C2M2.Visualization.VTK
+namespace C2M2.NeuronalDynamics.Visualization.VTK
 {
     using static Utils.Math;
     /// <summary>

@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.Events;
 
-namespace C2M2
+namespace C2M2.Utils
 {
     /// <summary>
     /// Restart the scene upon a button click.

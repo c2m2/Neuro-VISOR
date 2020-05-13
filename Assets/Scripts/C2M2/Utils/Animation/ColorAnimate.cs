@@ -1,27 +1,27 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-public class ColorAnimate : MonoBehaviour {
-
-
-    public Color altColor = Color.black;
-    public Renderer rend;
-
-
-    void Start()
+namespace C2M2.Utils.Animation
+{
+    public class ColorAnimate : MonoBehaviour
     {
-        //Get the renderer of the object so we can access the color
-        rend = GetComponent<Renderer>();
-        //Set the alt
-        altColor = rend.material.color;
-    }
+        public Color altColor = Color.black;
+        public Renderer rend;
 
-    void FixedUpdate()
-    {
-        altColor.r = (Mathf.Sin(Mathf.PI * Time.time / 10)+1)/2;
+        void Start()
+        {
+            //Get the renderer of the object so we can access the color
+            rend = GetComponent<Renderer>();
+            //Set the alt
+            altColor = rend.material.color;
+        }
 
-        rend.material.color = altColor;
+        void FixedUpdate()
+        {
+            altColor.r = (Mathf.Sin(Mathf.PI * Time.time / 10) + 1) / 2;
 
+            rend.material.color = altColor;
+
+        }
     }
 }

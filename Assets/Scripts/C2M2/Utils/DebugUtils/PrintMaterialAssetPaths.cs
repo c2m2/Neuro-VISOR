@@ -2,19 +2,22 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
-#if(UNITY_EDITOR)
-public class PrintMaterialAssetPaths : MonoBehaviour
+namespace C2M2.Utils.DebugUtils
 {
-    public Material mat;
-
-    private void Update()
+#if (UNITY_EDITOR)
+    public class PrintMaterialAssetPaths : MonoBehaviour
     {
-        if (OVRInput.GetDown(OVRInput.Button.Two))
+        public Material mat;
+
+        private void Update()
         {
-            Debug.Log("Spacebar was pressed");
-            Debug.Log("Name: " + AssetDatabase.GetAssetPath(mat));
-            Debug.Log("Path: " + AssetDatabase.GetAssetPath(mat));
+            if (OVRInput.GetDown(OVRInput.Button.Two))
+            {
+                Debug.Log("Spacebar was pressed");
+                Debug.Log("Name: " + AssetDatabase.GetAssetPath(mat));
+                Debug.Log("Path: " + AssetDatabase.GetAssetPath(mat));
+            }
         }
     }
-}
 #endif
+}

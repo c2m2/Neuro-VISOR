@@ -3,7 +3,7 @@ using UnityEngine;
 using System.IO;
 using System;
 using C2M2.NeuronalDynamics.UGX;
-using C2M2.Utils;
+using C2M2.Utils.DebugUtils;
 using C2M2.Utils.MeshUtils;
 using C2M2.Interaction;
 using C2M2.Simulation;

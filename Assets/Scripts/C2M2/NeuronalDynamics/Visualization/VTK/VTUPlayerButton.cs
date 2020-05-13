@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-namespace C2M2.Visualization.VTK
+namespace C2M2.NeuronalDynamics.Visualization.VTK
 {
     public class VTUPlayerButton : MonoBehaviour
     {

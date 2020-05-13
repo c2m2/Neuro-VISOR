@@ -4,7 +4,7 @@ using System;
 using System.IO;
 using System.Xml;
 
-namespace C2M2.Visualization.VTK
+namespace C2M2.NeuronalDynamics.Visualization.VTK
 {
     /// <summary>
     /// Translates 1 or more VTK files into Unity meshes

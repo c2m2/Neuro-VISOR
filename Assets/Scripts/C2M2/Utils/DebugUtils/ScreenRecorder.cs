@@ -3,54 +3,55 @@ using System.Collections.Generic;
 using UnityEngine;
 using GetSocialSdk.Capture.Scripts;
 using System;
-
-public class ScreenRecorder : MonoBehaviour
+namespace C2M2.Utils.DebugUtils
 {
-    public KeyCode recordKey = KeyCode.Space;
-    private GetSocialCapture screenRecorder;
-    // Start is called before the first frame update
-    void Awake()
+    public class ScreenRecorder : MonoBehaviour
     {
-        screenRecorder = Camera.main.gameObject.GetComponent<GetSocialCapture>();
-        if(screenRecorder == null)
+        public KeyCode recordKey = KeyCode.Space;
+        private GetSocialCapture screenRecorder;
+        // Start is called before the first frame update
+        void Awake()
         {
-            Debug.LogWarning("No screen recorder found on " + Camera.main.name);
-            Destroy(this);
-        }
-        screenRecorder.captureMode = GetSocialCapture.GetSocialCaptureMode.Manual;
-
-    }
-
-    // Update is called once per frame
-    private bool recording = false;
-    void Update()
-    {
-        if (IsPressed)
-        {
-            if (!recording)
+            screenRecorder = Camera.main.gameObject.GetComponent<GetSocialCapture>();
+            if (screenRecorder == null)
             {
-                screenRecorder.StartCapture();
-                recording = true;
+                Debug.LogWarning("No screen recorder found on " + Camera.main.name);
+                Destroy(this);
             }
-            screenRecorder.CaptureFrame();
+            screenRecorder.captureMode = GetSocialCapture.GetSocialCaptureMode.Manual;
+
         }
-    }
-    private bool IsPressed
-    {
-        get
+
+        // Update is called once per frame
+        private bool recording = false;
+        void Update()
         {
-            if (Input.GetKey(recordKey)) return true;
-            return false;
-        }
-    }
-    private void OnApplicationQuit()
-    {
-        if (recording)
-        {         
-            screenRecorder.StopCapture();
-            // generate gif
-            Action<byte[]> result = bytes =>
+            if (IsPressed)
             {
+                if (!recording)
+                {
+                    screenRecorder.StartCapture();
+                    recording = true;
+                }
+                screenRecorder.CaptureFrame();
+            }
+        }
+        private bool IsPressed
+        {
+            get
+            {
+                if (Input.GetKey(recordKey)) return true;
+                return false;
+            }
+        }
+        private void OnApplicationQuit()
+        {
+            if (recording)
+            {
+                screenRecorder.StopCapture();
+                // generate gif
+                Action<byte[]> result = bytes =>
+                {
                 // Action<string> messageTarget = s => 
                 // {
                 //      Console.WriteLine(s)
@@ -62,14 +63,15 @@ public class ScreenRecorder : MonoBehaviour
                 {
                     return Image.FromStream(ms);
                 }*/
-                byte[] gifContent = bytes;
+                    byte[] gifContent = bytes;
                 //Image image = Image.FromStream(ms4, true, true);
                 //image.Save(@"C:\Users\Administrator\Desktop\imageTest.png", System.Drawing.Imaging.ImageFormat.Png);
 
                 // use content, like send it to your friends by using GetSocial Sdk
             };
 
-            screenRecorder.GenerateCapture(result);
+                screenRecorder.GenerateCapture(result);
+            }
         }
     }
 }

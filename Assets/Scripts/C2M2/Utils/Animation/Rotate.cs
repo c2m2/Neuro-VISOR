@@ -1,105 +1,107 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-public class Rotate : MonoBehaviour
+namespace C2M2.Utils.Animation
 {
-    public bool rigidbodyRotate = true;
-
-    [Header("X-axis")]
-    public bool rotateX = true;
-    public float XSpeed = 1f;
-    [Tooltip("Produce random speed each fixed frame")]
-    public bool randomX = false;
-
-    [Header("Y-axis")]
-    public bool rotateY = true;
-    public float YSpeed = 1f;
-    [Tooltip("Produce random speed each fixed frame")]
-    public bool randomY = false;
-
-    [Header("Z-axis")]
-    public bool rotateZ = true;
-    public float ZSpeed = 1f;
-    [Tooltip("Produce random speed each fixed frame")]
-    public bool randomZ = false;
-
-    private Vector3 rotationVector;
-
-    public Rigidbody rb;
-    private Quaternion rotationQuat;
-
-
-    // Start is called before the first frame update
-    void Awake()
+    public class Rotate : MonoBehaviour
     {
-        if (!rotateX)
-        {
-            XSpeed = 0f;
-        }
+        public bool rigidbodyRotate = true;
 
-        if (!rotateY)
-        {
-            YSpeed = 0f;
-        }
+        [Header("X-axis")]
+        public bool rotateX = true;
+        public float XSpeed = 1f;
+        [Tooltip("Produce random speed each fixed frame")]
+        public bool randomX = false;
 
-        if (!rotateZ)
-        {
-            ZSpeed = 0f;
-        }
+        [Header("Y-axis")]
+        public bool rotateY = true;
+        public float YSpeed = 1f;
+        [Tooltip("Produce random speed each fixed frame")]
+        public bool randomY = false;
 
-        rotationVector = new Vector3(XSpeed, YSpeed, ZSpeed);
-    }
+        [Header("Z-axis")]
+        public bool rotateZ = true;
+        public float ZSpeed = 1f;
+        [Tooltip("Produce random speed each fixed frame")]
+        public bool randomZ = false;
 
-    private void Start()
-    {
-        if (rigidbodyRotate)
+        private Vector3 rotationVector;
+
+        public Rigidbody rb;
+        private Quaternion rotationQuat;
+
+
+        // Start is called before the first frame update
+        void Awake()
         {
-            rb = GetComponent<Rigidbody>();
-            if(rb == null)
+            if (!rotateX)
             {
-                Debug.Log("in Rotate, could not find rigibody");
-                rigidbodyRotate = false;
-            }
-        }
-    }
-
-    // Update is called once per frame
-    void FixedUpdate()
-    {
-        if (randomX || randomY || randomZ)
-        {
-            if (randomX)
-            {
-                XSpeed = Random.Range(0f, 3f);
+                XSpeed = 0f;
             }
 
-            if (randomY)
+            if (!rotateY)
             {
-                YSpeed = Random.Range(0f, 3f);
+                YSpeed = 0f;
             }
 
-            if (randomZ)
+            if (!rotateZ)
             {
-                ZSpeed = Random.Range(0f, 3f);
+                ZSpeed = 0f;
             }
 
-            rotationVector[0] = XSpeed;
-            rotationVector[1] = YSpeed;
-            rotationVector[2] = ZSpeed;
-
+            rotationVector = new Vector3(XSpeed, YSpeed, ZSpeed);
         }
 
-        if (rigidbodyRotate)
+        private void Start()
         {
+            if (rigidbodyRotate)
+            {
+                rb = GetComponent<Rigidbody>();
+                if (rb == null)
+                {
+                    Debug.Log("in Rotate, could not find rigibody");
+                    rigidbodyRotate = false;
+                }
+            }
+        }
 
-            rotationQuat = Quaternion.Euler(rotationVector * Time.deltaTime);
-            rb.MoveRotation(rb.rotation * rotationQuat);
-        }
-        else
+        // Update is called once per frame
+        void FixedUpdate()
         {
-            transform.Rotate(rotationVector, Space.Self);
+            if (randomX || randomY || randomZ)
+            {
+                if (randomX)
+                {
+                    XSpeed = Random.Range(0f, 3f);
+                }
+
+                if (randomY)
+                {
+                    YSpeed = Random.Range(0f, 3f);
+                }
+
+                if (randomZ)
+                {
+                    ZSpeed = Random.Range(0f, 3f);
+                }
+
+                rotationVector[0] = XSpeed;
+                rotationVector[1] = YSpeed;
+                rotationVector[2] = ZSpeed;
+
+            }
+
+            if (rigidbodyRotate)
+            {
+
+                rotationQuat = Quaternion.Euler(rotationVector * Time.deltaTime);
+                rb.MoveRotation(rb.rotation * rotationQuat);
+            }
+            else
+            {
+                transform.Rotate(rotationVector, Space.Self);
+            }
+
         }
-       
     }
 }

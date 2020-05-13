@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-
-namespace C2M2.Visualization.VTK
+using C2M2.Simulation;
+namespace C2M2.NeuronalDynamics.Visualization.VTK
 {
     using Utils.MeshUtils;
-    using Simulation;
    
     public class VTUManager : MonoBehaviour
     {

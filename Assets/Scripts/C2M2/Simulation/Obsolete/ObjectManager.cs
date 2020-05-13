@@ -2,12 +2,12 @@
 
 using UnityEngine;
 using System;
+using C2M2.NeuronalDynamics.Visualization.VTK;
 
 namespace C2M2.Simulation
 {
     using Interaction;
-    using Visualization.VTK;
-
+   
     [RequireComponent(typeof(VTUManager))]
     [RequireComponent(typeof(MeshInfo))]
     [RequireComponent(typeof(DiffusionManager))]

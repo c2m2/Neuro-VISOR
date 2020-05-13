@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace C2M2 {
-    namespace Utils {
+namespace C2M2
+{
+    namespace Utils
+    {
         using static Math;
         /// <summary>
         /// This resets the position, rotation of the object it's attached to at "startFrame".

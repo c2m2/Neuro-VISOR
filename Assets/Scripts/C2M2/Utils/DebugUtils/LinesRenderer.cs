@@ -5,7 +5,7 @@ using System.IO;
 using System;
 using C2M2.NeuronalDynamics.UGX;
 using Grid = C2M2.NeuronalDynamics.UGX.Grid;
-namespace C2M2.Utils
+namespace C2M2.Utils.DebugUtils
 {
     /// <summary>
     /// Draw a series of disjointed lines given a list of edges using the native LineRenderer class
