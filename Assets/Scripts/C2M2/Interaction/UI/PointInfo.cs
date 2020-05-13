@@ -2,8 +2,9 @@
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
-namespace C2M2
+namespace C2M2.Interaction.UI
 {
+    using Simulation;
     /// <summary> Store useful information about individual simulation vertices, and spawn info panels to display that info </summary>
     public class PointInfo : MonoBehaviour
     {

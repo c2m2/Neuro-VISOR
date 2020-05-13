@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
-namespace C2M2
+namespace C2M2.Simulation
 {
-    [Obsolete("Script has been replaced by Simulation")]
+    using Interaction;
+    using Interaction.UI;
+    [Obsolete("Replaced by Simulation")]
     public class DiffusionManager : MonoBehaviour
     {
         private void Awake()

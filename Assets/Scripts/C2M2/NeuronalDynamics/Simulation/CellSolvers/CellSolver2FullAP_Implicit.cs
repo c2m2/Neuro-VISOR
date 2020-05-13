@@ -56,7 +56,7 @@ namespace C2M2.NeuronalDynamics.Simulation
 
         private Timer timer = new Timer();
 
-        [CustomLabel("Order type of matrix")]
+        [C2M2.Attributes.CustomLabel("Order type of matrix")]
         internal OrderType type = OrderType.Identity;
 
         // NeuronCellSimulation handles reading the UGX file

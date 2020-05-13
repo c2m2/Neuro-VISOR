@@ -6,8 +6,9 @@ using UnityEngine;
 using System.Linq;
 using UnityEditor;
 
-namespace C2M2
+namespace C2M2.Interaction
 {
+    using Simulation;
     using Utils;
     /// <summary> Create and store additional mesh info like an adjacency list, array of unique vertices, unique and mesh vertex Vector3 dictionaries </summary>
     [Obsolete("Separated into separate scripts AdjacencyList, UniqueVertices, ColorManager, etc")]

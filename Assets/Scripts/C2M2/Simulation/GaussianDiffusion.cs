@@ -4,8 +4,9 @@ using System.Collections;
 using System;
 using UnityEngine;
 
-namespace C2M2
+namespace C2M2.Interaction
 {
+    [Obsolete("Replaced by Simulation")]
     public class GaussianDiffusion : MonoBehaviour
     {
         public GaussianDistanceCalculator gaussian { get; private set; }

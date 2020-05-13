@@ -3,8 +3,9 @@
 using UnityEngine;
 using System;
 
-namespace C2M2
+namespace C2M2.Simulation
 {
+    using Interaction;
     using Visualization.VTK;
 
     [RequireComponent(typeof(VTUManager))]

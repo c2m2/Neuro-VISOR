@@ -4,6 +4,7 @@ using UnityEngine;
 namespace C2M2.Visualization.VTK
 {
     using Utils.MeshUtils;
+    using Simulation;
    
     public class VTUManager : MonoBehaviour
     {

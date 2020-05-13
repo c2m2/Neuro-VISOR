@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
-namespace C2M2
+namespace C2M2.Simulation
 {
     using Utils;
     using static Utils.Math;
@@ -11,6 +11,7 @@ namespace C2M2
     /// TODO: Create a get/set values requirement
     /// TODO: Solve code should possibly be wrapped in a method here that tracks pauses/unpauses, pauseTime, hasChanged, etc, for launching user solve code. This would simplify user's coding requirements
     /// TODO: This really should just be an interface for simulations happening somewhere else, it should only send and receive values to the simulation, not manage how the simulation runs
+    [Obsolete("Replaced by CellSolvers")]
     public abstract class SimulationDiffuseReact : MonoBehaviour
     {
         protected ObjectManager objectManager;
