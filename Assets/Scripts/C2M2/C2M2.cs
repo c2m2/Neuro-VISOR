@@ -19,6 +19,8 @@ namespace C2M2
         namespace Simulation { }
         /// <summary> Neuronal Dynamics visualization </summary>
         namespace Visualization { }
+        /// <summary> Utilities for processing .ugx files containing 1D, 3D, and mapping geometry info </summary>
+        namespace UGX { }
     }
 
     /// <summary> Scripts that were used during an unsuccessful exploration into implementing order-independent transparency in VR. </summary>

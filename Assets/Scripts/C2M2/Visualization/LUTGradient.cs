@@ -14,7 +14,7 @@ namespace C2M2.Visualization
     /// For large applications, like resolving the color of every vertex of a large mesh surface,
     /// this script will be much faster than Gradient.Evaluate().
     /// </remarks>
-    public class Gradient32LUT : MonoBehaviour
+    public class LUTGradient : MonoBehaviour
     {
         /// <summary>
         /// Should max/min for each time frame be decided by that time frame, a preset 

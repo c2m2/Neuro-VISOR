@@ -1,5 +1,5 @@
 ﻿#pragma warning disable CS0618
-
+using System;
 using System.Collections.Generic;
 
 namespace C2M2.Simulation
@@ -9,6 +9,7 @@ namespace C2M2.Simulation
     using Utils;
     using static Utils.Math;
     /// <summary> Simulate a diffusion over the surface of a given geometry </summary>
+    [Obsolete("Built based on old simulation backend")]
     public class ReactionDiffusion : SimulationDiffuseReact
     {
         private DiffusionManager diffusionManager;

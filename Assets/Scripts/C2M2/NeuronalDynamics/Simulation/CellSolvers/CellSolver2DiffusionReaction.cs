@@ -107,10 +107,10 @@ namespace C2M2.NeuronalDynamics.Simulation
             timer.StartTimer();
 
             // Access the color manager and have it color the surface based on our preset max/min value
-            Gradient32LUT colorManager = GetComponent<Gradient32LUT>();
+            LUTGradient colorManager = GetComponent<LUTGradient>();
             if (colorManager != null)
             {
-                colorManager.extremaMethod = Gradient32LUT.ExtremaMethod.GlobalExtrema;
+                colorManager.extremaMethod = LUTGradient.ExtremaMethod.GlobalExtrema;
                 colorManager.globalMax = 65;
                 colorManager.globalMin = -15;
             }

@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
 using C2M2.Visualization;
+
 namespace C2M2.Simulation
 {
     using Utils;
-    using Interaction;
     /// <summary>
     /// Simulation of type double[] for visualizing scalar fields on meshes
     /// </summary>
@@ -12,11 +12,11 @@ namespace C2M2.Simulation
         #region Variables
 
         public Gradient gradient;
-        public Gradient32LUT.ExtremaMethod extremaMethod = Gradient32LUT.ExtremaMethod.RollingExtrema;
+        public LUTGradient.ExtremaMethod extremaMethod = LUTGradient.ExtremaMethod.RollingExtrema;
         public float globalMax;
         public float globalMin;
 
-        public Gradient32LUT colorLUT { get; private set; } = null;
+        public LUTGradient colorLUT { get; private set; } = null;
         private MeshFilter mf;
         private MeshRenderer mr;
         #endregion
@@ -53,10 +53,10 @@ namespace C2M2.Simulation
             mr.material = GameManager.instance.vertexColorationMaterial;
 
             // Scalar field simulations need to color said field onto the object surface
-            colorLUT = gameObject.AddComponent<Gradient32LUT>();
+            colorLUT = gameObject.AddComponent<LUTGradient>();
             colorLUT.Gradient = gradient;
             colorLUT.extremaMethod = extremaMethod;
-            if(extremaMethod == Gradient32LUT.ExtremaMethod.GlobalExtrema)
+            if(extremaMethod == LUTGradient.ExtremaMethod.GlobalExtrema)
             {
                 colorLUT.globalMax = globalMax;
                 colorLUT.globalMin = globalMin;
