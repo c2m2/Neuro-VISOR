@@ -2,7 +2,7 @@
 using UnityEngine;
 using System.Linq;
 
-namespace C2M2
+namespace C2M2.Interaction.Adjacency
 {
     using Utils;
     public class DijkstraSearch : MonoBehaviour

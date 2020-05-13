@@ -15,7 +15,6 @@ using MathNet.Numerics.LinearAlgebra.Double;
 using MathNet.Numerics.Data.Text;
 using MathNet.Numerics.LinearAlgebra.Double.Solvers;
 
-using C2M2.Attributes;
 using C2M2.Simulation;
 using C2M2.UGX;
 using C2M2.NeuronalDynamics.UGX;

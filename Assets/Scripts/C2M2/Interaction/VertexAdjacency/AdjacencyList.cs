@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace C2M2
+namespace C2M2.Interaction.Adjacency
 {
     // TODO: Separate edgelist
     [RequireComponent(typeof(MeshFilter))]

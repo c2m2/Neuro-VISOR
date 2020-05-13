@@ -13,7 +13,6 @@ namespace C2M2
 	using DiameterAttachment = IAttachment<DiameterData>;
 	using MappingAttachment = IAttachment<MappingData>;
 	using Grid = C2M2.UGX.Grid;
-	using CustomLabel = C2M2.Attributes.CustomLabel;
       
 	/// <summary>
 	/// Behaviour can be attached to test mesh consistency
@@ -22,19 +21,13 @@ namespace C2M2
 	{
 	    #region Test selection
 	    [Header ( "Grid generation tests" )]
-	    [CustomLabel ( "1d within 2d mesh" )]
 	    public bool isModelGeometryVisible = false;
-	    [CustomLabel ( "Mapping" )]
 	    public bool isMappingChecked = true;
-	    [CustomLabel ( "Winding Consistency" )]
 	    public bool isWindingConsistent = true;
-	    [CustomLabel ( "Normal Consistency" )]
 	    public bool areNormalsConsistent = true;
-	    [CustomLabel ( "Distance threshold")]
 	    public float eps = 1e-6f;
 	    private float thresh = 5f;
 	    #endregion
-	    
 	    #region private
 	    private GameObject go;
 	    private static string hhCellFolder = "HHSolver";

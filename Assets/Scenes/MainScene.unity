@@ -1167,7 +1167,8 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 1246904544822792154, guid: 3cd62f4122818be4585249f5083a977d, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 3cd62f4122818be4585249f5083a977d, type: 3}
 --- !u!1001 &3671467347388522957
 PrefabInstance:
@@ -1321,9 +1322,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a274ac0c0991f9c4db3827b6a7461eb6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scriptEnabled: 0
-  ovrPlayerController: {fileID: 447441493}
-  nonVRCamera: {fileID: 0}
 --- !u!4 &3671467347388522961 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3671467348768610593, guid: f49e57d0c1b71c4418326894ace9a9b5,

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace C2M2
+namespace C2M2.Interaction.Signaling
 {
     public class MouseEventSignaler : RaycastEventSignaler
     {

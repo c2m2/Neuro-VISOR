@@ -98,7 +98,7 @@ public static class NonConvexMeshCollider
                 boxColliders[i] = bc;
             }
             Debug.Log("NonConvexMeshCollider: " + mergedBoxes.Length + " box colliders created");
-            collidersGo.name = "Colliders " + boxesPerEdge + " (" + mergedBoxes.Length + " colliders)";
+            collidersGo.name = "NonConvexMeshCollider@" + mergedBoxes.Length + "cols";
 
             //cleanup stuff not needed anymore on collider child obj
             UnityEngine.Object.Destroy(collidersGo.GetComponent<MeshFilter>());

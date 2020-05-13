@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace C2M2.Interaction
 {
+    using Adjacency;
     [Obsolete("Replaced by Simulation")]
     public class GaussianDiffusion : MonoBehaviour
     {

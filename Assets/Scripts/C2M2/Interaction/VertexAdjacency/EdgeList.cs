@@ -2,36 +2,39 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public struct Edge
+namespace C2M2.Interaction.Adjacency
 {
-    public int v1 { get; private set; }
-    public int v2 { get; private set; }
-    public float length { get; private set; }
-    public Edge(int v1, int v2, float length)
+    public struct Edge
     {
-        this.v1 = v1;
-        this.v2 = v2;
-        this.length = length;
-    }
-    public Edge(int v1, int v2, Vector3[] uniqueVerts)
-    {
-        this.v1 = v1;
-        this.v2 = v2;
-        length = Vector3.Distance(uniqueVerts[v1], uniqueVerts[v2]);
-    }
-    public bool Equals(Edge other)
-    {
-        if ((v1 == other.v2 && v2 == other.v1) || (v1 == other.v1 && v2 == other.v2))
+        public int v1 { get; private set; }
+        public int v2 { get; private set; }
+        public float length { get; private set; }
+        public Edge(int v1, int v2, float length)
         {
-            return true;
+            this.v1 = v1;
+            this.v2 = v2;
+            this.length = length;
         }
-        else
+        public Edge(int v1, int v2, Vector3[] uniqueVerts)
         {
-            return false;
+            this.v1 = v1;
+            this.v2 = v2;
+            length = Vector3.Distance(uniqueVerts[v1], uniqueVerts[v2]);
         }
-    }
-    public override string ToString()
-    {
-        return "(" + v1 + ", " + v2 + "); length: " + length;
+        public bool Equals(Edge other)
+        {
+            if ((v1 == other.v2 && v2 == other.v1) || (v1 == other.v1 && v2 == other.v2))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        public override string ToString()
+        {
+            return "(" + v1 + ", " + v2 + "); length: " + length;
+        }
     }
 }

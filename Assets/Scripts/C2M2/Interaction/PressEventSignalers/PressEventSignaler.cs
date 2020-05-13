@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace C2M2
+namespace C2M2.Interaction.Signaling
 {
     /// <summary>
     /// Send press, holdPress, and endPress events based on set values of Pressed and RaycastTriggerManager

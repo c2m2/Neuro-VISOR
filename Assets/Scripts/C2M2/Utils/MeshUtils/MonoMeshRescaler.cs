@@ -27,7 +27,7 @@ namespace C2M2 {
             }
 #if UNITY_EDITOR
             [CustomEditor(typeof(MonoMeshRescaler))]
-            public class RescaleMeshEditor : Editor
+            public class RescaleMeshEditor : UnityEditor.Editor
             {
                 public override void OnInspectorGUI()
                 {

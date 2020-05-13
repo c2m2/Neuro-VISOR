@@ -3,6 +3,7 @@ using UnityEngine;
 using System;
 namespace C2M2.Interaction
 {
+    using Adjacency;
     using Utils;
     using static Utils.Math;
     using C2M2.Simulation;

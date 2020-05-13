@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using System;
-namespace C2M2
+namespace C2M2.Interaction.Adjacency
 {
     /// <summary>
     /// Get the unique vertices of a mesh and add invisible vertices for adjacency list

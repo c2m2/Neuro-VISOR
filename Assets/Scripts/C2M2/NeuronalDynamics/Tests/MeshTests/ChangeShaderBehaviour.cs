@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using C2M2.Attributes;
 
 /// <summary>
 /// Changes the shader for the selected gameobject, here: 3d Mesh.

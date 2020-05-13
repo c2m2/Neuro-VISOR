@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 namespace C2M2.Interaction
 {
+    using Adjacency;
     using Utils;
     using C2M2.Simulation;
     [Obsolete("Replaced by DijkstraSearch, which does not rely on ObjectManager and simply adds the parts it needs in its constructor")]

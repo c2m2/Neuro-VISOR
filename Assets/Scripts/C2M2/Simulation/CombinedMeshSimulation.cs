@@ -8,6 +8,7 @@ using GetSocialSdk.Capture.Scripts;
 namespace C2M2
 {
     using Interaction;
+    using Interaction.VR;
     namespace Simulation
     {
         ////////////////////////////////////////////////////////////////////////////////////////////////////

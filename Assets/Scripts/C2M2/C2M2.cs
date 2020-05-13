@@ -34,6 +34,8 @@ namespace C2M2
         /// Utilities used in debugging
         /// </summary>
         namespace DebugUtils { }
+
+        namespace Editor { }
     }
     
     /// <summary>

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 namespace C2M2.Simulation
 {
     using Interaction;
+    using Interaction.Adjacency;
     using Utils;
     using static Utils.Math;
     /// <summary> Simulate a diffusion over the surface of a given geometry </summary>
