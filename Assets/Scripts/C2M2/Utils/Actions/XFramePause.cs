@@ -2,17 +2,20 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class XFramePause : MonoBehaviour
+namespace C2M2.Utils.DebugUtils.Actions
 {
-    [Tooltip("Pause the game after this many frames")]
-    public int frameCount = 5;
-
-    // Update is called once per frame
-    void Update()
+    public class XFramePause : MonoBehaviour
     {
-        if(Time.frameCount == frameCount)
+        [Tooltip("Pause the game after this many frames")]
+        public int frameCount = 5;
+
+        // Update is called once per frame
+        void Update()
         {
-            Debug.Break();
+            if (Time.frameCount == frameCount)
+            {
+                Debug.Break();
+            }
         }
     }
 }

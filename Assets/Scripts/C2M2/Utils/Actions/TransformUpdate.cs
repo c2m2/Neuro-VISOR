@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-namespace C2M2.Utils
+namespace C2M2.Utils.DebugUtils.Actions
 {
     /// <summary> Correct an object's position and rotation to given values </summary>
     public static class TransformUpdate

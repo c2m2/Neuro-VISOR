@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-namespace C2M2.Utils.DebugUtils
+namespace C2M2.Utils.DebugUtils.Actions
 {
     public class EditorButtonPause : MonoBehaviour
     {

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace C2M2
 {
-    namespace Utils
+    namespace Utils.DebugUtils.Actions
     {
         using static Math;
         /// <summary>
