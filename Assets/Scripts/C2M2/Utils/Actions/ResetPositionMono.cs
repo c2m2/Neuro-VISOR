@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace C2M2.Utils
+namespace C2M2.Utils.Actions
 {
     public class ResetPositionMono : MonoBehaviour
     {

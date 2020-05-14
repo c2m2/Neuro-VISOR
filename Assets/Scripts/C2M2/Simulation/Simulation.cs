@@ -50,7 +50,7 @@ namespace C2M2.Simulation
                 case (InteractionType.Continuous): simHeater = gameObject.AddComponent<RaycastSimHeaterContinuous>(); break;
             }
 
-            gameObject.AddComponent<TransformResetter>();
+            gameObject.AddComponent<C2M2.Utils.DebugUtils.Actions.TransformResetter>();
 
             RaycastEventManager eventManager = gameObject.AddComponent<RaycastEventManager>();
 

@@ -35,7 +35,7 @@ namespace C2M2.Interaction.VR
             if (mesh == null) throw new MeshNotFoundException();
             BuildMeshCollider(gameObject, raycastTargetObject, mesh);
 
-            raycastTargetObject.AddComponent<TransformResetter>().targetFrame = 2;
+            raycastTargetObject.AddComponent<C2M2.Utils.DebugUtils.Actions.TransformResetter>().targetFrame = 2;
         }
         /// <summary> Instantiate child object & set its layer to "Raycast" </summary>
         /// <returns> The child object that was created. </returns>
