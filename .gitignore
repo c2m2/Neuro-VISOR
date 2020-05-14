@@ -74,6 +74,7 @@ crashlytics-build.properties
 
 # Exclude csv
 *.csv
+*.csv.meta
 
 # Exclude local project settings
 ProjectSettings/LocalProjectVersion.txt

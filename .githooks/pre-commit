@@ -1,0 +1,107 @@
+#!/bin/bash
+
+# Make sure local unity version matches current branch's remote revision
+BRANCH_ON_REMOTE=$(git rev-parse --abbrev-ref --symbolic-full-name @{u})
+git show $BRANCH_ON_REMOTE:ProjectSettings/ProjectVersion.txt > ProjectSettings/LocalProjectVersion.txt
+
+# Unity version
+CURRENT_UNITY_PROJECT_VERSION=$(head -n 1 ProjectSettings/ProjectVersion.txt | cut -d ':' -f 2 | tr -d ' ')
+LOCAL_UNITY_PROJECT_VERSION=$(head -n 1 ProjectSettings/LocalProjectVersion.txt | cut -d ':' -f 2 | tr -d ' ')
+
+# git lfs version
+LOCAL_GIT_LFS_VERSION=$(git lfs env| awk -F ' ' 'FNR == 1 {print $1} ' | awk -F '/' '{print $2}')
+REQUIRED_MINIMUM_GIT_LFS_VERSION=2.10.0
+
+# git version
+LOCAL_GIT_VERSION=$(git --version | cut -d ' ' -f 3)
+REQUIRED_MININUM_GIT_VERSION=2.7.0
+
+# colors
+RED='\033[0;31m'
+BLACK="$(tput sgr0)"
+
+# compare version 
+vercomp () {
+    if [[ $1 == $2 ]]
+    then
+        return 0
+    fi
+    local IFS=.
+    local i ver1=($1) ver2=($2)
+    # fill empty fields in ver1 with zeros
+    for ((i=${#ver1[@]}; i<${#ver2[@]}; i++))
+    do
+        ver1[i]=0
+    done
+    for ((i=0; i<${#ver1[@]}; i++))
+    do
+        if [[ -z ${ver2[i]} ]]
+        then
+            # fill empty fields in ver2 with zeros
+            ver2[i]=0
+        fi
+        if ((10#${ver1[i]} > 10#${ver2[i]}))
+        then
+            return 1
+        fi
+        if ((10#${ver1[i]} < 10#${ver2[i]}))
+        then
+            return 2
+        fi
+    done
+    return 0
+}
+
+echo "*************************************** PRE-COMMIT HOOK ********************************************"
+# if unity version is correct, then we also check for correct git and and git lfs version next
+if [  "$CURRENT_UNITY_PROJECT_VERSION" = "$LOCAL_UNITY_PROJECT_VERSION" ];  then
+   echo -e "Local version and current Unity version are consistent: ${RED} $CURRENT_UNITY_PROJECT_VERSION ${BLACK}."
+   echo "****************************************************************************************************"
+   
+    # check git lfs version
+    vercomp "$LOCAL_GIT_LFS_VERSION" "$REQUIRED_MINIMUM_GIT_LFS_VERSION"
+    case $? in
+        0) op='=';;
+        1) op='>';;
+        2) op='<';;
+    esac
+
+    if [[ ! $op != "<" ]]; then
+      echo -e "Local git lfs version does not satisfy minimum required version ${RED} $LOCAL_GIT_LFS_VERSION ${BLACK}(Have) < ${RED} $REQUIRED_MINIMUM_GIT_LFS_VERSION ${BLACK} (Required) ${BLACK}."
+      echo "****************************************************************************************************"
+      git stash 
+      echo "Your changes have been stashed. Use git stash pop to retrieve (uncommited) changes."
+      exit 1
+    fi 
+
+      echo -e "Local git lfs version does satisfy minimum required version ${RED} $LOCAL_GIT_LFS_VERSION ${BLACK}(Have) >= ${RED} $REQUIRED_MINIMUM_GIT_LFS_VERSION ${BLACK} (Required) ${BLACK}."
+      echo "****************************************************************************************************"
+
+   
+   # check git version
+    vercomp "$LOCAL_GIT_VERSION" "$REQUIRED_MININUM_GIT_VERSION"
+    case $? in
+        0) op='=';;
+        1) op='>';;
+        2) op='<';;
+    esac
+
+    if [[ ! $op != "<" ]]; then
+      echo -e "Local git version does not satisfy minimum required version ${RED} $LOCAL_GIT_VERSION ${BLACK}(Have) < ${RED} $REQUIRED_MINIMUM_GIT_VERSION ${BLACK} (Required) ${BLACK}."
+      echo "****************************************************************************************************"
+      git stash 
+      echo "Your changes have been stashed. Use git stash pop to retrieve (uncommited) changes."
+      exit 1
+    fi 
+
+      echo -e "Local git version does satisfy minimum required version ${RED} $LOCAL_GIT_VERSION ${BLACK}(Have) >= ${RED} $REQUIRED_MININUM_GIT_VERSION ${BLACK} (Required) ${BLACK}."
+      echo "****************************************************************************************************"
+
+    exit 0
+else 
+   echo -e "Local Unity project version (${RED}$LOCAL_UNITY_PROJECT_VERSION${BLACK}) differs from"
+   echo -e "master branch's Unity project version (${RED}$CURRENT_UNITY_PROJECT_VERSION${BLACK})!"
+   git stash
+   echo "Your changes have been stashed. Use git stash pop to retrieve (uncommited) changes."
+fi
+echo "*************************************************************************"
