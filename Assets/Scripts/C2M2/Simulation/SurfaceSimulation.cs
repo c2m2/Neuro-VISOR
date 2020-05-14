@@ -6,9 +6,9 @@ namespace C2M2.Simulation
     using Utils;
     using Utils.MeshUtils;
     /// <summary>
-    /// Simulation of type double[] for visualizing scalar fields on meshes
+    /// Simulation of type double[] for visualizing scalar fields on mesh surfaces
     /// </summary>
-    public abstract class ScalarFieldSimulation : Simulation<double[]>
+    public abstract class SurfaceSimulation : Simulation<double[]>
     {
         #region Variables
 

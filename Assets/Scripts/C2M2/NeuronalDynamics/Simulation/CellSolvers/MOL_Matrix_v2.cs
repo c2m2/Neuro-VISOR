@@ -26,7 +26,7 @@ namespace C2M2.NeuronalDynamics.Simulation
     /// The system matrix will solve the system of center difference equations in
     ///space and then step through time using FE 
     /// </remarks>
-    public class MOL_Matrix_v2 : HHSimulation
+    public class MOL_Matrix_v2 : NeuronSimulation
     {
         //----------------------Public constants for the solver-------------------//
         public const double nX = 119;            // Number of spatial steps

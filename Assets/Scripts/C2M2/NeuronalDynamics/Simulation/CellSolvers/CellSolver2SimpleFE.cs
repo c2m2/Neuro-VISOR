@@ -19,7 +19,7 @@ using C2M2.NeuronalDynamics.UGX;
 using Grid = C2M2.NeuronalDynamics.UGX.Grid;
 namespace C2M2.NeuronalDynamics.Simulation
 {
-    public class CellSolver2SimpleFE : HHSimulation
+    public class CellSolver2SimpleFE : NeuronSimulation
     {
         //Set cell biological paramaters
         public const double res = 10.0;

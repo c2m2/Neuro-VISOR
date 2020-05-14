@@ -11,12 +11,13 @@ using Grid = C2M2.NeuronalDynamics.UGX.Grid;
 namespace C2M2.NeuronalDynamics.Simulation
 {
     /// <summary>
-    /// Provides base functionality for Hodgkin-Huxley solvers.
+    /// Provides base functionality for Neuron simulations
     /// </summary>
     /// <remarks>
-    /// This script automatically reads in ugx files, builds the 3D neuron mesh, and builds a map between 1D and 3D geometries.
+    /// Make your neuron surface simulation derive from this class.
+    /// It will read in ugx files, build the 3D neuron mesh, and build a map between 1D and 3D geometries.
     /// </remarks>
-    public abstract class HHSimulation : ScalarFieldSimulation
+    public abstract class NeuronSimulation : SurfaceSimulation
     {
         public bool visualize1D = false;
         public Color32 color1D = Color.green;
@@ -26,7 +27,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         //[Tooltip("Name of obj file within folder")]
         //public string fileName3D = "10-6kdv2.CNG";
         protected Grid grid1D;
-        private static string hhCellFolder = "HHSolver";
+        private static string neuronCellFolder = "NeuronalDynamics";
         private static string activeCellFolder = "ActiveCell";
         private static string ugxExt = ".ugx";
         private static string cngExt = ".CNG";
@@ -81,7 +82,7 @@ namespace C2M2.NeuronalDynamics.Simulation
                 cells[3] = "NULL";
 
                 char slash = Path.DirectorySeparatorChar;
-                string cellPath = Application.streamingAssetsPath + slash + hhCellFolder + slash + activeCellFolder + slash;
+                string cellPath = Application.streamingAssetsPath + slash + neuronCellFolder + slash + activeCellFolder + slash;
                 // Only take the first cell found
                 cellPath = Directory.GetDirectories(cellPath)[0];
 

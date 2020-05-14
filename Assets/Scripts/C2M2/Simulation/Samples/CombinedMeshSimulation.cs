@@ -14,7 +14,7 @@ namespace C2M2.Simulation.Samples
     ///
     /// <remarks>   Jacob, 4/29/2020. </remarks>
     ////////////////////////////////////////////////////////////////////////////////////////////////////
-    public class CombinedMeshSimulation : ScalarFieldSimulation
+    public class CombinedMeshSimulation : SurfaceSimulation
     {
         private double[] values;
 
