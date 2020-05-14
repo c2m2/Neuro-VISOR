@@ -17,8 +17,8 @@ namespace CSparse.Double.Factorization
     {
         readonly int n;
 
-        SymbolicFactorization S;
-        CompressedColumnStorage<double> L;
+        public SymbolicFactorization S;
+        public CompressedColumnStorage<double> L;
 
         double[] temp; // workspace
 
@@ -312,6 +312,7 @@ namespace CSparse.Double.Factorization
                 lx[p] = Math.Sqrt(d);
             }
             lp[n] = colp[n]; // finalize L
+
         }
 
         /// <summary>
