@@ -609,8 +609,6 @@ GameObject:
   m_Component:
   - component: {fileID: 884125482}
   - component: {fileID: 884125481}
-  - component: {fileID: 884125485}
-  - component: {fileID: 884125484}
   m_Layer: 0
   m_Name: HHSolver
   m_TagString: Untagged
@@ -627,7 +625,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 884125480}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c8732b478b546074d9919b18da8bd118, type: 3}
+  m_Script: {fileID: 11500000, guid: c59781e644c873f499c77d5f22c7e9ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   interactionType: 0
@@ -635,9 +633,9 @@ MonoBehaviour:
   gradient:
     serializedVersion: 2
     key0: {r: 0, g: 0, b: 1, a: 1}
-    key1: {r: 0, g: 0.9606447, b: 1, a: 1}
-    key2: {r: 0.028034896, g: 0.990566, b: 0.068421096, a: 0}
-    key3: {r: 1, g: 0.9993106, b: 0, a: 0}
+    key1: {r: 0, g: 1, b: 1, a: 1}
+    key2: {r: 0, g: 1, b: 0, a: 0}
+    key3: {r: 1, g: 1, b: 0, a: 0}
     key4: {r: 1, g: 0, b: 0, a: 0}
     key5: {r: 0, g: 0, b: 0, a: 0}
     key6: {r: 0, g: 0, b: 0, a: 0}
@@ -661,24 +659,24 @@ MonoBehaviour:
     m_Mode: 0
     m_NumColorKeys: 5
     m_NumAlphaKeys: 2
-  extremaMethod: 1
-  globalMax: 130
-  globalMin: -10
-  visualize1D: 1
+  extremaMethod: 2
+  globalMax: 0
+  globalMin: 0
+  visualize1D: 0
   color1D:
     serializedVersion: 2
     rgba: 4278255360
   lineWidth1D: 0.005
   vstart: 55
-  endTime: 40
+  endTime: 50
   h: 0.27
-  k: 0.004999999888241291
+  k: 0.0027
   HK_auto: 1
   SomaOn: 1
   numRuns: 0
-  printMatrices: 1
-  printCellInfo: 1
-  printVolt_time: 1
+  printMatrices: 0
+  printCellInfo: 0
+  printVolt_time: 0
   res: 10
   cap: 0.09
   ni: 0.5
@@ -707,36 +705,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &884125484
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 884125480}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 85c8f1a78d801b351a54cdd31a967ef2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  isModelGeometryVisible: 0
-  isMappingChecked: 1
-  isWindingConsistent: 1
-  areNormalsConsistent: 1
-  eps: 0.000001
---- !u!114 &884125485
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 884125480}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9f4c437bcf3e1fd3b8f30c09117c883c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  shaderType: RevealBackfaces
 --- !u!1 &905720990 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5843646973417418017, guid: 70469a93359ee8b4e98c4c445b157af9,

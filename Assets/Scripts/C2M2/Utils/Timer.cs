@@ -64,6 +64,7 @@ namespace C2M2
                 string filePath = GameManager.instance.assetsPath + separator + "TimerResults" + separator + newFileName;
                 csv.ExportCSV(timerInfo, filePath, overwrite: true);
             }
+
             public override string ToString()
             {
                 // TODO: Use StringBuilder here and use timerNodes.Count to estimate StringBuilder size;
