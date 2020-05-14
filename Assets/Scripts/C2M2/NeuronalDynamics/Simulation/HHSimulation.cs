@@ -32,6 +32,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         private static string cngExt = ".CNG";
         private static string spec1D = "_1d";
         private static string specTris = "_tris";
+        private static string specBlownup = "_blown_up";
 
 
         // List of 1D vertex/new double value pairings. NOTE: 1D vertices may appear more than once in the array
@@ -48,6 +49,7 @@ namespace C2M2.NeuronalDynamics.Simulation
             // Build map
             MappingInfo mapping = MapUtils.BuildMap(cellFiles[1], cellFiles[0], false, cellFiles[2]);
             SetNeuronCell(mapping.ModelGeometry);
+            
 
             // Tuple<Grid, Grid, Dictionary<int, Tuple<int, int, double>>> mapping = MapUtils.BuildMap(fileName1D, fileName3D, fileNameTris);
             map = mapping.Data;
@@ -63,11 +65,20 @@ namespace C2M2.NeuronalDynamics.Simulation
                 GameObject lines1D = gameObject.AddComponent<LinesRenderer>().Constr(geom1D, color1D, lineWidth1D);
             }
 
+            // If a blownup mesh file is given, read it in and apply it
+            if (!cellFiles[3].Equals("NULL"))
+            {
+                Mesh blownupMesh = MapUtils.BuildMap(cellFiles[3], cellFiles[0], false, cellFiles[2]).SurfaceGeometry.Mesh;
+                MeshColController meshColController = gameObject.AddComponent<MeshColController>();
+                meshColController.mesh = blownupMesh;
+            }
+
             return newMesh;
 
             string[] GetCellFiles()
             {
-                string[] cells = new string[3];
+                string[] cells = new string[4];
+                cells[3] = "NULL";
 
                 char slash = Path.DirectorySeparatorChar;
                 string cellPath = Application.streamingAssetsPath + slash + hhCellFolder + slash + activeCellFolder + slash;
@@ -83,6 +94,7 @@ namespace C2M2.NeuronalDynamics.Simulation
                         if (file.EndsWith(cngExt + ugxExt)) cells[0] = file;    // 3D cell
                         else if (file.EndsWith(cngExt + spec1D + ugxExt)) cells[1] = file;  // 1D cell
                         else if (file.EndsWith(cngExt + specTris + ugxExt)) cells[2] = file;    // Triangles
+                        else if (file.EndsWith(cngExt + specBlownup + ugxExt)) cells[3] = file;    // Blown up mesh
                     }
                 }
                 return cells;

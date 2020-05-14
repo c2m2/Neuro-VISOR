@@ -4,6 +4,7 @@ using C2M2.Visualization;
 namespace C2M2.Simulation
 {
     using Utils;
+    using Utils.MeshUtils;
     /// <summary>
     /// Simulation of type double[] for visualizing scalar fields on meshes
     /// </summary>

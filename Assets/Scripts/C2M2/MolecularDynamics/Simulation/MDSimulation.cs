@@ -5,7 +5,7 @@ using C2M2.Simulation;
 using C2M2.MolecularDynamics.Visualization;
 namespace C2M2.MolecularDynamics.Simulation
 {
-    public abstract class MDSimulation : Vector3Simulation
+    public abstract class MDSimulation : PositionFieldSimulation
     {
         public string pdbFilePath;
 

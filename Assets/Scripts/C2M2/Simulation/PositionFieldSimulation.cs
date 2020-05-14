@@ -3,7 +3,10 @@ using UnityEngine;
 
 namespace C2M2.Simulation
 {
-    public abstract class Vector3Simulation : Simulation<Vector3[]>
+    /// <summary>
+    /// Simulation of type Vector3[] for simulating positional fields
+    /// </summary>
+    public abstract class PositionFieldSimulation : Simulation<Vector3[]>
     {
         private Transform[] transforms;
         protected override void OnAwake()
