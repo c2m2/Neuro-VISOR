@@ -47,32 +47,17 @@ namespace C2M2.NeuronalDynamics.Simulation
         {            
             string[] cellFiles = GetCellFiles();
 
-            // Build map
             MappingInfo mapping = MapUtils.BuildMap(cellFiles[1], cellFiles[0], false, cellFiles[2]);
-            SetNeuronCell(mapping.ModelGeometry);
-            
-
-            // Tuple<Grid, Grid, Dictionary<int, Tuple<int, int, double>>> mapping = MapUtils.BuildMap(fileName1D, fileName3D, fileNameTris);
             map = mapping.Data;
 
-            Mesh newMesh = mapping.SurfaceGeometry.Mesh;
-            newMesh.Rescale(transform, new Vector3(4, 4, 4));
-            newMesh.RecalculateNormals();
+            // Pass the cell to simulation code
+            SetNeuronCell(mapping.ModelGeometry);
 
-            // Render the 1D mesh, disable it if not requested
-            if (visualize1D)
-            {
-                Grid geom1D = mapping.ModelGeometry;
-                GameObject lines1D = gameObject.AddComponent<LinesRenderer>().Constr(geom1D, color1D, lineWidth1D);
-            }
+            Mesh newMesh = Clean3DCell();
 
-            // If a blownup mesh file is given, read it in and apply it
-            if (!cellFiles[3].Equals("NULL"))
-            {
-                Mesh blownupMesh = MapUtils.BuildMap(cellFiles[3], cellFiles[0], false, cellFiles[2]).SurfaceGeometry.Mesh;
-                MeshColController meshColController = gameObject.AddComponent<MeshColController>();
-                meshColController.mesh = blownupMesh;
-            }
+            Render1DCell();
+
+            CheckMeshCollider();
 
             return newMesh;
 
@@ -99,6 +84,32 @@ namespace C2M2.NeuronalDynamics.Simulation
                     }
                 }
                 return cells;
+            }
+            Mesh Clean3DCell()
+            {
+                Mesh mesh = mapping.SurfaceGeometry.Mesh;
+                mesh.Rescale(transform, new Vector3(4, 4, 4));
+                mesh.RecalculateNormals();
+                return mesh;
+            }
+            void Render1DCell()
+            {
+                // Render the 1D mesh, disable it if not requested
+                if (visualize1D)
+                {
+                    Grid geom1D = mapping.ModelGeometry;
+                    GameObject lines1D = gameObject.AddComponent<LinesRenderer>().Constr(geom1D, color1D, lineWidth1D);
+                }
+            }
+            void CheckMeshCollider()
+            {
+                // If a blownup mesh file is given, read it in and apply it
+                if (!cellFiles[3].Equals("NULL"))
+                {
+                    Mesh blownupMesh = MapUtils.BuildMap(cellFiles[3], cellFiles[0], false, cellFiles[2]).SurfaceGeometry.Mesh;
+                    MeshColController meshColController = gameObject.AddComponent<MeshColController>();
+                    meshColController.mesh = blownupMesh;
+                }
             }
         }
 
