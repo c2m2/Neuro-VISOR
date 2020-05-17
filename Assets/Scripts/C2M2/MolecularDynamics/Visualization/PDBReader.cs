@@ -3,96 +3,76 @@ using UnityEngine;
 using System.IO;
 using System;
 
-namespace C2M2.MolecularDynamics.Visualization
+namespace C2M2
 {
-    public static class PDBReader
+    namespace MolecularDynamics.Visualization
     {
-        public static Sphere[] ReadFile(in string pdbFilePath)
+        public static class PDBReader
         {
-            // Initialize mesh object and vert, tri list
-            Mesh objMesh = new Mesh();
-            List<Vector3> verts = new List<Vector3>();
-            List<int> triangles = new List<int>();
-            // Attempt to open file as a StreamReader
-            if (!File.Exists(pdbFilePath)) { throw new System.Exception("Could not find file " + pdbFilePath); }
-            StreamReader reader = new StreamReader(pdbFilePath);
-            // Get file name to copy to mesh name
-            string[] fileSplit = pdbFilePath.Split(Path.DirectorySeparatorChar);
-            string fileName = fileSplit[fileSplit.Length - 1];
-            // Read file until the end
-            while (reader.Peek() > -1)
+            public static PDBFile ReadFile(in string pdbFilePath)
             {
-                // Read the next line of the file
-                string curLine = reader.ReadLine();
-                string[] splitLine = curLine.Split(' ');
-                switch (splitLine[0])
+                // Initialize list object
+                List<Vector3> Pos = new List<Vector3>();
+
+                // Attempt to open file as a StreamReader
+                if (!File.Exists(pdbFilePath)) { throw new System.Exception("Could not find file " + pdbFilePath); }
+                StreamReader reader = new StreamReader(pdbFilePath);
+
+                // Get file name to copy to list name
+                string[] fileSplit = pdbFilePath.Split(Path.DirectorySeparatorChar);
+                string fileName = fileSplit[fileSplit.Length - 1];
+
+                bool inPos = false;
+                // Read file until the end
+                //while (reader.Peek() > -1)
+		for (int i = 0; i < 17; i++)
                 {
-                    case "v": verts.Add(ReadVertex(splitLine)); break;
-                    case "f": triangles.AddRange(ReadTriangle(splitLine)); break;
-                    // Ignore comments
-                    case "#": break;
-                    default: throw new Exception("OBJReadFile can only accept vertex and face lines");
+                    // Read the next line of the file
+                    string curLine = reader.ReadLine();
+                    string[] splitLine = curLine.Split(null); //delimiter is any white space
+                    CheckHeader(splitLine);
+                    CheckLine(splitLine);            
                 }
-            }
-            objMesh.vertices = verts.ToArray();
-            objMesh.triangles = triangles.ToArray();
-            objMesh.name = fileName;
-            if (objMesh.normals.Length == 0) { objMesh.RecalculateNormals(); }
-            objMesh.RecalculateBounds();
-            return null;
-        }
-        private static Vector3 ReadVertex(in string[] splitLine)
-        {
-            if (splitLine.Length >= 4)
-            {
-                float x = 0f, y = 0f, z = 0f;
-                for (int i = 1; i < 4; i++)
+
+                PDBFile pdbFile = new PDBFile(Pos.ToArray());
+
+                return pdbFile;
+
+                void CheckHeader(string[] splitLine)
                 {
-                    try
+                    if (splitLine[0]=="ATOM")
+                    { // Entering atom section
+                        inPos = true;
+
+                        int atomCount = int.Parse(splitLine[1]);
+                        Pos.Capacity = atomCount;
+                    }
+                }
+                void CheckLine(string[] splitLine)
+                {
+                    if (inPos)
                     {
-                        switch (i)
+                        float x = float.Parse(splitLine[5]);
+                        float y = float.Parse(splitLine[6]);
+			float z = float.Parse(splitLine[7]);
+			Pos.Add(new Vector3(x,y,z));
+                        /*for (int i = 5; i < 8; i++)
                         {
-                            case 1: x = Single.Parse(splitLine[i]); break;
-                            case 2: y = Single.Parse(splitLine[i]); break;
-                            case 3: z = Single.Parse(splitLine[i]); break;
-                            default: throw new IndexOutOfRangeException();
-                        }
+                            
+                            Pos.Add(float.Parse(splitLine[i]));
+                        }*/
                     }
-                    catch (FormatException) { throw new FormatException(splitLine[i] + " is not in a valid format to be a Single."); }
-                    catch (OverflowException) { throw new OverflowException(splitLine[i] + " is outside the range of a Single."); }
-                    catch (ArgumentNullException) { throw new ArgumentNullException(splitLine[i] + " is null"); }
                 }
-                return new Vector3(x, y, z);
             }
-            else { throw new Exception("Line must be length 4. Line length: " + splitLine.Length); }
+
         }
-        private static int[] ReadTriangle(in string[] splitLine)
+        public class PDBFile
         {
-            // Save space for our new triangle indices
-            int[] newTris = new int[3];
-            for (int i = 1; i < 4; i++)
+            public Vector3[] pos { get; private set; }
+            public PDBFile(Vector3[] pos)
             {
-                try
-                {
-                    switch (i)
-                    {
-                        case 1: newTris[0] = int.Parse(splitLine[i]) - 1; break;    //OBJ indices start at 1
-                        case 2: newTris[1] = int.Parse(splitLine[i]) - 1; break;
-                        case 3: newTris[2] = int.Parse(splitLine[i]) - 1; break;
-                        default: throw new IndexOutOfRangeException();
-                    }
-                }
-                catch (FormatException)
-                { // Faces might have unintended decimals. Try to read them as a float instead
-                    Vector3 floatTris = ReadVertex(splitLine);
-                    newTris[0] = ((int)floatTris.x) - 1;
-                    newTris[1] = ((int)floatTris.y) - 1;
-                    newTris[2] = ((int)floatTris.z) - 1;
-                }
-                catch (OverflowException) { throw new OverflowException(splitLine[i] + " is outside the range of an int."); }
-                catch (ArgumentNullException) { throw new ArgumentNullException(splitLine[i] + " is null"); }
+                this.pos = pos;
             }
-            return newTris;
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -20,10 +21,10 @@ namespace C2M2.MolecularDynamics.Simulation
         public float timestepSize = .1f;
             
         private Vector3[] x = null;
-	    private Vector3[] v = null;
+	private Vector3[] v = null;
         private Vector3[] r = null;
-	    private int[][] bond_topo = null;
-	    private int[][] angle_topo = null;
+	private int[][] bond_topo = null;
+	private int[][] angle_topo = null;
 
         Dictionary<Transform, int> molLookup;
 
@@ -64,9 +65,9 @@ namespace C2M2.MolecularDynamics.Simulation
         /// </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         protected override Transform[] BuildTransforms()
-        {
+       {
             // Create spheres
-            Sphere[] spheres = new Sphere[numSpheres];
+            /*Sphere[] spheres = new Sphere[numSpheres];
             x = new Vector3[numSpheres];
             v = new Vector3[numSpheres];
             for(int i = 0; i < spheres.Length; i++)
@@ -74,11 +75,19 @@ namespace C2M2.MolecularDynamics.Simulation
                 // Put our new spheres in a straight line and store their positions as simulation values
                 Vector3 pos = new Vector3(4*i, 0, 0);
                 Vector3 vel = new Vector3(0, 0, 0);
-                spheres[i] = new Sphere(pos, radius);
-                x[i] = pos;
-                v[i] = vel;
-            }
+            //    spheres[i] = new Sphere(pos, radius);
+            //    x[i] = pos;
+            //    v[i] = vel;
+            }*/
+            //Debug.Log(Directory.GetCurrentDirectory());
+	    PDBFile pdbfile = PDBReader.ReadFile("pe_cg.pdb"); //Assets/StreamingAssets/MolecularDynamics/PE/pe_cg.pdb");
 
+            x = pdbfile.pos; 
+	    Sphere[] spheres = new Sphere[x.Length];
+	    for(int i = 0; i < x.Length; i++)
+	    {
+                spheres[i] = new Sphere(x[i],.1);
+	    }
             // Instantiate the created spheres and return their transform components
             SphereInstantiator instantiator = gameObject.AddComponent<SphereInstantiator>();
             Transform[] transforms = instantiator.InstantiateSpheres(spheres);
