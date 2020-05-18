@@ -44,7 +44,7 @@ ExportedObj/
 *.svd
 *.pdb
 # We need molecular dynamics-related pdb files
-![Aa]ssets/*/*.pdb
+![Aa]ssets/**/*.pdb
 *.mdb
 *.opendb
 *.VC.db
