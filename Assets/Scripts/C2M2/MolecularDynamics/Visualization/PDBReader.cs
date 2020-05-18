@@ -25,11 +25,11 @@ namespace C2M2
                 bool inPos = false;
                 // Read file until the end
                 //while (reader.Peek() > -1)
-		for (int i = 0; i < 16; i++)
+		        for (int i = 0; i < 16; i++)
                 {
                     // Read the next line of the file
                     string curLine = reader.ReadLine();
-	            //Debug.Log(curLine);
+	                //Debug.Log(curLine);
                     string[] splitLine = curLine.Split(new char[] {' '},StringSplitOptions.RemoveEmptyEntries); //delimiter is any white space
                     CheckHeader(splitLine);
                     CheckLine(splitLine);            
@@ -54,8 +54,8 @@ namespace C2M2
                     {
                         float x = float.Parse(splitLine[5]);
                         float y = float.Parse(splitLine[6]);
-			float z = float.Parse(splitLine[7]);
-			Pos.Add(new Vector3(x,y,z));
+			            float z = float.Parse(splitLine[7]);
+			            Pos.Add(new Vector3(x,y,z));
                         /*for (int i = 5; i < 8; i++)
                         {
                             
