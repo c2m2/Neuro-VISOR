@@ -21,12 +21,12 @@ namespace C2M2.MolecularDynamics.Simulation
         public float timestepSize = .1f;
             
         private Vector3[] x = null;
-	    private Vector3[] v = null;
+	private Vector3[] v = null;
         private Vector3[] r = null;
-	    private int[] bonds = null;
-	    private int[] angles = null;
-	    private int[][] bond_topo = null;
-	    private int[][] angle_topo = null;
+	private int[] bonds = null;
+	private int[] angles = null;
+	private int[][] bond_topo = null;
+	private int[][] angle_topo = null;
 
         Dictionary<Transform, int> molLookup;
 
@@ -67,7 +67,7 @@ namespace C2M2.MolecularDynamics.Simulation
         /// </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         protected override Transform[] BuildTransforms()
-        {
+       {
             // Create spheres
             /*Sphere[] spheres = new Sphere[numSpheres];
             x = new Vector3[numSpheres];
@@ -82,15 +82,14 @@ namespace C2M2.MolecularDynamics.Simulation
             //    v[i] = vel;
             }*/
             Debug.Log(System.IO.Directory.GetCurrentDirectory());
-	        PDBFile pdbfile = PDBReader.ReadFile("Assets/StreamingAssets/MolecularDynamics/PE/pe_cg.pdb");
+	    PDBFile pdbfile = PDBReader.ReadFile("Assets/StreamingAssets/MolecularDynamics/PE/pe_cg.pdb");
 
             x = pdbfile.pos; 
-	        Sphere[] spheres = new Sphere[x.Length];
-	        for(int i = 0; i < x.Length; i++)
-	        {
+	    Sphere[] spheres = new Sphere[x.Length];
+	    for(int i = 0; i < x.Length; i++)
+	    {
                 spheres[i] = new Sphere(x[i],1.5);
-	        }
-
+	    }
             // Instantiate the created spheres and return their transform components
             SphereInstantiator instantiator = gameObject.AddComponent<SphereInstantiator>();
             Transform[] transforms = instantiator.InstantiateSpheres(spheres);
@@ -114,18 +113,18 @@ namespace C2M2.MolecularDynamics.Simulation
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         public Vector3[] Force(Vector3[] pos, int[][] bond_topo)
 	    {
-		    Vector3[] f = new Vector3[x.Length];
-            float kappa=0.0f;
-		    float r0=4.0f;
-            Vector3 r = new Vector3(0,0,0);
+		Vector3[] f = new Vector3[x.Length];
+            	float kappa=0.0f;
+		float r0=4.0f;
+            	Vector3 r = new Vector3(0,0,0);
 
-		    for(int i = 0; i < x.Length; i++)         
+		for(int i = 0; i < x.Length; i++)         
 		    {
-                for(int j = 0; j < bond_topo[i].Length; j++)
+                	for(int j = 0; j < bond_topo[i].Length; j++)
 		        {
-                	// U(x) = sum kappa_ij*(|x_i-x_j|-r_0)^2  
-                    r = pos[i]-pos[bond_topo[i][j]];
-                    f[i] += -kappa*(r.magnitude-r0)*r*0;                    
+                	    // U(x) = sum kappa_ij*(|x_i-x_j|-r_0)^2  
+                    		r = pos[i]-pos[bond_topo[i][j]];
+                    		f[i] += -kappa*(r.magnitude-r0)*r*0;                    
                 }
             }
  		    return f;
