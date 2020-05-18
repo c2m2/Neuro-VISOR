@@ -5,7 +5,7 @@ using System;
 
 namespace C2M2
 {
-    namespace Readers
+    namespace MolecularDynamics.Visualization
     {
         public static class PSFReader
         {
@@ -34,7 +34,7 @@ namespace C2M2
                 {
                     // Read the next line of the file
                     string curLine = reader.ReadLine();
-                    string[] splitLine = curLine.Split('\t');
+                    string[] splitLine = curLine.Split(new char[] {' '},StringSplitOptions.RemoveEmptyEntries);
                     CheckHeader(curLine, splitLine);
                     CheckLine(splitLine);            
                 }

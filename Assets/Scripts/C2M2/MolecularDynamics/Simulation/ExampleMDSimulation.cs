@@ -23,6 +23,8 @@ namespace C2M2.MolecularDynamics.Simulation
         private Vector3[] x = null;
 	private Vector3[] v = null;
         private Vector3[] r = null;
+	private int[] bonds = null;
+	private int[] angles = null;
 	private int[][] bond_topo = null;
 	private int[][] angle_topo = null;
 
@@ -79,14 +81,14 @@ namespace C2M2.MolecularDynamics.Simulation
             //    x[i] = pos;
             //    v[i] = vel;
             }*/
-            //Debug.Log(Directory.GetCurrentDirectory());
-	    PDBFile pdbfile = PDBReader.ReadFile("pe_cg.pdb"); //Assets/StreamingAssets/MolecularDynamics/PE/pe_cg.pdb");
+            Debug.Log(System.IO.Directory.GetCurrentDirectory());
+	    PDBFile pdbfile = PDBReader.ReadFile("Assets/StreamingAssets/MolecularDynamics/PE/pe_cg.pdb");
 
             x = pdbfile.pos; 
 	    Sphere[] spheres = new Sphere[x.Length];
 	    for(int i = 0; i < x.Length; i++)
 	    {
-                spheres[i] = new Sphere(x[i],.1);
+                spheres[i] = new Sphere(x[i],1.5);
 	    }
             // Instantiate the created spheres and return their transform components
             SphereInstantiator instantiator = gameObject.AddComponent<SphereInstantiator>();
@@ -111,18 +113,18 @@ namespace C2M2.MolecularDynamics.Simulation
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         public Vector3[] Force(Vector3[] pos, int[][] bond_topo)
 	    {
-		    Vector3[] f = new Vector3[x.Length];
-            float kappa=.1f;
-		    float r0=4.0f;
-            Vector3 r = new Vector3(0,0,0);
+		Vector3[] f = new Vector3[x.Length];
+            	float kappa=0.0f;
+		float r0=4.0f;
+            	Vector3 r = new Vector3(0,0,0);
 
-		    for(int i = 0; i < x.Length; i++)         
+		for(int i = 0; i < x.Length; i++)         
 		    {
-                for(int j = 0; j < bond_topo[i].Length; j++)
+                	for(int j = 0; j < bond_topo[i].Length; j++)
 		        {
-                    // U(x) = sum kappa_ij*(|x_i-x_j|-r_0)^2  
-                    r = pos[i]-pos[bond_topo[i][j]];
-                    f[i] += -kappa*(r.magnitude-r0)*r;                    
+                	    // U(x) = sum kappa_ij*(|x_i-x_j|-r_0)^2  
+                    		r = pos[i]-pos[bond_topo[i][j]];
+                    		f[i] += -kappa*(r.magnitude-r0)*r*0;                    
                 }
             }
  		    return f;
@@ -179,44 +181,57 @@ namespace C2M2.MolecularDynamics.Simulation
             int nT = timestepCount;
             float dt = timestepSize;
             float m = 10.0f;
-		    float gamma=0.1f;
+	    float gamma=0.1f;
             float a=((1-gamma*dt/2)/(1+gamma*dt/2));
             float coeff=Convert.ToSingle(Math.Sqrt(kb*T*(1-a*a)/m));
-                
+	    Debug.Log(a);
+	    PSFFile psffile = PSFReader.ReadFile("Assets/StreamingAssets/MolecularDynamics/PE/pe_cg.psf");
+            bonds = psffile.bonds;
+            angles = psffile.angles;
+	    Debug.Log(bonds);
+ 
+	    for (int i = 0; i < x.Length; i++)
+	    {
+	 	for (int j = 0; j < x.Length; j++)
+                {
+                    bond_topo[i][j] = bonds[i];
+                }
+	    }
+
 	        //hard code the bond info
-            int[][] bond_topo = new int[x.Length][];
-            bond_topo[0]= new int[] {1};
-		    bond_topo[1]= new int[] {0,2};
-		    bond_topo[2]= new int[] {1};
+            //int[][] bond_topo = new int[x.Length][];
+            //bond_topo[0]= new int[] {1};
+	    //	    bond_topo[1]= new int[] {0,2};
+	    //	    bond_topo[2]= new int[] {1};
 
             //hard code the angle info
             //int[][] angle_topo = new int[x.Length][];
             //angle_topo[0]= new int[] {};
 		    //angle_topo[1]= new int[] {0,1,2};
 		    //angle_topo[2]= new int[] {};
-
-		    //instantiate a normal dist.
-		    var normal = Normal.WithMeanPrecision(0.0, 1.0);
-
-		    Vector3[] force = Force(x,bond_topo); // + angle_Force(x,angle_topo);
-		    Vector3[] angle = angle_Force(x);
+	    
+	    //instantiate a normal dist.
+	    var normal = Normal.WithMeanPrecision(0.0, 1.0);
+	    Vector3[] force = Force(x,bond_topo); // + angle_Force(x,angle_topo);
+	    Vector3[] angle = angle_Force(x);
 
             // OPTION 2:
             //lastHit.distance = float.PositiveInfinity;
                 
             // Iterate over time
             for (int t = 0; t < nT; t++)
-		    {
+	    {
                 // iterate over the atoms
                 for(int i = 0; i < x.Length; i++)
                 {
                     double rxx = normal.Sample();
                     float rx = Convert.ToSingle(rxx);
- 		            double ryy = normal.Sample();
+ 		    double ryy = normal.Sample();
                     float ry = Convert.ToSingle(ryy);
                     double rzz = normal.Sample();
                     float rz = Convert.ToSingle(rzz);
                     Vector3 r = new Vector3(rx,ry,rz);
+                    Debug.Log(r);
 
                     // OPTION 2:
                     /*
@@ -229,14 +244,14 @@ namespace C2M2.MolecularDynamics.Simulation
                     v[i]=v[i]+(dt*dt/2/m)*(force[i]+angle[i] + pushTerm);
                     */
                     v[i]=v[i]+(dt*dt/2/m)*(force[i]+angle[i]);
-		            x[i]=x[i]+(dt/2)*v[i];
+		    x[i]=x[i]+(dt/2)*v[i];
                     v[i]=a*v[i]+coeff*r;
-			        x[i]=x[i]+(dt/2)*v[i];
+		    x[i]=x[i]+(dt/2)*v[i];
                 }
 
-		        force = Force(x,bond_topo);
+		force = Force(x,bond_topo);
                 angle = angle_Force(x);
-                //Debug.Log(angle[0]);
+                
 
                 for(int i = 0; i < x.Length; i++)
                 {

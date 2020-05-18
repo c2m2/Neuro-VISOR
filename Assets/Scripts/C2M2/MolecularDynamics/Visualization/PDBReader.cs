@@ -25,11 +25,12 @@ namespace C2M2
                 bool inPos = false;
                 // Read file until the end
                 //while (reader.Peek() > -1)
-		for (int i = 0; i < 17; i++)
+		for (int i = 0; i < 16; i++)
                 {
                     // Read the next line of the file
                     string curLine = reader.ReadLine();
-                    string[] splitLine = curLine.Split(null); //delimiter is any white space
+	            //Debug.Log(curLine);
+                    string[] splitLine = curLine.Split(new char[] {' '},StringSplitOptions.RemoveEmptyEntries); //delimiter is any white space
                     CheckHeader(splitLine);
                     CheckLine(splitLine);            
                 }
@@ -43,9 +44,8 @@ namespace C2M2
                     if (splitLine[0]=="ATOM")
                     { // Entering atom section
                         inPos = true;
-
-                        int atomCount = int.Parse(splitLine[1]);
-                        Pos.Capacity = atomCount;
+                        //int atomCount = int.Parse(splitLine[1]);
+                        Pos.Capacity = 1000;//atomCount;
                     }
                 }
                 void CheckLine(string[] splitLine)
