@@ -19,7 +19,7 @@ namespace C2M2.MolecularDynamics.Simulation
 
         public int timestepCount = 50000;
         public float timestepSize = .1f;
-           
+
 	    private int[] bonds = null;
 	    private int[] angles = null;
 	    private int[][] bond_topo = null;
@@ -42,39 +42,37 @@ namespace C2M2.MolecularDynamics.Simulation
         public override void SetValues(RaycastHit hit)
         {
             // You have two options: add the force here, or in your solve thread.
-            // 
-            // 
+            //
+            //
             // OPTION 1: You may run into mutual exclusion issues with this method, but maybe not
             // Get the molecule index that was hit by the interaction Raycast
             //int molHit = molLookup[hit.transform];  // Now v[molHit] or x[molHit] should affect the molecule hit by the raycast
             //Vector3 hitDirection = hit.normal;
-            //v[molHit] += hitDirection or whatever. 
+            //v[molHit] += hitDirection or whatever.
 
             // OPTION 2:
             //lastHit = hit;
         }
 
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>
-        /// Evaluates the forces. 
-        /// First will try doing for system of oscillators. 
+        /// Evaluates the forces.
+        /// First will try doing for system of oscillators.
         /// Then will extend to non-bonded interactions
         /// </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         public Vector3[] Force(Vector3[] pos, int[][] bond_topo)
 	    {
-		    Vector3[] f = new Vector3[x.Length];
-            float kappa=0.0f;
-		    float r0=4.0f;
-            Vector3 r = new Vector3(0,0,0);
+		Vector3[] f = new Vector3[x.Length];
+            	float kappa=0.0f;
+		float r0=4.0f;
+            	Vector3 r = new Vector3(0,0,0);
 
-		    for(int i = 0; i < x.Length; i++)         
+		for(int i = 0; i < x.Length; i++)
 		    {
-                for(int j = 0; j < bond_topo[i].Length; j++)
+                	for(int j = 0; j < bond_topo[i].Length; j++)
 		        {
-                	// U(x) = sum kappa_ij*(|x_i-x_j|-r_0)^2  
-                    r = pos[i]-pos[bond_topo[i][j]];
-                    f[i] += -kappa*(r.magnitude-r0)*r*0;                    
+                	    // U(x) = sum kappa_ij*(|x_i-x_j|-r_0)^2
+                    		r = pos[i]-pos[bond_topo[i][j]];
+                    		f[i] += -kappa*(r.magnitude-r0)*r*0;
                 }
             }
  		    return f;
@@ -89,15 +87,15 @@ namespace C2M2.MolecularDynamics.Simulation
 	    {
 		    Vector3[] f = new Vector3[3];
             float kappa_theta=.01f;
-            Vector3 r12 = pos[1]-pos[0]; 
-		    Vector3 r23 = pos[2]-pos[1]; 
-            Vector3 r13 = pos[2]-pos[0]; 
-                
+            Vector3 r12 = pos[1]-pos[0];
+		    Vector3 r23 = pos[2]-pos[1];
+            Vector3 r13 = pos[2]-pos[0];
+
             float g = 2*Vector3.Dot(r12,r13);
             float h = (r12.magnitude+r13.magnitude-r23.magnitude);
 		    float rad2deg = 180/Mathf.PI;
 		    float theta=rad2deg*Mathf.Atan(g/h);
-		    float theta_0=180.0f;		
+		    float theta_0=180.0f;
 
 		    Vector3 g_x1 = -(r13+r12);
             Vector3 g_x2 = r13;
@@ -105,13 +103,13 @@ namespace C2M2.MolecularDynamics.Simulation
             Vector3 h_x1 = -(r12/r12.magnitude)-(r13/r13.magnitude);
 		    Vector3 h_x2 = (r12/r12.magnitude)+(r23/r23.magnitude);
 		    Vector3 h_x3 = (r13/r13.magnitude)-(r23/r23.magnitude);
-		    //for(int i = 0; i < x.Length; i++)         
+		    //for(int i = 0; i < x.Length; i++)
 		    //{
                         //for(int j = 0; j < angle_topo[i].Length; j++)
-		        //{                        
+		        //{
                         //f[i]=
-                            //r[j] = pos[i]-pos[angle_topo[i][j]];	
-                            //f[i] += angle_Force(pos,angle_topo); //harmonic angle forces                      
+                            //r[j] = pos[i]-pos[angle_topo[i][j]];
+                            //f[i] += angle_Force(pos,angle_topo); //harmonic angle forces
                         //}
             float pre_factor = -kappa_theta*(theta-theta_0)/(1+(g/h)*(g/h));
 		    Debug.Log(theta);
@@ -123,7 +121,7 @@ namespace C2M2.MolecularDynamics.Simulation
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
-        /// Molecular dynamics simulation code   
+        /// Molecular dynamics simulation code
         /// </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         protected override void Solve()
@@ -139,7 +137,7 @@ namespace C2M2.MolecularDynamics.Simulation
             bonds = psffile.bonds;
             angles = psffile.angles;
 	    Debug.Log(bonds);
- 
+
 	    for (int i = 0; i < x.Length; i++)
 	    {
 	 	for (int j = 0; j < x.Length; j++)
@@ -159,7 +157,7 @@ namespace C2M2.MolecularDynamics.Simulation
             //angle_topo[0]= new int[] {};
 		    //angle_topo[1]= new int[] {0,1,2};
 		    //angle_topo[2]= new int[] {};
-	    
+
 	    //instantiate a normal dist.
 	    var normal = Normal.WithMeanPrecision(0.0, 1.0);
 	    Vector3[] force = Force(x,bond_topo); // + angle_Force(x,angle_topo);
@@ -167,7 +165,7 @@ namespace C2M2.MolecularDynamics.Simulation
 
             // OPTION 2:
             //lastHit.distance = float.PositiveInfinity;
-                
+
             // Iterate over time
             for (int t = 0; t < nT; t++)
 	    {
@@ -201,7 +199,7 @@ namespace C2M2.MolecularDynamics.Simulation
 
 		force = Force(x,bond_topo);
                 angle = angle_Force(x);
-                
+
 
                 for(int i = 0; i < x.Length; i++)
                 {
