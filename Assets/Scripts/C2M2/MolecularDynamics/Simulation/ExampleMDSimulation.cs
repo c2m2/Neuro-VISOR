@@ -14,21 +14,16 @@ namespace C2M2.MolecularDynamics.Simulation
         public int numSpheres = 3;
         // Example radius for spheres
         public float radius = .5f;
-        public float kb=0.001987f; //kcal per mol
-        public float T=1.0f; //K
+        public float kb = 0.001987f; //kcal per mol
+        public float T = 1.0f; //K
 
         public int timestepCount = 50000;
         public float timestepSize = .1f;
-            
-        private Vector3[] x = null;
-	    private Vector3[] v = null;
-        private Vector3[] r = null;
+           
 	    private int[] bonds = null;
 	    private int[] angles = null;
 	    private int[][] bond_topo = null;
 	    private int[][] angle_topo = null;
-
-        Dictionary<Transform, int> molLookup;
 
         // OPTION 2:
         //RaycastHit lastHit = new RaycastHit();
@@ -57,52 +52,6 @@ namespace C2M2.MolecularDynamics.Simulation
 
             // OPTION 2:
             //lastHit = hit;
-        }
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>
-        /// In the future, MDSimulation should this method with the PDBReader, 
-        /// so you won't need to worry about coding it every time. 
-        /// We don't have a PDB file, so we create so make-believe positions
-        /// </summary>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        protected override Transform[] BuildTransforms()
-        {
-            // Create spheres
-            /*Sphere[] spheres = new Sphere[numSpheres];
-            x = new Vector3[numSpheres];
-            v = new Vector3[numSpheres];
-            for(int i = 0; i < spheres.Length; i++)
-            {
-                // Put our new spheres in a straight line and store their positions as simulation values
-                Vector3 pos = new Vector3(4*i, 0, 0);
-                Vector3 vel = new Vector3(0, 0, 0);
-            //    spheres[i] = new Sphere(pos, radius);
-            //    x[i] = pos;
-            //    v[i] = vel;
-            }*/
-            Debug.Log(System.IO.Directory.GetCurrentDirectory());
-	        PDBFile pdbfile = PDBReader.ReadFile("Assets/StreamingAssets/MolecularDynamics/PE/pe_cg.pdb");
-
-            x = pdbfile.pos; 
-	        Sphere[] spheres = new Sphere[x.Length];
-	        for(int i = 0; i < x.Length; i++)
-	        {
-                spheres[i] = new Sphere(x[i],1.5);
-	        }
-
-            // Instantiate the created spheres and return their transform components
-            SphereInstantiator instantiator = gameObject.AddComponent<SphereInstantiator>();
-            Transform[] transforms = instantiator.InstantiateSpheres(spheres);
-
-            // Create a lookup so that given a transform hit by a raycast we can get the molecule's index
-            molLookup = new Dictionary<Transform, int>(transforms.Length);
-            for(int i = 0; i < transforms.Length; i++)
-            {
-                molLookup.Add(transforms[i], i);
-            }
-
-            return transforms;
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
