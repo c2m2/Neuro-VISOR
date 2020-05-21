@@ -7,11 +7,15 @@ namespace C2M2.MolecularDynamics.Simulation
 {
     public abstract class MDSimulation : PositionFieldSimulation
     {
-        public string pdbFilePath;
+        private readonly string relPath = Application.streamingAssetsPath + @"/MolecularDynamics/";
+        public string pdbFilePath = "PE/pe_cg.pdb";
+        public string psfFilePath = "PE/octatetracontane_128.cg.psf.psf";
         protected Dictionary<Transform, int> molLookup;
         protected Vector3[] x = null;
         protected Vector3[] v = null;
         protected Vector3[] r = null;
+        protected int[] bonds = null;
+        protected int[] angles = null;
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
@@ -22,9 +26,12 @@ namespace C2M2.MolecularDynamics.Simulation
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         protected override Transform[] BuildTransforms()
         {
-            PDBFile pdbfile = PDBReader.ReadFile(pdbFilePath);
+            PDBFile pdbFile = PDBReader.ReadFile(relPath + pdbFilePath);
+            PSFFile psfFile = PSFReader.ReadFile(relPath + psfFilePath);
+            bonds = psfFile.bonds;
+            angles = psfFile.angles;
+            x = pdbFile.pos;
 
-            x = pdbfile.pos;
             Sphere[] spheres = new Sphere[x.Length];
             for (int i = 0; i < x.Length; i++)
             {
@@ -33,7 +40,7 @@ namespace C2M2.MolecularDynamics.Simulation
 
             // Instantiate the created spheres and return their transform components
             SphereInstantiator instantiator = gameObject.AddComponent<SphereInstantiator>();
-            Transform[] transforms = instantiator.InstantiateSpheres(spheres);
+            Transform[] transforms = instantiator.InstantiateSpheres(spheres, "Molecule", "Atom");
 
             // Create a lookup so that given a transform hit by a raycast we can get the molecule's index
             molLookup = new Dictionary<Transform, int>(transforms.Length);

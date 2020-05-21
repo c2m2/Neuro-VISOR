@@ -23,6 +23,7 @@ namespace C2M2.Simulation
 
         protected override void UpdateVisualization(in Vector3[] simulationValues)
         {
+
             for (int i = 0; i < simulationValues.Length; i++)
             {
                 transforms[i].position = simulationValues[i];

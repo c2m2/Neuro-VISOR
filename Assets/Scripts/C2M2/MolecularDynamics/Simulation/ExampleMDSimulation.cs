@@ -20,8 +20,6 @@ namespace C2M2.MolecularDynamics.Simulation
         public int timestepCount = 50000;
         public float timestepSize = .1f;
 
-	    private int[] bonds = null;
-	    private int[] angles = null;
 	    private int[][] bond_topo = null;
 	    private int[][] angle_topo = null;
 
@@ -61,18 +59,18 @@ namespace C2M2.MolecularDynamics.Simulation
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         public Vector3[] Force(Vector3[] pos, int[][] bond_topo)
 	    {
-		Vector3[] f = new Vector3[x.Length];
-            	float kappa=0.0f;
-		float r0=4.0f;
-            	Vector3 r = new Vector3(0,0,0);
+		    Vector3[] f = new Vector3[x.Length];
+            float kappa=0.0f;
+		    float r0=4.0f;
+            Vector3 r = new Vector3(0,0,0);
 
-		for(int i = 0; i < x.Length; i++)
+		    for(int i = 0; i < x.Length; i++)
 		    {
-                	for(int j = 0; j < bond_topo[i].Length; j++)
+                for(int j = 0; j < bond_topo[i].Length; j++)
 		        {
-                	    // U(x) = sum kappa_ij*(|x_i-x_j|-r_0)^2
-                    		r = pos[i]-pos[bond_topo[i][j]];
-                    		f[i] += -kappa*(r.magnitude-r0)*r*0;
+                	// U(x) = sum kappa_ij*(|x_i-x_j|-r_0)^2
+                    r = pos[i]-pos[bond_topo[i][j]];
+                    f[i] += -kappa*(r.magnitude-r0)*r*0;
                 }
             }
  		    return f;
@@ -129,14 +127,11 @@ namespace C2M2.MolecularDynamics.Simulation
             int nT = timestepCount;
             float dt = timestepSize;
             float m = 10.0f;
-	    float gamma=0.1f;
+	        float gamma=0.1f;
             float a=((1-gamma*dt/2)/(1+gamma*dt/2));
             float coeff=Convert.ToSingle(Math.Sqrt(kb*T*(1-a*a)/m));
-	    Debug.Log(a);
-	    PSFFile psffile = PSFReader.ReadFile("Assets/StreamingAssets/MolecularDynamics/PE/pe_cg.psf");
-            bonds = psffile.bonds;
-            angles = psffile.angles;
-	    Debug.Log(bonds);
+	        Debug.Log(a);
+	        Debug.Log(bonds);
 
 	    for (int i = 0; i < x.Length; i++)
 	    {

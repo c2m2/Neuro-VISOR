@@ -6,9 +6,16 @@ namespace C2M2.MolecularDynamics.Visualization
 {
     public class SphereInstantiator : MonoBehaviour
     {
-        public Transform[] InstantiateSpheres(Sphere[] spheres)
+        public Transform[] InstantiateSpheres(Sphere[] spheres, string rootName = "Spheres", string instanceName = "Sphere")
         {
+            Transform root = new GameObject().transform;
+            root.parent = transform;
+            root.name = rootName;
+            root.localPosition = Vector3.zero;
+            root.localEulerAngles = Vector3.zero;
+
             // Instantiate sphere objects, adjust their transforms
+            string fmt = instanceName + " {0}";
             Transform[] transforms = new Transform[spheres.Length];
             for (int i = 0; i < spheres.Length; i++)
             {
@@ -18,6 +25,8 @@ namespace C2M2.MolecularDynamics.Visualization
                 transforms[i].position = spheres[i].position;
                 float diameter = (float)(spheres[i].radius * 2);
                 transforms[i].localScale = new Vector3(diameter, diameter, diameter);
+                transforms[i].name = string.Format(fmt, i);
+                transforms[i].parent = root;
             }
 
             return transforms;
