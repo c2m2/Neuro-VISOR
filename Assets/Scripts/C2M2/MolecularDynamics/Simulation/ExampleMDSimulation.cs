@@ -20,7 +20,6 @@ namespace C2M2.MolecularDynamics.Simulation
         public int timestepCount = 50000;
         public float timestepSize = .1f;
 
-	    private int[][] bond_topo = null;
 	    private int[][] angle_topo = null;
 
         // OPTION 2:
@@ -59,17 +58,17 @@ namespace C2M2.MolecularDynamics.Simulation
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         public Vector3[] Force(Vector3[] pos, int[][] bond_topo)
 	    {
-		    Vector3[] f = new Vector3[x.Length];
+		    Vector3[] f = new Vector3[bond_topo.Length];
             float kappa=0.0f;
 		    float r0=4.0f;
             Vector3 r = new Vector3(0,0,0);
 
-		    for(int i = 0; i < x.Length; i++)
+		    for(int i = 0; i < bond_topo.Length; i++)
 		    {
                 for(int j = 0; j < bond_topo[i].Length; j++)
 		        {
                 	// U(x) = sum kappa_ij*(|x_i-x_j|-r_0)^2
-                    r = pos[i]-pos[bond_topo[i][j]];
+                    r = pos[i] - pos[bond_topo[i][j]];
                     f[i] += -kappa*(r.magnitude-r0)*r*0;
                 }
             }
@@ -105,15 +104,16 @@ namespace C2M2.MolecularDynamics.Simulation
 		    //{
                         //for(int j = 0; j < angle_topo[i].Length; j++)
 		        //{
-                        //f[i]=
-                            //r[j] = pos[i]-pos[angle_topo[i][j]];
-                            //f[i] += angle_Force(pos,angle_topo); //harmonic angle forces
-                        //}
+            //f[i]=
+                //r[j] = pos[i]-pos[angle_topo[i][j]];
+                //f[i] += angle_Force(pos,angle_topo); //harmonic angle forces
+            //}
             float pre_factor = -kappa_theta*(theta-theta_0)/(1+(g/h)*(g/h));
 		    Debug.Log(theta);
   		    f[0] = pre_factor*(h*g_x1-g*h_x1)/h/h;
 		    f[1] = pre_factor*(h*g_x2-g*h_x2)/h/h;
 		    f[2] = pre_factor*(h*g_x3-g*h_x3)/h/h;
+
  		    return f;
 	    }
 
@@ -127,25 +127,15 @@ namespace C2M2.MolecularDynamics.Simulation
             int nT = timestepCount;
             float dt = timestepSize;
             float m = 10.0f;
-	        float gamma=0.1f;
-            float a=((1-gamma*dt/2)/(1+gamma*dt/2));
-            float coeff=Convert.ToSingle(Math.Sqrt(kb*T*(1-a*a)/m));
-	        Debug.Log(a);
-	        Debug.Log(bonds);
-
-	    for (int i = 0; i < x.Length; i++)
-	    {
-	 	for (int j = 0; j < x.Length; j++)
-                {
-                    bond_topo[i][j] = bonds[i];
-                }
-	    }
+	        float gamma = 0.1f;
+            float a = ((1-gamma*dt/2)/(1+gamma*dt/2));
+            float coeff = Convert.ToSingle(Math.Sqrt(kb*T*(1-a*a)/m));
 
 	        //hard code the bond info
             //int[][] bond_topo = new int[x.Length][];
             //bond_topo[0]= new int[] {1};
-	    //	    bond_topo[1]= new int[] {0,2};
-	    //	    bond_topo[2]= new int[] {1};
+	        //	    bond_topo[1]= new int[] {0,2};
+	        //	    bond_topo[2]= new int[] {1};
 
             //hard code the angle info
             //int[][] angle_topo = new int[x.Length][];
@@ -153,28 +143,33 @@ namespace C2M2.MolecularDynamics.Simulation
 		    //angle_topo[1]= new int[] {0,1,2};
 		    //angle_topo[2]= new int[] {};
 
-	    //instantiate a normal dist.
-	    var normal = Normal.WithMeanPrecision(0.0, 1.0);
-	    Vector3[] force = Force(x,bond_topo); // + angle_Force(x,angle_topo);
-	    Vector3[] angle = angle_Force(x);
+	        //instantiate a normal dist.
+	        var normal = Normal.WithMeanPrecision(0.0, 1.0);
+	        Vector3[] force = Force(x,bond_topo); // + angle_Force(x,angle_topo);
+                                                  //Vector3[] angle = angle_Force(x);
 
             // OPTION 2:
             //lastHit.distance = float.PositiveInfinity;
 
             // Iterate over time
             for (int t = 0; t < nT; t++)
-	    {
+	        {
+        
                 // iterate over the atoms
                 for(int i = 0; i < x.Length; i++)
                 {
                     double rxx = normal.Sample();
                     float rx = Convert.ToSingle(rxx);
- 		    double ryy = normal.Sample();
+
+ 		            double ryy = normal.Sample();
                     float ry = Convert.ToSingle(ryy);
+
                     double rzz = normal.Sample();
                     float rz = Convert.ToSingle(rzz);
+
                     Vector3 r = new Vector3(rx,ry,rz);
-                    Debug.Log(r);
+                    //Debug.Log(r);
+                    //GameManager.instance.DebugLogSafe(r);
 
                     // OPTION 2:
                     /*
@@ -186,20 +181,22 @@ namespace C2M2.MolecularDynamics.Simulation
                     }
                     v[i]=v[i]+(dt*dt/2/m)*(force[i]+angle[i] + pushTerm);
                     */
-                    v[i]=v[i]+(dt*dt/2/m)*(force[i]+angle[i]);
-		    x[i]=x[i]+(dt/2)*v[i];
-                    v[i]=a*v[i]+coeff*r;
-		    x[i]=x[i]+(dt/2)*v[i];
+                    v[i] = v[i] + (dt*dt/2/m) * (force[i]);
+		            x[i] = x[i] + (dt/2) * v[i];
+                    v[i]=a*v[i] + coeff * r;
+		            x[i]=x[i] + (dt/2) * v[i];
                 }
 
-		force = Force(x,bond_topo);
-                angle = angle_Force(x);
+		        force = Force(x,bond_topo);
 
+                /*GameManager.instance.DebugLogSafe("force[1043]: " + force[1043]
+                    + "\nx[1043]: " + x[1043]
+                    + "\nv[1043]: " + v[1043]);*/
+                //angle = angle_Force(x);
 
                 for(int i = 0; i < x.Length; i++)
                 {
-
-                    v[i]=v[i]+(dt*dt/2/m)*(force[i]+angle[i]);
+                    v[i] = v[i] + (dt*dt/2/m) * (force[i]);
                 }
             }
             Debug.Log("ExampleMDSimulation complete.");

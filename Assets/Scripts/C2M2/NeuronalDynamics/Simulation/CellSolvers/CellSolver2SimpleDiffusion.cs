@@ -21,7 +21,7 @@ namespace C2M2.NeuronalDynamics.Simulation
 {
     using DiameterAttachment = IAttachment<DiameterData>;
 
-    public class CellSolver2SimpleDiffusion : NeuronSimulation
+    public class CellSolver2SimpleDiffusion : NeuronSimulation1D
     {
         //Set cell biological paramaters
         public const double res = 10.0;

@@ -35,7 +35,7 @@ namespace C2M2
         public Transform menuSnapPosition;
         [Header("FPS Counter")]
         public Utils.DebugUtils.FPSCounter fpsCounter;
-
+        private bool isRunning = false;
 
         private void Awake()
         {
@@ -48,7 +48,7 @@ namespace C2M2
             // Initialize keyboard
             raycastKeyboardPrefab = Instantiate(raycastKeyboardPrefab, new Vector3(50, 50, 50), Quaternion.identity);
             raycastKeyboard = raycastKeyboardPrefab.GetComponent<RaycastKeyboard>();
-
+            isRunning = true;
 
         }
 
@@ -75,13 +75,24 @@ namespace C2M2
         /// </remarks>
         public void DebugLogSafe(string s)
         {
-            if(logQ.Count > logQCap)
+            if (isRunning)
             {
-                Debug.LogWarning("Cannot call DebugLogSafe more than [" + logQCap + "] times per frame. New statements will not be added to queue");
-                return;
+                if (logQ.Count > logQCap)
+                {
+                    Debug.LogWarning("Cannot call DebugLogSafe more than [" + logQCap + "] times per frame. New statements will not be added to queue");
+                    return;
+                }
+                logQ.Add(s);
             }
-            logQ.Add(s);
         }
         public void DebugLogSafe<T>(T t) => DebugLogSafe(t.ToString());
+        private void OnApplicationQuit()
+        {
+            isRunning = false;
+        }
+        private void OnApplicationPause(bool pause)
+        {
+            isRunning = !pause;
+        }
     }
 }

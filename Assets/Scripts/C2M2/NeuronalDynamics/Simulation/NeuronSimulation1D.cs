@@ -11,13 +11,13 @@ using Grid = C2M2.NeuronalDynamics.UGX.Grid;
 namespace C2M2.NeuronalDynamics.Simulation
 {
     /// <summary>
-    /// Provides base functionality for Neuron simulations
+    /// Provide an interface for 1D neuron-surface simulations to be visualized and interacted with properly
+    /// 
     /// </summary>
     /// <remarks>
-    /// Make your neuron surface simulation derive from this class.
-    /// It will read in ugx files, build the 3D neuron mesh, and build a map between 1D and 3D geometries.
+    /// 1D Neuron surface simulations should derive from this class.
     /// </remarks>
-    public abstract class NeuronSimulation : SurfaceSimulation
+    public abstract class NeuronSimulation1D : SurfaceSimulation
     {
         public bool visualize1D = false;
         public Color32 color1D = Color.green;
@@ -45,9 +45,9 @@ namespace C2M2.NeuronalDynamics.Simulation
         Dictionary<int, Tuple<int, int, double>> map;
         protected override Mesh BuildMesh()
         {            
-            string[] cellFiles = GetCellFiles();
+            string[] cellFileNames = BuildCellFileNames();
 
-            MappingInfo mapping = MapUtils.BuildMap(cellFiles[1], cellFiles[0], false, cellFiles[2]);
+            MappingInfo mapping = MapUtils.BuildMap(cellFileNames[1], cellFileNames[0], false, cellFileNames[2]);
             map = mapping.Data;
 
             // Pass the cell to simulation code
@@ -61,7 +61,7 @@ namespace C2M2.NeuronalDynamics.Simulation
 
             return newMesh;
 
-            string[] GetCellFiles()
+            string[] BuildCellFileNames()
             {
                 string[] cells = new string[4];
                 cells[3] = "NULL";
@@ -104,9 +104,9 @@ namespace C2M2.NeuronalDynamics.Simulation
             void CheckMeshCollider()
             {
                 // If a blownup mesh file is given, read it in and apply it
-                if (!cellFiles[3].Equals("NULL"))
+                if (!cellFileNames[3].Equals("NULL"))
                 {
-                    Mesh blownupMesh = MapUtils.BuildMap(cellFiles[3], cellFiles[0], false, cellFiles[2]).SurfaceGeometry.Mesh;
+                    Mesh blownupMesh = MapUtils.BuildMap(cellFileNames[3], cellFileNames[0], false, cellFileNames[2]).SurfaceGeometry.Mesh;
                     MeshColController meshColController = gameObject.AddComponent<MeshColController>();
                     meshColController.mesh = blownupMesh;
                 }

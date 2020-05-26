@@ -857,13 +857,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   interactionType: 0
   startOnAwake: 1
-  pdbFilePath: Assets/StreamingAssets/MolecularDynamics/PE/pe_cg.pdb
+  pdbFilePath: PE/pe_cg.pdb
+  psfFilePath: PE/octatetracontane_128.cg.psf
   numSpheres: 1000
   radius: 0.1
   kb: 0.001987
   T: 1
   timestepCount: 1000000
-  timestepSize: 0.000002
+  timestepSize: 0.1
 --- !u!4 &1815266849
 Transform:
   m_ObjectHideFlags: 0
@@ -1335,7 +1336,7 @@ PrefabInstance:
     - target: {fileID: 5843646974706866111, guid: 70469a93359ee8b4e98c4c445b157af9,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5843646974706866111, guid: 70469a93359ee8b4e98c4c445b157af9,
         type: 3}

@@ -1,10 +1,12 @@
 ﻿using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using C2M2.Simulation;
 using C2M2.MolecularDynamics.Visualization;
 namespace C2M2.MolecularDynamics.Simulation
 {
+    using Utils;
     public abstract class MDSimulation : PositionFieldSimulation
     {
         private readonly string relPath = Application.streamingAssetsPath + @"/MolecularDynamics/";
@@ -16,6 +18,7 @@ namespace C2M2.MolecularDynamics.Simulation
         protected Vector3[] r = null;
         protected int[] bonds = null;
         protected int[] angles = null;
+        protected int[][] bond_topo = null;
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
@@ -29,8 +32,19 @@ namespace C2M2.MolecularDynamics.Simulation
             PDBFile pdbFile = PDBReader.ReadFile(relPath + pdbFilePath);
             PSFFile psfFile = PSFReader.ReadFile(relPath + psfFilePath);
             bonds = psfFile.bonds;
+            // Convert bonds to 0 base
+            for(int i = 0; i < bonds.Length; i++)
+            {
+                bonds[i] = bonds[i] - 1;
+            }
             angles = psfFile.angles;
             x = pdbFile.pos;
+            // Initialize v
+            v = new Vector3[x.Length];
+            for(int i = 0; i < v.Length; i++)
+            {
+                v[i] = Vector3.one;
+            }
 
             Sphere[] spheres = new Sphere[x.Length];
             for (int i = 0; i < x.Length; i++)
@@ -48,7 +62,53 @@ namespace C2M2.MolecularDynamics.Simulation
             {
                 molLookup.Add(transforms[i], i);
             }
-            return null;
+
+            bond_topo = BuildBondTopology(bonds);
+
+            return transforms;
+
+            int[][] BuildBondTopology(int[] bonds)
+            {
+                int maxInd = bonds.Max();
+                List<int>[] bond_topo_list = new List<int>[maxInd + 1];
+                int i = 0;
+                for(i = 0; i < bond_topo_list.Length; i++)
+                {
+                    bond_topo_list[i] = new List<int>();
+                }
+
+                int a = -1, b = -1;
+
+                try
+                {
+                    // Look at each bond and store it in our symmetric matrix
+                    for (i = 0; i < bonds.Length; i += 2)
+                    {
+                        if (!(bonds.Length % 2 == 0)) throw new System.Exception("Bond array is not divisible by 2");
+
+                        // Convert indices to be zero based
+                        a = bonds[i];
+                        b = bonds[i + 1];
+                        bond_topo_list[a].Add(b);
+                        bond_topo_list[b].Add(a);
+                    }
+                }catch(IndexOutOfRangeException e)
+                {
+                    Debug.LogError("a: " + a
+                        + "\nb: " + b
+                        + "\nmaxInd: " + maxInd
+                        + "\n" + e);
+                }
+
+                // Convert array of lists to jagged array
+                bond_topo = new int[maxInd + 1][];
+                for(i = 0; i < bond_topo_list.Length; i++)
+                {
+                    bond_topo[i] = bond_topo_list[i].ToArray();
+                }
+
+                return bond_topo;
+            }
         }
 
     }
