@@ -862,8 +862,8 @@ MonoBehaviour:
   numSpheres: 1000
   radius: 0.1
   kb: 0.001987
-  T: 1
-  timestepCount: 1000000
+  T: 100
+  timestepCount: 100000
   timestepSize: 0.1
 --- !u!4 &1815266849
 Transform:

@@ -20,6 +20,9 @@ namespace C2M2.MolecularDynamics.Simulation
         public int timestepCount = 50000;
         public float timestepSize = .1f;
 
+        public float kappa = 6f;
+        public float r0 = 3.65f;
+
 	    private int[][] angle_topo = null;
 
         // OPTION 2:
@@ -59,8 +62,6 @@ namespace C2M2.MolecularDynamics.Simulation
         public Vector3[] Force(Vector3[] pos, int[][] bond_topo)
 	    {
 		    Vector3[] f = new Vector3[bond_topo.Length];
-            float kappa=0.0f;
-		    float r0=4.0f;
             Vector3 r = new Vector3(0,0,0);
 
 		    for(int i = 0; i < bond_topo.Length; i++)
@@ -189,9 +190,9 @@ namespace C2M2.MolecularDynamics.Simulation
 
 		        force = Force(x,bond_topo);
 
-                /*GameManager.instance.DebugLogSafe("force[1043]: " + force[1043]
+                GameManager.instance.DebugLogSafe("force[1043]: " + force[1043]
                     + "\nx[1043]: " + x[1043]
-                    + "\nv[1043]: " + v[1043]);*/
+                    + "\nv[1043]: " + v[1043]);
                 //angle = angle_Force(x);
 
                 for(int i = 0; i < x.Length; i++)
