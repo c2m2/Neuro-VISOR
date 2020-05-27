@@ -4,6 +4,7 @@ using System.Threading;
 
 namespace C2M2
 {
+    using Interaction;
     public class GameManager : MonoBehaviour
     {
         public static GameManager instance = null;

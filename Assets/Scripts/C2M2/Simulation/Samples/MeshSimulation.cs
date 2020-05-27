@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System;
+using C2M2.Utils.Exceptions;
 
 namespace C2M2.Simulation.Samples
 {

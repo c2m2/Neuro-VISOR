@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using C2M2.Interaction;
 namespace C2M2.NeuronalDynamics.Visualization.VTK
 {
     //TODO: Convert this into a manager with Singleton's (http://wiki.unity3d.com/index.php/Singleton, https://answers.unity.com/questions/50716/how-to-make-a-global-variable-in-unity.html)

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
-namespace C2M2
+namespace C2M2.Interaction
 {
     /// <summary> Attach this script to parent gameObject, create one child with one raycast trigger per child. Switch between triggers by index or switch the active trigger to any custom RaycastTrigger instance. </summary>
     /// TODO: Events should be triggered from this script, not from the trigger. 

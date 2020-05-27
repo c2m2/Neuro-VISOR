@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-namespace C2M2
+namespace C2M2.Interaction.UI
 {
     public class RaycastKey : MonoBehaviour
     {

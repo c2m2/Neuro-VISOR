@@ -2,7 +2,7 @@
 using System;
 using UnityEngine.Events;
 
-namespace C2M2
+namespace C2M2.Interaction
 {
     /// <summary> Store custom events that the corresponding RaycastTriggerManager will invoke </summary>
     /// Adapted from: https://answers.unity.com/questions/1335277/how-to-make-a-custom-onclick-event.html

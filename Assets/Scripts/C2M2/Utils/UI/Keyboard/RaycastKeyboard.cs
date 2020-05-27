@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
-namespace C2M2
+namespace C2M2.Interaction
 {
+    using UI;
     /// <summary>
     /// 
     /// </summary>

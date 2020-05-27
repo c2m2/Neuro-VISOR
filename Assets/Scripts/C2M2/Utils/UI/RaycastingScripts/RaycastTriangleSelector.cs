@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+
 /// <summary>
 /// Color a mesh's triangles as you raycast to it
 /// </summary>

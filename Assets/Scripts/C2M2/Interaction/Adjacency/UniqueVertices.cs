@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using System;
+using C2M2.Utils.Exceptions;
 namespace C2M2.Interaction.Adjacency
 {
     /// <summary>

@@ -1,23 +1,25 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-public class RaycastShiftKey : MonoBehaviour
+namespace C2M2.Interaction.UI
 {
-    public GameObject uppercaseKeys;
-    public GameObject lowercaseKeys;
-
-    public void SwitchKeyboard()
+    public class RaycastShiftKey : MonoBehaviour
     {
-        if (uppercaseKeys.activeSelf)
+        public GameObject uppercaseKeys;
+        public GameObject lowercaseKeys;
+
+        public void SwitchKeyboard()
         {
-            uppercaseKeys.SetActive(false);
-            lowercaseKeys.SetActive(true);
-        }
-        else
-        {
-            uppercaseKeys.SetActive(true);
-            lowercaseKeys.SetActive(false);
+            if (uppercaseKeys.activeSelf)
+            {
+                uppercaseKeys.SetActive(false);
+                lowercaseKeys.SetActive(true);
+            }
+            else
+            {
+                uppercaseKeys.SetActive(true);
+                lowercaseKeys.SetActive(false);
+            }
         }
     }
 }

@@ -4,7 +4,7 @@ using UnityEngine.UI;
 using TMPro;
 using UnityEngine.Events;
 
-namespace C2M2
+namespace C2M2.Interaction.UI
 {
     public class RaycastInputField : MonoBehaviour
     {

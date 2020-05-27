@@ -2,7 +2,7 @@
 
 using UnityEngine;
 using System;
-namespace C2M2
+namespace C2M2.Interaction
 {
     [Obsolete("Replace by OculusEventSignaler")]
     public class RaycastForward : MonoBehaviour
