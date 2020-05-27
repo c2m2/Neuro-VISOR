@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace C2M2.Simulation
 {
