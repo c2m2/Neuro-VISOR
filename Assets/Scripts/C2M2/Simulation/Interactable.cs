@@ -6,14 +6,17 @@ namespace C2M2.Simulation
 {
     using Interaction;
     /// <summary>
-    /// Manages interaction input to simulations
+    /// Interface for interaction scripts
     /// </summary>
     /// <remarks>
-    /// Interactable provides an interface so that interaction scripts can affect a Simulation without needing to know their type.
+    /// Interactable provides an interface so that interaction scripts can affect a Simulation without needing to know its type.
     /// </remarks>
     public abstract class Interactable : MonoBehaviour
     {
-        protected RaycastSimHeater simHeater = null;
+        private RaycastSimHeater simHeater = null;
+        /// <summary>
+        /// Interaction script that resolves player interaction and passes new values back here
+        /// </summary>
         public RaycastSimHeater SimHeater
         {
             get { return simHeater; }
@@ -26,13 +29,10 @@ namespace C2M2.Simulation
         public enum InteractionType { Discrete, Continuous }
         public InteractionType interactionType = InteractionType.Discrete;
 
-        /// <summary> Send an array of (index, newValue) pairings for hit points </summary>
+        /// <summary> Require derived classes to know how to receive an interaction event </summary>
         /// <remarks>
         /// In order to affect live simulations, this method must know how to add values between 0 and 1 to the current simulation values
         /// </remarks>
         public abstract void SetValues(RaycastHit hit);
-
-
-
     }
 }
