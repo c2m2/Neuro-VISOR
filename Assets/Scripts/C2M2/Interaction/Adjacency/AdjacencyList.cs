@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-
+using C2M2.Utils.Exceptions;
 namespace C2M2.Interaction.Adjacency
 {
     // TODO: Separate edgelist
