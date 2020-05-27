@@ -1,6 +1,9 @@
 ﻿/// <summary>
 /// Domain for all scripts produced in-house at the Center for Computational Mathematics and Modeling (C2M2) at Temple University
 /// </summary>
+/// <remarks>
+/// This script provides Doxygen with namespace descriptions for documentation purposes
+/// </remarks>
 namespace C2M2
 {
     /// <summary> Scripts powering Molecular Dynamics modeling </summary>

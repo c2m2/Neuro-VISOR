@@ -1,11 +1,9 @@
 ﻿using UnityEngine;
-namespace C2M2.Interaction
+namespace C2M2.Interaction.UI
 {
-    using UI;
     /// <summary>
-    /// 
+    /// Instantiates a raycastable keyboard and manages its input/output
     /// </summary>
-    /// TODO: Shift key should only captialize while it is held down
     public class RaycastKeyboard : MonoBehaviour
     {
         public GameObject keyPrefab;
