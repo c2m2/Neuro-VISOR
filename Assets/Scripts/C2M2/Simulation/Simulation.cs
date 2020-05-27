@@ -1,9 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using System.Threading;
 using System;
-using C2M2.Utils;
 using C2M2.Interaction;
 using C2M2.Interaction.VR;
 
