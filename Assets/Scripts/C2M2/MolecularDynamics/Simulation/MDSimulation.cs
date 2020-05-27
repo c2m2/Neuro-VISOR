@@ -11,13 +11,14 @@ namespace C2M2.MolecularDynamics.Simulation
     {
         private readonly string relPath = Application.streamingAssetsPath + @"/MolecularDynamics/";
         public string pdbFilePath = "PE/pe_cg.pdb";
-        public string psfFilePath = "PE/octatetracontane_128.cg.psf.psf";
+        public string psfFilePath = "PE/octatetracontane_128.cg.psf";
         protected Dictionary<Transform, int> molLookup;
         protected Vector3[] x = null;
         protected Vector3[] v = null;
         protected Vector3[] r = null;
         protected int[] bonds = null;
         protected int[] angles = null;
+	protected float[] mass = null;
         protected int[][] bond_topo = null;
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -32,18 +33,27 @@ namespace C2M2.MolecularDynamics.Simulation
             PDBFile pdbFile = PDBReader.ReadFile(relPath + pdbFilePath);
             PSFFile psfFile = PSFReader.ReadFile(relPath + psfFilePath);
             bonds = psfFile.bonds;
-            // Convert bonds to 0 base
+	    angles = psfFile.angles;
+	    mass = psfFile.mass;
+            Debug.Log(mass[2047]);
+
+            // Convert bonds and angles to 0 base
             for(int i = 0; i < bonds.Length; i++)
             {
                 bonds[i] = bonds[i] - 1;
             }
-            angles = psfFile.angles;
+	    for(int i = 0; i < angles.Length; i++)
+            {
+                angles[i] = angles[i] - 1;
+            }
+            
             x = pdbFile.pos;
+
             // Initialize v
             v = new Vector3[x.Length];
             for(int i = 0; i < v.Length; i++)
             {
-                v[i] = Vector3.one;
+                v[i] = Vector3.zero;
             }
 
             Sphere[] spheres = new Sphere[x.Length];
@@ -70,7 +80,7 @@ namespace C2M2.MolecularDynamics.Simulation
             int[][] BuildBondTopology(int[] bonds)
             {
                 int maxInd = bonds.Max();
-                List<int>[] bond_topo_list = new List<int>[maxInd + 1];
+                List<int>[] bond_topo_list = new List<int>[maxInd + 1]; //make list of bond connections
                 int i = 0;
                 for(i = 0; i < bond_topo_list.Length; i++)
                 {
@@ -106,7 +116,7 @@ namespace C2M2.MolecularDynamics.Simulation
                 {
                     bond_topo[i] = bond_topo_list[i].ToArray();
                 }
-
+                //Debug.Log(bond_topo[0][1]);
                 return bond_topo;
             }
         }
