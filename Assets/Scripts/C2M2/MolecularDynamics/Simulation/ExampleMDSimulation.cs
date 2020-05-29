@@ -10,8 +10,6 @@ namespace C2M2.MolecularDynamics.Simulation
 {
     public class ExampleMDSimulation : MDSimulation
     {
-        // Example radius for spheres
-        public float radius = .5f;
         public float kb = 0.001987f; //kcal per mol
         public float T = 100.0f; //K
 

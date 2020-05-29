@@ -17,6 +17,7 @@ namespace C2M2
         [Header("Environment")]
         public Material defaultMaterial;
         public Material vertexColorationMaterial;
+        public Material lineRendMaterial;
 
         public Vector3 objectScaleDefault = new Vector3(1f, 1f, 1f);
         //[Header("Raycasters")]

@@ -50,19 +50,6 @@ namespace C2M2.Utils.DebugUtils
             lr.positionCount = lrPos.Count;
             lr.SetPositions(lrPos.ToArray());
 
-            //      Add n1's position to the list,
-            //      Get n1's neighbors
-            //          for each neighbor n2
-            //              Add n2's position to the list,
-            //              Get n2's neighbors
-            //              for each neighbor n3
-            //                  Add n3's position to the list
-            //                  ...
-            //              add n3 to the list again, move to next neighbor
-            //          add n2 to the list again, move to next neighbor
-            //      add n1 to the list again, move to next neighbor
-
-
             renderersGo.transform.parent = transform;
 
             return renderersGo;

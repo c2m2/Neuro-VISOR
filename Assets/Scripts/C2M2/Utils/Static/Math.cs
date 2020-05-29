@@ -171,6 +171,35 @@ namespace C2M2
                 return sum;
             }
             #endregion
+            #region Abs
+            /// <summary> Get the absolute value of each array element </summary>
+            public static int[] Abs(this int[] array)
+            {
+                for (int i = 0; i < array.Length; i++)
+                {
+                    array[i] = array[i] > 0 ? array[i] : -array[i];
+                }
+                return array;
+            }
+            /// <summary> Get the absolute value of each array element </summary>
+            public static float[] Abs(this float[] array)
+            {
+                for (int i = 0; i < array.Length; i++)
+                {
+                    array[i] = array[i] > 0 ? array[i] : -array[i];
+                }
+                return array;
+            }
+            /// <summary> Get the absolute value of each array element </summary>
+            public static double[] Abs(this double[] array)
+            {
+                for (int i = 0; i < array.Length; i++)
+                {
+                    array[i] = array[i] > 0 ? array[i] : -array[i];
+                }
+                return array;
+            }
+            #endregion
             #endregion
         }
     }
