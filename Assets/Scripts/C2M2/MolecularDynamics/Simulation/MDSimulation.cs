@@ -13,7 +13,7 @@ namespace C2M2.MolecularDynamics.Simulation
         private readonly string relPath = Application.streamingAssetsPath + @"/MolecularDynamics/";
         public string pdbFilePath = "PE/pe_cg.pdb";
         public string psfFilePath = "PE/octatetracontane_128.cg.psf";
-        public float radius = 1.5f;
+        public float radius = 1f;
         public Material bondMaterial;
 
         protected Dictionary<Transform, int> molLookup;
@@ -75,7 +75,7 @@ namespace C2M2.MolecularDynamics.Simulation
             // Instantiate the created spheres and return their transform components
             SphereInstantiator instantiator = gameObject.AddComponent<SphereInstantiator>();
             Transform[] transforms = instantiator.InstantiateSpheres(spheres, "Molecule", "Atom");
-
+            // Apply positions to the transforms
             for(int i = 0; i < x.Length; i++)
             {
                 transforms[i].localPosition = x[i];
@@ -174,14 +174,11 @@ namespace C2M2.MolecularDynamics.Simulation
                     zs[i] = sphereTransforms[i].position.z;
                 }
                 float xScale = 1, yScale = 1, zScale = 1;
-                //xs = xs.Abs();
                 float[] boundsArray = { xs.Max(), ys.Max(), zs.Max() };
                 float max = boundsArray.Max();
 
-                Debug.Log("boundsArray: " + boundsArray[0] + ", " + boundsArray[1] + ", " + boundsArray[2]);
                 Vector3 targetSize = GameManager.instance.objectScaleDefault;
                 float[] targetArray = { targetSize.x, targetSize.y, targetSize.z };
-                Debug.Log("targetArray: " + targetArray[0] + ", " + targetArray[1] + ", " + targetArray[2]);
                 float min = Mathf.Min(targetArray);
                 xScale = min / max;
                 yScale = xScale;
