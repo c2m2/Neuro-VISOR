@@ -5,6 +5,7 @@ using System.Threading;
 namespace C2M2
 {
     using Interaction;
+    using Interaction.UI;
     public class GameManager : MonoBehaviour
     {
         public static GameManager instance = null;

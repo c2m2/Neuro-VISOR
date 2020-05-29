@@ -1,11 +1,11 @@
 ﻿
-namespace C2M2
+namespace C2M2.Tests
 {
-    namespace Tests
+    /// <summary>
+    /// TestManager will run tests that derive from StartTest during Start
+    /// </summary>
+    public abstract class StartTest : Test
     {
-        public abstract class StartTest : Test
-        {
 
-        }
     }
 }

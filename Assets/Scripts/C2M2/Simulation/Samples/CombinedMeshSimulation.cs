@@ -18,14 +18,20 @@ namespace C2M2.Simulation.Samples
     {
         private double[] values;
 
-        #region SimulationMethods
-        // Retrieve simulation values as a double array
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>
+        /// Send values upwards for visualization
+        /// </summary>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
         public override double[] GetValues()
         {
             return values;
         }
-
-        // Your simulation will receive new simulation values between 0 and 1 for each point
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>
+        /// Incorporate a raycast hit interaction into simulation values
+        /// </summary>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
         public override void SetValues(RaycastHit hit)
         {
             Tuple<int, double>[] newValues = RaycastSimHeaterDiscrete.HitToTriangles(hit);
@@ -35,7 +41,6 @@ namespace C2M2.Simulation.Samples
                 values[value.Item1] = value.Item2;
             }
         }
-
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary> Get every child mesh and combine into one mesh </summary>
         /// <returns> Combined mesh </returns>
@@ -62,12 +67,22 @@ namespace C2M2.Simulation.Samples
 
             return combinedMesh;
         }
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary> 
+        /// Find all meshes childed under a root transform and combine them into one.
+        /// </summary>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
         private Mesh CombineMeshes(Transform root)
         {
             Debug.Log("Combining from " + root.gameObject.name);
             MeshFilter[] mfs = root.GetComponentsInChildren<MeshFilter>(true);
             return CombineMeshes(mfs);
         }
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary> 
+        /// Take all MeshFilter.mesh's from an array and combine them into a single Mesh
+        /// </summary>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
         private Mesh CombineMeshes(MeshFilter[] mfs)
         {
             List<CombineInstance> meshesToCombine = new List<CombineInstance>(mfs.Length);
@@ -98,9 +113,11 @@ namespace C2M2.Simulation.Samples
 
             return combinedMesh;
         }
-
-        // Simulation computation should be contained in this method.
-        // This method will launch in its own thread.
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary> 
+        /// Simply degrades the value at each point by the time change times its current value
+        /// </summary>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
         protected override void Solve()
         {
             DateTime t0 = DateTime.Now;
@@ -114,6 +131,5 @@ namespace C2M2.Simulation.Samples
                 t0 = DateTime.Now;
             }
         }
-        #endregion
     }
 }

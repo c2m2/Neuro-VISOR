@@ -1,11 +1,11 @@
 ﻿
-namespace C2M2
+namespace C2M2.Tests
 {
-    namespace Tests
+    /// <summary>
+    /// TestManager will run tests that derive from AwakeTest during Awake
+    /// </summary>
+    public abstract class AwakeTest : Test
     {
-        public abstract class AwakeTest : Test
-        {
             
-        }
     }
 }

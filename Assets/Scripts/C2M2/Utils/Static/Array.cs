@@ -47,7 +47,6 @@ namespace C2M2
             /// <summary> Fills double array with random numbers from min [inclusive] to max [inclusive] </summary>
             public static void FillArrayRandom(this double[] array, double min, double max) => FillArrayRandom(array, (float)min, (float)max);
             #endregion
-
             #region Converters
             #region Array<->List
             public static int[] ToArray(this List<int> list)
@@ -103,7 +102,6 @@ namespace C2M2
                 return floats;
             }
             #endregion
-
             #region Reverse
             public static int[] Reverse(this int[] array)
             {
@@ -136,7 +134,6 @@ namespace C2M2
                 return array;
             }
             #endregion
-
             #region Rescale
             /// <summary> Rescale an array from (oldMin, oldMax) to (newMin, newMax) </summary>
             public static void RescaleArray(this float[] array, float newMin, float newMax, float oldMin, float oldMax)
@@ -158,6 +155,7 @@ namespace C2M2
             /// <summary> Rescale an array from (oldMin, oldMax) to (newMin, newMax) </summary>
             public static void RescaleArray(this float[] array, float newMin, float newMax) => RescaleArray(array, array.Min(), array.Max(), newMin, newMax);
             #endregion
+            #region Times
             /// <summary> Multiplies every value in this array by s </summary>
             public static float[] Times(this float[] array, float s)
             {
@@ -170,6 +168,7 @@ namespace C2M2
                 for (int i = 0; i < array.Length; i++) { array[i] *= s; }
                 return array;
             }
+            #endregion
             public static string ToStringFull(this double[] array)
             {
                 StringBuilder sb = new StringBuilder(array.Length * 10);

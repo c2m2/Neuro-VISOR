@@ -3,14 +3,27 @@ using UnityEngine;
 using C2M2.Utils.Exceptions;
 namespace C2M2.Interaction.Adjacency
 {
-    // TODO: Separate edgelist
+    /// <summary>
+    /// Given a mesh, creates and stores an edge list and adjacency list of the mesh vertices
+    /// </summary>
     [RequireComponent(typeof(MeshFilter))]
     [RequireComponent(typeof(UniqueVertices))]
     public class AdjacencyList : MonoBehaviour
     {
-        /// <summary> Stores the distance between adjacent vertices </summary>
+        /// <summary> 
+        /// Stores the distance between adjacent vertices 
+        /// </summary>
         public List<Node>[] adjacencyList { get; private set; }
+        /// <summary>
+        /// Stores a list of edges between vertices
+        /// </summary>
         public List<Edge> edgeList { get; private set; }
+        /// <summary>
+        /// Stores the number of edges connected to each vertex.
+        /// </summary>
+        /// <remarks>
+        /// edgeCount indices correspond to mesh.vertices indices
+        /// </remarks>
         public int[] edgeCount { get; private set; }
         private Mesh mesh;
         private Vector3[] vertices;

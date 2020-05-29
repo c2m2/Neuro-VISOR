@@ -1,11 +1,10 @@
-﻿
-namespace C2M2
+﻿namespace C2M2.Tests
 {
-    namespace Tests
+    /// <summary>
+    /// TestManager will run tests that derive from UpdateTest during Update
+    /// </summary>
+    public abstract class UpdateTest : Test
     {
-        public abstract class UpdateTest : Test
-        {
 
-        }
     }
 }

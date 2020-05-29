@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace C2M2.Utils.Animation
 {
+    /// <summary>
+    /// Alters the color of a material in a sinusoidal fashion using FixedUpdate
+    /// </summary>
     public class ColorAnimate : MonoBehaviour
     {
         public Color altColor = Color.black;
