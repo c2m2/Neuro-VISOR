@@ -8,6 +8,33 @@ using Unity.XRTools.Rendering;
 namespace C2M2.MolecularDynamics.Simulation
 {
     using Utils;
+    /// <summary>
+    /// Stores and updates information needed to render bonds
+    /// </summary>
+    public struct BondRenderer
+    {
+        public Transform a { get; private set; }
+        public Transform b { get; private set; }
+        LineRenderer renderer;
+        private static Color defaultCol = Color.black;
+        public BondRenderer(Transform a, Transform b, float width = 1f)
+        {
+            this.a = a;
+            this.b = b;
+            renderer = a.gameObject.AddComponent<LineRenderer>();
+            renderer.sharedMaterial = GameManager.instance.lineRendMaterial;
+            renderer.positionCount = 2;
+            renderer.startWidth = width;
+            renderer.endWidth = width;
+            renderer.startColor = Color.black;
+            renderer.endColor = Color.black;
+            Update();
+        }
+        public void Update()
+        {
+            renderer.SetPositions(new Vector3[] { a.position, b.position });
+        }
+    }
     public abstract class MDSimulation : PositionFieldSimulation
     {
         private readonly string relPath = Application.streamingAssetsPath + @"/MolecularDynamics/";
@@ -25,7 +52,7 @@ namespace C2M2.MolecularDynamics.Simulation
 	    protected float[] mass = null;
         protected int[][] bond_topo = null;
 
-        private XRLineRenderer[] bondViz;
+        private BondRenderer[] bondRenderers;
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
@@ -90,8 +117,9 @@ namespace C2M2.MolecularDynamics.Simulation
 
             bond_topo = BuildBondTopology(bonds);
 
-            //RenderBonds(bonds, transforms);
             ResizeField(transforms);
+            RenderBonds(bonds, transforms);
+
             timer.StopTimer("BuildTransforms");
             timer.ExportCSV("MDSimulation.BuildTransforms");
 
@@ -132,12 +160,12 @@ namespace C2M2.MolecularDynamics.Simulation
             }
             void RenderBonds(int[] bonds, Transform[] sphereTransforms)
             {
-                /*
-                bondViz = new XRLineRenderer[bonds.Length];
+                bondRenderers = new BondRenderer[bonds.Length / 2];
+               // bondViz = new XRLineRenderer[bonds.Length];
                 int j = 0;
                 for(int i = 0; i < bonds.Length-1; i+=2)
                 {
-                    Transform bondA = sphereTransforms[bonds[i]];
+                    /*Transform bondA = sphereTransforms[bonds[i]];
                     Transform bondB = sphereTransforms[bonds[i + 1]];
 
                     // Build child object for the line
@@ -156,9 +184,10 @@ namespace C2M2.MolecularDynamics.Simulation
 
                     // Store the line
                     bondViz[j] = line;
+                    j++;*/
+                    bondRenderers[j] = new BondRenderer(sphereTransforms[bonds[i]], sphereTransforms[bonds[i + 1]], 0.001f);
                     j++;
-                }*/
-                
+                }               
             }
             void ResizeField(Transform[] sphereTransforms)
             {
@@ -195,15 +224,13 @@ namespace C2M2.MolecularDynamics.Simulation
         /// </summary>
         protected override void UpdateVisChild(in Vector3[] simulationValues)
         {
-            int j = 0;
-            for(int i = 0; i < bonds.Length; i+=2)
+            if(bondRenderers != null)
             {
-                Transform bondA = transforms[bonds[i]];
-                Transform bondB = transforms[bonds[i + 1]];
-                //bondViz[j].SetPositions(new Vector3[] { bondA.position, bondB.position });
-                //j++;
-            }
-            
+                for(int i = 0; i < bondRenderers.Length; i++)
+                {
+                    bondRenderers[i].Update();
+                }
+            }      
         }
 
     }
