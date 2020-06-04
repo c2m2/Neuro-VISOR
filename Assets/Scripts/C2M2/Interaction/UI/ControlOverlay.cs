@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace C2M2.Interaction.UI
 {
+    /// <summary>
+    /// Display controls to the user upon the game start, and destroys the overlay once the user moves
+    /// </summary>
     public class ControlOverlay : MonoBehaviour
     {
         private KeyCode[] keys;

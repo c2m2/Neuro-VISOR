@@ -7,9 +7,9 @@ namespace C2M2.MolecularDynamics.Visualization
     public struct Sphere
     {
         public readonly Vector3 position;
-        public readonly double radius;
+        public readonly float radius;
         // Constructors
-        public Sphere(Vector3 position, double radius)
+        public Sphere(Vector3 position, float radius)
         {
             this.position = position;
             this.radius = radius;

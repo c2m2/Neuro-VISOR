@@ -10,12 +10,8 @@ namespace C2M2.MolecularDynamics.Simulation
 {
     public class ExampleMDSimulation : MDSimulation
     {
-        // Define number of example spheres
-        public int numSpheres = 3;
-        // Example radius for spheres
-        public float radius = .5f;
         public float kb = 0.001987f; //kcal per mol
-        public float T = 1.0f; //K
+        public float T = 100.0f; //K
 
         public int timestepCount = 50000;
         public float timestepSize = .1f;
@@ -23,7 +19,8 @@ namespace C2M2.MolecularDynamics.Simulation
         public float kappa = 6f;
         public float r0 = 3.65f;
 
-	    private int[][] angle_topo = null;
+	private int[][] angle_topo = null;
+        
 
         // OPTION 2:
         //RaycastHit lastHit = new RaycastHit();
@@ -70,7 +67,8 @@ namespace C2M2.MolecularDynamics.Simulation
 		        {
                 	// U(x) = sum kappa_ij*(|x_i-x_j|-r_0)^2
                     r = pos[i] - pos[bond_topo[i][j]];
-                    f[i] += -kappa*(r.magnitude-r0)*r*0;
+                    f[i] += -kappa*(r.magnitude-r0)*r;
+                    //GameManager.instance.DebugLogSafe(f[i]);
                 }
             }
  		    return f;
@@ -78,7 +76,7 @@ namespace C2M2.MolecularDynamics.Simulation
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
-        /// What does this method do?
+        /// Compute angle forces
         /// </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 	    public Vector3[] angle_Force(Vector3[] pos) //, int[][] angle_topo)
@@ -127,10 +125,10 @@ namespace C2M2.MolecularDynamics.Simulation
         {
             int nT = timestepCount;
             float dt = timestepSize;
-            float m = 10.0f;
+            //float m = 40.0f;
 	        float gamma = 0.1f;
             float a = ((1-gamma*dt/2)/(1+gamma*dt/2));
-            float coeff = Convert.ToSingle(Math.Sqrt(kb*T*(1-a*a)/m));
+            
 
 	        //hard code the bond info
             //int[][] bond_topo = new int[x.Length][];
@@ -159,6 +157,7 @@ namespace C2M2.MolecularDynamics.Simulation
                 // iterate over the atoms
                 for(int i = 0; i < x.Length; i++)
                 {
+                    float coeff = Convert.ToSingle(Math.Sqrt(kb*T*(1-a*a)/mass[i]));
                     double rxx = normal.Sample();
                     float rx = Convert.ToSingle(rxx);
 
@@ -167,7 +166,7 @@ namespace C2M2.MolecularDynamics.Simulation
 
                     double rzz = normal.Sample();
                     float rz = Convert.ToSingle(rzz);
-
+                     
                     Vector3 r = new Vector3(rx,ry,rz);
                     //Debug.Log(r);
                     //GameManager.instance.DebugLogSafe(r);
@@ -182,7 +181,7 @@ namespace C2M2.MolecularDynamics.Simulation
                     }
                     v[i]=v[i]+(dt*dt/2/m)*(force[i]+angle[i] + pushTerm);
                     */
-                    v[i] = v[i] + (dt*dt/2/m) * (force[i]);
+                    v[i] = v[i] + (dt*dt/2/mass[i]) * (force[i]);
 		            x[i] = x[i] + (dt/2) * v[i];
                     v[i]=a*v[i] + coeff * r;
 		            x[i]=x[i] + (dt/2) * v[i];
@@ -190,14 +189,15 @@ namespace C2M2.MolecularDynamics.Simulation
 
 		        force = Force(x,bond_topo);
 
-                GameManager.instance.DebugLogSafe("force[1043]: " + force[1043]
+                /*GameManager.instance.DebugLogSafe("force[1043]: " + force[1043]
                     + "\nx[1043]: " + x[1043]
-                    + "\nv[1043]: " + v[1043]);
-                //angle = angle_Force(x);
+                    + "\nv[1043]: " + v[1043]
+		    + "\nm[1043]: " + mass[1043]);
+                //angle = angle_Force(x); */
 
                 for(int i = 0; i < x.Length; i++)
                 {
-                    v[i] = v[i] + (dt*dt/2/m) * (force[i]);
+                    v[i] = v[i] + (dt*dt/2/mass[i]) * (force[i]);
                 }
             }
             Debug.Log("ExampleMDSimulation complete.");

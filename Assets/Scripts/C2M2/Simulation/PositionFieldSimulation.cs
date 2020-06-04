@@ -9,7 +9,8 @@ namespace C2M2.Simulation
     /// </summary>
     public abstract class PositionFieldSimulation : Simulation<Vector3[]>
     {
-        private Transform[] transforms;
+        protected Transform[] transforms;
+
         protected override void OnAwake()
         {
             transforms = BuildTransforms();
@@ -36,8 +37,14 @@ namespace C2M2.Simulation
         {
             for (int i = 0; i < simulationValues.Length; i++)
             {
-                transforms[i].position = simulationValues[i];
+                transforms[i].localPosition = simulationValues[i];
             }
+
+            UpdateVisChild(simulationValues);
         }
+        /// <summary>
+        /// Allow derived classes to implement custom visualization features
+        /// </summary>
+        protected virtual void UpdateVisChild(in Vector3[] simulationValues) { }
     }
 }
