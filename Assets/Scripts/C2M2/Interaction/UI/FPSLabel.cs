@@ -1,9 +1,11 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System;
 using UnityEngine;
 using TMPro;
 namespace C2M2.Interaction.UI
 {
+    /// <summary>
+    /// Stores and updates text labels for FPS readings
+    /// </summary>
     public class FPSLabel : MonoBehaviour
     {
         public TextMeshProUGUI highFPSLabel;
@@ -11,22 +13,26 @@ namespace C2M2.Interaction.UI
         public TextMeshProUGUI lowFPSLabel;
         private Utils.DebugUtils.FPSCounter fpsCounter;
 
-        // Start is called before the first frame update
         void Start()
         {
             fpsCounter = GameManager.instance.fpsCounter;
+            if (avgFPSLabel == null) throw new LabelNotFoundException();
+            if (highFPSLabel == null) throw new LabelNotFoundException();
+            if (lowFPSLabel == null) throw new LabelNotFoundException();
         }
 
-        // Update is called once per frame
         void Update()
         {
-            UpdateLabels();
+            avgFPSLabel.text = fpsCounter.avgStr;
+            highFPSLabel.text = fpsCounter.highStr;
+            lowFPSLabel.text = fpsCounter.lowStr;
         }
-        private void UpdateLabels()
+        public class LabelNotFoundException : Exception
         {
-            if (avgFPSLabel != null) avgFPSLabel.text = fpsCounter.averageFPSString;
-            if (highFPSLabel != null) highFPSLabel.text = fpsCounter.highestFPSString;
-            if (lowFPSLabel != null) lowFPSLabel.text = fpsCounter.lowestFPSString;
+            public LabelNotFoundException() { }
+            public LabelNotFoundException(string message) : base(message) { }
+            public LabelNotFoundException(string message, Exception inner) : base(message, inner) { }
         }
     }
+
 }

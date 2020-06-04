@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace C2M2.Utils.DebugUtils.Actions
 {
+    /// <summary>
+    /// Allows user to press a button to pause editor play mode from within the application
+    /// </summary>
     public class EditorButtonPause : MonoBehaviour
     {
         public bool allowOculusPause = true;
@@ -16,8 +19,8 @@ namespace C2M2.Utils.DebugUtils.Actions
             {
                 if (OVRInput.GetDown(oculusPauseButton))
                 {
-                    Debug.Log("Editor Paused");
                     Debug.Break();
+                    Debug.Log("Editor Paused");
                 }
             }
             if (allowKeyboardPause)
@@ -26,8 +29,8 @@ namespace C2M2.Utils.DebugUtils.Actions
                 {
                     if (OVRInput.GetDown(oculusPauseButton))
                     {
-                        Debug.Log("Editor Paused");
                         Debug.Break();
+                        Debug.Log("Editor Paused");
                     }
                 }
             }

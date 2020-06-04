@@ -5,17 +5,13 @@ using System.Linq;
 namespace C2M2.OIT
 {
     /// <summary>
-    /// TODO: You should actually make the struct a Particle, and give it a position and colorfloat and color, and then make a list of particles and maybe that can be its own data type
+    /// Stores a list of DataPoints, resizes particle fields, 
     /// </summary>
     public class DataSet
     {
 
         public List<DataPoint> dataList;
         private List<DataPoint> dataListBackup;
-
-
-
-        //**CONSTRUCTORS**
 
         public DataSet()
         {
@@ -29,8 +25,6 @@ namespace C2M2.OIT
             this.dataList = dataList;
             BackupDataSet();
         }
-
-        //**RESIZING METHODS**
 
         //Take in room bounds and resize particle field accordingly
         /// For each dimension we use the following equation to scale a range [min, max] to [a, b]
@@ -180,10 +174,6 @@ namespace C2M2.OIT
             }
         }
 
-
-
-        //**REDUCTION METHODS**
-
         //If reduceCount = 2, remove one out of every 2 elements. If reduceCount = 3, remove one out of every 3 elements, etc
         public void ReduceLists(int reduceCount)
         {
@@ -222,10 +212,6 @@ namespace C2M2.OIT
                 Debug.Log("High value must be larger than low value");
             }
         }
-
-
-
-        //**RESTORATION METHODS**
 
         public void RestoreOriginalValues()
         {

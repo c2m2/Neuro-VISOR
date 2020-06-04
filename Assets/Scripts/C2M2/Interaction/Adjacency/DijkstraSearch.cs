@@ -5,9 +5,11 @@ using System.Linq;
 namespace C2M2.Interaction.Adjacency
 {
     using Utils;
+    /// <summary>
+    /// Runs a dijkstra search over a surface of mesh vertices, given an initial hit point and a distance threshold
+    /// </summary>
     public class DijkstraSearch : MonoBehaviour
     {
-        // TODO: Use Gaussian width to get distance threshold
         /// <summary> Stores a list of all mesh and invisible vertices that need to be traversed </summary>
         private UniqueVertices uniqueVertices = null;
         /// <summary> Stores the distances between adjacent real and invisible vertices </summary>
@@ -37,11 +39,10 @@ namespace C2M2.Interaction.Adjacency
                 minDistances[initialNodes[i].index] = initialNodes[i].weight;
             }
             // Store a list of the nearest mesh vertex neighbors to our point
-            // TODO: How can we guess the size of this list beforehand so that we can preallocate memory for it?
             List<int> closestMeshVertList = new List<int>(3);
             while (queue.Count() > 0)
-            { // While there are still nodes to check
-              // Pull a node off of the queue
+            {
+                // Pull a node off of the queue
                 Node curNode = queue.Dequeue();
                 // Get the list of nodes adjacent to it
                 List<Node> adjacentNodes = adjacencyList.adjacencyList[curNode.index];

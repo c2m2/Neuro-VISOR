@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace C2M2.Interaction.Adjacency
 {
+    /// <summary>
+    /// stores two vertex indices and an edge length. Used by AdjacencyLisst
+    /// </summary>
     public struct Edge
     {
         public int v1 { get; private set; }
@@ -23,18 +26,9 @@ namespace C2M2.Interaction.Adjacency
         }
         public bool Equals(Edge other)
         {
-            if ((v1 == other.v2 && v2 == other.v1) || (v1 == other.v1 && v2 == other.v2))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            if ((v1 == other.v2 && v2 == other.v1) || (v1 == other.v1 && v2 == other.v2)) return true;
+            else return false;
         }
-        public override string ToString()
-        {
-            return "(" + v1 + ", " + v2 + "); length: " + length;
-        }
+        public override string ToString() => "(" + v1 + ", " + v2 + "); length: " + length;
     }
 }

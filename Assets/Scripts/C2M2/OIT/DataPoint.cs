@@ -4,18 +4,17 @@ using UnityEngine;
 
 namespace C2M2.OIT
 {
+    // Stores the value of one position/vertex so that it can be shown on a billboard
     public class DataPoint
     {
 
         public Vector3 position;
         public float scalarValue;
         public Color color;
-
         public DataPoint()
         {
 
         }
-
         public DataPoint(Vector3 position, float scalarValue, Color color)
         {
             this.position = position;

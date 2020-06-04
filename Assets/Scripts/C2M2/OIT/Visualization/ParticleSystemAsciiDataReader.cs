@@ -6,12 +6,13 @@ using System.IO;
 using System.Linq;
 namespace C2M2.OIT.Visualization
 {
+    /// <summary>
+    /// Read and store ascii data representing particle data
+    /// </summary>
     public class ParticleSystemAsciiDataReader : MonoBehaviour
     {
         public TextAsset[] assets;
         public GameObject RoomObject;
-
-        //TODO: This is dumb change this
         public int reduceBy = 2;
 
         private string assetString = string.Empty;
@@ -46,9 +47,6 @@ namespace C2M2.OIT.Visualization
                 //Get positions and color float values from ascii file
                 InitializeInformationLists(particleSet);
 
-                // FindColorFloatMaxandMin(p);
-                //Could change this to other maps with a switch
-                //TODO, figure this out after going through every text asset so that your max and min are actually global
                 particleSet.ColorMap_RedWhiteBlue();
 
                 //resize each dataset to the room, then downscale it further by percent
@@ -59,9 +57,6 @@ namespace C2M2.OIT.Visualization
                 backupdataSetList.Add(particleSet);
                 particleSet.ReduceLists(reduceBy);
                 particleSet.ReduceLists(reduceBy);
-                //  particleSet.ReduceLists(reduceBy);
-                //    particleSet.ReduceLists(reduceBy);
-                // particleSet.ReduceLists(reduceBy);
 
                 particleSet.BackupDataSet();
 
@@ -80,7 +75,7 @@ namespace C2M2.OIT.Visualization
             p = 0;
         }
 
-        //Break ascii file into strings and split into string arrays, then add information to appropriate information lists
+        // Break ascii file into strings and split into string arrays, then add information to appropriate information lists
         private void InitializeInformationLists(DataSet dataSet)
         {
             //Store datapoints into Vector3, then assign Vector3 to positions list
@@ -98,24 +93,17 @@ namespace C2M2.OIT.Visualization
                 for (int u = 0; u < 4; u += 4)
                 {
                     if (!currentLineSplit[u].Equals(string.Empty))
-                    {
                         currentPosition.x = (float.Parse(currentLineSplit[u]));
-                    }
 
                     if (!currentLineSplit[u + 1].Equals(string.Empty))
-                    {
                         currentPosition.y = float.Parse(currentLineSplit[u + 1]);
-                    }
 
                     if (!currentLineSplit[u + 2].Equals(string.Empty))
-                    {
                         currentPosition.z = float.Parse(currentLineSplit[u + 2]);
-                    }
 
                     if (!currentLineSplit[u + 3].Equals(string.Empty))
-                    {
                         dataPoint.scalarValue = float.Parse(currentLineSplit[u + 3]);
-                    }
+
                     dataPoint.position = currentPosition;
 
                     dataSet.dataList.Add(dataPoint);
@@ -124,9 +112,7 @@ namespace C2M2.OIT.Visualization
 
                 currentLine = sR.ReadLine();
                 if (currentLine != null)
-                {
                     currentLineSplit = currentLine.Split(' ');
-                }
             }
         }
 
@@ -143,11 +129,6 @@ namespace C2M2.OIT.Visualization
         {
             sR.Close();
             assetString = string.Empty;
-        }
-
-        public void Isoquant(DataSet dataSet, float low, float high)
-        {
-
         }
 
     }

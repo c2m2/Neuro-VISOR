@@ -20,7 +20,6 @@ namespace C2M2.Utils.DebugUtils
         ///                 https://stackoverflow.com/questions/26615480/how-to-transform-an-array-of-file-paths-into-a-hierarchical-json-structure
         /// </remarks>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-
         [MenuItem("Assets/Get All Asset Dependencies")]
         static void GetAllDependenciesForScenes()
         {
@@ -28,18 +27,19 @@ namespace C2M2.Utils.DebugUtils
             string[] allPaths = new string[allScenes.Length];
             int curSceneIndex = 0;
 
+            // Find and store the path to every scene
             foreach (string guid in allScenes)
             {
                 string path = AssetDatabase.GUIDToAssetPath(guid);
                 allPaths[curSceneIndex] = path;
                 ++curSceneIndex;
             }
-
+            // Find all asset dependencies of every scene recursively
             string[] dependencies = AssetDatabase.GetDependencies(allPaths, true);
 
+            // Build an organize folder hierarchy string for every asset dependency
             StringBuilder dependenciesString = new StringBuilder();
             dependenciesString.AppendLine();
-
             Dir root = new Dir("");
             foreach (string dependency in dependencies)
             {
@@ -48,6 +48,9 @@ namespace C2M2.Utils.DebugUtils
             Debug.Log("All direct and indirect dependencies from all scenes in project:\n\n" + root.ToString());
         }
 
+        /// <summary>
+        /// Stores information about a directory and the files/directories nested in it
+        /// </summary>
         class Dir
         {
             public string Name { get; set; }
@@ -61,6 +64,9 @@ namespace C2M2.Utils.DebugUtils
                 Files = new HashSet<string>();
             }
 
+            /// <summary>
+            /// Scan full paths and pick out new files/directories from it
+            /// </summary>
             public Dir FindOrCreate(string path, bool mightBeFile = true)
             {
                 int i = path.IndexOf('/');

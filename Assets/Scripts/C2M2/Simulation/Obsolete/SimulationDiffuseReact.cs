@@ -117,7 +117,7 @@ namespace C2M2.Simulation
         private void AdaptStepsPerSec()
         {
             // If we're running too slow, do fewer simulation steps per second 
-            if (GameManager.instance.fpsCounter.AverageFPS < idealRenderFPS) { stepsPerSec--; }
+            if (GameManager.instance.fpsCounter.avg < idealRenderFPS) { stepsPerSec--; }
             // If we're above our ideal FPS, we can afford to do more simulation steps    
             else { stepsPerSec++; }
             // 5 < stepsPerSec < 150
