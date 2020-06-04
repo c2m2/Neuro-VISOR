@@ -142,7 +142,7 @@ namespace C2M2.NeuronalDynamics.UGX
     }
 
     /// <summary>
-    /// Undef Synapse
+    /// Undefined Synapse
     /// </summary>
     public readonly struct UndefSynapse : ISynapse
     {
