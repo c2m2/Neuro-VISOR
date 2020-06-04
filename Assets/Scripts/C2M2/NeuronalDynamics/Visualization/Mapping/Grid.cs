@@ -20,7 +20,7 @@ namespace C2M2.NeuronalDynamics.UGX
         /// Construct an empty AttachmentInfo
         /// </summary>
         /// <param name="attachments"> Name of attachment </param>
-        /// <param name="types"> TYpe of attachment</param>
+        /// <param name="types"> TYpe of attachment </param>
         public AttachmentInfo(Dictionary<string, Attachment> attachments, Dictionary<string, Type> types)
         {
             Types = types;

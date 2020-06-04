@@ -67,7 +67,7 @@ namespace C2M2.NeuronalDynamics.UGX
         /// <summary>
         /// Distribute the attachments
         /// </summary>
-        /// <param name="grid"></param>
+        /// <param name="grid"> a grid </param>
         public static void Distribute(in Grid grid)
         {
             /// TODO: Distribute mesh and attachments for grid in parallel
@@ -116,7 +116,7 @@ namespace C2M2.NeuronalDynamics.UGX
         /// <summary>
         /// Get the name of the attachment by type
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="T"> Type of attachment </typeparam>
         /// <returns></returns>
         public static string GetName<T>(this Grid grid)
         {
@@ -146,8 +146,8 @@ namespace C2M2.NeuronalDynamics.UGX
         /// <summary>
         /// Register an attachment
         /// </summary>
-        /// <param name="attachment"></param>
-        /// <param name="name"></param>
+        /// <typeparam name="T"> Attachment type </param>
+        /// <param name="name"> Name of attachment </param>
         private static void Register<T>(in string name)
         {
             if (attachments.ContainsKey(name))
