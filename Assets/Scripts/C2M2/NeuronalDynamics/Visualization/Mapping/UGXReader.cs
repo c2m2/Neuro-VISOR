@@ -310,6 +310,10 @@ namespace C2M2.NeuronalDynamics.UGX
                                     {
                                         String subsetName = el.Attribute("name").Value;
                                         grid.Subsets[subsetName] = new Subset(subsetName, GetIndices(subsetName, el));
+                                        if (subsetName.Equals("soma")) {
+					  UnityEngine.Debug.Log("soma indices: " + grid.Subsets["soma"]);
+                                        
+                                        }
                                     }
                                 }
                                 else
