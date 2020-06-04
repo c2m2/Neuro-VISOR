@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using C2M2.Simulation;
 using C2M2.MolecularDynamics.Visualization;
-using Unity.XRTools.Rendering;
 namespace C2M2.MolecularDynamics.Simulation
 {
     using Utils;
