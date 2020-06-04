@@ -9,6 +9,9 @@ namespace C2M2
 {
     namespace Utils
     {
+        /// <summary>
+        /// Writes general data to a CSV file
+        /// </summary>
         public class CSVBuilder
         {
             public string filePath = null;
