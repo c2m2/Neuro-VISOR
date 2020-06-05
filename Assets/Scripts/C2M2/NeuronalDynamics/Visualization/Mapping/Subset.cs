@@ -11,7 +11,7 @@ namespace C2M2.NeuronalDynamics.UGX
     /// </summary>
     public class SubsetCollection
     {
-        private Dictionary<string, Subset> subsets = new Dictionary<string, Subset>();
+        public Dictionary<string, Subset> subsets = new Dictionary<string, Subset>();
         /// <summary>
         /// Indexer
         /// </summary>
