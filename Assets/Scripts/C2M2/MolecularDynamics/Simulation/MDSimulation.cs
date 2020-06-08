@@ -221,13 +221,7 @@ namespace C2M2.MolecularDynamics.Simulation
                 for (int i = 0; i < x.Length; i++)
                 {
                     ts[i].localPosition = x[i];
-                    try
-                    {
-                        ts[i].GetComponent<MeshRenderer>().sharedMaterial = matLookup[es[i]];
-                    }catch(Exception e)
-                    {
-                        Debug.LogError("element: " + es[i].ToLower() + "\n" + e);
-                    }
+                    ts[i].GetComponent<MeshRenderer>().sharedMaterial = matLookup[es[i]];
                 }
 
                 // Create a lookup so that given a transform hit by a raycast we can get the molecule's index
