@@ -6,6 +6,9 @@ namespace C2M2
 {
     using Interaction;
     using Interaction.UI;
+    /// <summary>
+    /// Stores many global variables, handles pregame initializations
+    /// </summary>
     public class GameManager : MonoBehaviour
     {
         public static GameManager instance = null;

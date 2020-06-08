@@ -27,11 +27,11 @@ namespace C2M2.Utils.DebugUtils
             //return InitializeRenderers(grid.Edges, grid.Mesh.vertices, lineWidth);
             return InitializeRenderers(grid.Vertices, grid.Mesh.vertices, lineWidth);
         }
+        public void Toggle(bool on) => renderersGo.SetActive(on);
         private GameObject InitializeRenderers(List<Vertex> verts, Vector3[] vertPos, float lineWidth)
         {
             char slash = Path.DirectorySeparatorChar;
             GameObject renderersGo = Instantiate(Resources.Load("Prefabs" + slash + "LineRenderer"), transform) as GameObject;
-            // renderersGo = InstantiateChild(transform);
             LineRenderer lr = renderersGo.GetComponent<LineRenderer>();
             lr.startColor = color;
             lr.endColor = color;
@@ -39,7 +39,6 @@ namespace C2M2.Utils.DebugUtils
 
             // Make positions for the linerenderer
             List<Vector3> lrPos = new List<Vector3>(verts.Count);
-
 
             bool[] visited = new bool[verts.Count];
             int startId = 0;
@@ -117,8 +116,6 @@ namespace C2M2.Utils.DebugUtils
             go.transform.localScale = Vector3.one;
             return go;
         }
-
-        public void Toggle(bool on) => renderersGo.SetActive(on);
         private bool enabledPrev = true;
         private IEnumerator CheckToggle()
         {

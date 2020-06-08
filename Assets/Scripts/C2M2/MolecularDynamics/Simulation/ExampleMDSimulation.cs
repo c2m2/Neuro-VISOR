@@ -19,12 +19,10 @@ namespace C2M2.MolecularDynamics.Simulation
         public float kappa = 6f;
         public float r0 = 3.65f;
 
-	private int[][] angle_topo = null;
+    	private int[][] angle_topo = null;
         
-
         // OPTION 2:
         //RaycastHit lastHit = new RaycastHit();
-
         public override Vector3[] GetValues()
         {
             return x;

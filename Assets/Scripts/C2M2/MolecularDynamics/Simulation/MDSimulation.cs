@@ -65,54 +65,62 @@ namespace C2M2.MolecularDynamics.Simulation
             Timer timer = new Timer();
             timer.StartTimer();
 
-            PDBFile pdbFile = PDBReader.ReadFile(relPath + pdbFilePath);
+            // Read mass, bonds, angles from PSF file
             PSFFile psfFile = PSFReader.ReadFile(relPath + psfFilePath);
+            mass = psfFile.mass;
             bonds = psfFile.bonds;
-	        angles = psfFile.angles;
-	        mass = psfFile.mass;
-            Debug.Log(mass[2047]);
-
+            angles = psfFile.angles;
             // Convert bonds and angles to 0 base
-            for(int i = 0; i < bonds.Length; i++)
+            for (int i = 0; i < bonds.Length; i++)
             {
                 bonds[i] = bonds[i] - 1;
             }
-	        for(int i = 0; i < angles.Length; i++)
+            for (int i = 0; i < angles.Length; i++)
             {
                 angles[i] = angles[i] - 1;
             }
-            
+
+            // Read positions from PDB file
+            PDBFile pdbFile = PDBReader.ReadFile(relPath + pdbFilePath);
             x = pdbFile.pos;
 
             // Initialize v
             v = new Vector3[x.Length];
-            for(int i = 0; i < v.Length; i++)
+            for (int i = 0; i < v.Length; i++)
             {
                 v[i] = Vector3.zero;
             }
 
-            Sphere[] spheres = new Sphere[x.Length];
-            for (int i = 0; i < x.Length; i++)
+            // Randomly set types. This will come from a file in the future
+            string[] elements = new string[x.Length];
+
+            string[] types = new string[]
             {
-                //spheres[i] = new Sphere(x[i], radius);
-                spheres[i] = new Sphere(Vector3.zero, radius);
+                "Alkali",
+                "AlkaliEarthMetal",
+                "B",
+                "Br",
+                "C",
+                "Cl",
+                "F",
+                "Fe",
+                "H",
+                "I",
+                "N",
+                "Noble",
+                "O",
+                "Other",
+                "P",
+                "S",
+                "T"
+             };
+            for (int i = 0; i < elements.Length; i++)
+            {
+                int type = (int)UnityEngine.Random.Range(0f, types.Length - 0.000000000001f);
+                elements[i] = types[type];
             }
 
-            // Instantiate the created spheres and return their transform components
-            SphereInstantiator instantiator = gameObject.AddComponent<SphereInstantiator>();
-            Transform[] transforms = instantiator.InstantiateSpheres(spheres, "Molecule", "Atom");
-            // Apply positions to the transforms
-            for(int i = 0; i < x.Length; i++)
-            {
-                transforms[i].localPosition = x[i];
-            }
-
-            // Create a lookup so that given a transform hit by a raycast we can get the molecule's index
-            molLookup = new Dictionary<Transform, int>(transforms.Length);
-            for (int i = 0; i < transforms.Length; i++)
-            {
-                molLookup.Add(transforms[i], i);
-            }
+            Transform[] transforms = RenderSpheres(x, elements, radius);
 
             bond_topo = BuildBondTopology(bonds);
 
@@ -157,6 +165,81 @@ namespace C2M2.MolecularDynamics.Simulation
                 //Debug.Log(bond_topo[0][1]);
                 return bond_topo;
             }
+           
+            Transform[] RenderSpheres(Vector3[] x, string[] es, float radius)
+            {
+                // Instantiate one sphere per atom
+                Sphere[] spheres = new Sphere[x.Length];
+                for (int i = 0; i < x.Length; i++)
+                {
+                    spheres[i] = new Sphere(Vector3.zero, radius);
+                }
+
+                // Instantiate the created spheres and return their transform components
+                SphereInstantiator instantiator = gameObject.AddComponent<SphereInstantiator>();
+                Transform[] ts = instantiator.InstantiateSpheres(spheres, "Molecule", "Atom");
+                Material[] mats = new Material[]
+                {
+                    Resources.Load<Material>("Materials/MolecularDynamics/Alkali"),
+                    Resources.Load<Material>("Materials/MolecularDynamics/AlkaliEarthMetal"),
+                    Resources.Load<Material>("Materials/MolecularDynamics/B"),
+                    Resources.Load<Material>("Materials/MolecularDynamics/Br"),
+                    Resources.Load<Material>("Materials/MolecularDynamics/C"),
+                    Resources.Load<Material>("Materials/MolecularDynamics/Cl"),
+                    Resources.Load<Material>("Materials/MolecularDynamics/Fe"),
+                    Resources.Load<Material>("Materials/MolecularDynamics/H"),
+                    Resources.Load<Material>("Materials/MolecularDynamics/I"),
+                    Resources.Load<Material>("Materials/MolecularDynamics/N"),
+                    Resources.Load<Material>("Materials/MolecularDynamics/Noble"),
+                    Resources.Load<Material>("Materials/MolecularDynamics/O"),
+                    Resources.Load<Material>("Materials/MolecularDynamics/Other"),
+                    Resources.Load<Material>("Materials/MolecularDynamics/P"),
+                    Resources.Load<Material>("Materials/MolecularDynamics/S"),
+                    Resources.Load<Material>("Materials/MolecularDynamics/T")
+                };
+                var matLookup = new Dictionary<string, Material>()
+                {
+                    { "Alkali", mats[0] },
+                    { "AlkaliEarthMetal", mats[1] },
+                    { "B", mats[2] },
+                    { "Br", mats[3] },
+                    { "C",  mats[4] },
+                    { "Cl", mats[5] },
+                    { "F", mats[5] },
+                    { "Fe", mats[6] },
+                    { "H", mats[7] },
+                    { "I", mats[8] },
+                    { "N", mats[9] },
+                    { "Noble", mats[10] },
+                    { "O",  mats[11] },
+                    { "Other", mats[12] },
+                    { "P", mats[13] },
+                    { "S", mats[14] },
+                    { "T", mats[15] }
+                };
+
+                for (int i = 0; i < x.Length; i++)
+                {
+                    ts[i].localPosition = x[i];
+                    try
+                    {
+                        ts[i].GetComponent<MeshRenderer>().sharedMaterial = matLookup[es[i]];
+                    }catch(Exception e)
+                    {
+                        Debug.LogError("element: " + es[i].ToLower() + "\n" + e);
+                    }
+                }
+
+                // Create a lookup so that given a transform hit by a raycast we can get the molecule's index
+                molLookup = new Dictionary<Transform, int>(ts.Length);
+                for (int i = 0; i < ts.Length; i++)
+                {
+                    molLookup.Add(ts[i], i);
+                }
+
+                return ts;
+            }
+
             void RenderBonds(int[] bonds, Transform[] sphereTransforms)
             {
                 bondRenderers = new BondRenderer[bonds.Length / 2];
@@ -164,26 +247,6 @@ namespace C2M2.MolecularDynamics.Simulation
                 int j = 0;
                 for(int i = 0; i < bonds.Length-1; i+=2)
                 {
-                    /*Transform bondA = sphereTransforms[bonds[i]];
-                    Transform bondB = sphereTransforms[bonds[i + 1]];
-
-                    // Build child object for the line
-                    Transform lineObj = new GameObject().transform;
-                    lineObj.name = "Bond[" + bondA.name + "->" + bondB.name + "]";
-                    lineObj.parent = bondA;
-                    //lineObj.localPosition = Vector3.zero;
-                    //lineObj.eulerAngles = Vector3.zero;
-
-                    // Set rendering options for the line
-                    XRLineRenderer line = lineObj.gameObject.AddComponent<XRLineRenderer>();
-                    line.SetPositions(new Vector3[] { bondA.localPosition, bondB.localPosition });
-                    line.sharedMaterial = GameManager.instance.lineRendMaterial;
-                    line.widthStart = radius;
-                    line.widthEnd = radius;
-
-                    // Store the line
-                    bondViz[j] = line;
-                    j++;*/
                     bondRenderers[j] = new BondRenderer(sphereTransforms[bonds[i]], sphereTransforms[bonds[i + 1]], 0.001f);
                     j++;
                 }               

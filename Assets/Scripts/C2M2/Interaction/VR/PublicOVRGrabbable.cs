@@ -16,6 +16,7 @@ namespace C2M2.Interaction.VR
     {
         public Collider[] M_GrabPoints { get { return m_grabPoints; } set { m_grabPoints = value; } }
     }
+
     public class GrabbableNotFoundException : Exception
     {
         public GrabbableNotFoundException() { }
