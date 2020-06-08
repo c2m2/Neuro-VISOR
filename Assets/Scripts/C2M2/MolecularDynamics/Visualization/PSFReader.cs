@@ -20,6 +20,7 @@ namespace C2M2
                 List<int> bonds = new List<int>();
                 List<int> angles = new List<int>();
                 List<float> mass = new List<float>();
+                List<string> types = new List<string>();
 
                 // Attempt to open file as a StreamReader
                 if (!File.Exists(psfFilePath)) { throw new System.Exception("Could not find file " + psfFilePath); }
@@ -31,7 +32,7 @@ namespace C2M2
 
                 bool inBonds = false;
                 bool inAngles = false;
-	        bool inAtoms = false;
+	            bool inAtoms = false;
                 /*
                 var lines = File
                    .ReadLines(@"C:\MyFile.txt")
@@ -51,7 +52,7 @@ namespace C2M2
                     }
                 }
 
-                PSFFile psfFile = new PSFFile(bonds.ToArray(), angles.ToArray(), mass.ToArray());
+                PSFFile psfFile = new PSFFile(bonds.ToArray(), angles.ToArray(), mass.ToArray(), types.ToArray());
 
                 return psfFile;
 
@@ -63,7 +64,7 @@ namespace C2M2
                         { // Entering bonds section
                             inBonds = true;
                             inAngles = false;
-			    inAtoms = false;
+			                inAtoms = false;
 
                             int bondCount = int.Parse(splitLine[0]) * 2;
                             bonds.Capacity = bondCount;
@@ -73,7 +74,7 @@ namespace C2M2
                         {
                             inAngles = true;
                             inBonds = false;
-			    inAtoms = false;
+			                inAtoms = false;
 
                             int thetaCount = int.Parse(splitLine[0]) * 3;
                             angles.Capacity = thetaCount;
@@ -83,17 +84,19 @@ namespace C2M2
                         {
                             inAtoms = true;
                             inBonds = false;
-			    inAngles = false;
+			                inAngles = false;
 
                             int atomCount = int.Parse(splitLine[0]);
-                            mass.Capacity = atomCount; 
+                            mass.Capacity = atomCount;
+                            // One type per atom
+                            types.Capacity = atomCount;
                             return true;
                         }
                         else
                         { // We have reached an unsupported action
                             inAngles = false;
                             inBonds = false;
-			    inAtoms = false;
+			                inAtoms = false;
                         }
                     }
 
@@ -131,11 +134,12 @@ namespace C2M2
                         }
                         else throw new IndexOutOfRangeException("Angle line was of length " + splitLine.Length + "; must be divisible by three");
                     }
-		    else if (inAtoms)
+		            else if (inAtoms)
                     {
                         try
                         {
                             mass.Add(float.Parse(splitLine[7]));
+                            types.Add(splitLine[5]);
                         }catch(Exception e)
                         {
                             string s = "";
@@ -152,11 +156,13 @@ namespace C2M2
             public int[] bonds { get; private set; }
             public int[] angles { get; private set; }
             public float[] mass { get; private set; }
-            public PSFFile(int[] bonds, int[] angles, float[] mass)
+            public string[] types { get; private set; }
+            public PSFFile(int[] bonds, int[] angles, float[] mass, string[] types)
             {
                 this.bonds = bonds;
                 this.angles = angles;
-	        this.mass = mass;
+	            this.mass = mass;
+                this.types = types;
             }
         }
     }

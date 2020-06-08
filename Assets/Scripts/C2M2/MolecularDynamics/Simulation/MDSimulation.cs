@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using C2M2.Simulation;
 using C2M2.MolecularDynamics.Visualization;
+using System.Linq;
 namespace C2M2.MolecularDynamics.Simulation
 {
     using Utils;
@@ -40,6 +41,11 @@ namespace C2M2.MolecularDynamics.Simulation
         public string pdbFilePath = "PE/pe_cg.pdb";
         public string psfFilePath = "PE/octatetracontane_128.cg.psf";
         public float radius = 1f;
+
+        public string shaderName = "Standard";
+        public string[] uniqueTypes;
+        public Color[] uniqueCols = new Color[] { Color.gray, Color.cyan };
+
         public Material bondMaterial;
 
         protected Dictionary<Transform, int> molLookup;
@@ -52,6 +58,8 @@ namespace C2M2.MolecularDynamics.Simulation
         protected int[][] bond_topo = null;
 
         private BondRenderer[] bondRenderers;
+        private Shader shader;
+        private float[][] neighborList;
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
@@ -91,36 +99,7 @@ namespace C2M2.MolecularDynamics.Simulation
                 v[i] = Vector3.zero;
             }
 
-            // Randomly set types. This will come from a file in the future
-            string[] elements = new string[x.Length];
-
-            string[] types = new string[]
-            {
-                "Alkali",
-                "AlkaliEarthMetal",
-                "B",
-                "Br",
-                "C",
-                "Cl",
-                "F",
-                "Fe",
-                "H",
-                "I",
-                "N",
-                "Noble",
-                "O",
-                "Other",
-                "P",
-                "S",
-                "T"
-             };
-            for (int i = 0; i < elements.Length; i++)
-            {
-                int type = (int)UnityEngine.Random.Range(0f, types.Length - 0.000000000001f);
-                elements[i] = types[type];
-            }
-
-            Transform[] transforms = RenderSpheres(x, elements, radius);
+            Transform[] transforms = RenderSpheres(x, psfFile.types, radius);
 
             bond_topo = BuildBondTopology(bonds);
 
@@ -166,70 +145,46 @@ namespace C2M2.MolecularDynamics.Simulation
                 return bond_topo;
             }
            
-            Transform[] RenderSpheres(Vector3[] x, string[] es, float radius)
+            Transform[] RenderSpheres(Vector3[] x, string[] types, float radius)
             {
                 // Instantiate one sphere per atom
                 Sphere[] spheres = new Sphere[x.Length];
-                for (int i = 0; i < x.Length; i++)
-                {
-                    spheres[i] = new Sphere(Vector3.zero, radius);
-                }
-
+                for (int i = 0; i < x.Length; i++) spheres[i] = new Sphere(Vector3.zero, radius);
                 // Instantiate the created spheres and return their transform components
                 SphereInstantiator instantiator = gameObject.AddComponent<SphereInstantiator>();
                 Transform[] ts = instantiator.InstantiateSpheres(spheres, "Molecule", "Atom");
-                Material[] mats = new Material[]
-                {
-                    Resources.Load<Material>("Materials/MolecularDynamics/Alkali"),
-                    Resources.Load<Material>("Materials/MolecularDynamics/AlkaliEarthMetal"),
-                    Resources.Load<Material>("Materials/MolecularDynamics/B"),
-                    Resources.Load<Material>("Materials/MolecularDynamics/Br"),
-                    Resources.Load<Material>("Materials/MolecularDynamics/C"),
-                    Resources.Load<Material>("Materials/MolecularDynamics/Cl"),
-                    Resources.Load<Material>("Materials/MolecularDynamics/Fe"),
-                    Resources.Load<Material>("Materials/MolecularDynamics/H"),
-                    Resources.Load<Material>("Materials/MolecularDynamics/I"),
-                    Resources.Load<Material>("Materials/MolecularDynamics/N"),
-                    Resources.Load<Material>("Materials/MolecularDynamics/Noble"),
-                    Resources.Load<Material>("Materials/MolecularDynamics/O"),
-                    Resources.Load<Material>("Materials/MolecularDynamics/Other"),
-                    Resources.Load<Material>("Materials/MolecularDynamics/P"),
-                    Resources.Load<Material>("Materials/MolecularDynamics/S"),
-                    Resources.Load<Material>("Materials/MolecularDynamics/T")
-                };
-                var matLookup = new Dictionary<string, Material>()
-                {
-                    { "Alkali", mats[0] },
-                    { "AlkaliEarthMetal", mats[1] },
-                    { "B", mats[2] },
-                    { "Br", mats[3] },
-                    { "C",  mats[4] },
-                    { "Cl", mats[5] },
-                    { "F", mats[5] },
-                    { "Fe", mats[6] },
-                    { "H", mats[7] },
-                    { "I", mats[8] },
-                    { "N", mats[9] },
-                    { "Noble", mats[10] },
-                    { "O",  mats[11] },
-                    { "Other", mats[12] },
-                    { "P", mats[13] },
-                    { "S", mats[14] },
-                    { "T", mats[15] }
-                };
 
+                // Build type->Material lookup
+                shader = Shader.Find(shaderName);
+                string[] uniqueTypes = types.Distinct().ToArray();
+                Color[] cols = new Color[uniqueTypes.Length];
+                for(int i = 0; i < cols.Length; i++)
+                {
+                    if(i < uniqueCols.Length) cols[i] = uniqueCols[i];
+                    else cols[i] = UnityEngine.Random.ColorHSV();
+                }
+                uniqueCols = cols;
+
+                // Creat material lookup
+                Dictionary<string, Material> matLookup = new Dictionary<string, Material>(ts.Length);
+                for (int i = 0; i < this.uniqueTypes.Length; i++)
+                {
+                    Material mat = new Material(shader);
+                    mat.color = uniqueCols[i];
+                    mat.name = this.uniqueTypes[i] + "Mat";
+                    matLookup.Add(this.uniqueTypes[i], mat);
+                }
+
+                // Apply positions and materials to spheres
                 for (int i = 0; i < x.Length; i++)
                 {
                     ts[i].localPosition = x[i];
-                    ts[i].GetComponent<MeshRenderer>().sharedMaterial = matLookup[es[i]];
+                    ts[i].GetComponent<MeshRenderer>().sharedMaterial = matLookup[types[i]];
                 }
 
                 // Create a lookup so that given a transform hit by a raycast we can get the molecule's index
                 molLookup = new Dictionary<Transform, int>(ts.Length);
-                for (int i = 0; i < ts.Length; i++)
-                {
-                    molLookup.Add(ts[i], i);
-                }
+                for (int i = 0; i < ts.Length; i++) molLookup.Add(ts[i], i);
 
                 return ts;
             }
@@ -245,6 +200,7 @@ namespace C2M2.MolecularDynamics.Simulation
                     j++;
                 }               
             }
+
             void ResizeField(Transform[] sphereTransforms)
             {
                 // Separate transform positions into their parts
