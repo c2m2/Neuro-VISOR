@@ -110,7 +110,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// Read in the cell and initialize 3D/1D visualization/interaction infrastructure
         /// </summary>
         /// <returns> Unity Mesh visualization of the 3D geometry. </returns>
-        protected override Mesh BuildMesh()
+        protected override Mesh BuildVisualization()
         {            
             string[] cellFileNames = BuildCellFileNames();
             // Read in 1D & 3D data and build a map between them

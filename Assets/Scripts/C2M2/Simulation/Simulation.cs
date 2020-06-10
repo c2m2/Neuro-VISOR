@@ -10,7 +10,7 @@ namespace C2M2.Simulation
     /// Provides an base interface for simulations using a general data type T
     /// </summary>
     /// <typeparam name="ValueType"> Type of simulation values </typeparam>
-    public abstract class Simulation<ValueType> : Interactable
+    public abstract class Simulation<ValueType, VizType> : Interactable
     {
         /// <summary>
         /// Should the simulation start itself in Awake?
@@ -29,11 +29,19 @@ namespace C2M2.Simulation
         /// Require derived classes to make simulation values available
         /// </summary>
         public abstract ValueType GetValues();
-
         /// <summary>
-        /// Require derived classes to know how to translate simulation values onto their simulation
+        /// Simulations must know how to build their visualization and what type the visualization is
         /// </summary>
-        /// <param name="newValues"></param>
+        /// <remarks>
+        /// See SurfaceSimulation & NeuronSimulation1D or PositionFieldSimulation for examples.
+        /// </remarks>
+        protected abstract VizType BuildVisualization();
+        /// <summary>
+        /// Simulations must know how to update the visualization and what type is needed for that.
+        /// </summary>
+        /// <remarks>
+        /// See SurfaceSimulation & NeuronSimulation1D or PositionFieldSimulation for examples.
+        /// </remarks>
         protected abstract void UpdateVisualization(in ValueType newValues);
 
         /// <summary>

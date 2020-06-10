@@ -7,7 +7,7 @@ namespace C2M2.Simulation
     /// <summary>
     /// Simulation of type double[] for visualizing scalar fields on mesh surfaces
     /// </summary>
-    public abstract class SurfaceSimulation : Simulation<double[]>
+    public abstract class SurfaceSimulation : Simulation<double[], Mesh>
     {
         #region Variables
         /// <summary>
@@ -29,13 +29,6 @@ namespace C2M2.Simulation
         private MeshRenderer mr;
         #endregion
 
-        #region Abstract Methods
-        /// <summary>
-        /// Require derived classes to know how to build their surface visualizations
-        /// </summary>
-        /// <returns></returns>
-        protected abstract Mesh BuildMesh();
-        #endregion
         /// <summary>
         /// Update vertex colors based on simulation values
         /// </summary>
@@ -55,7 +48,7 @@ namespace C2M2.Simulation
             InitMat();
             InitColors();
             // Initialize mesh
-            Mesh mesh = BuildMesh();
+            Mesh mesh = BuildVisualization();
             mf.sharedMesh = mesh;
             return;
 

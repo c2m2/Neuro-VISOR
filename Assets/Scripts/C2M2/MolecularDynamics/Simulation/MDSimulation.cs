@@ -66,54 +66,55 @@ namespace C2M2.MolecularDynamics.Simulation
         /// We don't have a PDB file, so we create so make-believe positions
         /// </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        protected override Transform[] BuildTransforms()
+        protected override Transform[] BuildVisualization()
         {
             Timer timer = new Timer();
-            timer.StartTimer();
+            //for (int trial = 0; trial < 10; trial++)
+            //{
+                timer.StartTimer();
 
-            // Read mass, bonds, angles from PSF file
-            PSFFile psfFile = PSFReader.ReadFile(relPath + psfFilePath);
-            mass = psfFile.mass;
-            bonds = psfFile.bonds;
-            angles = psfFile.angles;
-            // Convert bonds and angles to 0 base
-            for (int i = 0; i < bonds.Length; i++)
-            {
-                bonds[i] = bonds[i] - 1;
-            }
-            for (int i = 0; i < angles.Length; i++)
-            {
-                angles[i] = angles[i] - 1;
-            }
+                // Read mass, bonds, angles from PSF file
+                PSFFile psfFile = PSFReader.ReadFile(relPath + psfFilePath);
+                mass = psfFile.mass;
+                bonds = psfFile.bonds;
+                angles = psfFile.angles;
+                // Convert bonds and angles to 0 base
+                for (int i = 0; i < bonds.Length; i++)
+                {
+                    bonds[i] = bonds[i] - 1;
+                }
+                for (int i = 0; i < angles.Length; i++)
+                {
+                    angles[i] = angles[i] - 1;
+                }
 
-            // Read positions from PDB file
-            PDBFile pdbFile = PDBReader.ReadFile(relPath + pdbFilePath);
-            x = pdbFile.pos;
+                // Read positions from PDB file
+                PDBFile pdbFile = PDBReader.ReadFile(relPath + pdbFilePath);
+                x = pdbFile.pos;
 
-            // Initialize v
-            v = new Vector3[x.Length];
-            for (int i = 0; i < v.Length; i++)
-            {
-                v[i] = Vector3.zero;
-            }
-            timer.StopTimer("Init");
+                // Initialize v
+                v = new Vector3[x.Length];
+                for (int i = 0; i < v.Length; i++)
+                {
+                    v[i] = Vector3.zero;
+                }
+                timer.StopTimer("Init");
 
-            timer.StartTimer();
-            Transform[] transforms = RenderSpheres(x, psfFile.types, radius);
-            timer.StopTimer("RenderSpheres");
+                //timer.StartTimer();
+                Transform[] transforms = RenderSpheres(x, psfFile.types, radius);
+                //timer.StopTimer("RenderSpheres");
 
-            bond_topo = BuildBondTopology(bonds);
+                bond_topo = BuildBondTopology(bonds);
 
-            timer.StartTimer();
-            ResizeField(transforms);
-            timer.StopTimer("ResizeField");
+                //timer.StartTimer();
+                ResizeField(transforms);
+                //timer.StopTimer("ResizeField");
 
-            timer.StartTimer();
-            RenderBonds(bonds, transforms);
-            timer.StopTimer("RenderBonds");
-
-            timer.StopTimer("BuildTransforms");
-            timer.ExportCSV("MDSimulation.BuildTransforms");
+                //timer.StartTimer();
+                RenderBonds(bonds, transforms);
+                //timer.StopTimer("RenderBonds");
+            //}
+            timer.ExportCSV("MDSimulation.BuildVisualization");
 
             return transforms;
 
@@ -214,19 +215,23 @@ namespace C2M2.MolecularDynamics.Simulation
                 float[] ys = new float[sphereTransforms.Length];
                 float[] zs = new float[sphereTransforms.Length];
                 Vector3[] positions = new Vector3[sphereTransforms.Length];
+
+                // Separate positions
                 for(int i = 0; i < sphereTransforms.Length; i++)
                 {
                     xs[i] = sphereTransforms[i].position.x;
                     ys[i] = sphereTransforms[i].position.y;
                     zs[i] = sphereTransforms[i].position.z;
                 }
-                float xScale = 1, yScale = 1, zScale = 1;
+
                 float[] boundsArray = { xs.Max(), ys.Max(), zs.Max() };
                 float max = boundsArray.Max();
 
                 Vector3 targetSize = GameManager.instance.objectScaleDefault;
                 float[] targetArray = { targetSize.x, targetSize.y, targetSize.z };
-                float min = Mathf.Min(targetArray);
+                float min = targetArray.Min();
+
+                float xScale = 1, yScale = 1, zScale = 1;
                 xScale = min / max;
                 yScale = xScale;
                 zScale = xScale;

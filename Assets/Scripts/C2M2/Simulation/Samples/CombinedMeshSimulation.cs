@@ -45,7 +45,7 @@ namespace C2M2.Simulation.Samples
         /// <summary> Get every child mesh and combine into one mesh </summary>
         /// <returns> Combined mesh </returns>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        protected override Mesh BuildMesh()
+        protected override Mesh BuildVisualization()
         {
             Mesh combinedMesh, colMesh;
 

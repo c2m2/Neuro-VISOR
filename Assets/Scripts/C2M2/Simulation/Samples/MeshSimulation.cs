@@ -37,7 +37,7 @@ namespace C2M2.Simulation.Samples
                 }
             }
         }
-        protected override Mesh BuildMesh()
+        protected override Mesh BuildVisualization()
         {
             MeshFilter meshf = GetComponent<MeshFilter>() ?? throw new MeshFilterNotFoundException();
             Mesh mesh = meshf.sharedMesh ?? throw new MeshNotFoundException();

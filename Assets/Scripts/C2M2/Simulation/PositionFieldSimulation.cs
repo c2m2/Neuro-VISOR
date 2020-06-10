@@ -7,13 +7,13 @@ namespace C2M2.Simulation
     /// <summary>
     /// Simulation of type Vector3[] for simulating positional fields
     /// </summary>
-    public abstract class PositionFieldSimulation : Simulation<Vector3[]>
+    public abstract class PositionFieldSimulation : Simulation<Vector3[], Transform[]>
     {
         protected Transform[] transforms;
 
         protected override void OnAwake()
         {
-            transforms = BuildTransforms();
+            transforms = BuildVisualization();
             Vector3[] pos = new Vector3[transforms.Length];
 
             // Make each transform a child of this gameobject so the hierarchy isn't flooded
@@ -22,16 +22,7 @@ namespace C2M2.Simulation
                 // transforms[i].parent = transform;
                 // pos[i] = transforms[i].position;
             }
-
-            // Rescale the field and reapply
-            //pos = RescaleField(pos);
-            /*for(int i = 0; i < transforms.Length; i++)
-            {
-                transforms[i].position = pos[i];
-            }*/
         }
-
-        protected abstract Transform[] BuildTransforms();
 
         protected override void UpdateVisualization(in Vector3[] simulationValues)
         {
