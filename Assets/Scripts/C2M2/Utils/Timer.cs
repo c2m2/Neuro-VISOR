@@ -80,7 +80,7 @@ namespace C2M2
             public string ToStringPlus()
             {
                 // TODO: Use StringBuilder here and use timerNodes.Count to estimate StringBuilder size;
-                string s = String.Format("{0},{1},{2},{3},{4}", "name", "time (ms)", "min (ms)", "avg (ms)", "max (ms)");
+                string s = String.Format("{0},{1},{2},{3},{4},{5}", "name", "time (ms)", "max (ms)", "avg (ms)", "std.dev (ms)", "min (ms)");
 
                 string[] names = new string[timerNodes.Count];
                 double[] times = new double[timerNodes.Count];
@@ -90,13 +90,13 @@ namespace C2M2
                     names[i] = timerNodes[i].name;
                     times[i] = timerNodes[i].Milliseconds;
                 }
-                string formatString = "\n{0},{1:0.#####},{2:0.#####},{3:0.#####},{4:0.#####}";
+                string formatString = "\n{0},{1:0.#####},{2:0.#####},{3:0.#####},{4:0.#####},{5:0.####}";
                 for (int i = 0; i < timerNodes.Count; i++)
                 {
                     string newLine;
                     if (i == 0)
                     {
-                        newLine = String.Format(formatString, names[i], times[i], times.Min(), times.Avg(), times.Max());
+                        newLine = String.Format(formatString, names[i], times[i], times.Max(), times.Avg(), times.StdDev(), times.Min());
                         formatString = "\n{0},{1:0.#####}";
                     }
                     else newLine = String.Format(formatString, names[i], times[i]);

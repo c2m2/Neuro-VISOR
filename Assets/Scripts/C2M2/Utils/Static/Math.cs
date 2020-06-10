@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using UnityEngine;
 namespace C2M2
 {
     namespace Utils
@@ -127,11 +128,11 @@ namespace C2M2
             #endregion
             #region Avg
             /// <summary> Find the average of a given integer array </summary>
-            public static int Avg(this int[] array)
+            public static float Avg(this int[] array)
             {
                 int sum = 0;
                 for (int i = 0; i < array.Length; i++) { sum += array[i]; }
-                return sum / array.Length;
+                return (float)sum / array.Length;
             }
             /// <summary> Find the average of a given float array </summary>
             public static float Avg(this float[] array)
@@ -146,6 +147,38 @@ namespace C2M2
                 double sum = 0;
                 for (int i = 0; i < array.Length; i++) { sum += array[i]; }
                 return sum / array.Length;
+            }
+            #endregion
+            #region StdDev
+            public static float StdDev(this int[] array)
+            {
+                float avg = array.Avg();
+                float sumSqDiff = 0f;
+                for (int i = 0; i < array.Length; i++)
+                {
+                    sumSqDiff += (array[i] - avg) * (array[i] - avg);
+                }
+                return Mathf.Sqrt(sumSqDiff / array.Length);
+            }
+            public static float StdDev(this float[] array)
+            {
+                float avg = array.Avg();
+                float sumSqDiff = 0f;
+                for(int i = 0; i < array.Length; i++)
+                {
+                    sumSqDiff += (array[i] - avg) * (array[i] - avg);
+                }
+                return Mathf.Sqrt(sumSqDiff / array.Length);
+            }
+            public static float StdDev(this double[] array)
+            {
+                double avg = array.Avg();
+                double sumSqDiff = 0f;
+                for (int i = 0; i < array.Length; i++)
+                {
+                    sumSqDiff += (array[i] - avg) * (array[i] - avg);
+                }
+                return Mathf.Sqrt((float)sumSqDiff / array.Length);
             }
             #endregion
             #region Sum

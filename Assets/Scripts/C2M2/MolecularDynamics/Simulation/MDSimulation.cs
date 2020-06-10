@@ -53,6 +53,7 @@ namespace C2M2.MolecularDynamics.Simulation
         protected int[] bonds = null;
         protected int[] angles = null;
 	    protected float[] mass = null;
+        protected string[] types = null;
         protected int[][] bond_topo = null;
 
         private BondRenderer[] bondRenderers;
@@ -68,26 +69,30 @@ namespace C2M2.MolecularDynamics.Simulation
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         protected override Transform[] BuildVisualization()
         {
-            Timer timer = new Timer();
-            //for (int trial = 0; trial < 10; trial++)
-            //{
-                timer.StartTimer();
+            ReadPSF();
+            ReadPDB();
+            Transform[] transforms = RenderSpheres(x, types, radius);
+            bond_topo = BuildBondTopology(bonds);
+            ResizeField(transforms);
+            RenderBonds(bonds, transforms);
 
+            return transforms;
+
+            void ReadPSF()
+            {
                 // Read mass, bonds, angles from PSF file
                 PSFFile psfFile = PSFReader.ReadFile(relPath + psfFilePath);
                 mass = psfFile.mass;
                 bonds = psfFile.bonds;
                 angles = psfFile.angles;
-                // Convert bonds and angles to 0 base
-                for (int i = 0; i < bonds.Length; i++)
-                {
-                    bonds[i] = bonds[i] - 1;
-                }
-                for (int i = 0; i < angles.Length; i++)
-                {
-                    angles[i] = angles[i] - 1;
-                }
+                types = psfFile.types;
 
+                // Convert bonds and angles to 0 base
+                for (int i = 0; i < bonds.Length; i++) bonds[i] = bonds[i] - 1;
+                for (int i = 0; i < angles.Length; i++) angles[i] = angles[i] - 1;
+            }
+            void ReadPDB()
+            {
                 // Read positions from PDB file
                 PDBFile pdbFile = PDBReader.ReadFile(relPath + pdbFilePath);
                 x = pdbFile.pos;
@@ -98,60 +103,7 @@ namespace C2M2.MolecularDynamics.Simulation
                 {
                     v[i] = Vector3.zero;
                 }
-                timer.StopTimer("Init");
-
-                //timer.StartTimer();
-                Transform[] transforms = RenderSpheres(x, psfFile.types, radius);
-                //timer.StopTimer("RenderSpheres");
-
-                bond_topo = BuildBondTopology(bonds);
-
-                //timer.StartTimer();
-                ResizeField(transforms);
-                //timer.StopTimer("ResizeField");
-
-                //timer.StartTimer();
-                RenderBonds(bonds, transforms);
-                //timer.StopTimer("RenderBonds");
-            //}
-            timer.ExportCSV("MDSimulation.BuildVisualization");
-
-            return transforms;
-
-            int[][] BuildBondTopology(int[] bonds)
-            {
-                int maxInd = bonds.Max();
-                List<int>[] bond_topo_list = new List<int>[maxInd + 1]; //make list of bond connections
-                int i = 0;
-                for(i = 0; i < bond_topo_list.Length; i++)
-                {
-                    bond_topo_list[i] = new List<int>();
-                }
-
-                int a = -1, b = -1;
-
-                // Look at each bond and store it in our symmetric matrix
-                for (i = 0; i < bonds.Length; i += 2)
-                {
-                    if (!(bonds.Length % 2 == 0)) throw new System.Exception("Bond array is not divisible by 2");
-
-                    // Convert indices to be zero based
-                    a = bonds[i];
-                    b = bonds[i + 1];
-                    bond_topo_list[a].Add(b);
-                    bond_topo_list[b].Add(a);
-                }
-
-                // Convert array of lists to jagged array
-                bond_topo = new int[maxInd + 1][];
-                for(i = 0; i < bond_topo_list.Length; i++)
-                {
-                    bond_topo[i] = bond_topo_list[i].ToArray();
-                }
-                //Debug.Log(bond_topo[0][1]);
-                return bond_topo;
             }
-           
             Transform[] RenderSpheres(Vector3[] x, string[] types, float radius)
             {
                 // Instantiate one sphere per atom
@@ -165,9 +117,9 @@ namespace C2M2.MolecularDynamics.Simulation
                 shader = Shader.Find(shaderName);
                 string[] atomTypes = types.Distinct().ToArray();
                 Color[] uniqueCols = new Color[atomTypes.Length];
-                for(int i = 0; i < uniqueCols.Length; i++)
+                for (int i = 0; i < uniqueCols.Length; i++)
                 {
-                    if(i < atomColors.Length) uniqueCols[i] = atomColors[i];
+                    if (i < atomColors.Length) uniqueCols[i] = atomColors[i];
                     else uniqueCols[i] = UnityEngine.Random.ColorHSV();
                 }
                 atomColors = uniqueCols;
@@ -196,18 +148,39 @@ namespace C2M2.MolecularDynamics.Simulation
 
                 return ts;
             }
-
-            void RenderBonds(int[] bonds, Transform[] sphereTransforms)
+            int[][] BuildBondTopology(int[] bonds)
             {
-                bondRenderers = new BondRenderer[bonds.Length / 2];
-                int j = 0;
-                for(int i = 0; i < bonds.Length-1; i+=2)
+                int maxInd = bonds.Max();
+                List<int>[] bond_topo_list = new List<int>[maxInd + 1]; //make list of bond connections
+                int i = 0;
+                for (i = 0; i < bond_topo_list.Length; i++)
                 {
-                    bondRenderers[j] = new BondRenderer(sphereTransforms[bonds[i]], sphereTransforms[bonds[i + 1]], 0.001f);
-                    j++;
-                }               
-            }
+                    bond_topo_list[i] = new List<int>();
+                }
 
+                int a = -1, b = -1;
+
+                // Look at each bond and store it in our symmetric matrix
+                for (i = 0; i < bonds.Length; i += 2)
+                {
+                    if (!(bonds.Length % 2 == 0)) throw new System.Exception("Bond array is not divisible by 2");
+
+                    // Convert indices to be zero based
+                    a = bonds[i];
+                    b = bonds[i + 1];
+                    bond_topo_list[a].Add(b);
+                    bond_topo_list[b].Add(a);
+                }
+
+                // Convert array of lists to jagged array
+                bond_topo = new int[maxInd + 1][];
+                for (i = 0; i < bond_topo_list.Length; i++)
+                {
+                    bond_topo[i] = bond_topo_list[i].ToArray();
+                }
+                //Debug.Log(bond_topo[0][1]);
+                return bond_topo;
+            }
             void ResizeField(Transform[] sphereTransforms)
             {
                 // Separate transform positions into their parts
@@ -240,6 +213,16 @@ namespace C2M2.MolecularDynamics.Simulation
                 Transform mol = sphereTransforms[0].parent;
                 mol.localScale = new Vector3(xScale, yScale, zScale);
             }
+            void RenderBonds(int[] bonds, Transform[] sphereTransforms)
+            {
+                bondRenderers = new BondRenderer[bonds.Length / 2];
+                int j = 0;
+                for (int i = 0; i < bonds.Length - 1; i += 2)
+                {
+                    bondRenderers[j] = new BondRenderer(sphereTransforms[bonds[i]], sphereTransforms[bonds[i + 1]], 0.001f);
+                    j++;
+                }
+            }
         }        
         /// <summary>
         /// Called after position field transforms are updated, used here to update bond visualization
@@ -247,10 +230,7 @@ namespace C2M2.MolecularDynamics.Simulation
         protected override void UpdateVisChild(in Vector3[] simulationValues)
         {
             if (bondRenderers == null) return;
-            for(int i = 0; i < bondRenderers.Length; i++)
-            {
-                bondRenderers[i].Update();
-            }     
+            for(int i = 0; i < bondRenderers.Length; i++) bondRenderers[i].Update();   
         }
     }
 }

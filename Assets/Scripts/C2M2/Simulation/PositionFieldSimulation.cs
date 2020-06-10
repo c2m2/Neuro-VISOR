@@ -3,14 +3,15 @@ using UnityEngine;
 
 namespace C2M2.Simulation
 {
-    using Utils.MeshUtils;
+    using Utils;
     /// <summary>
     /// Simulation of type Vector3[] for simulating positional fields
     /// </summary>
     public abstract class PositionFieldSimulation : Simulation<Vector3[], Transform[]>
     {
         protected Transform[] transforms;
-
+        private Timer timer;
+        private int trials = 1000;
         protected override void OnAwake()
         {
             transforms = BuildVisualization();
@@ -22,16 +23,23 @@ namespace C2M2.Simulation
                 // transforms[i].parent = transform;
                 // pos[i] = transforms[i].position;
             }
+            timer = new Timer();
         }
 
         protected override void UpdateVisualization(in Vector3[] simulationValues)
         {
-            for (int i = 0; i < simulationValues.Length; i++)
+            if (trials > 0)
             {
-                transforms[i].localPosition = simulationValues[i];
+                timer.StartTimer();
+                for (int i = 0; i < simulationValues.Length; i++)
+                {
+                    transforms[i].localPosition = simulationValues[i];
+                }
+                UpdateVisChild(simulationValues);
+                timer.StopTimer();
+                trials--;
+                if (trials == 0) timer.ExportCSV("UpdateVisualization");
             }
-
-            UpdateVisChild(simulationValues);
         }
         /// <summary>
         /// Allow derived classes to implement custom visualization features

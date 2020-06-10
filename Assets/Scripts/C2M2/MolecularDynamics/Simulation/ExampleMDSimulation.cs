@@ -145,13 +145,9 @@ namespace C2M2.MolecularDynamics.Simulation
 	        Vector3[] force = Force(x,bond_topo); // + angle_Force(x,angle_topo);
                                                   //Vector3[] angle = angle_Force(x);
 
-            // OPTION 2:
-            //lastHit.distance = float.PositiveInfinity;
-
             // Iterate over time
             for (int t = 0; t < nT; t++)
-	        {
-        
+	        {      
                 // iterate over the atoms
                 for(int i = 0; i < x.Length; i++)
                 {
@@ -166,8 +162,6 @@ namespace C2M2.MolecularDynamics.Simulation
                     float rz = Convert.ToSingle(rzz);
                      
                     Vector3 r = new Vector3(rx,ry,rz);
-                    //Debug.Log(r);
-                    //GameManager.instance.DebugLogSafe(r);
 
                     // OPTION 2:
                     /*
