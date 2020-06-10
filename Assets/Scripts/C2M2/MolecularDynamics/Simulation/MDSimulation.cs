@@ -16,7 +16,6 @@ namespace C2M2.MolecularDynamics.Simulation
         public Transform a { get; private set; }
         public Transform b { get; private set; }
         LineRenderer renderer;
-        private static Color defaultCol = Color.black;
         public BondRenderer(Transform a, Transform b, float width = 1f)
         {
             this.a = a;
@@ -43,8 +42,7 @@ namespace C2M2.MolecularDynamics.Simulation
         public float radius = 1f;
 
         public string shaderName = "Standard";
-        public string[] uniqueTypes;
-        public Color[] uniqueCols = new Color[] { Color.gray, Color.cyan };
+        public Color[] atomColors = new Color[] { Color.cyan, Color.gray };
 
         public Material bondMaterial;
 
@@ -98,13 +96,21 @@ namespace C2M2.MolecularDynamics.Simulation
             {
                 v[i] = Vector3.zero;
             }
+            timer.StopTimer("Init");
 
+            timer.StartTimer();
             Transform[] transforms = RenderSpheres(x, psfFile.types, radius);
+            timer.StopTimer("RenderSpheres");
 
             bond_topo = BuildBondTopology(bonds);
 
+            timer.StartTimer();
             ResizeField(transforms);
+            timer.StopTimer("ResizeField");
+
+            timer.StartTimer();
             RenderBonds(bonds, transforms);
+            timer.StopTimer("RenderBonds");
 
             timer.StopTimer("BuildTransforms");
             timer.ExportCSV("MDSimulation.BuildTransforms");
@@ -154,29 +160,30 @@ namespace C2M2.MolecularDynamics.Simulation
                 SphereInstantiator instantiator = gameObject.AddComponent<SphereInstantiator>();
                 Transform[] ts = instantiator.InstantiateSpheres(spheres, "Molecule", "Atom");
 
-                // Build type->Material lookup
+                // Resolve which colors to use for our system
                 shader = Shader.Find(shaderName);
-                string[] uniqueTypes = types.Distinct().ToArray();
-                Color[] cols = new Color[uniqueTypes.Length];
-                for(int i = 0; i < cols.Length; i++)
+                string[] atomTypes = types.Distinct().ToArray();
+                Color[] uniqueCols = new Color[atomTypes.Length];
+                for(int i = 0; i < uniqueCols.Length; i++)
                 {
-                    if(i < uniqueCols.Length) cols[i] = uniqueCols[i];
-                    else cols[i] = UnityEngine.Random.ColorHSV();
+                    if(i < atomColors.Length) uniqueCols[i] = atomColors[i];
+                    else uniqueCols[i] = UnityEngine.Random.ColorHSV();
                 }
-                uniqueCols = cols;
-
-                // Creat material lookup
+                atomColors = uniqueCols;
+                // Create a material for each unique atom type and add it to a dictionary
                 Dictionary<string, Material> matLookup = new Dictionary<string, Material>(ts.Length);
-                for (int i = 0; i < this.uniqueTypes.Length; i++)
+                for (int i = 0; i < atomTypes.Length; i++)
                 {
                     Material mat = new Material(shader);
-                    mat.color = uniqueCols[i];
-                    mat.name = this.uniqueTypes[i] + "Mat";
-                    matLookup.Add(this.uniqueTypes[i], mat);
+                    mat.color = atomColors[i];
+                    mat.name = atomTypes[i] + "Mat";
+                    matLookup.Add(atomTypes[i], mat);
                 }
 
-                // Apply positions and materials to spheres
-                for (int i = 0; i < x.Length; i++)
+                // Apply positions and materials to atoms
+                if (ts.Length != x.Length) throw new Exception("Number of atoms does not match number of positions given!");
+                if (types.Length != x.Length) throw new Exception("Number of atoms does not match number of atom types given!");
+                for (int i = 0; i < ts.Length; i++)
                 {
                     ts[i].localPosition = x[i];
                     ts[i].GetComponent<MeshRenderer>().sharedMaterial = matLookup[types[i]];
@@ -192,7 +199,6 @@ namespace C2M2.MolecularDynamics.Simulation
             void RenderBonds(int[] bonds, Transform[] sphereTransforms)
             {
                 bondRenderers = new BondRenderer[bonds.Length / 2];
-               // bondViz = new XRLineRenderer[bonds.Length];
                 int j = 0;
                 for(int i = 0; i < bonds.Length-1; i+=2)
                 {
@@ -227,7 +233,6 @@ namespace C2M2.MolecularDynamics.Simulation
 
                 // Get the parent of all the atom transforms
                 Transform mol = sphereTransforms[0].parent;
-                Debug.Log("mol.name: " + mol.name);
                 mol.localScale = new Vector3(xScale, yScale, zScale);
             }
         }        
@@ -236,14 +241,11 @@ namespace C2M2.MolecularDynamics.Simulation
         /// </summary>
         protected override void UpdateVisChild(in Vector3[] simulationValues)
         {
-            if(bondRenderers != null)
+            if (bondRenderers == null) return;
+            for(int i = 0; i < bondRenderers.Length; i++)
             {
-                for(int i = 0; i < bondRenderers.Length; i++)
-                {
-                    bondRenderers[i].Update();
-                }
-            }      
+                bondRenderers[i].Update();
+            }     
         }
-
     }
 }

@@ -2154,6 +2154,10 @@ MonoBehaviour:
   pdbFilePath: PE/pe_cg.pdb
   psfFilePath: PE/octatetracontane_128.cg.psf
   radius: 1
+  shaderName: Standard
+  atomColors:
+  - {r: 0, g: 1, b: 1, a: 1}
+  - {r: 0.5019608, g: 0.5019608, b: 0.5019608, a: 1}
   bondMaterial: {fileID: 0}
   kb: 0.001987
   T: 100
@@ -2743,7 +2747,7 @@ PrefabInstance:
     - target: {fileID: 5843646974706866111, guid: 70469a93359ee8b4e98c4c445b157af9,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5843646974706866111, guid: 70469a93359ee8b4e98c4c445b157af9,
         type: 3}
