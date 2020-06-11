@@ -33,7 +33,7 @@ namespace C2M2.Interaction
         {
             List<Node> initialNodes = meshInfo.BuildInitialNodes(hit);
             // Initialize min distance array to be all Infinity
-            minDistances.FillArray(float.PositiveInfinity);
+            minDistances.Fill(float.PositiveInfinity);
             PriorityQueue queue = new PriorityQueue();
             // Our raycast hits in between three nodes, so we find the distance between our raycast hit point and those nodes, and then queue all of them as our "initial" nodes
             for (int i = 0; i < initialNodes.Count; i++)

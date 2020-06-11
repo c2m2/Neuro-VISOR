@@ -75,7 +75,6 @@ namespace C2M2.MolecularDynamics.Simulation
             bond_topo = BuildBondTopology(bonds);
             ResizeField(transforms);
             RenderBonds(bonds, transforms);
-
             return transforms;
 
             void ReadPSF()

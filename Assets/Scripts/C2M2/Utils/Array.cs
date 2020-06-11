@@ -22,17 +22,18 @@ namespace C2M2
                 System.Array.Copy(endArray, 0, newArray, beginningArray.Length, endArray.Length);
                 return newArray;
             }
-            #region FillArray
+            #region Fill
             /// <summary> Fill a preallocated array of type T with identical values of type T. </summary>
-            public static void FillArray<T>(this T[] array, T value)
+            public static T[] Fill<T>(this T[] array, T value)
             {
                 for (int i = 0; i < array.Length; i++) { array[i] = value; }
+                return array;
             }
             /// <summary> Fill an unallocated array of type T with identical values of type T. </summary>
-            public static void FillArray<T>(this T[] array, T value, int size)
+            public static T[] Fill<T>(this T[] array, T value, int size)
             {
                 array = new T[size];
-                FillArray(array, value);
+                return Fill(array, value);
             }
             #endregion
             #region FillArrayRandom

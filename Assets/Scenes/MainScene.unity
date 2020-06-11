@@ -2161,7 +2161,7 @@ MonoBehaviour:
   bondMaterial: {fileID: 0}
   kb: 0.001987
   T: 100
-  timestepCount: 50000
+  timestepCount: 10000
   timestepSize: 0.1
   kappa: 6
   r0: 3.65

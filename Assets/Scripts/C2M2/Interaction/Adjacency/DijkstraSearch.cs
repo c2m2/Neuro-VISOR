@@ -27,7 +27,7 @@ namespace C2M2.Interaction.Adjacency
             // Create an array to store distances
             minDistances = new float[uniqueVertices.uniqueVerts.Length];
             // Initialize min distance array to be all Infinity
-            minDistances.FillArray(float.PositiveInfinity);
+            minDistances.Fill(float.PositiveInfinity);
             // Find the vertices adjacent to our raycast hit to start the search from
             List<Node> initialNodes = uniqueVertices.RaycastFindNearestUniqueVerts(hit, 1);
             // Create a priority queue to queue the next adjacent nodes

@@ -78,7 +78,7 @@ namespace C2M2.Interaction
                     {
                         valueChanges = new double[objectManager.diffusionManager.activeDiffusion.simulationConditions.Length];
                     }
-                    valueChanges.FillArray(0);
+                    valueChanges.Fill(0);
                     findPath.FindPath(curHit, (float)distanceThreshold);
                     //if (newConditions.Length != findPath.closestMeshVertArr.Length) { newConditions = new MeshInfo.NodeDouble[findPath.closestMeshVertArr.Length]; }
                     newConditions = new MeshInfo.DNode[findPath.closestMeshVertArr.Length];
@@ -115,7 +115,7 @@ namespace C2M2.Interaction
                 {
                     valueChanges = new double[objectManager.diffusionManager.activeDiffusion.simulationConditions.Length];
                 }
-                valueChanges.FillArray(0);
+                valueChanges.Fill(0);
                 findPath.FindPath(curHit, (float)distanceThreshold);
                 //if (newConditions.Length != findPath.closestMeshVertArr.Length) { newConditions = new MeshInfo.NodeDouble[findPath.closestMeshVertArr.Length]; }
                 newConditions = new MeshInfo.DNode[findPath.closestMeshVertArr.Length];

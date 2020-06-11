@@ -336,7 +336,7 @@ namespace C2M2.Interaction
               // Create a new array and fill it with initial values
                 colors32 = new Color32[vertices.Length];
                 Color32 col32 = gradient.Evaluate(0);
-                colors32.FillArray(col32);
+                colors32.Fill(col32);
             }
         }
         /// <summary> "Flip" the mesh vertex array around so that you can lookup a vertex index by its position </summary>

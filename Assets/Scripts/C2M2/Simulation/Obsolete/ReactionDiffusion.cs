@@ -85,7 +85,7 @@ namespace C2M2.Simulation
         }
         public void ValuesEmpty()
         {
-            simulationConditions.FillArray(0);
+            simulationConditions.Fill(0);
             meshInfo.SubmitComponentDataChanges(simulationConditions.ToFloat());
         }
         /// <summary> Change the current value at a specific point </summary>
