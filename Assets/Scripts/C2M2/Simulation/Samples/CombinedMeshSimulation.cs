@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using C2M2;
 using System;
-using GetSocialSdk.Capture.Scripts;
 
 namespace C2M2.Simulation.Samples
 {
