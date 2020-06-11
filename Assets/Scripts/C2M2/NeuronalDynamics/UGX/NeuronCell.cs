@@ -13,7 +13,8 @@ namespace C2M2.NeuronalDynamics.UGX
         public List<double> edgeLengths = new List<double>();
         public List<int> boundaryID = new List<int>();
         public List<int> somaID = new List<int>();
-            
+        public List<int> brchID = new List<int>();
+
         public int vertCount = new int();
         public int edgeCount = new int();
 
@@ -73,6 +74,7 @@ namespace C2M2.NeuronalDynamics.UGX
             this.edgeCount = this.edges.Count();
 
             this.somaID = grid.Subsets["soma"].Indices.ToList();
+            this.brchID = grid.Subsets["testbranch"].Indices.ToList();
         }
 
         // For reading in an swc file
