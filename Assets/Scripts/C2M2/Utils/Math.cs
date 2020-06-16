@@ -66,18 +66,21 @@ namespace C2M2
                 for (int i = 0; i < array.Length; i++) { if (array[i] > max) { max = array[i]; } }
                 return max;
             }
+            /// <summary> Find the maximum value of a given int list. Should run faster than LINQ.max </summary>
             public static int Max(this List<int> list)
             {
                 int max = int.MinValue;
                 for (int i = 0; i < list.Count; i++) { if (list[i] > max) { max = list[i]; } }
                 return max;
             }
+            /// <summary> Find the maximum value of a given float list. Should run faster than LINQ.max </summary>
             public static float Max(this List<float> list)
             {
                 float max = float.MinValue;
                 for (int i = 0; i < list.Count; i++) { if (list[i] > max) { max = list[i]; } }
                 return max;
             }
+            /// <summary> Find the maximum value of a given double list. Should run faster than LINQ.max </summary>
             public static double Max(this List<double> list)
             {
                 double max = double.MinValue;
@@ -107,18 +110,21 @@ namespace C2M2
                 for (int i = 0; i < array.Length; i++) { if (min > array[i]) { min = array[i]; } }
                 return min;
             }
+            /// <summary> Find the minimum of a given int list </summary>
             public static int Min(this List<int> list)
             {
                 int min = int.MaxValue;
                 for (int i = 0; i < list.Count; i++) { if (list[i] < min) { min = list[i]; } }
                 return min;
             }
+            /// <summary> Find the minimum of a given float list </summary>
             public static float Min(this List<float> list)
             {
                 float min = float.MaxValue;
                 for (int i = 0; i < list.Count; i++) { if (list[i] < min) { min = list[i]; } }
                 return min;
             }
+            /// <summary> Find the minimum of a given double list </summary>
             public static double Min(this List<double> list)
             {
                 double min = double.MaxValue;
@@ -148,8 +154,30 @@ namespace C2M2
                 for (int i = 0; i < array.Length; i++) { sum += array[i]; }
                 return sum / array.Length;
             }
+            /// <summary> Find the average of a given integer list </summary>
+            public static float Avg(this List<int> list)
+            {
+                int sum = 0;
+                for (int i = 0; i < list.Count; i++) { sum += list[i]; }
+                return (float)sum / list.Count;
+            }
+            /// <summary> Find the average of a given float list </summary>
+            public static float Avg(this List<float> list)
+            {
+                float sum = 0;
+                for (int i = 0; i < list.Count; i++) { sum += list[i]; }
+                return sum / list.Count;
+            }
+            /// <summary> Find the average of a given double list </summary>
+            public static double Avg(this List<double> list)
+            {
+                double sum = 0;
+                for (int i = 0; i < list.Count; i++) { sum += list[i]; }
+                return sum / list.Count;
+            }
             #endregion
             #region StdDev
+            /// <summary> Find the standard deviation of the given int array </summary>
             public static float StdDev(this int[] array)
             {
                 float avg = array.Avg();
@@ -160,6 +188,7 @@ namespace C2M2
                 }
                 return Mathf.Sqrt(sumSqDiff / array.Length);
             }
+            /// <summary> Find the standard deviation of the given float array </summary>
             public static float StdDev(this float[] array)
             {
                 float avg = array.Avg();
@@ -170,6 +199,7 @@ namespace C2M2
                 }
                 return Mathf.Sqrt(sumSqDiff / array.Length);
             }
+            /// <summary> Find the standard deviation of the given double array </summary>
             public static float StdDev(this double[] array)
             {
                 double avg = array.Avg();
@@ -179,6 +209,33 @@ namespace C2M2
                     sumSqDiff += (array[i] - avg) * (array[i] - avg);
                 }
                 return Mathf.Sqrt((float)sumSqDiff / array.Length);
+            }
+            /// <summary> Find the standard deviation of the given int list </summary>
+            public static float StdDev(this List<int> list)
+            {
+                float avg = list.Avg();
+                float sumSqDiff = 0f;
+                for (int i = 0; i < list.Count; i++)
+                {
+                    sumSqDiff += (list[i] - avg) * (list[i] - avg);
+                }
+                return Mathf.Sqrt(sumSqDiff / list.Count);
+            }
+            /// <summary> Find the standard deviation of the given float list </summary>
+            public static float StdDev(this List<float> list)
+            {
+                float avg = list.Avg();
+                float sumSqDiff = 0f;
+                for (int i = 0; i < list.Count; i++) sumSqDiff += (list[i] - avg) * (list[i] - avg);
+                return Mathf.Sqrt(sumSqDiff / list.Count);
+            }
+            /// <summary> Find the standard deviation of the given double list </summary>
+            public static float StdDev(this List<double> list)
+            {
+                double avg = list.Avg();
+                double sumSqDiff = 0f;
+                for (int i = 0; i < list.Count; i++) sumSqDiff += (list[i] - avg) * (list[i] - avg);
+                return Mathf.Sqrt((float)sumSqDiff / list.Count);
             }
             #endregion
             #region Sum
@@ -201,6 +258,27 @@ namespace C2M2
             {
                 double sum = 0;
                 for (int i = 0; i < array.Length; i++) { sum += array[i]; }
+                return sum;
+            }
+            /// <summary> Sum all elements of a given integer int </summary>
+            public static int Sum(this List<int> list)
+            {
+                int sum = 0;
+                for (int i = 0; i < list.Count; i++) { sum += list[i]; }
+                return sum;
+            }
+            /// <summary> Sum all elements of a given float list </summary>
+            public static float Sum(this List<float> list)
+            {
+                float sum = 0;
+                for (int i = 0; i < list.Count; i++) { sum += list[i]; }
+                return sum;
+            }
+            /// <summary> Sum all elements of a given double list </summary>
+            public static double Sum(this List<double> list)
+            {
+                double sum = 0;
+                for (int i = 0; i < list.Count; i++) { sum += list[i]; }
                 return sum;
             }
             #endregion
@@ -226,11 +304,32 @@ namespace C2M2
             /// <summary> Get the absolute value of each array element </summary>
             public static double[] Abs(this double[] array)
             {
-                for (int i = 0; i < array.Length; i++)
-                {
-                    array[i] = array[i] > 0 ? array[i] : -array[i];
-                }
+                for (int i = 0; i < array.Length; i++) array[i] = array[i] > 0 ? array[i] : -array[i];
                 return array;
+            }
+            /// <summary> Get the absolute value of each list element </summary>
+            public static List<int> Abs(this List<int> list)
+            {
+                for (int i = 0; i < list.Count; i++)
+                {
+                    list[i] = list[i] > 0 ? list[i] : -list[i];
+                }
+                return list;
+            }
+            /// <summary> Get the absolute value of each list element </summary>
+            public static List<float> Abs(this List<float> list)
+            {
+                for (int i = 0; i < list.Count; i++)
+                {
+                    list[i] = list[i] > 0 ? list[i] : -list[i];
+                }
+                return list;
+            }
+            /// <summary> Get the absolute value of each array element </summary>
+            public static List<double> Abs(this List<double> list)
+            {
+                for (int i = 0; i < list.Count; i++) list[i] = list[i] > 0 ? list[i] : -list[i];
+                return list;
             }
             #endregion
             #endregion

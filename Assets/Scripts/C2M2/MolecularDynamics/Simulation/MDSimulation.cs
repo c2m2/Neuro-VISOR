@@ -29,27 +29,43 @@ namespace C2M2.MolecularDynamics.Simulation
             renderer.endColor = Color.black;
             Update();
         }
-        public void Update()
-        {
-            renderer.SetPositions(new Vector3[] { a.position, b.position });
-        }
+        public void Update() => renderer.SetPositions(new Vector3[] { a.position, b.position });
     }
+    /// <summary>
+    /// Reads data files and creates and updates visualizations for molecular dynamics systemss
+    /// </summary>
     public abstract class MDSimulation : PositionFieldSimulation
     {
-        private readonly string relPath = Application.streamingAssetsPath + @"/MolecularDynamics/";
-        public string pdbFilePath = "PE/pe_cg.pdb";
-        public string psfFilePath = "PE/octatetracontane_128.cg.psf";
+        // Folder path to PDB and PSF files
+        private readonly string path = Application.streamingAssetsPath + @"/MolecularDynamics/";
+        [Tooltip("Path to PDB file, relative to Assets/StreamingAssets/MolecularDynamics/")]
+        public string pdbPath = "PE/pe_cg.pdb";
+        [Tooltip("Path to PSF file, relative to Assets/StreamingAssets/MolecularDynamics/")]
+        public string psfPath = "PE/octatetracontane_128.cg.psf";
+        [Tooltip("Initial radius of atoms in the system. These will be scaled down to fit inside of the room")]
         public float radius = 1f;
-
+        [Tooltip("Name of shader to use on particles")]
         public string shaderName = "Standard";
+        [Tooltip("Colors to use on each atom type. If not enough colors are provided, random colors will be generated for each additional type.")]
         public Color[] atomColors = new Color[] { Color.cyan, Color.gray };
 
-        public Material bondMaterial;
-
-        protected Dictionary<Transform, int> molLookup;
+        private Material bondMaterial;
+        /// <summary>
+        /// Look up a Transform, get back a position index.
+        /// </summary>
+        /// <remarks>
+        /// Used to find which particle transform has been hit by a Raycast
+        /// </remarks>
+        protected Dictionary<Transform, int> atomLookup;
+        /// <summary> Position of each particle </summary>
         protected Vector3[] x = null;
+        /// <summary> Velocity of each particle </summary>
         protected Vector3[] v = null;
         protected Vector3[] r = null;
+        /// <summary> Each two indices represents one bond. </summary>
+        /// <remarks>
+        /// If bonds[0] = 10 and bonds[1] = 15, then the particles at x[10] & x[15] represent a bonded pair.
+        /// </remarks>
         protected int[] bonds = null;
         protected int[] angles = null;
 	    protected float[] mass = null;
@@ -58,13 +74,10 @@ namespace C2M2.MolecularDynamics.Simulation
 
         private BondRenderer[] bondRenderers;
         private Shader shader;
-        private float[][] neighborList;
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
-        /// In the future, MDSimulation should this method with the PDBReader, 
-        /// so you won't need to worry about coding it every time. 
-        /// We don't have a PDB file, so we create so make-believe positions
+        /// Reads and stores PDB and PSF data, uses the data to build the system visualization
         /// </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         protected override Transform[] BuildVisualization()
@@ -80,7 +93,7 @@ namespace C2M2.MolecularDynamics.Simulation
             void ReadPSF()
             {
                 // Read mass, bonds, angles from PSF file
-                PSFFile psfFile = PSFReader.ReadFile(relPath + psfFilePath);
+                PSFFile psfFile = PSFReader.ReadFile(path + psfPath);
                 mass = psfFile.mass;
                 bonds = psfFile.bonds;
                 angles = psfFile.angles;
@@ -93,7 +106,7 @@ namespace C2M2.MolecularDynamics.Simulation
             void ReadPDB()
             {
                 // Read positions from PDB file
-                PDBFile pdbFile = PDBReader.ReadFile(relPath + pdbFilePath);
+                PDBFile pdbFile = PDBReader.ReadFile(path + pdbPath);
                 x = pdbFile.pos;
 
                 // Initialize v
@@ -142,8 +155,8 @@ namespace C2M2.MolecularDynamics.Simulation
                 }
 
                 // Create a lookup so that given a transform hit by a raycast we can get the molecule's index
-                molLookup = new Dictionary<Transform, int>(ts.Length);
-                for (int i = 0; i < ts.Length; i++) molLookup.Add(ts[i], i);
+                atomLookup = new Dictionary<Transform, int>(ts.Length);
+                for (int i = 0; i < ts.Length; i++) atomLookup.Add(ts[i], i);
 
                 return ts;
             }
@@ -222,10 +235,13 @@ namespace C2M2.MolecularDynamics.Simulation
                     j++;
                 }
             }
-        }        
+        }
         /// <summary>
-        /// Called after position field transforms are updated, used here to update bond visualization
+        /// Used here to update bond visualization.
         /// </summary>
+        /// <remarks>
+        /// Called after position field transforms are updated.
+        /// </remarks>
         protected override void UpdateVisChild(in Vector3[] simulationValues)
         {
             if (bondRenderers == null) return;

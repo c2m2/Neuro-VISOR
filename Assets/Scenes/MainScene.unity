@@ -1431,7 +1431,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &884125481
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1475,13 +1475,13 @@ MonoBehaviour:
     m_Mode: 0
     m_NumColorKeys: 5
     m_NumAlphaKeys: 2
-  extremaMethod: 1
+  extremaMethod: 2
   globalMax: 130
   globalMin: -10
-  visualize1D: 0
+  visualize1D: 1
   color1D:
     serializedVersion: 2
-    rgba: 4278512639
+    rgba: 4278510591
   lineWidth1D: 0.005
   vstart: 55
   endTime: 50
@@ -2014,7 +2014,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1601653133
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2132,7 +2132,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1815266848
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2147,14 +2147,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   interactionType: 0
   startOnAwake: 1
-  pdbFilePath: PE/pe_cg.pdb
-  psfFilePath: PE/octatetracontane_128.cg.psf
+  pdbPath: PE/pe_cg.pdb
+  psfPath: PE/octatetracontane_128.cg.psf
   radius: 1
   shaderName: Standard
   atomColors:
-  - {r: 0, g: 1, b: 1, a: 1}
-  - {r: 0.5019608, g: 0.5019608, b: 0.5019608, a: 1}
-  bondMaterial: {fileID: 0}
+  - {r: 1, g: 0.514151, b: 0.514151, a: 1}
+  - {r: 0.754717, g: 0.754717, b: 0.754717, a: 1}
   kb: 0.001987
   T: 100
   timestepCount: 10000
@@ -2743,7 +2742,7 @@ PrefabInstance:
     - target: {fileID: 5843646974706866111, guid: 70469a93359ee8b4e98c4c445b157af9,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5843646974706866111, guid: 70469a93359ee8b4e98c4c445b157af9,
         type: 3}
