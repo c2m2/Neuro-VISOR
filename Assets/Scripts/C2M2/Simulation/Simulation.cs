@@ -81,8 +81,8 @@ namespace C2M2.Simulation
             void InitInteraction(){
                 switch (interactionType)
                 {
-                    case (InteractionType.Discrete): SimHeater = gameObject.AddComponent<RaycastSimHeaterDiscrete>(); break;
-                    case (InteractionType.Continuous): SimHeater = gameObject.AddComponent<RaycastSimHeaterContinuous>(); break;
+                    case (InteractionType.Discrete): Heater = gameObject.AddComponent<RaycastSimHeaterDiscrete>(); break;
+                    case (InteractionType.Continuous): Heater = gameObject.AddComponent<RaycastSimHeaterContinuous>(); break;
                 }
 
                 /// Add event child object for interaction scripts to find
@@ -92,7 +92,7 @@ namespace C2M2.Simulation
                 child.transform.eulerAngles = Vector3.zero;
                 // Create hit event
                 RaycastPressEvents raycastEvents = child.AddComponent<RaycastPressEvents>();
-                raycastEvents.OnHoldPress.AddListener((hit) => SimHeater.Hit(hit));
+                raycastEvents.OnHoldPress.AddListener((hit) => Heater.Hit(hit));
                 // Attach event to an event manager
                 RaycastEventManager eventManager = gameObject.AddComponent<RaycastEventManager>();
                 eventManager.rightTrigger = raycastEvents;

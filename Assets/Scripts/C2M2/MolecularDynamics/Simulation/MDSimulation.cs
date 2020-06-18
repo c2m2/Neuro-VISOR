@@ -82,17 +82,15 @@ namespace C2M2.MolecularDynamics.Simulation
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         protected override Transform[] BuildVisualization()
         {
-            ReadPSF();
-            ReadPDB();
+            ReadData();
             Transform[] transforms = RenderSpheres(x, types, radius);
             bond_topo = BuildBondTopology(bonds);
             ResizeField(transforms);
             RenderBonds(bonds, transforms);
             return transforms;
 
-            void ReadPSF()
+            void ReadData()
             {
-                // Read mass, bonds, angles from PSF file
                 PSFFile psfFile = PSFReader.ReadFile(path + psfPath);
                 mass = psfFile.mass;
                 bonds = psfFile.bonds;
@@ -102,10 +100,7 @@ namespace C2M2.MolecularDynamics.Simulation
                 // Convert bonds and angles to 0 base
                 for (int i = 0; i < bonds.Length; i++) bonds[i] = bonds[i] - 1;
                 for (int i = 0; i < angles.Length; i++) angles[i] = angles[i] - 1;
-            }
-            void ReadPDB()
-            {
-                // Read positions from PDB file
+
                 PDBFile pdbFile = PDBReader.ReadFile(path + pdbPath);
                 x = pdbFile.pos;
 

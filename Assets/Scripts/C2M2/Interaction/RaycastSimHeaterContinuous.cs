@@ -4,7 +4,7 @@ using System;
 namespace C2M2.Interaction
 {
     using Adjacency;
-    public class RaycastSimHeaterContinuous : RaycastSimHeater
+    public class RaycastSimHeaterContinuous : RaycastHeater
     {
         private DijkstraSearch dijkstraSearch;
         private GaussianDistanceCalculator gaussian;
