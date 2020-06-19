@@ -1,6 +1,6 @@
 #!/bin/bash
 # quick and dirty insert license script
-# Usage:  find . -iname "*.cs" -print0 | xargs -0 ./insert_license.sh 
+## Usage:  find . -iname "*.cs" -print0 | xargs -0 ./insert_license.sh 
 
 LICENSE=license.txt
 FILE=$1
