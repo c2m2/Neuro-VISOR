@@ -1,5 +1,6 @@
 #!/bin/bash
 # quick and dirty insert license script
+# Usage:  find . -iname "*.cs" -print0 | xargs -0 ./insert_license.sh 
 
 LICENSE=license.txt
 FILE=$1
@@ -10,4 +11,4 @@ if [ ! -f "$1" ]; then
 fi
 
 # could also use sed
-cat "$LICENSE" | cat - "$FILE"  > temp.txt && move temp.txt "$FILE"
+cat "$LICENSE" | cat - "$FILE"  > temp.txt && mv temp.txt "$FILE"
