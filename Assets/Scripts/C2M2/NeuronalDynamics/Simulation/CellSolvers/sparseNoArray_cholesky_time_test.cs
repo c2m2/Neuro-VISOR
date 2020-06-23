@@ -19,6 +19,7 @@ using MathNet.Numerics.Data.Text;
 // These are for the sparse solving
 using CSparse.Storage;
 using CSparse.Double.Factorization;
+//using Vector=CSparse.Double.Vector;
 using CSparse;
 
 using C2M2.Utils;
@@ -30,8 +31,8 @@ namespace C2M2.NeuronalDynamics.Simulation
     {
         //Simulation parameters
         [Header("Simulation Parameters")]
-        [Range(0.0f, 65.0f)]
-        public double vstart = 55;                        // 55 [mV]
+        [Range(0.0f, 200.0f)]
+        public double vstart = 65;                        // 55 [mV]
         public double endTime = 50;                       // End time value
         [Range(0.01f, 0.50f)]
         public double h = 0.27;                           // User enters spatial step size
@@ -42,6 +43,7 @@ namespace C2M2.NeuronalDynamics.Simulation
 
         [Header("Print Output files")]
         public int numRuns = 0;                           // Number of Runs
+        public bool randomPermute = false;                // Randomly permute the order of the solution entries
         public bool printMatrices = false;                // turn on/off printing of system matrices
         public bool printCellInfo = false;                // turn on/off printing of cell info
         public bool printVolt_time = false;               // turn on/off printing of voltage and times
@@ -67,7 +69,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         [Range(0.0f, 200.0f)]
         public double gna = 153.0;                        // [mS/cm^2]
         [Range(-120.0f, 120.0f)]
-        public double ena = 112;                          // [mV]
+        public double ena = 90;                          // [mV]
 
         // Turn On/Off Leak
         public bool leak_ONOFF = true;
@@ -76,8 +78,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         [Range(-120.0f, 120.0f)]
         public double el = 0.6;                           // [mV]
 
-
-        //Solution vectors
+        // Solution vectors
         // all in units [mV]
         private Vector U;
         private Vector M;
@@ -97,10 +98,10 @@ namespace C2M2.NeuronalDynamics.Simulation
             myCell = new NeuronCell(grid);
 
             //Initialize vector with all zeros
-            U = Vector.Build.Dense(myCell.vertCount);
-            M = Vector.Build.Dense(myCell.vertCount);
-            N = Vector.Build.Dense(myCell.vertCount);
-            H = Vector.Build.Dense(myCell.vertCount);
+            U = Vector.Build.Dense(myCell.vertCount,-75);
+            M = Vector.Build.Dense(myCell.vertCount,mi);
+            N = Vector.Build.Dense(myCell.vertCount,ni);
+            H = Vector.Build.Dense(myCell.vertCount,hi);
 
             //Set all initial state probabilities
             M[0] = mi;
@@ -109,7 +110,7 @@ namespace C2M2.NeuronalDynamics.Simulation
 
             //Set the initial conditions of the solution
             U.SetSubVector(0, myCell.vertCount, initialConditions(U, myCell.boundaryID));
-            if (SomaOn) { U.SetSubVector(0, myCell.vertCount, setSoma(U, myCell.somaID, vstart)); }
+            if (SomaOn) { U.SetSubVector(0, myCell.vertCount, setSoma(U, myCell.somaID, vstart));}
         }
 
         // Send simulation 1D values 
@@ -145,7 +146,7 @@ namespace C2M2.NeuronalDynamics.Simulation
                 foreach (Tuple<int, double> newVal in newValues)
                 {
                     int j = newVal.Item1;
-                    double val = newVal.Item2 * vstart * 0.25;
+                    double val = newVal.Item2 * vstart* 0.75;
                     U[j] += val;
                 }
                 mutex.ReleaseMutex();
@@ -160,6 +161,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         {
             for (int kSim = 0; kSim <= numRuns; kSim++)
             {
+                //if (SomaOn) { U.SetSubVector(0, myCell.vertCount, setSoma(U, myCell.somaID, vstart)); }
                 int nT;                 // Number of Time steps
                 List<bool> channels = new List<bool> { false, false, false };       // For adding/removing channels
 
@@ -167,16 +169,14 @@ namespace C2M2.NeuronalDynamics.Simulation
                 if (HK_auto)
                 {
                     h = 0.1 * myCell.edgeLengths.Average();
-                    if (h > 0.29) { h = 0.29; }
-                    if (h <= 1) { k = h / 100; }          // For cell 13_0ref
-                    if (h <= 0.15) { k = h / 50; }        // For cell 13_1ref
-                    if (h <= 0.08) { k = h / 25; }        // For cell 13_2ref
-                    if (h <= 0.04) { k = h / 8.5; }      // For cell 13_3ref
-                    if (h <= 0.02) { k = h / 5.5; }       // For cell 13_4ref
+                    //if (h > 0.29) { h = 0.29; }
+                    if (h <= 1) { k = h / 130; }   // 0 refine       
+                    if (h <= 0.5) { k = h / 65; }   // 1 refine
+                    if (h <= 0.25) { k = h / 32.5; }        // 2 refine
+                    if (h <= 0.12) { k = h / 18; }        // 3 refine
+                    if (h <= 0.06) { k = h / 9; }       // 4 refine
+                    if (h <= 0.03) { k = h / 5; }       
                 }
-
-                // for timing data
-                DateTime now = DateTime.Now;
 
                 // setup up paths for writing output
                 string strPath = Environment.GetFolderPath(System.Environment.SpecialFolder.DesktopDirectory);
@@ -212,43 +212,33 @@ namespace C2M2.NeuronalDynamics.Simulation
                 CompressedColumnStorage<double> r_csc = CompressedColumnStorage<double>.OfIndexed(sparse_stencils[0]); //null;
                 CompressedColumnStorage<double> l_csc = CompressedColumnStorage<double>.OfIndexed(sparse_stencils[1]); //null;
 
-                // Write rhsM and lhsM to file
-                if (printMatrices)
-                {
-                    printMatrix(r_csc, l_csc, strPath, kSim);
-                }
+                // Permutation matrix----------------------------------------------------------------------//
+                int[] p = new int[myCell.vertCount];
+                if (randomPermute){ p = Permutation.Create(myCell.vertCount, 1);}
+                else { p = Permutation.Create(myCell.vertCount, 0);}
+                
+                CompressedColumnStorage<double> Id_csc = CompressedColumnStorage<double>.CreateDiagonal(myCell.vertCount, 1);
+                Id_csc.PermuteRows(p);                
+                //--------------------------------------------------------------------------------------------//
 
                 // for solving Ax = b problem
                 double[] b = new double[myCell.vertCount];
 
-                // TODO: UNDERSTAND WHAT THIS IS DOING! --> QUEISSER/SEIBOLD!
                 // Apply column ordering to A to reduce fill-in.
-                var order = ColumnOrdering.MinimumDegreeAtPlusA;
+                //var order = ColumnOrdering.MinimumDegreeAtPlusA;
 
-                // TODO: GO INTO Source code and print the L matrix
-                //       Time the reordering steps? --> Ask Queisser again about this!
                 // Create Cholesky factorization setup
-                Timer timer = new Timer(1);
+                Timer timer = new Timer();
                 timer.StartTimer();
-                var chl = SparseCholesky.Create(l_csc, order);
+                var chl = SparseCholesky.Create(l_csc,p);
+                //var chl = SparseCholesky.Create(l_csc, order);
                 timer.StopTimer("Matrix Setup");
-
-                var tempMat = new StreamWriter(strPath + @"\tempMat.txt", true);
-                for (int jj = 0; jj < myCell.vertCount; jj++)
-                {
-                    for (int ii = 0; ii < myCell.vertCount; ii++)
-                    {
-                        tempMat.Write(chl.L.At(jj, ii) + ",");
-                    }
-                    tempMat.Write("\n");
-                }
-                tempMat.Close();
-
+                timer.ExportCSV_path(strPath + @"\chlSetup_" + kSim);
+                
+                // Write permutation, rhsM, lhsM, and choleskyR matrix to file
+                if (printMatrices) { printMatrix(Id_csc, r_csc, l_csc, chl.L, strPath, kSim); }
                 // Print cell info to a text file
-                if (printCellInfo)
-                {
-                    printCell(myCell, h, k, nT, endTime, cfl, strPath, kSim);
-                }
+                if (printCellInfo){ printCell(myCell, h, k, nT, endTime, cfl, strPath, kSim); }
 
                 // For printing voltage data and time steps
                 var sw = new StreamWriter(strPath + @"\outputVoltage_" + kSim + ".txt", true);
@@ -260,11 +250,10 @@ namespace C2M2.NeuronalDynamics.Simulation
                     for (i = 0; i < nT; i++)
                     {
                         if (SomaOn) { U.SetSubVector(0, myCell.vertCount, setSoma(U, myCell.somaID, vstart)); }
-
                         mutex.WaitOne();
-
-                        r_csc.Multiply(U.ToArray(), b);         // Peform b = rhs * U_curr  
-                                                                // Diffusion solver
+                       
+                        r_csc.Multiply(U.ToArray(), b);         // Peform b = rhs * U_curr 
+                        // Diffusion solver
                         timer.StartTimer();
                         chl.Solve(b, b);
                         timer.StopTimer(i.ToString());
@@ -318,7 +307,7 @@ namespace C2M2.NeuronalDynamics.Simulation
                 }
                 finally
                 {
-                    timer.ExportCSV("diffusionTimes");
+                    timer.ExportCSV_path(strPath + @"\diffusionTimes_" + kSim);
                     sw.Close();
                     tw.Close();
                 }
@@ -363,6 +352,11 @@ namespace C2M2.NeuronalDynamics.Simulation
         {
             var cellinfo = new StreamWriter(strPath + @"\cellinfo_" + kSim + ".txt", true);
             var neigbors = new StreamWriter(strPath + @"\nodeNeigbors_" + kSim + ".txt", true);
+            var radii = new StreamWriter(strPath + @"\radii_" + kSim + ".txt", true);
+            var somapoints = new StreamWriter(strPath + @"\somapoints_" + kSim + ".txt", true);
+            var vertexinfo = new StreamWriter(strPath + @"\vertexinfo_" + kSim + ".txt", true);
+            //var brchpoints = new StreamWriter(strPath + @"\brch1_" + kSim + ".txt", true);
+
             cellinfo.Write("aver edgelength = " + myCell.edgeLengths.Average() + "\n");
             cellinfo.Write("max edgelength = " + myCell.edgeLengths.Max() + "\n");
             cellinfo.Write("min edgelength = " + myCell.edgeLengths.Min() + "\n");
@@ -382,17 +376,41 @@ namespace C2M2.NeuronalDynamics.Simulation
                     neigbors.Write(myCell.nodeData[p].neighborIDs[q] + ", ");
                 }
                 neigbors.Write("\n");
+
+                radii.Write(myCell.nodeData[p].nodeRadius + Environment.NewLine);
+                vertexinfo.Write(myCell.nodeData[p].id + " " + myCell.nodeData[p].xcoords + " " + myCell.nodeData[p].ycoords + " " + myCell.nodeData[p].zcoords + " " + Environment.NewLine);
             }
 
+            int sID;
+
+            for (int p = 0; p<myCell.somaID.Count; p++)
+            {
+                sID = myCell.somaID[p];
+                somapoints.Write(sID + " " + myCell.nodeData[sID].xcoords + " " + myCell.nodeData[sID].ycoords + " " + myCell.nodeData[sID].zcoords + Environment.NewLine);
+            }
+
+            /*
+            int bID;
+            for (int p=0; p<myCell.brchID.Count; p++)
+            {
+                bID = myCell.brchID[p];
+                brchpoints.Write(bID + Environment.NewLine);
+            }
+            */
             neigbors.Close();
+            radii.Close();
+            somapoints.Close();
+            //brchpoints.Close();
+            vertexinfo.Close();
         }
 
-        // TODO: Do this to print sparse pattern
         // this prints the right hand side and left hand side system stencil matrices
-        public void printMatrix(CompressedColumnStorage<double> rhsMarray, CompressedColumnStorage<double> lhsMarray, string strPath, int kSim)
+        public void printMatrix(CompressedColumnStorage<double> Id_csc, CompressedColumnStorage<double> rhsMarray, CompressedColumnStorage<double> lhsMarray, CompressedColumnStorage<double> chlR, string strPath, int kSim)
         {
             var rhsMatrix = new StreamWriter(strPath + @"\rhsMatrix_" + kSim + ".txt", true);
             var lhsMatrix = new StreamWriter(strPath + @"\lhsMatrix_" + kSim + ".txt", true);
+            var permId = new StreamWriter(strPath + @"\permIdMatrix_" + kSim + ".txt", true);
+            var chlMatrix = new StreamWriter(strPath + @"\chlLmat_" + kSim + ".txt", true);
 
             for (int q = 0; q < myCell.vertCount; q++)
             {
@@ -400,12 +418,18 @@ namespace C2M2.NeuronalDynamics.Simulation
                 {
                     rhsMatrix.Write(rhsMarray.At(q, j) + " ");
                     lhsMatrix.Write(lhsMarray.At(q, j) + " ");
+                    permId.Write(Id_csc.At(q, j) + " ");
+                    chlMatrix.Write(chlR.At(q, j) + " ");
                 }
-                rhsMatrix.Write("\n");
-                lhsMatrix.Write("\n");
+                rhsMatrix.Write(Environment.NewLine);
+                lhsMatrix.Write(Environment.NewLine);
+                permId.Write(Environment.NewLine);
+                chlMatrix.Write(Environment.NewLine);
             }
             rhsMatrix.Close();
             lhsMatrix.Close();
+            permId.Close();
+            chlMatrix.Close();
         }
 
         // This is for constructing the lhs and rhs of system matrix
@@ -424,16 +448,17 @@ namespace C2M2.NeuronalDynamics.Simulation
 
             // need cfl coefficient
             double cfl = diffConst * k / h;
-            double vRad = 1;    // need to use radius data attached to geometry, TODO: move inside the loop and access for each node
+            double vRad= 1;    
 
             for (int p = 0; p < myCell.vertCount; p++)
             {
                 nghbrCount = myCell.nodeData[p].neighborIDs.Count;
-
+                //vRad = myCell.nodeData[p].nodeRadius;
+                if (vRad > 1) { vRad = 0.1 * vRad; }
+                
                 // set main diagonal entries
-
-                rhs.At(p, p, 1 - ((double)nghbrCount) * vRad * cfl / (2 * h));
-                lhs.At(p, p, 1 + ((double)nghbrCount) * vRad * cfl / (2 * h));
+                rhs.At(p, p, 1 - ((double)nghbrCount+h*h) * vRad * cfl / (2 * h));
+                lhs.At(p, p, 1 + ((double)nghbrCount+h*h) * vRad * cfl / (2 * h));
 
                 // this inner loop is for setting the off diagonal entries which correspond
                 // to the neighbors of each node in the branch structure
@@ -441,6 +466,9 @@ namespace C2M2.NeuronalDynamics.Simulation
                 {
                     nghbrInd = myCell.nodeData[p].neighborIDs[q];
 
+                    // should I be using the neighbor radii here or same as main node?
+                    //vRad = myCell.nodeData[myCell.nodeData[p].neighborIDs[q]].nodeRadius;
+                    
                     // for off diagonal entries
                     rhs.At(p, nghbrInd, vRad * cfl / (2 * h));
                     //rhs.At(nghbrInd, p, vRad * cfl / (2 * h));
@@ -451,21 +479,22 @@ namespace C2M2.NeuronalDynamics.Simulation
                 }
 
             }
-
             stencils.Add(rhs);
             stencils.Add(lhs);
             return stencils;
         }
+
         // this sets the soma voltage for testing
         // the soma maybe a set of indices, not just one.
         public static Vector setSoma(Vector V, List<int> somaID, double voltage)
         {
-
+            /*
             for (int ind = 0; ind < somaID.Count; ind++)
             {
                 V[somaID[ind]] = voltage;
             }
-
+            */
+            V[0] = voltage;
             return V;
         }
 
@@ -483,9 +512,8 @@ namespace C2M2.NeuronalDynamics.Simulation
         {
             for (int ind = 0; ind < bcIndices.Count; ind++)
             {
-                V[bcIndices[ind]] = 0;
+                V[bcIndices[ind]] = -5;
             }
-
             return V;
 
         }
