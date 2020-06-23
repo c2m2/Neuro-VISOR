@@ -812,7 +812,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 884125480}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d8635808cd77e3643a2eebbe7b1054f3, type: 3}
+  m_Script: {fileID: 11500000, guid: 4c3fba0763c6dd5478f2f60d291d1144, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   interactionType: 0
@@ -847,33 +847,15 @@ MonoBehaviour:
     m_NumColorKeys: 5
     m_NumAlphaKeys: 2
   extremaMethod: 1
-  globalMax: 130
+  globalMax: 100
   globalMin: -10
   visualize1D: 0
   color1D:
     serializedVersion: 2
     rgba: 4278512639
   lineWidth1D: 0.005
-  vstart: 55
   endTime: 100
-  h: 0.27
-  k: 0.0027
-  HK_auto: 1
   SomaOn: 1
-  res: 10
-  cap: 0.09
-  ni: 0.5
-  mi: 0.4
-  hi: 0.2
-  k_ONOFF: 1
-  gk: 36
-  ek: -2
-  na_ONOFF: 1
-  gna: 153
-  ena: 112
-  leak_ONOFF: 1
-  gl: 0.3
-  el: 0.6
 --- !u!4 &884125482
 Transform:
   m_ObjectHideFlags: 0
@@ -1238,17 +1220,17 @@ PrefabInstance:
     - target: {fileID: 1246904545557568982, guid: 3cd62f4122818be4585249f5083a977d,
         type: 3}
       propertyPath: m_BackGroundColor.r
-      value: 0
+      value: 0.1792453
       objectReference: {fileID: 0}
     - target: {fileID: 1246904545557568982, guid: 3cd62f4122818be4585249f5083a977d,
         type: 3}
       propertyPath: m_BackGroundColor.g
-      value: 0
+      value: 0.1775543
       objectReference: {fileID: 0}
     - target: {fileID: 1246904545557568982, guid: 3cd62f4122818be4585249f5083a977d,
         type: 3}
       propertyPath: m_BackGroundColor.b
-      value: 0
+      value: 0.1775543
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 1246904544822792154, guid: 3cd62f4122818be4585249f5083a977d, type: 3}
