@@ -335,7 +335,7 @@ Light:
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
   m_Shadows:
-    m_Type: 0
+    m_Type: 2
     m_Resolution: -1
     m_CustomResolution: -1
     m_Strength: 1
@@ -812,26 +812,26 @@ MonoBehaviour:
   m_GameObject: {fileID: 884125480}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4c3fba0763c6dd5478f2f60d291d1144, type: 3}
+  m_Script: {fileID: 11500000, guid: b1d5792188130eb498f3035a80c079b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   interactionType: 0
   startOnAwake: 1
   gradient:
     serializedVersion: 2
-    key0: {r: 0, g: 0, b: 1, a: 1}
-    key1: {r: 0, g: 0.9606447, b: 1, a: 1}
-    key2: {r: 0.028034896, g: 0.990566, b: 0.068421096, a: 0}
-    key3: {r: 1, g: 0.9993106, b: 0, a: 0}
-    key4: {r: 1, g: 0, b: 0, a: 0}
+    key0: {r: 0.056692775, g: 0.056692775, b: 0.46226418, a: 1}
+    key1: {r: 0.42188105, g: 0, b: 0.754717, a: 1}
+    key2: {r: 0.9716981, g: 0.05560791, b: 0, a: 0}
+    key3: {r: 0.92001855, g: 1, b: 0, a: 0}
+    key4: {r: 0, g: 0, b: 0, a: 0}
     key5: {r: 0, g: 0, b: 0, a: 0}
     key6: {r: 0, g: 0, b: 0, a: 0}
     key7: {r: 0, g: 0, b: 0, a: 0}
     ctime0: 0
-    ctime1: 16384
-    ctime2: 32768
-    ctime3: 49151
-    ctime4: 65535
+    ctime1: 21843
+    ctime2: 43692
+    ctime3: 65535
+    ctime4: 0
     ctime5: 0
     ctime6: 0
     ctime7: 0
@@ -844,9 +844,9 @@ MonoBehaviour:
     atime6: 0
     atime7: 0
     m_Mode: 0
-    m_NumColorKeys: 5
+    m_NumColorKeys: 4
     m_NumAlphaKeys: 2
-  extremaMethod: 1
+  extremaMethod: 2
   globalMax: 100
   globalMin: -10
   visualize1D: 0
@@ -854,8 +854,31 @@ MonoBehaviour:
     serializedVersion: 2
     rgba: 4278512639
   lineWidth1D: 0.005
+  vstart: 55
   endTime: 100
+  h: 0.27
+  k: 0.0027
+  HK_auto: 1
   SomaOn: 1
+  numRuns: 0
+  randomPermute: 0
+  printMatrices: 0
+  printCellInfo: 0
+  printVolt_time: 0
+  res: 0.3
+  cap: 0.3
+  ni: 0.317677
+  mi: 0.0529325
+  hi: 0.596121
+  k_ONOFF: 1
+  gk: 36
+  ek: -2
+  na_ONOFF: 1
+  gna: 153
+  ena: 120
+  leak_ONOFF: 1
+  gl: 0.3
+  el: -10
 --- !u!4 &884125482
 Transform:
   m_ObjectHideFlags: 0
