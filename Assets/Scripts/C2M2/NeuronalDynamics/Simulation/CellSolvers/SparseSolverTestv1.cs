@@ -27,16 +27,13 @@ using C2M2.NeuronalDynamics.UGX;
 using Grid = C2M2.NeuronalDynamics.UGX.Grid;
 namespace C2M2.NeuronalDynamics.Simulation
 {
-    public class sparseNoArray_cholesky_time_test : NeuronSimulation1D
+    public class SparseSolverTestv1 : NeuronSimulation1D
     {
         //Simulation parameters
         [Header("Simulation Parameters")]
-        [Range(0.0f, 200.0f)]
-        public double vstart = 65;                        // 55 [mV]
-        public double endTime = 50;                       // End time value
-        [Range(0.01f, 0.50f)]
+        public double vstart = 55;                        // 55 [mV]
+        public double endTime = 100;                     // End time value
         public double h = 0.27;                           // User enters spatial step size
-        [Range(0.0001f, 0.01f)]
         public double k = 0.0027;                         // User enters time step size
         public bool HK_auto = true;                       // auto choose H and K
         public bool SomaOn = true;                        // set soma to be clamped to vstart
@@ -50,36 +47,26 @@ namespace C2M2.NeuronalDynamics.Simulation
 
         //Set cell biological paramaters
         [Header("Biological Parameters")]
-        [Range(0.0f, 50.0f)]
-        public double res = 10.0;
-        [Range(0.00f, 1.00f)]
-        public double cap = 0.09;                         // [uF/cm^2]
-        [Range(0.00f, 1.00f)]
-        public double ni = 0.5, mi = 0.4, hi = 0.2;       //state probabilities, unitless
+        public double res = 0.3;                          // Ohm.cm
+        public double cap = 0.3;                          // [uF/cm^2]
+        public double ni = 0.317677, mi = 0.0529325, hi = 0.596121;       //state probabilities, unitless
 
         // Turn On/Off Potassium
         public bool k_ONOFF = true;
-        [Range(0.0f, 100.0f)]
         public double gk = 36.0;                          // [mS/cm^2]
-        [Range(-120.0f, 120.0f)]
         public double ek = -2.0;                          // [mV]
 
         // Turn On/Off Sodium
         public bool na_ONOFF = true;
-        [Range(0.0f, 200.0f)]
         public double gna = 153.0;                        // [mS/cm^2]
-        [Range(-120.0f, 120.0f)]
-        public double ena = 90;                          // [mV]
+        public double ena = 120;                           // [mV]
 
         // Turn On/Off Leak
         public bool leak_ONOFF = true;
-        [Range(0.0f, 10.0f)]
         public double gl = 0.3;                           // [mS/cm^2]
-        [Range(-120.0f, 120.0f)]
-        public double el = 0.6;                           // [mV]
+        public double el = -10.0;                         // [mV]
 
         // Solution vectors
-        // all in units [mV]
         private Vector U;
         private Vector M;
         private Vector N;
@@ -90,18 +77,16 @@ namespace C2M2.NeuronalDynamics.Simulation
 
         private NeuronCell myCell;
 
-        //private TimeUtilities.Timer timer = new TimeUtilities.Timer();
-
         // NeuronCellSimulation handles reading the UGX file
         protected override void SetNeuronCell(Grid grid)
         {
             myCell = new NeuronCell(grid);
 
             //Initialize vector with all zeros
-            U = Vector.Build.Dense(myCell.vertCount,-75);
-            M = Vector.Build.Dense(myCell.vertCount,mi);
-            N = Vector.Build.Dense(myCell.vertCount,ni);
-            H = Vector.Build.Dense(myCell.vertCount,hi);
+            U = Vector.Build.Dense(myCell.vertCount,0);
+            M = Vector.Build.Dense(myCell.vertCount, mi);
+            N = Vector.Build.Dense(myCell.vertCount, ni);
+            H = Vector.Build.Dense(myCell.vertCount, hi);
 
             //Set all initial state probabilities
             M[0] = mi;
@@ -110,7 +95,7 @@ namespace C2M2.NeuronalDynamics.Simulation
 
             //Set the initial conditions of the solution
             U.SetSubVector(0, myCell.vertCount, initialConditions(U, myCell.boundaryID));
-            if (SomaOn) { U.SetSubVector(0, myCell.vertCount, setSoma(U, myCell.somaID, vstart));}
+            if (SomaOn) { U.SetSubVector(0, myCell.vertCount, setSoma(U, myCell.somaID, vstart)); }
         }
 
         // Send simulation 1D values 
@@ -125,6 +110,7 @@ namespace C2M2.NeuronalDynamics.Simulation
                 {
                     Vector curTimeSlice = U.SubVector(0, myCell.vertCount);
                     curTimeSlice.Multiply(1, curTimeSlice);
+                    //curTimeSlice = curTimeSlice - 70;
                     curVals = curTimeSlice.ToArray();
                 }
 
@@ -146,7 +132,7 @@ namespace C2M2.NeuronalDynamics.Simulation
                 foreach (Tuple<int, double> newVal in newValues)
                 {
                     int j = newVal.Item1;
-                    double val = newVal.Item2 * vstart* 0.75;
+                    double val = newVal.Item2 * vstart * 0.75;
                     U[j] += val;
                 }
                 mutex.ReleaseMutex();
@@ -161,21 +147,19 @@ namespace C2M2.NeuronalDynamics.Simulation
         {
             for (int kSim = 0; kSim <= numRuns; kSim++)
             {
-                //if (SomaOn) { U.SetSubVector(0, myCell.vertCount, setSoma(U, myCell.somaID, vstart)); }
-                int nT;                 // Number of Time steps
+                int nT;                                                             // Number of Time steps
                 List<bool> channels = new List<bool> { false, false, false };       // For adding/removing channels
 
                 // TODO: NEED TO DO THIS BETTER
                 if (HK_auto)
                 {
                     h = 0.1 * myCell.edgeLengths.Average();
-                    //if (h > 0.29) { h = 0.29; }
-                    if (h <= 1) { k = h / 130; }   // 0 refine       
-                    if (h <= 0.5) { k = h / 65; }   // 1 refine
-                    if (h <= 0.25) { k = h / 32.5; }        // 2 refine
-                    if (h <= 0.12) { k = h / 18; }        // 3 refine
-                    if (h <= 0.06) { k = h / 9; }       // 4 refine
-                    if (h <= 0.03) { k = h / 5; }       
+                    if (h <= 1) { k = h / 130; }                // 0 refine       
+                    if (h <= 0.5) { k = h / 65; }               // 1 refine
+                    if (h <= 0.25) { k = h / 32.5; }            // 2 refine
+                    if (h <= 0.12) { k = h / 18; }              // 3 refine
+                    if (h <= 0.06) { k = h / 9; }               // 4 refine
+                    if (h <= 0.03) { k = h / 5; }
                 }
 
                 // setup up paths for writing output
@@ -214,11 +198,11 @@ namespace C2M2.NeuronalDynamics.Simulation
 
                 // Permutation matrix----------------------------------------------------------------------//
                 int[] p = new int[myCell.vertCount];
-                if (randomPermute){ p = Permutation.Create(myCell.vertCount, 1);}
-                else { p = Permutation.Create(myCell.vertCount, 0);}
-                
+                if (randomPermute) { p = Permutation.Create(myCell.vertCount, 1); }
+                else { p = Permutation.Create(myCell.vertCount, 0); }
+
                 CompressedColumnStorage<double> Id_csc = CompressedColumnStorage<double>.CreateDiagonal(myCell.vertCount, 1);
-                Id_csc.PermuteRows(p);                
+                Id_csc.PermuteRows(p);
                 //--------------------------------------------------------------------------------------------//
 
                 // for solving Ax = b problem
@@ -230,15 +214,15 @@ namespace C2M2.NeuronalDynamics.Simulation
                 // Create Cholesky factorization setup
                 Timer timer = new Timer();
                 timer.StartTimer();
-                var chl = SparseCholesky.Create(l_csc,p);
+                var chl = SparseCholesky.Create(l_csc, p);
                 //var chl = SparseCholesky.Create(l_csc, order);
                 timer.StopTimer("Matrix Setup");
                 timer.ExportCSV_path(strPath + @"\chlSetup_" + kSim);
-                
+
                 // Write permutation, rhsM, lhsM, and choleskyR matrix to file
                 if (printMatrices) { printMatrix(Id_csc, r_csc, l_csc, chl.L, strPath, kSim); }
                 // Print cell info to a text file
-                if (printCellInfo){ printCell(myCell, h, k, nT, endTime, cfl, strPath, kSim); }
+                if (printCellInfo) { printCell(myCell, h, k, nT, endTime, cfl, strPath, kSim); }
 
                 // For printing voltage data and time steps
                 var sw = new StreamWriter(strPath + @"\outputVoltage_" + kSim + ".txt", true);
@@ -251,7 +235,7 @@ namespace C2M2.NeuronalDynamics.Simulation
                     {
                         if (SomaOn) { U.SetSubVector(0, myCell.vertCount, setSoma(U, myCell.somaID, vstart)); }
                         mutex.WaitOne();
-                       
+
                         r_csc.Multiply(U.ToArray(), b);         // Peform b = rhs * U_curr 
                         // Diffusion solver
                         timer.StartTimer();
@@ -288,16 +272,13 @@ namespace C2M2.NeuronalDynamics.Simulation
                             for (int j = 0; j < myCell.vertCount; j++)
                             {
                                 sw.Write(U[j] + " ");
-
                             }
                             sw.Write("\n");
                             tw.Write((k * (double)i) + " ");
                             tw.Write("\n");
                         }
-
                         mutex.ReleaseMutex();
                     }
-
                     sw.Close();
                     tw.Close();
                 }
@@ -383,7 +364,7 @@ namespace C2M2.NeuronalDynamics.Simulation
 
             int sID;
 
-            for (int p = 0; p<myCell.somaID.Count; p++)
+            for (int p = 0; p < myCell.somaID.Count; p++)
             {
                 sID = myCell.somaID[p];
                 somapoints.Write(sID + " " + myCell.nodeData[sID].xcoords + " " + myCell.nodeData[sID].ycoords + " " + myCell.nodeData[sID].zcoords + Environment.NewLine);
@@ -391,7 +372,7 @@ namespace C2M2.NeuronalDynamics.Simulation
 
             /*
             int bID;
-            for (int p=0; p<myCell.brchID.Count; p++)
+            for (int p = 0; p < myCell.brchID.Count; p++)
             {
                 bID = myCell.brchID[p];
                 brchpoints.Write(bID + Environment.NewLine);
@@ -448,17 +429,17 @@ namespace C2M2.NeuronalDynamics.Simulation
 
             // need cfl coefficient
             double cfl = diffConst * k / h;
-            double vRad= 1;    
-
+            double vRad = 0.14;
             for (int p = 0; p < myCell.vertCount; p++)
             {
                 nghbrCount = myCell.nodeData[p].neighborIDs.Count;
                 //vRad = myCell.nodeData[p].nodeRadius;
-                if (vRad > 1) { vRad = 0.1 * vRad; }
-                
+                //if (vRad >= 1) { vRad = 1; }
+
                 // set main diagonal entries
-                rhs.At(p, p, 1 - ((double)nghbrCount+h*h) * vRad * cfl / (2 * h));
-                lhs.At(p, p, 1 + ((double)nghbrCount+h*h) * vRad * cfl / (2 * h));
+                rhs.At(p, p, 1 - (((double)nghbrCount) * vRad * cfl / (2 * h)));
+                lhs.At(p, p, 1 + (((double)nghbrCount) * vRad * cfl / (2 * h)));
+                
 
                 // this inner loop is for setting the off diagonal entries which correspond
                 // to the neighbors of each node in the branch structure
@@ -468,17 +449,29 @@ namespace C2M2.NeuronalDynamics.Simulation
 
                     // should I be using the neighbor radii here or same as main node?
                     //vRad = myCell.nodeData[myCell.nodeData[p].neighborIDs[q]].nodeRadius;
-                    
-                    // for off diagonal entries
-                    rhs.At(p, nghbrInd, vRad * cfl / (2 * h));
-                    //rhs.At(nghbrInd, p, vRad * cfl / (2 * h));
 
                     // for off diagonal entries
-                    lhs.At(p, nghbrInd, -vRad * cfl / (2 * h));
-                    //lhs.At(nghbrInd, p, -vRad * cfl / (2 * h));
+                    rhs.At(p, nghbrInd, vRad * cfl / (4 * h));
+                    rhs.At(nghbrInd, p, vRad * cfl / (4 * h));
+
+                    // for off diagonal entries
+                    lhs.At(p, nghbrInd, -vRad * cfl / (4 * h));
+                    lhs.At(nghbrInd, p, -vRad * cfl / (4 * h));
                 }
 
             }
+
+            //
+            int bcInd;
+            for(int p=0;p<myCell.boundaryID.Count;p++)
+            {
+                bcInd = myCell.boundaryID[p];
+                rhs.At(bcInd, bcInd, 1-(1*vRad * cfl / (2 * h)));
+                lhs.At(bcInd, bcInd, 1+(1*vRad * cfl / (2 * h)));
+            }
+             
+            //
+
             stencils.Add(rhs);
             stencils.Add(lhs);
             return stencils;
@@ -509,11 +502,13 @@ namespace C2M2.NeuronalDynamics.Simulation
 
         // initialize the ends of dendrites to be clamped at 0 mV
         public static Vector boundaryConditions(Vector V, List<int> bcIndices)
-        {
+        {   
+            /*
             for (int ind = 0; ind < bcIndices.Count; ind++)
             {
-                V[bcIndices[ind]] = -5;
+                V[bcIndices[ind]] = 0;
             }
+            */
             return V;
 
         }
@@ -526,129 +521,44 @@ namespace C2M2.NeuronalDynamics.Simulation
             double ek, ena, el, gk, gna, gl;
 
             // set constants for voltage
-            gk = reactConst[0];
-            gna = reactConst[1];
-            gl = reactConst[2];
-
+            gk = reactConst[0]; gna = reactConst[1]; gl = reactConst[2];
             // set constants for conductances
-            ek = reactConst[3];
-            ena = reactConst[4];
-            el = reactConst[5];
+            ek = reactConst[3]; ena = reactConst[4]; el = reactConst[5];
 
-            if (channels[0])
-            {
-                // Add current due to potassium
-                prod = NN.PointwisePower(4);
-                prod = (V - ek).PointwiseMultiply(prod);
-
-                output = gk * prod;
-            }
-
-            if (channels[1])
-            {
-                // Add current due to sodium
-                prod = MM.PointwisePower(3);
-                prod = HH.PointwiseMultiply(prod);
-                prod = (V - ena).PointwiseMultiply(prod);
-                output = output + gna * prod;
-            }
-
-            if (channels[2])
-            {
-                // Add leak current
-                output = output + gl * (V - el);
-            }
-
+            // Add current due to potassium
+            if (channels[0]) { prod = NN.PointwisePower(4); prod = (V - ek).PointwiseMultiply(prod); output = gk * prod; }
+            // Add current due to sodium
+            if (channels[1]) { prod = MM.PointwisePower(3); prod = HH.PointwiseMultiply(prod); prod = (V - ena).PointwiseMultiply(prod); output = output + gna * prod; }
+            // Add leak current
+            if (channels[2]) { output = output + gl * (V - el); }
             // Return the negative of the total
             output.Multiply(-1, output);
-
             output.SetSubVector(0, V.Count, boundaryConditions(output, bcIndices));
-
             return output;
         }
-
         // The following functions are for the state variable ODEs on M,N,H
-        private static Vector fN(Vector V, Vector N)
-        {
-            Vector output = Vector.Build.Dense(V.Count);
-
-            output = an(V).PointwiseMultiply(1 - N) - bn(V).PointwiseMultiply(N);
-
-            return output;
-
-        }
-
-        private static Vector fM(Vector V, Vector M)
-        {
-            Vector output = Vector.Build.Dense(V.Count);
-
-            output = am(V).PointwiseMultiply(1 - M) - bm(V).PointwiseMultiply(M);
-
-            return output;
-
-        }
-
-        private static Vector fH(Vector V, Vector H)
-        {
-            Vector output = Vector.Build.Dense(V.Count);
-
-            output = ah(V).PointwiseMultiply(1 - H) - bh(V).PointwiseMultiply(H);
-
-            return output;
-
-        }
-
+        private static Vector fN(Vector V, Vector N) { return an(V).PointwiseMultiply(1 - N) - bn(V).PointwiseMultiply(N); }
+        private static Vector fM(Vector V, Vector M) { return am(V).PointwiseMultiply(1 - M) - bm(V).PointwiseMultiply(M); }
+        private static Vector fH(Vector V, Vector H) { return ah(V).PointwiseMultiply(1 - H) - bh(V).PointwiseMultiply(H); }
         //The following functions are for the state variable ODEs on M,N,H
-        private static Vector an(Vector V)
-        {
-            Vector output = Vector.Build.Dense(V.Count);
-            Vector temp = 10 - V;
+        
+        
+        private static Vector an(Vector V) { return 0.01 * (10 - V).PointwiseDivide(((10 - V) / 10).PointwiseExp() - 1); }
+        private static Vector bn(Vector V) { return 0.125 * (-1 * V / 80).PointwiseExp(); }
+        private static Vector am(Vector V) { return 0.1 * (25 - V).PointwiseDivide(((25 - V) / 10).PointwiseExp() - 1); }
+        private static Vector bm(Vector V) { return 4 * (-1 * V / 18).PointwiseExp(); }
+        private static Vector ah(Vector V) { return 0.07 * (-1 * V / 20).PointwiseExp(); }
+        private static Vector bh(Vector V) { return 1 / (((30 - V) / 10).PointwiseExp() + 1); }
+        
 
-            output = 0.01 * temp.PointwiseDivide((temp / 10).PointwiseExp() - 1);
-            return output;
-        }
-
-        private static Vector bn(Vector V)
-        {
-            Vector output = Vector.Build.Dense(V.Count);
-
-            output = 0.125 * (-1 * V / 80).PointwiseExp();
-            return output;
-        }
-
-        private static Vector am(Vector V)
-        {
-            Vector output = Vector.Build.Dense(V.Count);
-            Vector temp = 25 - V;
-
-            output = 0.1 * temp.PointwiseDivide((temp / 10).PointwiseExp() - 1);
-            return output;
-        }
-
-        private static Vector bm(Vector V)
-        {
-            Vector output = Vector.Build.Dense(V.Count);
-
-            output = 4 * (-1 * V / 18).PointwiseExp();
-            return output;
-        }
-
-        private static Vector ah(Vector V)
-        {
-            Vector output = Vector.Build.Dense(V.Count);
-
-            output = 0.07 * (-1 * V / 20).PointwiseExp();
-            return output;
-        }
-
-        private static Vector bh(Vector V)
-        {
-            Vector output = Vector.Build.Dense(V.Count);
-            Vector temp = 30 - V;
-
-            output = 1 / ((temp / 10).PointwiseExp() + 1);
-            return output;
-        }
-    #endregion
+            /*
+        private static Vector an(Vector V) { return 0.01 * (55 + V).PointwiseDivide(1-((55+V) / (-10)).PointwiseExp()); }
+        private static Vector bn(Vector V) { return 0.125 * (-1 * (V+65) / 80).PointwiseExp(); }
+        private static Vector am(Vector V) { return 0.1 * (40 + V).PointwiseDivide(1-((40 + V) / (-10)).PointwiseExp()); }
+        private static Vector bm(Vector V) { return 4 * (-1 * (V+65) / 18).PointwiseExp(); }
+        private static Vector ah(Vector V) { return 0.07 * (-1 * (V+65) / 20).PointwiseExp(); }
+        private static Vector bh(Vector V) { return 1 / (((35+ V) / (-10)).PointwiseExp() + 1); }
+        */
+        #endregion
     }
 }

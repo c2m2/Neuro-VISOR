@@ -6,6 +6,7 @@ install()
    SOURCE_DIR=.githooks
    DEST_DIR=.git/hooks
    cp "${SOURCE_DIR}/pre-commit" "${DEST_DIR}/pre-commit" 
+   chmod +x "${DEST_DIR}/pre-commit" 
    exit
 }
 
