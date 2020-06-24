@@ -116,14 +116,15 @@ namespace C2M2.MolecularDynamics.Simulation
                 // Instantiate one sphere per atom
                 Sphere[] spheres = new Sphere[x.Length];
                 for (int i = 0; i < x.Length; i++) spheres[i] = new Sphere(Vector3.zero, radius);
-                // Instantiate the created spheres and return their transform components
+                // Instantiate sphere objects in the scene and store their transform components for later reference
                 SphereInstantiator instantiator = gameObject.AddComponent<SphereInstantiator>();
                 Transform[] ts = instantiator.InstantiateSpheres(spheres, "Molecule", "Atom");
 
-                // Resolve which colors to use for our system
+                // Resolve which colors and shader to use for our system
                 shader = Shader.Find(shaderName);
                 string[] atomTypes = types.Distinct().ToArray();
                 Color[] uniqueCols = new Color[atomTypes.Length];
+                // Use the user-given colors first, then randomly generate other necessary colors
                 for (int i = 0; i < uniqueCols.Length; i++)
                 {
                     if (i < atomColors.Length) uniqueCols[i] = atomColors[i];
