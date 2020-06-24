@@ -13,9 +13,6 @@ namespace C2M2.MolecularDynamics.Simulation
         public float kb = 0.001987f; //kcal per mol
         public float T = 100.0f; //K
 
-        public int timestepCount = 50000;
-        public float timestepSize = .1f;
-
         public float kappa = 6f;
         public float r0 = 3.65f;
 
@@ -123,22 +120,6 @@ namespace C2M2.MolecularDynamics.Simulation
         {
             int nT = timestepCount;
             float dt = timestepSize;
-            //float m = 40.0f;
-	        float gamma = 0.1f;
-            float a = ((1-gamma*dt/2)/(1+gamma*dt/2));
-            
-
-	        //hard code the bond info
-            //int[][] bond_topo = new int[x.Length][];
-            //bond_topo[0]= new int[] {1};
-	        //	    bond_topo[1]= new int[] {0,2};
-	        //	    bond_topo[2]= new int[] {1};
-
-            //hard code the angle info
-            //int[][] angle_topo = new int[x.Length][];
-            //angle_topo[0]= new int[] {};
-		    //angle_topo[1]= new int[] {0,1,2};
-		    //angle_topo[2]= new int[] {};
 
 	        //instantiate a normal dist.
 	        var normal = Normal.WithMeanPrecision(0.0, 1.0);
@@ -151,7 +132,7 @@ namespace C2M2.MolecularDynamics.Simulation
                 // iterate over the atoms
                 for(int i = 0; i < x.Length; i++)
                 {
-                    float coeff = Convert.ToSingle(Math.Sqrt(kb*T*(1-a*a)/mass[i]));
+                    float coeff = Convert.ToSingle(Math.Sqrt(kb*T*(1-c*c)/mass[i]));
                     double rxx = normal.Sample();
                     float rx = Convert.ToSingle(rxx);
 
@@ -175,8 +156,8 @@ namespace C2M2.MolecularDynamics.Simulation
                     */
                     v[i] = v[i] + (dt*dt/2/mass[i]) * (force[i]);
 		            x[i] = x[i] + (dt/2) * v[i];
-                    v[i]=a*v[i] + coeff * r;
-		            x[i]=x[i] + (dt/2) * v[i];
+                    v[i] = c * v[i] + coeff * r;
+		            x[i] = x[i] + (dt/2) * v[i];
                 }
 
 		        force = Force(x,bond_topo);

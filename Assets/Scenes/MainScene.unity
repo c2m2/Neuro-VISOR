@@ -2146,7 +2146,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1815266847}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 06bfb302f99dc3347a81b132b82d563e, type: 3}
+  m_Script: {fileID: 11500000, guid: 1f96a81e774442547bae37f64da7f4d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   interactionType: 0
@@ -2157,12 +2157,14 @@ MonoBehaviour:
   shaderName: Standard
   atomColors:
   - {r: 0, g: 1, b: 1, a: 1}
-  - {r: 0.5019608, g: 0.5019608, b: 0.5019608, a: 1}
+  - {r: 0.5, g: 0.5, b: 0.5, a: 1}
   bondMaterial: {fileID: 0}
+  methodType: 2
+  timestepCount: 50000
+  timestepSize: 0.1
+  gamma: 0.1
   kb: 0.001987
   T: 100
-  timestepCount: 10000
-  timestepSize: 0.1
   kappa: 6
   r0: 3.65
 --- !u!4 &1815266849

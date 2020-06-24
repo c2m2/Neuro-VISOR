@@ -46,6 +46,14 @@ namespace C2M2.MolecularDynamics.Simulation
 
         public Material bondMaterial;
 
+        public enum MethodType { gjI, gjII, gjIII }
+        public MethodType methodType = MethodType.gjI;
+
+        public int timestepCount = 50000;
+        public float timestepSize = .1f;
+        public float gamma = 0.1f;
+        protected float c = -1;
+
         protected Dictionary<Transform, int> molLookup;
         protected Vector3[] x = null;
         protected Vector3[] v = null;
@@ -75,6 +83,20 @@ namespace C2M2.MolecularDynamics.Simulation
             bond_topo = BuildBondTopology(bonds);
             ResizeField(transforms);
             RenderBonds(bonds, transforms);
+
+            switch (methodType)
+            {
+                case (MethodType.gjI):
+                    c = gjI(gamma, timestepSize);
+                    break;
+                case (MethodType.gjII):
+                    c = gjII(gamma, timestepSize);
+                    break;
+                case (MethodType.gjIII):
+                    c = gjIII(gamma, timestepSize);
+                    break;
+            }
+
             return transforms;
 
             void ReadPSF()
@@ -222,7 +244,10 @@ namespace C2M2.MolecularDynamics.Simulation
                     j++;
                 }
             }
-        }        
+        }
+        private float gjI(float gamma, float dt) => (1 - gamma * dt / 2) / (1 + gamma * dt / 2);
+        private float gjII(float gamma, float dt) => (float)System.Math.Exp(-gamma * dt);
+        private float gjIII(float gamma, float dt) => 1 - (gamma * dt);
         /// <summary>
         /// Called after position field transforms are updated, used here to update bond visualization
         /// </summary>
