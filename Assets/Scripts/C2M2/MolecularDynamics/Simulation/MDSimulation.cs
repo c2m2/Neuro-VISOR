@@ -54,7 +54,7 @@ namespace C2M2.MolecularDynamics.Simulation
         public float gamma = 0.1f;
         protected float c = -1;
 
-        protected Dictionary<Transform, int> molLookup;
+        protected Dictionary<Transform, int> particleLookup;
         protected Vector3[] x = null;
         protected Vector3[] v = null;
         protected Vector3[] r = null;
@@ -133,7 +133,7 @@ namespace C2M2.MolecularDynamics.Simulation
                 for (int i = 0; i < x.Length; i++) spheres[i] = new Sphere(Vector3.zero, radius);
                 // Instantiate the created spheres and return their transform components
                 SphereInstantiator instantiator = gameObject.AddComponent<SphereInstantiator>();
-                Transform[] ts = instantiator.InstantiateSpheres(spheres, "Molecule", "Atom");
+                Transform[] ts = instantiator.InstantiateSpheres(spheres, true, "Molecule", "Atom");
 
                 // Resolve which colors to use for our system
                 shader = Shader.Find(shaderName);
@@ -165,8 +165,8 @@ namespace C2M2.MolecularDynamics.Simulation
                 }
 
                 // Create a lookup so that given a transform hit by a raycast we can get the molecule's index
-                molLookup = new Dictionary<Transform, int>(ts.Length);
-                for (int i = 0; i < ts.Length; i++) molLookup.Add(ts[i], i);
+                particleLookup = new Dictionary<Transform, int>(ts.Length);
+                for (int i = 0; i < ts.Length; i++) particleLookup.Add(ts[i], i);
 
                 return ts;
             }

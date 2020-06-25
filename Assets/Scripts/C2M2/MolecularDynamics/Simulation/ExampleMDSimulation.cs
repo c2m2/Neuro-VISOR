@@ -17,6 +17,8 @@ namespace C2M2.MolecularDynamics.Simulation
         public float r0 = 3.65f;
 
     	private int[][] angle_topo = null;
+
+        private Vector3[] force = null;
         
         // OPTION 2:
         //RaycastHit lastHit = new RaycastHit();
@@ -33,19 +35,12 @@ namespace C2M2.MolecularDynamics.Simulation
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         public override void SetValues(RaycastHit hit)
         {
-            // You have two options: add the force here, or in your solve thread.
-            //
-            //
-            // OPTION 1: You may run into mutual exclusion issues with this method, but maybe not
-            // Get the molecule index that was hit by the interaction Raycast
-            //int molHit = molLookup[hit.transform];  // Now v[molHit] or x[molHit] should affect the molecule hit by the raycast
-            //Vector3 hitDirection = hit.normal;
-            //v[molHit] += hitDirection or whatever.
-
-            // OPTION 2:
-            //lastHit = hit;
+            if (force == null) return;
+            int particleHit = particleLookup[hit.transform.parent];
+            force[particleHit] += (-100 * hit.normal) / hit.distance;
         }
 
+        /// <summary>
         /// Evaluates the forces.
         /// First will try doing for system of oscillators.
         /// Then will extend to non-bonded interactions
@@ -63,7 +58,6 @@ namespace C2M2.MolecularDynamics.Simulation
                 	// U(x) = sum kappa_ij*(|x_i-x_j|-r_0)^2
                     r = pos[i] - pos[bond_topo[i][j]];
                     f[i] += -kappa*(r.magnitude-r0)*r;
-                    //GameManager.instance.DebugLogSafe(f[i]);
                 }
             }
  		    return f;
@@ -123,12 +117,10 @@ namespace C2M2.MolecularDynamics.Simulation
 
 	        //instantiate a normal dist.
 	        var normal = Normal.WithMeanPrecision(0.0, 1.0);
-	        Vector3[] force = Force(x,bond_topo); // + angle_Force(x,angle_topo);
-                                                  //Vector3[] angle = angle_Force(x);
-
+	        force = Force(x,bond_topo); // + angle_Force(x,angle_topo);
             // Iterate over time
             for (int t = 0; t < nT; t++)
-	        {      
+	        {
                 // iterate over the atoms
                 for(int i = 0; i < x.Length; i++)
                 {
@@ -144,16 +136,6 @@ namespace C2M2.MolecularDynamics.Simulation
                      
                     Vector3 r = new Vector3(rx,ry,rz);
 
-                    // OPTION 2:
-                    /*
-                    Vector3 pushTerm = Vector3.zero;
-                    if (lastHit.distance != float.PositiveInfinity)
-                    {
-                        pushTerm = lastHit.normal;
-                        lastHit.distance = float.PositiveInfinity;
-                    }
-                    v[i]=v[i]+(dt*dt/2/m)*(force[i]+angle[i] + pushTerm);
-                    */
                     v[i] = v[i] + (dt*dt/2/mass[i]) * (force[i]);
 		            x[i] = x[i] + (dt/2) * v[i];
                     v[i] = c * v[i] + coeff * r;
@@ -161,12 +143,6 @@ namespace C2M2.MolecularDynamics.Simulation
                 }
 
 		        force = Force(x,bond_topo);
-
-                /*GameManager.instance.DebugLogSafe("force[1043]: " + force[1043]
-                    + "\nx[1043]: " + x[1043]
-                    + "\nv[1043]: " + v[1043]
-		    + "\nm[1043]: " + mass[1043]);
-                //angle = angle_Force(x); */
 
                 for(int i = 0; i < x.Length; i++)
                 {

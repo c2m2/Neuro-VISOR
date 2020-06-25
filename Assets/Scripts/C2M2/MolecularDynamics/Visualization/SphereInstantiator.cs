@@ -6,7 +6,7 @@ namespace C2M2.MolecularDynamics.Visualization
 {
     public class SphereInstantiator : MonoBehaviour
     {
-        public Transform[] InstantiateSpheres(Sphere[] spheres, string rootName = "Spheres", string instanceName = "Sphere")
+        public Transform[] InstantiateSpheres(Sphere[] spheres, bool addColliders = true, string rootName = "Spheres", string instanceName = "Sphere")
         {
             Transform root = new GameObject().transform;
             root.parent = transform;
@@ -34,6 +34,11 @@ namespace C2M2.MolecularDynamics.Visualization
                 transforms[i].localScale = new Vector3(diameter, diameter, diameter);
                 transforms[i].name = string.Format(fmt, i);
                 transforms[i].parent = root;
+
+                if (addColliders)
+                {
+                    obj.AddComponent<SphereCollider>();
+                }
             }
 
             // Cleanup

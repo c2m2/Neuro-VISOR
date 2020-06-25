@@ -7,6 +7,7 @@ namespace C2M2.Interaction.VR
 {
     public class VRRaycastableMesh : VRRaycastable<Mesh>
     {
+        public GameObject raycastTargetObj { get; private set; } = null;
         // protected Mesh source;
 
         public override Mesh GetSource()
@@ -27,6 +28,12 @@ namespace C2M2.Interaction.VR
 
         protected override void OnAwake()
         {
+            // Build raycast target object
+            raycastTargetObj = BuildChildObject(transform);
+
+            // Build the Rigidbody
+            //BuildRigidBody(raycastTargetObj);
+
             // Check if there is a mesh, then send it to mesh collider   
             MeshFilter mf = gameObject.GetComponent<MeshFilter>();
             Mesh mesh = gameObject.GetComponent<MeshFilter>().mesh;

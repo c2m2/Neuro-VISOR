@@ -54,6 +54,8 @@ namespace C2M2.Simulation
             VRRaycastableMesh raycastable = gameObject.AddComponent<VRRaycastableMesh>();
             raycastable.SetSource(mesh);
 
+            // Add custom grabbable here
+
             return;
 
             void InitMat()

@@ -104,7 +104,7 @@ namespace C2M2.Simulation
         public void Start()
         {
             OnStart();
-            gameObject.AddComponent<VRGrabbable>();
+            //gameObject.AddComponent<VRGrabbable>();
         }
         public void Update()
         {

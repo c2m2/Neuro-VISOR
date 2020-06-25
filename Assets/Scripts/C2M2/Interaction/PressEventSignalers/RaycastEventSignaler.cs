@@ -38,7 +38,11 @@ namespace C2M2.Interaction.Signaling
             else { Pressed = false; }
         }
         /// <summary> Try to find the RaycastTriggerManager on the hit object </summary>
-        private static RaycastEventManager FindRaycastTrigger(RaycastHit hit) => hit.collider.GetComponentInParent<RaycastEventManager>();
+        private static RaycastEventManager FindRaycastTrigger(RaycastHit hit)
+        {
+            return hit.collider.GetComponentInParent<RaycastEventManager>();
+
+        }
         sealed protected override void OnPress()
         {
             OnPressSub();

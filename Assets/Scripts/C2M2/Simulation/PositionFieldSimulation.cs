@@ -4,6 +4,7 @@ using UnityEngine;
 namespace C2M2.Simulation
 {
     using Utils;
+    using Interaction.VR;
     /// <summary>
     /// Simulation of type Vector3[] for simulating positional fields
     /// </summary>
@@ -23,7 +24,17 @@ namespace C2M2.Simulation
                 // transforms[i].parent = transform;
                 // pos[i] = transforms[i].position;
             }
-            
+
+            Collider[] colliders = new Collider[transforms.Length];
+            for(int i = 0; i < transforms.Length; i++)
+            {
+                colliders[i] = transforms[i].GetComponent<Collider>();
+            }
+            VRRaycastableColliders raycastable = gameObject.AddComponent<VRRaycastableColliders>();
+            raycastable.SetSource(colliders);
+
+            // Add custom grabbable here
+
             // Init interaction
         }
 
