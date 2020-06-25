@@ -1,43 +1,29 @@
 ﻿using UnityEngine;
-using C2M2.Utils.Exceptions;
 
 namespace C2M2.Interaction.VR
 {
     using Utils;
     [RequireComponent(typeof(MeshFilter))]
-    public class VRRaycastable : MonoBehaviour
+    public abstract class VRRaycastable<ColliderSourceT> : MonoBehaviour
     {
-        public GameObject raycastTargetObject { get; private set; } = null;
-        private Mesh colliderMesh = null;
-        public Mesh ColliderMesh
-        {
-            get { return colliderMesh; }
-            set
-            {
-                colliderMesh = value;
-                if (colliderMesh != null)
-                {
-                    MeshCollider col = raycastTargetObject.GetComponent<MeshCollider>();
-                    col.sharedMesh = colliderMesh;
-                }
-            }
-        }
+        public GameObject raycastTargetObj { get; private set; } = null;
+        protected ColliderSourceT source;
+        public abstract ColliderSourceT GetSource();
+        public abstract void SetSource(ColliderSourceT source);
 
         private void Awake()
         {
             // Build raycast target object
-            raycastTargetObject = BuildChildObject();
+            raycastTargetObj = BuildChildObject();
 
             // Build the Rigidbody
-            BuildRigidBody(raycastTargetObject);
+            BuildRigidBody(raycastTargetObj);
 
-            // Check if there is a mesh, then send it to mesh collider   
-            Mesh mesh = gameObject.GetComponent<MeshFilter>().mesh;
-            if (mesh == null) throw new MeshNotFoundException();
-            BuildMeshCollider(gameObject, raycastTargetObject, mesh);
-
-            raycastTargetObject.AddComponent<C2M2.Utils.DebugUtils.Actions.TransformResetter>().targetFrame = 2;
+            // Let children initialize
+            OnAwake();
         }
+        protected abstract void OnAwake();
+
         /// <summary> Instantiate child object & set its layer to "Raycast" </summary>
         /// <returns> The child object that was created. </returns>
         private GameObject BuildChildObject()
@@ -62,13 +48,6 @@ namespace C2M2.Interaction.VR
             rb.drag = Mathf.Infinity;
             return rb;
         }
-        /// <summary> Add a mesh collider to the child object, and set its mesh to be the original gameobject's. </summary>
-        /// <returns> The MeshCollider that was created. </returns>
-        private static MeshCollider BuildMeshCollider(GameObject gameObject, GameObject raycastTargetObject, Mesh mesh)
-        {
-            MeshCollider meshCollider = raycastTargetObject.AddComponent<MeshCollider>();
-            meshCollider.sharedMesh = mesh ?? throw new MeshNotFoundException("No mesh on " + gameObject);
-            return meshCollider;
-        }
+
     }
 }

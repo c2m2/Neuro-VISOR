@@ -23,23 +23,17 @@ namespace C2M2.Simulation
                 // transforms[i].parent = transform;
                 // pos[i] = transforms[i].position;
             }
-            timer = new Timer();
+            
+            // Init interaction
         }
 
         protected override void UpdateVisualization(in Vector3[] simulationValues)
         {
-            if (trials > 0)
+            for (int i = 0; i < simulationValues.Length; i++)
             {
-                timer.StartTimer();
-                for (int i = 0; i < simulationValues.Length; i++)
-                {
-                    transforms[i].localPosition = simulationValues[i];
-                }
-                UpdateVisChild(simulationValues);
-                timer.StopTimer();
-                trials--;
-                if (trials == 0) timer.ExportCSV("UpdateVisualization");
+                transforms[i].localPosition = simulationValues[i];
             }
+            UpdateVisChild(simulationValues);
         }
         /// <summary>
         /// Allow derived classes to implement custom visualization features

@@ -55,9 +55,9 @@ namespace C2M2.Simulation.Samples
             {
                 colMesh = CombineMeshes(colRoot);
                 colMesh.name = "Combined_Mesh_Collider";
-                VRRaycastable raycastable = GetComponent<VRRaycastable>();
-                if (raycastable == null) { raycastable = gameObject.AddComponent<VRRaycastable>(); }
-                raycastable.ColliderMesh = colMesh;
+                VRRaycastableMesh raycastable = GetComponent<VRRaycastableMesh>();
+                if (raycastable == null) { raycastable = gameObject.AddComponent<VRRaycastableMesh>(); }
+                raycastable.SetSource(colMesh);
             }
 
             combinedMesh = CombineMeshes(transform);

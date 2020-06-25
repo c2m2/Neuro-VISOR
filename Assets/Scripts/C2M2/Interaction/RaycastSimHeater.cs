@@ -8,7 +8,6 @@ namespace C2M2.Interaction
     public abstract class RaycastSimHeater : MonoBehaviour
     {
         protected Interactable simulation;
-        protected VRRaycastable raycastable;
 
         protected abstract void OnAwake();
         private void Awake()
@@ -16,7 +15,6 @@ namespace C2M2.Interaction
             OnAwake();
             // This script is useless if there isn't a simulation to effect
             simulation = GetComponent<Interactable>() ?? throw new SimulationNotFoundException();
-            raycastable = GetComponent<VRRaycastable>() ?? gameObject.AddComponent<VRRaycastable>();
         }
         // Return an array of 3D indices and new values to add to those indices
         protected abstract Tuple<int, double>[] HitMethod(RaycastHit hit);

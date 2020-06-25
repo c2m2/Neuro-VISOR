@@ -84,6 +84,7 @@ namespace C2M2.MolecularDynamics.Simulation
             ResizeField(transforms);
             RenderBonds(bonds, transforms);
 
+            // Initialize simulation parameter
             switch (methodType)
             {
                 case (MethodType.gjI):

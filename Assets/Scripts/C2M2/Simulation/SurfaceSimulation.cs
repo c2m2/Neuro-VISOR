@@ -4,6 +4,7 @@ using C2M2.Visualization;
 namespace C2M2.Simulation
 {
     using Utils;
+    using Interaction.VR;
     /// <summary>
     /// Simulation of type double[] for visualizing scalar fields on mesh surfaces
     /// </summary>
@@ -50,6 +51,9 @@ namespace C2M2.Simulation
             // Initialize mesh
             Mesh mesh = BuildVisualization();
             mf.sharedMesh = mesh;
+            VRRaycastableMesh raycastable = gameObject.AddComponent<VRRaycastableMesh>();
+            raycastable.SetSource(mesh);
+
             return;
 
             void InitMat()
