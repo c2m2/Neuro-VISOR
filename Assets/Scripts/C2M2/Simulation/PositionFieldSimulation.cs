@@ -11,8 +11,7 @@ namespace C2M2.Simulation
     public abstract class PositionFieldSimulation : Simulation<Vector3[], Transform[]>
     {
         protected Transform[] transforms;
-        private Timer timer;
-        private int trials = 1000;
+
         protected override void OnAwake()
         {
             transforms = BuildVisualization();
