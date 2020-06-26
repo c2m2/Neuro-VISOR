@@ -11,17 +11,17 @@ namespace C2M2.Simulation
     /// </remarks>
     public abstract class Interactable : MonoBehaviour
     {
-        private RaycastSimHeater simHeater = null;
+        private RaycastHeater heater = null;
         /// <summary>
         /// Interaction script that resolves player interaction and passes new values back here
         /// </summary>
-        public RaycastSimHeater SimHeater
+        public RaycastHeater Heater
         {
-            get { return simHeater; }
+            get { return heater; }
             protected set
             {
-                if (simHeater != null) Destroy(simHeater);
-                simHeater = value;
+                if (heater != null) Destroy(heater);
+                heater = value;
             }
         }
         public enum InteractionType { Discrete, Continuous }

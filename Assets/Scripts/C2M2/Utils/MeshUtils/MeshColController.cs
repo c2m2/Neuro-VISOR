@@ -5,10 +5,11 @@ using UnityEngine;
 namespace C2M2.Utils.MeshUtils
 {
     /// <summary>
-    /// Set MeshColController instance.mesh to automatically fetch and update MeshCollider meshCol.sharedMesh
+    /// Set this.mesh to quickly look up and update a MeshCollider's mesh
     /// </summary>
     /// <remarks>
-    /// Provides an interface to more easily update MeshCollider
+    /// Set this.meshCol to directly reference a specific MeshCollider.
+    /// Otherwise the script will use the first MeshCollider it finds.
     /// </remarks>
     public class MeshColController : MonoBehaviour
     {

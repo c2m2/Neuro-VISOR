@@ -5,7 +5,7 @@ namespace C2M2.Interaction
 {
     using VR;
     using Simulation;
-    public abstract class RaycastSimHeater : MonoBehaviour
+    public abstract class RaycastHeater : MonoBehaviour
     {
         protected Interactable simulation;
 

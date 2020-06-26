@@ -16,8 +16,8 @@ namespace C2M2.Utils.DebugUtils
         /// <remarks>   
         ///             Jacob Wells, 5/6/2020.
         ///             Adapted from:
-        ///                 https://docs.unity3d.com/ScriptReference/AssetDatabase.GetDependencies.html
-        ///                 https://stackoverflow.com/questions/26615480/how-to-transform-an-array-of-file-paths-into-a-hierarchical-json-structure
+        ///             https://docs.unity3d.com/ScriptReference/AssetDatabase.GetDependencies.html
+        ///             https://stackoverflow.com/questions/26615480/how-to-transform-an-array-of-file-paths-into-a-hierarchical-json-structure
         /// </remarks>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         [MenuItem("Assets/Get All Asset Dependencies")]
@@ -37,7 +37,7 @@ namespace C2M2.Utils.DebugUtils
             // Find all asset dependencies of every scene recursively
             string[] dependencies = AssetDatabase.GetDependencies(allPaths, true);
 
-            // Build an organize folder hierarchy string for every asset dependency
+            // Build a folder hierarchy string for every asset dependency
             StringBuilder dependenciesString = new StringBuilder();
             dependenciesString.AppendLine();
             Dir root = new Dir("");
@@ -45,6 +45,7 @@ namespace C2M2.Utils.DebugUtils
             {
                 root.FindOrCreate(dependency);
             }
+            // Print result
             Debug.Log("All direct and indirect dependencies from all scenes in project:\n\n" + root.ToString());
         }
 
