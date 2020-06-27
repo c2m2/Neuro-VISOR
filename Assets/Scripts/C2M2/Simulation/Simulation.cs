@@ -141,11 +141,11 @@ namespace C2M2.Simulation
         {
             OnUpdate();
 
-            ValueType simulationValues = GetValues();
-            if (simulationValues != null && !dryRun)
+            if (!dryRun)
             {
-                // Use simulation values to update visuals
-                UpdateVisualization(simulationValues);
+                ValueType simulationValues = GetValues();
+
+                if (simulationValues != null) UpdateVisualization(simulationValues);
             }
         }
         // Allow derived classes to run code in Awake/Start/Update if they choose

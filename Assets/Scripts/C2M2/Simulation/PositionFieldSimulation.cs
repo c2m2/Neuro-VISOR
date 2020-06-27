@@ -14,19 +14,22 @@ namespace C2M2.Simulation
 
         protected override void OnAwake()
         {
-            Vector3[] pos = new Vector3[viz.Length];
-
-            Collider[] colliders = new Collider[viz.Length];
-            for(int i = 0; i < viz.Length; i++)
+            if (!dryRun)
             {
-                colliders[i] = viz[i].GetComponent<Collider>();
+                Vector3[] pos = new Vector3[viz.Length];
+
+                Collider[] colliders = new Collider[viz.Length];
+                for (int i = 0; i < viz.Length; i++)
+                {
+                    colliders[i] = viz[i].GetComponent<Collider>();
+                }
+
+                VRRaycastableColliders raycastable = gameObject.AddComponent<VRRaycastableColliders>();
+
+                raycastable.SetSource(colliders);
+
+                // Add custom grabbable here
             }
-
-            VRRaycastableColliders raycastable = gameObject.AddComponent<VRRaycastableColliders>();
-
-            raycastable.SetSource(colliders);
-
-            // Add custom grabbable here
         }
 
         protected override void UpdateVisualization(in Vector3[] simulationValues)

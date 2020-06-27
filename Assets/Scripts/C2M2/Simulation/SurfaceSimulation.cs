@@ -47,16 +47,18 @@ namespace C2M2.Simulation
         #region Unity Methods
         protected sealed override void OnAwake()
         {
-            InitMat();
+            if (!dryRun)
+            {
+                InitMat();
 
-            InitColors();
+                InitColors();
 
-            mf.sharedMesh = viz;
-            VRRaycastableMesh raycastable = gameObject.AddComponent<VRRaycastableMesh>();
-            raycastable.SetSource(viz);
+                mf.sharedMesh = viz;
+                VRRaycastableMesh raycastable = gameObject.AddComponent<VRRaycastableMesh>();
+                raycastable.SetSource(viz);
 
-            // Add custom grabbable here
-
+                // Add custom grabbable here
+            }
             return;
 
             void InitMat()

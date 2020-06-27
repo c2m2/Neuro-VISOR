@@ -1445,7 +1445,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionType: 0
-  dryRun: 1
+  dryRun: 0
   startOnAwake: 1
   gradient:
     serializedVersion: 2
@@ -1491,9 +1491,9 @@ MonoBehaviour:
   HK_auto: 1
   SomaOn: 1
   numRuns: 0
-  randomPermute: 1
-  printMatrices: 1
-  printCellInfo: 1
+  randomPermute: 0
+  printMatrices: 0
+  printCellInfo: 0
   printVolt_time: 1
   res: 0.3
   cap: 0.3
