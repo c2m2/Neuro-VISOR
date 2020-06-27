@@ -90,9 +90,12 @@ namespace C2M2.Simulation
         {
             ReadData();
 
-            viz = BuildVisualization();
+            if (!dryRun)
+            {
+                viz = BuildVisualization();
 
-            BuildInteraction();
+                BuildInteraction();
+            }
 
             // Run child awake methods first
             OnAwake();
@@ -139,7 +142,7 @@ namespace C2M2.Simulation
             OnUpdate();
 
             ValueType simulationValues = GetValues();
-            if (simulationValues != null)
+            if (simulationValues != null && !dryRun)
             {
                 // Use simulation values to update visuals
                 UpdateVisualization(simulationValues);
