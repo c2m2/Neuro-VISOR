@@ -25,9 +25,11 @@ namespace C2M2.Simulation.Samples
                 scalars[newVal.Item1] += newVal.Item2;
             }
         }
+
         #region Unity Methods
 
         #endregion
+
         protected override void Solve()
         { // Do nothing, essentially
             while (true)
@@ -36,6 +38,10 @@ namespace C2M2.Simulation.Samples
                 {
                 }
             }
+        }
+        protected override void ReadData()
+        {
+            
         }
         protected override Mesh BuildVisualization()
         {

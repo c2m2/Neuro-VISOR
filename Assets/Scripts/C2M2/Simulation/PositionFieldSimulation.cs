@@ -14,6 +14,7 @@ namespace C2M2.Simulation
 
         protected override void OnAwake()
         {
+            ReadData();
             transforms = BuildVisualization();
             Vector3[] pos = new Vector3[transforms.Length];
 

@@ -12,14 +12,22 @@ namespace C2M2.Simulation
     /// <typeparam name="ValueType"> Type of simulation values </typeparam>
     public abstract class Simulation<ValueType, VizType> : Interactable
     {
+        [Tooltip("Run simulation code without visualization or interaction features")]
+        /// <summary>
+        /// Run simulation without visualization or interaction
+        /// </summary>
+        public bool dryRun = false;
+
         /// <summary>
         /// Should the simulation start itself in Awake?
         /// </summary>
         public bool startOnAwake = true;
+
         /// <summary>
         /// Provide mutual exclusion to derived classes
         /// </summary>
         protected Mutex mutex = new Mutex();
+
         /// <summary>
         /// Thread that runs simulation code
         /// </summary>
@@ -29,6 +37,7 @@ namespace C2M2.Simulation
         /// Require derived classes to make simulation values available
         /// </summary>
         public abstract ValueType GetValues();
+
         /// <summary>
         /// Simulations must know how to build their visualization and what type the visualization is
         /// </summary>
@@ -36,6 +45,12 @@ namespace C2M2.Simulation
         /// See SurfaceSimulation & NeuronSimulation1D or PositionFieldSimulation for examples.
         /// </remarks>
         protected abstract VizType BuildVisualization();
+
+        /// <summary>
+        /// ReadData is called before BuildVisualization
+        /// </summary>
+        protected abstract void ReadData();
+
         /// <summary>
         /// Simulations must know how to update the visualization and what type is needed for that.
         /// </summary>
@@ -90,13 +105,16 @@ namespace C2M2.Simulation
                 child.transform.parent = transform;
                 child.transform.position = Vector3.zero;
                 child.transform.eulerAngles = Vector3.zero;
+
                 // Create hit event
                 RaycastPressEvents raycastEvents = child.AddComponent<RaycastPressEvents>();
                 raycastEvents.OnHoldPress.AddListener((hit) => Heater.Hit(hit));
+
                 // Attach event to an event manager
                 RaycastEventManager eventManager = gameObject.AddComponent<RaycastEventManager>();
                 eventManager.rightTrigger = raycastEvents;
                 eventManager.leftTrigger = raycastEvents;
+
                 // Some scripts change transform position for some reason, reset the position/rotation at the first frame
                 gameObject.AddComponent<Utils.DebugUtils.Actions.TransformResetter>();
             }
@@ -121,6 +139,7 @@ namespace C2M2.Simulation
         protected virtual void OnAwake() { }
         protected virtual void OnStart() { }
         protected virtual void OnUpdate() { }
+
         // Don't allow threads to keep running when application pauses or quits
         private void OnApplicationPause(bool pause)
         {

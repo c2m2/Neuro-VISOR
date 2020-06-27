@@ -1431,7 +1431,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &884125481
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1441,10 +1441,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 884125480}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 61eaeda205492bb42989b8b1fdb008e9, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d02d90e177c4004aadf43a897cf3e8a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   interactionType: 0
+  dryRun: 0
   startOnAwake: 1
   gradient:
     serializedVersion: 2
@@ -1483,8 +1484,31 @@ MonoBehaviour:
     serializedVersion: 2
     rgba: 4278512639
   lineWidth1D: 0.005
+  vstart: 55
   endTime: 100
+  h: 0.27
+  k: 0.0027
+  HK_auto: 1
   SomaOn: 1
+  numRuns: 0
+  randomPermute: 0
+  printMatrices: 0
+  printCellInfo: 0
+  printVolt_time: 0
+  res: 0.3
+  cap: 0.3
+  ni: 0.317677
+  mi: 0.0529325
+  hi: 0.596121
+  k_ONOFF: 1
+  gk: 36
+  ek: -2
+  na_ONOFF: 1
+  gna: 153
+  ena: 120
+  leak_ONOFF: 1
+  gl: 0.3
+  el: -10
 --- !u!4 &884125482
 Transform:
   m_ObjectHideFlags: 0
@@ -2114,7 +2138,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1815266848
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2128,6 +2152,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionType: 0
+  dryRun: 0
   startOnAwake: 1
   pdbPath: PE/pe_cg.pdb
   psfPath: PE/octatetracontane_128.cg.psf

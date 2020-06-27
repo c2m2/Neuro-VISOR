@@ -46,13 +46,23 @@ namespace C2M2.Simulation
         #region Unity Methods
         protected sealed override void OnAwake()
         {
-            InitMat();
-            InitColors();
-            // Initialize mesh
-            Mesh mesh = BuildVisualization();
-            mf.sharedMesh = mesh;
-            VRRaycastableMesh raycastable = gameObject.AddComponent<VRRaycastableMesh>();
-            raycastable.SetSource(mesh);
+            ReadData();
+
+            if (!dryRun)
+            {
+                InitMat();
+                InitColors();
+            }
+
+            // Some simulation initialization might happen in BuildVisualization, so let it run even if in a dry run
+            Mesh viz = BuildVisualization();
+
+            if (!dryRun)
+            {
+                mf.sharedMesh = viz;
+                VRRaycastableMesh raycastable = gameObject.AddComponent<VRRaycastableMesh>();
+                raycastable.SetSource(viz);
+            }
 
             // Add custom grabbable here
 
@@ -63,8 +73,10 @@ namespace C2M2.Simulation
                 // Safe check for existing MeshFilter, MeshRenderer
                 mf = GetComponent<MeshFilter>();
                 if (mf == null) mf = gameObject.AddComponent<MeshFilter>();
+
                 mr = GetComponent<MeshRenderer>();
                 if (mr == null) mr = gameObject.AddComponent<MeshRenderer>();
+
                 // Ensure the renderer has a vertex coloring material     
                 mr.material = GameManager.instance.vertexColorationMaterial;
             }
@@ -79,7 +91,6 @@ namespace C2M2.Simulation
                     colorLUT.globalMax = globalMax;
                     colorLUT.globalMin = globalMin;
                 }
-
             }
         }
         #endregion

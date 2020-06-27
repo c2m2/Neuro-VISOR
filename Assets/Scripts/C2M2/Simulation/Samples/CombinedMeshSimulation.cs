@@ -40,6 +40,10 @@ namespace C2M2.Simulation.Samples
                 values[value.Item1] = value.Item2;
             }
         }
+        protected override void ReadData()
+        {
+
+        }
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary> Get every child mesh and combine into one mesh </summary>
         /// <returns> Combined mesh </returns>

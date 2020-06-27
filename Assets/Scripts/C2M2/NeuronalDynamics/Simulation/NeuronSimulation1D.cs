@@ -23,8 +23,12 @@ namespace C2M2.NeuronalDynamics.Simulation
         public Color32 color1D = Color.yellow;
         public float lineWidth1D = 0.005f;
         protected Grid grid1D;
+
         ///<summary> Lookup a 3D vert and get back two 1D indices and a lambda value for them </summary>
         private Dictionary<int, Tuple<int, int, double>> map;
+        private MappingInfo mapping;
+        private string[] cellFileNames;
+
         // Cell folder names and extensions
         private readonly string neuronCellFolder = "NeuronalDynamics";
         private readonly string activeCellFolder = "ActiveCell";
@@ -33,6 +37,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         private readonly string spec1D = "_1d";
         private readonly string specTris = "_tris";
         private readonly string specBlownup = "_blown_up";
+
         /// <summary>
         /// Translate 1D vertex values to 3D values and pass them upwards for visualization
         /// </summary>
@@ -81,9 +86,11 @@ namespace C2M2.NeuronalDynamics.Simulation
                 double lambda = map[vert3D].Item3;
                 double val1D = (1 - lambda) * val3D;
                 new1DValues[j] = new Tuple<int, double>(map[vert3D].Item1, val1D);
+
                 // Weight newVal by (lambda) for second 1D vert                    
                 val1D = lambda * val3D;
                 new1DValues[j + 1] = new Tuple<int, double>(map[vert3D].Item2, val1D);
+
                 // Move up two spots in 1D array
                 j += 2;
             }
@@ -91,38 +98,33 @@ namespace C2M2.NeuronalDynamics.Simulation
             // Send 1D-translated scalars to simulation
             Set1DValues(new1DValues);
         }
+
         /// <summary>
         /// Requires deived classes to know how to receive one value to add onto each 1D vert index
         /// </summary>
         /// <param name="newValuess"> List of 1D vert indices and values to add onto that index. </param>
         protected abstract void Set1DValues(Tuple<int, double>[] newValuess);
+
         /// <summary>
         /// Requires derived classes to know how to make available one value for each 1D vertex
         /// </summary>
         /// <returns></returns>
         protected abstract double[] Get1DValues();
+
         /// <summary>
         /// Pass the UGX 1D and 3D cells to simulation code
         /// </summary>
         /// <param name="grid"></param>
         protected abstract void SetNeuronCell(Grid grid);
-        /// <summary>
-        /// Read in the cell and initialize 3D/1D visualization/interaction infrastructure
-        /// </summary>
-        /// <returns> Unity Mesh visualization of the 3D geometry. </returns>
-        protected override Mesh BuildVisualization()
-        {            
-            string[] cellFileNames = BuildCellFileNames();
+
+        protected override void ReadData()
+        {
+            cellFileNames = BuildCellFileNames();
             // Read in 1D & 3D data and build a map between them
-            MappingInfo mapping = MapUtils.BuildMap(cellFileNames[1], cellFileNames[0], false, cellFileNames[2]);
+            mapping = MapUtils.BuildMap(cellFileNames[1], cellFileNames[0], false, cellFileNames[2]);
             map = mapping.Data;
             // Pass the cell to simulation code
             SetNeuronCell(mapping.ModelGeometry);
-            Mesh newMesh = Clean3DCell();
-            if(visualize1D) Render1DCell();
-            CheckForCustomCollider();
-
-            return newMesh;
 
             string[] BuildCellFileNames()
             {
@@ -148,6 +150,25 @@ namespace C2M2.NeuronalDynamics.Simulation
                 }
                 return cells;
             }
+        }
+
+        /// <summary>
+        /// Read in the cell and initialize 3D/1D visualization/interaction infrastructure
+        /// </summary>
+        /// <returns> Unity Mesh visualization of the 3D geometry. </returns>
+        protected override Mesh BuildVisualization()
+        {            
+
+            Mesh newMesh = new Mesh();
+            if (!dryRun)
+            {
+                newMesh = Clean3DCell();
+                if (visualize1D) Render1DCell();
+                CheckForCustomCollider();
+            }
+
+            return newMesh;
+
             Mesh Clean3DCell()
             {
                 Mesh mesh = mapping.SurfaceGeometry.Mesh;

@@ -77,6 +77,29 @@ namespace C2M2.MolecularDynamics.Simulation
         private BondRenderer[] bondRenderers;
         private Shader shader;
 
+
+        protected override void ReadData()
+        {
+            PSFFile psfFile = PSFReader.ReadFile(path + psfPath);
+            mass = psfFile.mass;
+            bonds = psfFile.bonds;
+            angles = psfFile.angles;
+            types = psfFile.types;
+
+            // Convert bonds and angles to 0 base
+            for (int i = 0; i < bonds.Length; i++) bonds[i] = bonds[i] - 1;
+            for (int i = 0; i < angles.Length; i++) angles[i] = angles[i] - 1;
+
+            PDBFile pdbFile = PDBReader.ReadFile(path + pdbPath);
+            x = pdbFile.pos;
+
+            // Initialize v
+            v = new Vector3[x.Length];
+            for (int i = 0; i < v.Length; i++)
+            {
+                v[i] = Vector3.zero;
+            }
+        }
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
         /// Reads and stores PDB and PSF data, uses the data to build the system visualization
@@ -84,7 +107,6 @@ namespace C2M2.MolecularDynamics.Simulation
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         protected override Transform[] BuildVisualization()
         {
-            ReadData();
             Transform[] transforms = RenderSpheres(x, types, radius);
             bond_topo = BuildBondTopology(bonds);
             ResizeField(transforms);
@@ -106,28 +128,6 @@ namespace C2M2.MolecularDynamics.Simulation
 
             return transforms;
 
-            void ReadData()
-            {
-                PSFFile psfFile = PSFReader.ReadFile(path + psfPath);
-                mass = psfFile.mass;
-                bonds = psfFile.bonds;
-                angles = psfFile.angles;
-                types = psfFile.types;
-
-                // Convert bonds and angles to 0 base
-                for (int i = 0; i < bonds.Length; i++) bonds[i] = bonds[i] - 1;
-                for (int i = 0; i < angles.Length; i++) angles[i] = angles[i] - 1;
-
-                PDBFile pdbFile = PDBReader.ReadFile(path + pdbPath);
-                x = pdbFile.pos;
-
-                // Initialize v
-                v = new Vector3[x.Length];
-                for (int i = 0; i < v.Length; i++)
-                {
-                    v[i] = Vector3.zero;
-                }
-            }
             Transform[] RenderSpheres(Vector3[] x, string[] types, float radius)
             {
                 // Instantiate one sphere per atom
