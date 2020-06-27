@@ -108,8 +108,11 @@ namespace C2M2.MolecularDynamics.Simulation
         protected override Transform[] BuildVisualization()
         {
             Transform[] transforms = RenderSpheres(x, types, radius);
+
             bond_topo = BuildBondTopology(bonds);
+
             ResizeField(transforms);
+
             RenderBonds(bonds, transforms);
 
             // Initialize simulation parameter

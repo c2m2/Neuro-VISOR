@@ -11,6 +11,7 @@ namespace C2M2.Simulation
     public abstract class SurfaceSimulation : Simulation<double[], Mesh>
     {
         #region Variables
+        public override Mesh viz { get; protected set; }
         /// <summary>
         /// Gradient for coloring each surface point based on their scalar values
         /// </summary>
@@ -46,23 +47,13 @@ namespace C2M2.Simulation
         #region Unity Methods
         protected sealed override void OnAwake()
         {
-            ReadData();
+            InitMat();
 
-            if (!dryRun)
-            {
-                InitMat();
-                InitColors();
-            }
+            InitColors();
 
-            // Some simulation initialization might happen in BuildVisualization, so let it run even if in a dry run
-            Mesh viz = BuildVisualization();
-
-            if (!dryRun)
-            {
-                mf.sharedMesh = viz;
-                VRRaycastableMesh raycastable = gameObject.AddComponent<VRRaycastableMesh>();
-                raycastable.SetSource(viz);
-            }
+            mf.sharedMesh = viz;
+            VRRaycastableMesh raycastable = gameObject.AddComponent<VRRaycastableMesh>();
+            raycastable.SetSource(viz);
 
             // Add custom grabbable here
 

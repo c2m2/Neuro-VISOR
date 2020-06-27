@@ -10,40 +10,32 @@ namespace C2M2.Simulation
     /// </summary>
     public abstract class PositionFieldSimulation : Simulation<Vector3[], Transform[]>
     {
-        protected Transform[] transforms;
+        public override Transform[] viz { get; protected set; }
 
         protected override void OnAwake()
         {
-            ReadData();
-            transforms = BuildVisualization();
-            Vector3[] pos = new Vector3[transforms.Length];
+            Vector3[] pos = new Vector3[viz.Length];
 
-            // Make each transform a child of this gameobject so the hierarchy isn't flooded
-            for(int i = 0; i < transforms.Length; i++)
+            Collider[] colliders = new Collider[viz.Length];
+            for(int i = 0; i < viz.Length; i++)
             {
-                // transforms[i].parent = transform;
-                // pos[i] = transforms[i].position;
+                colliders[i] = viz[i].GetComponent<Collider>();
             }
 
-            Collider[] colliders = new Collider[transforms.Length];
-            for(int i = 0; i < transforms.Length; i++)
-            {
-                colliders[i] = transforms[i].GetComponent<Collider>();
-            }
             VRRaycastableColliders raycastable = gameObject.AddComponent<VRRaycastableColliders>();
+
             raycastable.SetSource(colliders);
 
             // Add custom grabbable here
-
-            // Init interaction
         }
 
         protected override void UpdateVisualization(in Vector3[] simulationValues)
         {
             for (int i = 0; i < simulationValues.Length; i++)
             {
-                transforms[i].localPosition = simulationValues[i];
+                viz[i].localPosition = simulationValues[i];
             }
+
             UpdateVisChild(simulationValues);
         }
         /// <summary>

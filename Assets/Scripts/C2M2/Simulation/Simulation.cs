@@ -46,13 +46,15 @@ namespace C2M2.Simulation
         /// </remarks>
         protected abstract VizType BuildVisualization();
 
+        public abstract VizType viz { get; protected set; }
+
         /// <summary>
-        /// ReadData is called before BuildVisualization
+        /// Read/initialize data here. ReadData is called before BuildVisualization
         /// </summary>
         protected abstract void ReadData();
 
         /// <summary>
-        /// Simulations must know how to update the visualization and what type is needed for that.
+        /// Update the visualization. This will be called once per Update() call
         /// </summary>
         /// <remarks>
         /// See SurfaceSimulation & NeuronSimulation1D or PositionFieldSimulation for examples.
@@ -69,10 +71,12 @@ namespace C2M2.Simulation
             solveThread.Start();
             Debug.Log("Solve() launched on thread " + solveThread.ManagedThreadId);
         }
+
         /// <summary>
         /// Stop current Solve thread
         /// </summary>
         public void StopSimulation() { if (solveThread != null) solveThread.Abort(); }
+
         /// <summary>
         /// Method containing simulation code
         /// </summary>
@@ -84,16 +88,22 @@ namespace C2M2.Simulation
         #region Unity Methods
         public void Awake()
         {
+            ReadData();
+
+            viz = BuildVisualization();
+
+            BuildInteraction();
+
             // Run child awake methods first
             OnAwake();
-
-            InitInteraction();
 
             if (startOnAwake) StartSimulation();
 
             return;
 
-            void InitInteraction(){
+            void BuildInteraction()
+            {
+
                 switch (interactionType)
                 {
                     case (InteractionType.Discrete): Heater = gameObject.AddComponent<RaycastSimHeaterDiscrete>(); break;
