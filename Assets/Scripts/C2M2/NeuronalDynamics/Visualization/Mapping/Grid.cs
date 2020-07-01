@@ -125,7 +125,6 @@ namespace C2M2.NeuronalDynamics.UGX
             AttachmentInfo.Types.Remove(name);
             AttachmentInfo.Data.Remove(name);
         }
-
     }
 
     /// Vertex
