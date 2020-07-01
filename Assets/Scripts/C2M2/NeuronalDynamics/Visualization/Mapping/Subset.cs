@@ -15,6 +15,7 @@ namespace C2M2.NeuronalDynamics.UGX
         /// <summary>
         /// Indexer
         /// </summary>
+        /// <param name="name"> Name of list entry to index </param>
         public Subset this[string name]
         {
             get => (Subset)subsets[name];
@@ -24,6 +25,8 @@ namespace C2M2.NeuronalDynamics.UGX
         /// <summary>
         /// Print out all subset information in the current subset collection for a grid
         /// </summary>
+        /// <returns> string </returns>
+        /// Returns the string representation
         public override string ToString()
         {
             StringBuilder builder = new StringBuilder();
@@ -47,6 +50,8 @@ namespace C2M2.NeuronalDynamics.UGX
         /// <summary>
         /// Construct a subset information with a name and corresponding indices
         /// </summary>
+        /// <param name="name"> Name of subset </param>
+        /// <param name="indices"> Indices of the subset </param>
         public Subset(in string name, in int[] indices)
         {
             Name = name;
@@ -56,9 +61,8 @@ namespace C2M2.NeuronalDynamics.UGX
         /// <summary>
         /// Print out information for this subset, i.e. name and indices as a list
         /// </summary>
-        public override string ToString()
-        {
-            return $"Subset >>{Name}<< has vertex indices >>{string.Join(", ", Indices)}<<";
-        }
+        /// <returns> string </returns>
+        /// Returns the string representation
+        public override string ToString() => return $"Subset >>{Name}<< has vertex indices >>{string.Join(", ", Indices)}<<";
     }
 }
