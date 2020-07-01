@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace C2M2.NeuronalDynamics.UGX
 {
-    /// Note/TODO: Could enhance this as a generic attachment accessor also for Edges
+    /// Note: Could enhance this as a generic attachment accessor also for other geometric elements like edges, and so forth with ease.
     /// Basically use this as AttachmentAccessor<T, E> with T being the
     /// attachment data and E the element type
     /// <summary>
@@ -23,8 +23,7 @@ namespace C2M2.NeuronalDynamics.UGX
         /// <summary>
         /// Create the accessor
         /// </summary>
-        /// <param name="name"></param>
-        /// 
+        /// <param name="grid"> A grid which should be accessed with a VertexAttachmentAccessor </param>
         public VertexAttachementAccessor(in Grid grid)
         {
             this.grid = grid;
@@ -34,9 +33,9 @@ namespace C2M2.NeuronalDynamics.UGX
         /// <summary>
         /// Create the accesor with default data and a given size
         /// </summary>
-        /// <param name="grid"></param>
-        /// <param name="size"></param>
-        /// <param name="def"></param>
+        /// <param name="grid"> Grid instance </param>
+        /// <param name="size"> Number of elements </param>
+        /// <param name="def"> default value for unassigned attachment data at vertex index </param>
         public VertexAttachementAccessor(in Grid grid, int size, T def)
         {
             this.grid = grid;
@@ -52,8 +51,8 @@ namespace C2M2.NeuronalDynamics.UGX
         /// <summary>
         /// Get's the value of the attachment
         /// </summary>
-        /// <param name="index"></param>
-        /// <returns></returns>
+        /// <param name="index"> Index of vertex</param>
+        /// <returns> int </returns>
         private T GetValue(int index)
         {
             if (grid.HasVertexAttachment<T>())
@@ -68,7 +67,7 @@ namespace C2M2.NeuronalDynamics.UGX
             if (data == null)
             {
                 Debug.LogError($"Trying to access attachment data of vertex with index {index} but no attachment data " +
-                                     $"of type >>{typeof(T)}<< present for the required vertex index. Check input file for attachments!");
+                               $"of type >>{typeof(T)}<< present for the required vertex index. Check input file for attachments!");
             }
             return data;
         }
