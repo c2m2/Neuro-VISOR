@@ -4,7 +4,7 @@ using UnityEngine;
 using C2M2.Tests;
 namespace C2M2.NeuronalDynamics.Tests
 {
-	[System.Obsolete("This is an obsolete/not required test")]
+    [System.Obsolete("This is an obsolete/not required test but still might be useful to test mesh normals read in vs. computed normals from unity")]
     public class NormalTest : AwakeTest
     {
         /// Mesh
