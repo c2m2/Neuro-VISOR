@@ -13,9 +13,6 @@ namespace C2M2.NeuronalDynamics.UGX
         /// Prints available subsets and indices for the given grid
         /// </summary>
         /// <param name="grid">A grid</param>
-        public static void AvailableSubsets(in Grid grid)
-        {
-            UnityEngine.Debug.Log(grid.Subsets);
-        }
+        public static void AvailableSubsets(in Grid grid) => UnityEngine.Debug.Log(grid.Subsets);
     }
 }
