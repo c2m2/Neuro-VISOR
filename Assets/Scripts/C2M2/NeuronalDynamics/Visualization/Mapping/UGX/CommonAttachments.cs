@@ -8,6 +8,7 @@ namespace C2M2.NeuronalDynamics.UGX
     /// DiameterData
     /// <summary>
     /// Data for diameter attachment
+    /// Used to store diameters during reading in a grid
     /// </summary>
     readonly struct DiameterData : IAttachmentData
     {
@@ -22,6 +23,7 @@ namespace C2M2.NeuronalDynamics.UGX
     /// NormalData
     /// <summary>
     /// Data for normals of grid
+    /// Used to store normals during reading in a grid
     /// </summary>
     readonly struct NormalData : IAttachmentData
     {
@@ -36,6 +38,7 @@ namespace C2M2.NeuronalDynamics.UGX
     /// MappingData
     /// <summary>
     /// Data for mapping attachment
+    /// Used to read in mapping data which maps between 1d and 2d vertices
     /// </summary>
     readonly struct MappingData : IAttachmentData
     {
@@ -43,7 +46,7 @@ namespace C2M2.NeuronalDynamics.UGX
         public Vector3 End { get; }
         public Double Lambda { get; }
         /// <summary>
-        /// MappingData
+        /// MappingData 
         /// </summary>
         /// <param name="start">From vertex</param>
         /// <param name="end">To vertex</param>
@@ -53,8 +56,8 @@ namespace C2M2.NeuronalDynamics.UGX
     /// SynapseData
     /// <summary>
     /// Data for synapse attachment
+    /// Used to store synapse data during reading in a grid 
     /// </summary>
-    /// TODO: Add caching for synapse current data
     readonly struct SynapseData : IAttachmentData
     {
         public readonly ISynapse Synapse;
@@ -62,7 +65,7 @@ namespace C2M2.NeuronalDynamics.UGX
         /// <summary>
         /// Set the synapse
         /// </summary>
-        /// <param name="synapse"></param>
+        /// <param name="synapse"> Synapse data </param>
         public SynapseData(in ISynapse synapse) => Synapse = synapse;
     }
 }
