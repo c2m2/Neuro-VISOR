@@ -18,12 +18,9 @@ namespace C2M2.NeuronalDynamics.UGX
     /// <summary>
     /// UGXReaderTest 
     /// </summary>
+    /// Tests the UGXReader on a simple static CNG cell from NeuroMorpho database
     public sealed class UGXReaderTest : MonoBehaviour
     {
-
-        // Header for CNG cells 
-        // TODO: Add description what each cesll represents
-        // Neuromorpho.org seems to be down once again...
         [Header("CNG Cell")]
         public Cell cell;
 
@@ -65,7 +62,7 @@ namespace C2M2.NeuronalDynamics.UGX
 
             /// Debug for mesh
             // Debug.Log($"mesh.vertices.Length: {grid.Mesh.vertices.Length}");
-            //Debug.Log($"mesh.triangles.Length: {grid.Mesh.triangles.Length}");
+            // Debug.Log($"mesh.triangles.Length: {grid.Mesh.triangles.Length}");
 
             /// Add visual components
             go = new GameObject(grid.Mesh.name);
@@ -93,12 +90,11 @@ namespace C2M2.NeuronalDynamics.UGX
                 cellName = cellName.Replace("Cell", "");
                 /// Build the map
                 Debug.Log($"Building mesh for cell: {cellName}");
-                /*   BuildMap(@"C:/Users/tug41634/Desktop/C2M2/c2m2-vr-grids/Cells/" + (byte) cell + "/" + cellName + ".CNG_1d.ugx",
-                     @"C:/Users/tug41634/Desktop/C2M2/c2m2-vr-grids/Cells/" + (byte) cell + "/" + cellName + ".CNG.ugx",
-                     @"C:/Users/tug41634/Desktop/C2M2/c2m2-vr-grids/Cells/" + (byte) cell + "/" + cellName + ".CNG_tris.ugx");
-                     */
-
-
+                /*  
+                 BuildMap(@"C:/Users/tug41634/Desktop/C2M2/c2m2-vr-grids/Cells/" + (byte) cell + "/" + cellName + ".CNG_1d.ugx",
+                          @"C:/Users/tug41634/Desktop/C2M2/c2m2-vr-grids/Cells/" + (byte) cell + "/" + cellName + ".CNG.ugx",
+                          @"C:/Users/tug41634/Desktop/C2M2/c2m2-vr-grids/Cells/" + (byte) cell + "/" + cellName + ".CNG_tris.ugx");
+                 */
                 /// Surface geom (With triangles)
                 Grid grid3dvis = new Grid(new Mesh(), "3D Hippocampal Cell");
                 UGXReader.Validate = false;
@@ -106,9 +102,6 @@ namespace C2M2.NeuronalDynamics.UGX
                 Debug.Log(grid3dvis);
                 go.GetComponent<MeshFilter>().sharedMesh = grid3dvis.Mesh;
             }
-
-
-
         }
 
         /// <summary>
@@ -119,21 +112,13 @@ namespace C2M2.NeuronalDynamics.UGX
                                                   @"C:/Users/tug41634/Desktop/C2M2/c2m2-vr-grids/Mapping/after_selecting_boundary_elements_tris.ugx");
 
 
-        /*private static void BuildMap() => BuildMap(@"C:/Users/tug41634/Desktop/TestMapping/hipp_precond_with_soma.ugx",
-                                                   @"C:/Users/tug41634/Desktop/TestMapping/after_selecting_boundary_elements.ugx",
-                                                   @"C:/Users/tug41634/Desktop/TestMapping/after_selecting_boundary_elements_tris.ugx");
-                                                   */
-
-        // private static void BuildMap() => BuildMap(@"C:/Users/tug41634/Desktop/HippocampusSimple2020_Cell1_Smooth.ugx",
-        //                                            @"C:/Users/tug41634/Desktop/HippocampusSimple2020_Cell1_Smooth_wo_vols.ugx");
-
-
         /// BuildMap
         /// <summary>
         /// Geometries will be stored in grid1d and grid3d (Unity meshes)
         /// </summary>
         /// <param name="geom1d"> Filename of 1d (model) geometry </param>
-        /// <param name="geom3d"> Filename of 2d (surface) geometry </param>
+        /// <param name="geom3d"> Filename of 2d (surface) geometry with mapping data </param>
+        /// <param name="geom3dvis"> Filename of 2d (surface) geometry for visualization </param>
         /// <returns> A tuple containing the grids (1d and 3d) and the mapping data as a Dictionary </returns>
         public static Tuple<Grid, Grid, Dictionary<int, Tuple<int, int, double>>> BuildMap(in string geom1d, in string geom3d, in string geom3dvis)
         {
@@ -179,7 +164,7 @@ namespace C2M2.NeuronalDynamics.UGX
             {
                 int from = edge.From.Id;
                 int to = edge.To.Id;
-                //Mapping.DrawLine(vertices[from], vertices[to], Color.red, Color.red);
+                // Mapping.DrawLine(vertices[from], vertices[to], Color.red, Color.red);
             }
 
 
@@ -193,18 +178,13 @@ namespace C2M2.NeuronalDynamics.UGX
             grid3dvis.Mesh.colors = colors;
             */
 
-
-
             KdTree<float, int> tree = new KdTree<float, int>(3, new FloatMath());
             for (int i = 0; i < size1d; i++)
             {
                 tree.Add(new float[] { vertices[i].x, vertices[i].y, vertices[i].z }, i);
             }
 
-            /// Depending on precision points are not the same (Vector3). Can associated index with vPoints in SWC grid import / grid generation. Will this be more robust/easier??
-            /// TODO: Geometries still look awkward from NeuriteProjector grid generation somehow
-            /// 
-
+            /// Depending on precision points are not the same (Vector3) when read from the .ugx and from the Unity mesh (double vs. float)
             for (int i = 0; i < size3d; i++)
             {
                 var node = tree.GetNearestNeighbours(new[] { accessor[i].Start[0], accessor[i].Start[1], accessor[i].Start[2] }, 1); // current nearest neighbor
@@ -229,19 +209,16 @@ namespace C2M2.NeuronalDynamics.UGX
                   }
                  // Mapping.DrawLine(vertices2[i], vertices[index1], Color.red, Color.green);
               }
-
-      */
+              */
             Profiler.EndSample();
-
             go.GetComponent<MeshRenderer>().material = new Material(Shader.Find("Particles/Standard Surface"));
-
             return new Tuple<Grid, Grid, Dictionary<int, Tuple<int, int, double>>>(grid1d, grid3d, map2d1d);
         }
 
         /// <summary>
         /// Example for reading diameters from UGX files
         /// </summary>
-        /// <param name="filename"></param>
+        /// <param name="filename"> Name of file to read in as an example to verify diameters are read</param>
         private void DiameterExample(in string filename)
         {
             Grid grid = new Grid(new Mesh(), "Your mesh's name");
