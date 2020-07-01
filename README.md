@@ -21,7 +21,7 @@ For users of older git versions this remedies the problem that every LFS version
 The user should install the hooks by calling `./install_git_hooks.sh` after clone from the root directory.
 
 ### Make sure appropriate versions are used
-Pre-commit hook will block commits made with inappropriate versions of git LFS or Unity
+A pre-commit hook will block commits made with inappropriate versions of Git, Git LFS, or Unity
 - git lfs: `git lfs env` in a terminal/console.
 - git: `git --version`
 - Unity: see UnityEditor
@@ -33,5 +33,5 @@ Pre-commit hook will block commits made with inappropriate versions of git LFS o
 4. Open "MainScene", and ensure that "HHSolver" is enabled in the hierarchy. Hodgkin-Huxley simulation code is provided locally within the project along with example 1D and 3D neuron geometries to run on. These should run automatically upon pressing play.
 
 ## Previously developed code
-Previously the code was hosted on Gitlab [here](https://gitlab.com/vr-lab-repos) which still contains useful code for CUDA, compute shaders, Burst examples, OBJ and VTK handling. The code on Bitbucket [here](https://bitbucket.org/c2m2vr/workspace/projects/VIR) is now fully obsolete and replaced by this Github repository. VR grids are maintained [over here](https://github.com/stephanmg/vr-grids). Custom attributes which proved useful during development are maintained [here](https://github.com/stephanmg/vr-utils).
+Code was previously hosted on Gitlab [here](https://gitlab.com/vr-lab-repos). This repo still contains useful code for CUDA, compute shaders, Burst examples, OBJ and VTK handling. The code on Bitbucket [here](https://bitbucket.org/c2m2vr/workspace/projects/VIR) is now fully obsolete and replaced by this Github repository. VR grids are maintained [over here](https://github.com/stephanmg/vr-grids). Custom attributes which proved useful during development are maintained [here](https://github.com/stephanmg/vr-utils).
 
