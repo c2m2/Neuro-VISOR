@@ -33,5 +33,5 @@ Pre-commit hook will block commits made with inappropriate versions of git LFS o
 4. Open "MainScene", and ensure that "HHSolver" is enabled in the hierarchy. Hodgkin-Huxley simulation code is provided locally within the project along with example 1D and 3D neuron geometries to run on. These should run automatically upon pressing play.
 
 ## Previously developed code
-Previously the code was hosted on Gitlab [here](https://gitlab.com/vr-lab-repos) which still contains useful code for CUDA, shaders and VTK handling. The code on Bitbucket [here](https://bitbucket.org/c2m2vr/workspace/projects/VIR) is now full obsolete and replaced by this Github repository. 
+Previously the code was hosted on Gitlab [here](https://gitlab.com/vr-lab-repos) which still contains useful code for CUDA, shaders and VTK handling. The code on Bitbucket [here](https://bitbucket.org/c2m2vr/workspace/projects/VIR) is now fully obsolete and replaced by this Github repository. 
 
