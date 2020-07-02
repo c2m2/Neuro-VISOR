@@ -6,7 +6,7 @@ Our code is documented on [https://c2m2.github.io/](https://c2m2.github.io/)
 and documentation status [here](https://docs.google.com/spreadsheets/d/1Yv1ifSyBR8U7By-VtLxzVEA1oPpJABqbI88LnExnsM4/edit?ts=5ed0051c&pli=1#gid=1378336011)
 
 ## Connect with us
-A blog is hosted at [C2M2 VR](https://c2m2vr.wordpress.com/) provided by Wordpress.
+A blog is hosted at [C2M2 VR](https://c2m2vr.wordpress.com/) provided by Wordpress and [Trello](https://trello.com/b/iQ9aepTn/virtual-reality)
 
 ## Cloning this repository
 Git users (versions < 2.23.0) should clone the repository by using
