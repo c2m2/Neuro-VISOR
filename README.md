@@ -2,7 +2,7 @@
 Repository for Temple University's Center for Computational Mathematics and Modeling's virtual reality project
 
 ## Documentation
-Our code is documented here (https://c2m2.github.io/)
+Our code is documented on [https://c2m2.github.io/](https://c2m2.github.io/)
 
 ## Connect with us
 A blog is hosted at [C2M2 VR](https://c2m2vr.wordpress.com/) provided by Wordpress.
