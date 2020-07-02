@@ -3,6 +3,7 @@ Repository for Temple University's Center for Computational Mathematics and Mode
 
 ## Documentation
 Our code is documented on [https://c2m2.github.io/](https://c2m2.github.io/)
+Documentation status [here](https://docs.google.com/spreadsheets/d/1Yv1ifSyBR8U7By-VtLxzVEA1oPpJABqbI88LnExnsM4/edit?ts=5ed0051c&pli=1#gid=1378336011)
 
 ## Connect with us
 A blog is hosted at [C2M2 VR](https://c2m2vr.wordpress.com/) provided by Wordpress.
