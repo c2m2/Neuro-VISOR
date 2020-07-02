@@ -4,6 +4,9 @@ Repository for Temple University's Center for Computational Mathematics and Mode
 ## Documentation
 Our code is documented here (https://c2m2.github.io/)
 
+## Connect with us
+A blog is hosted at [C2M2 VR](https://c2m2vr.wordpress.com/) provided by Wordpress.
+
 ## Cloning this repository
 Git users (versions < 2.23.0) should clone the repository by using
 `git lfs clone` all other should use `git clone`.
