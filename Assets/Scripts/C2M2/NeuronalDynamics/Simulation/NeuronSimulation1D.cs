@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEditor;
+using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System;
 using C2M2.NeuronalDynamics.UGX;
@@ -8,6 +10,7 @@ using C2M2.Utils.MeshUtils;
 using C2M2.Interaction;
 using C2M2.Simulation;
 using Grid = C2M2.NeuronalDynamics.UGX.Grid;
+
 namespace C2M2.NeuronalDynamics.Simulation
 {
     /// <summary>
@@ -17,26 +20,40 @@ namespace C2M2.NeuronalDynamics.Simulation
     /// 1D Neuron surface simulations should derive from this class.
     /// </remarks>
     public abstract class NeuronSimulation1D : SurfaceSimulation
-    {
+    {   
+        public enum MeshColScaling { x1, x2, x3, x4, x5 }
+        [Header("3D Visualization")]
+        [Tooltip("Which mesh scale to use for the mesh collider used for raycasting. Larger meshes will be easier to interact with, but less accurate")]
+        public MeshColScaling meshColScale = MeshColScaling.x1;
+        public enum RefinementLevel { x0, x1, x2, x3, x4 }
+        public RefinementLevel refinementLevel = RefinementLevel.x1;
+
+        public string cellFile1D = "NULL";
+        public string cellFile3D = "NULL";
+        public string cellFileTriangles = "NULL";
+        public string cellColliderFile3D = "NULL";
+        public string cellColliderFileTriangles = "NULL";
+
         [Header("1D Visualization")]
         public bool visualize1D = false;
         public Color32 color1D = Color.yellow;
         public float lineWidth1D = 0.005f;
+
         protected Grid grid1D;
 
         ///<summary> Lookup a 3D vert and get back two 1D indices and a lambda value for them </summary>
         private Dictionary<int, Tuple<int, int, double>> map;
         private MappingInfo mapping;
-        private string[] cellFileNames;
 
-        // Cell folder names and extensions
-        private readonly string neuronCellFolder = "NeuronalDynamics";
-        private readonly string activeCellFolder = "ActiveCell";
         private readonly string ugxExt = ".ugx";
-        private readonly string cngExt = ".CNG";
+        private readonly string spec3D = "_scaled_x2";
         private readonly string spec1D = "_1d";
         private readonly string specTris = "_tris";
         private readonly string specBlownup = "_blown_up";
+        private string[] cellFileNames;
+        private readonly string neuronCellFolder = "NeuronalDynamics";
+        private readonly string activeCellFolder = "ActiveCell";
+
 
         /// <summary>
         /// Translate 1D vertex values to 3D values and pass them upwards for visualization
@@ -119,37 +136,12 @@ namespace C2M2.NeuronalDynamics.Simulation
 
         protected override void ReadData()
         {
-            cellFileNames = BuildCellFileNames();
+            //cellFileNames = BuildCellFileNames();
             // Read in 1D & 3D data and build a map between them
-            mapping = MapUtils.BuildMap(cellFileNames[1], cellFileNames[0], false, cellFileNames[2]);
+            mapping = MapUtils.BuildMap(cellFile1D, cellFile3D, false, cellFileTriangles);
             map = mapping.Data;
             // Pass the cell to simulation code
             SetNeuronCell(mapping.ModelGeometry);
-
-            string[] BuildCellFileNames()
-            {
-                string[] cells = new string[4];
-                cells[3] = "NULL";
-
-                char slash = Path.DirectorySeparatorChar;
-                string cellPath = Application.streamingAssetsPath + slash + neuronCellFolder + slash + activeCellFolder + slash;
-                // Only take the first cell found
-                cellPath = Directory.GetDirectories(cellPath)[0];
-
-                string[] files = Directory.GetFiles(cellPath);
-                foreach (string file in files)
-                {
-                    // If this isn't a non-metadata ugx file,
-                    if (!file.EndsWith(".meta") && file.EndsWith(ugxExt))
-                    {
-                        if (file.EndsWith(cngExt + ugxExt)) cells[0] = file;    // 3D cell
-                        else if (file.EndsWith(cngExt + spec1D + ugxExt)) cells[1] = file;  // 1D cell
-                        else if (file.EndsWith(cngExt + specTris + ugxExt)) cells[2] = file;    // Triangles
-                        else if (file.EndsWith(cngExt + specBlownup + ugxExt)) cells[3] = file;    // Blown up mesh
-                    }
-                }
-                return cells;
-            }
         }
 
         /// <summary>
@@ -158,13 +150,12 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// <returns> Unity Mesh visualization of the 3D geometry. </returns>
         protected override Mesh BuildVisualization()
         {            
-
             Mesh newMesh = new Mesh();
             if (!dryRun)
             {
                 newMesh = Clean3DCell();
                 if (visualize1D) Render1DCell();
-                CheckForCustomCollider();
+                BuildMeshCollider();
             }
 
             return newMesh;
@@ -181,15 +172,15 @@ namespace C2M2.NeuronalDynamics.Simulation
                 Grid geom1D = mapping.ModelGeometry;
                 GameObject lines1D = gameObject.AddComponent<LinesRenderer>().Constr(geom1D, color1D, lineWidth1D);
             }
-            void CheckForCustomCollider()
+            void BuildMeshCollider()
             {
-                // If a blownup mesh file is given, read it in and apply it
-                if (!cellFileNames[3].Equals("NULL"))
-                {
-                    Mesh blownupMesh = MapUtils.BuildMap(cellFileNames[3], cellFileNames[0], false, cellFileNames[2]).SurfaceGeometry.Mesh;
-                    MeshColController meshColController = gameObject.AddComponent<MeshColController>();
-                    meshColController.mesh = blownupMesh;
-                }
+                Mesh blownupMesh = MapUtils.BuildMap(cellColliderFile3D, 
+                    cellFile1D, 
+                    false, 
+                    cellColliderFileTriangles).SurfaceGeometry.Mesh;
+
+                MeshColController meshColController = gameObject.AddComponent<MeshColController>();
+                meshColController.Mesh = blownupMesh;
             }
         }
     }

@@ -38,8 +38,11 @@ namespace C2M2.Visualization.VR
         private void Awake()
         {
             DisableAvatar();
-            InitUI();
             StartCoroutine(ResolveMovement());
+        }
+        private void Start()
+        {
+            InitUI();
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////

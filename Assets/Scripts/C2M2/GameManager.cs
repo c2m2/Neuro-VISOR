@@ -13,11 +13,8 @@ namespace C2M2
     {
         public static GameManager instance = null;
 
-        public int mainThreadId = -1;
-        public string assetsPath = null;
-        [HideInInspector]
-        public bool useVirtualReality;
-
+        public int mainThreadId { get; private set; } = -1;
+        public string assetsPath { get; private set; } = null;
 
         [Header("Environment")]
         public Material defaultMaterial;
@@ -52,8 +49,8 @@ namespace C2M2
             if (instance == null) { instance = this; }
             else if (instance != this) { Destroy(this); }
             // Initialize keyboard
-            raycastKeyboardPrefab = Instantiate(raycastKeyboardPrefab, new Vector3(50, 50, 50), Quaternion.identity);
-            raycastKeyboard = raycastKeyboardPrefab.GetComponent<RaycastKeyboard>();
+            //raycastKeyboardPrefab = Instantiate(raycastKeyboardPrefab, new Vector3(50, 50, 50), Quaternion.identity);
+            //raycastKeyboard = raycastKeyboardPrefab.GetComponent<RaycastKeyboard>();
             isRunning = true;
 
         }

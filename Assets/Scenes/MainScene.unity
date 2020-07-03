@@ -596,10 +596,28 @@ MonoBehaviour:
     type: 3}
   m_PrefabInstance: {fileID: 1246904545894575464}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 475776573}
   m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0950df82e7936c84983497630bde5b54, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!1 &475776573 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1246904545451624249, guid: 3cd62f4122818be4585249f5083a977d,
+    type: 3}
+  m_PrefabInstance: {fileID: 1246904545894575464}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &475776574
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 475776573}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa07bcb39fe2e964ea18737becf33bd0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &509701296
@@ -1317,6 +1335,50 @@ Transform:
   m_Father: {fileID: 269422884}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 72.158005, y: -183.54799, z: -320.99}
+--- !u!1 &827762885
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 827762887}
+  - component: {fileID: 827762886}
+  m_Layer: 0
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &827762886
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 827762885}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 055d7e1d2cd5f604b9a7b4ac0505726d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  choice: foobar
+--- !u!4 &827762887
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 827762885}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -8.227389, y: -4.2894387, z: -1.5993307}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 7
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &836224700
 GameObject:
   m_ObjectHideFlags: 0
@@ -1479,6 +1541,13 @@ MonoBehaviour:
   extremaMethod: 2
   globalMax: -Infinity
   globalMin: Infinity
+  meshColScale: 0
+  refinementLevel: 1
+  cellFile1D: C:/Users/jacob/Desktop/C2M2/virtual-reality/Assets/StreamingAssets\NeuronalDynamics\ActiveCell\Cell2-0a\1xDiameter\Cell0-2a-1ref\0-2a.CNG_1d.ugx
+  cellFile3D: 
+  cellFileTriangles: C:/Users/jacob/Desktop/C2M2/virtual-reality/Assets/StreamingAssets\NeuronalDynamics\ActiveCell\Cell2-0a\1xDiameter\Cell0-2a-1ref\0-2a.CNG_tris.ugx
+  cellColliderFile3D: NULL
+  cellColliderFileTriangles: C:/Users/jacob/Desktop/C2M2/virtual-reality/Assets/StreamingAssets\NeuronalDynamics\ActiveCell\Cell2-0a\1xDiameter\Cell0-2a-1ref\0-2a.CNG_tris.ugx
   visualize1D: 0
   color1D:
     serializedVersion: 2
@@ -2020,7 +2089,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1601653133
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2504,6 +2573,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: OVRPlayerController
       objectReference: {fileID: 0}
+    - target: {fileID: 1246904545451624253, guid: 3cd62f4122818be4585249f5083a977d,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1246904545451624240, guid: 3cd62f4122818be4585249f5083a977d,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -2572,6 +2646,16 @@ PrefabInstance:
     - target: {fileID: 1246904545557568982, guid: 3cd62f4122818be4585249f5083a977d,
         type: 3}
       propertyPath: m_BackGroundColor.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1246904545451624250, guid: 3cd62f4122818be4585249f5083a977d,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1246904545451624251, guid: 3cd62f4122818be4585249f5083a977d,
+        type: 3}
+      propertyPath: m_Enabled
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents:

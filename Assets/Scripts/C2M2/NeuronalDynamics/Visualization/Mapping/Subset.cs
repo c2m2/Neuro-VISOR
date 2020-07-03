@@ -63,6 +63,6 @@ namespace C2M2.NeuronalDynamics.UGX
         /// </summary>
         /// <returns> string </returns>
         /// Returns the string representation
-        public override string ToString() => return $"Subset >>{Name}<< has vertex indices >>{string.Join(", ", Indices)}<<";
+        public override string ToString() => $"Subset >>{Name}<< has vertex indices >>{string.Join(", ", Indices)}<<";
     }
 }

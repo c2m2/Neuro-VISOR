@@ -10,24 +10,26 @@ namespace C2M2.Visualization.VR
     /// Make sure that a VR device is loaded before using OVRPlayerController.
     /// If none is loaded, add VR emulation tools
     /// </summary>
-    [RequireComponent(typeof(OVRHeadsetEmulator))]
+    [RequireComponent(typeof(MovingOVRHeadsetEmulator))]
     [RequireComponent(typeof(MouseEventSignaler))]
     [RequireComponent(typeof(OVRPlayerController))]
+    [ExecuteInEditMode]
     public class VRDeviceManager : MonoBehaviour
     {
-        private void Awake()
+        private MovingOVRHeadsetEmulator emulator;
+        private MouseEventSignaler signaler;
+        private OVRPlayerController playerController;
+
+        private void Update()
         {
-            ResolveDeviceState();
-            Destroy(this);
-        }
-        private void ResolveDeviceState()
-        {
-            // If there is no VR device loaded, enable emulator
-            bool emulatorEnabled = false;
-            if (XRSettings.loadedDeviceName == "") emulatorEnabled = true;
-            GetComponent<OVRHeadsetEmulator>().enabled = emulatorEnabled;
-            GetComponent<MouseEventSignaler>().enabled = emulatorEnabled;
-            GetComponent<OVRPlayerController>().enabled = !emulatorEnabled;
+            if (Application.isPlaying) Destroy(this);
+
+            emulator = GetComponent<MovingOVRHeadsetEmulator>();
+            signaler = GetComponent<MouseEventSignaler>();
+            playerController = GetComponent<OVRPlayerController>();
+
+            emulator.enabled = !playerController.enabled;
+            signaler.enabled = !playerController.enabled;
         }
     }
 }
