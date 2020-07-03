@@ -3,14 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using System.IO;
+using System;
 
 namespace C2M2.NeuronalDynamics.Simulation
 {
+    /// <summary>
+    /// Provides editor features so that users can more easily select neuron cells and options for them
+    /// </summary>
     [CustomEditor(typeof(NeuronSimulation1D), true)]
     public class NeuronSimulation1DEditor : Editor
     {
-        string[] _cellOptions = new[] { "NULL" };
-        int _cellIndex = 0;
 
         private readonly char slash = Path.DirectorySeparatorChar;
         private readonly string activeCellFolder = "ActiveCell";
@@ -23,44 +25,50 @@ namespace C2M2.NeuronalDynamics.Simulation
 
         public override void OnInspectorGUI()
         {
+            // Skip all of this if we're in runtime
             if (!Application.isPlaying)
             {
                 var neuronSimulation = target as NeuronSimulation1D;
 
-                string basePath;
-                string rendCellPath = Application.streamingAssetsPath + slash + neuronCellFolder + slash + activeCellFolder + slash;
+                string basePath = Application.streamingAssetsPath + slash + neuronCellFolder + slash + activeCellFolder + slash;
 
-                _cellOptions = Directory.GetDirectories(rendCellPath);
+                string[] _cellOptions = new[] { "No cells found" };
+                _cellOptions = BuildCellOptions(basePath);
 
+                // Build dropdown menu
+                int _cellIndex = 0;
                 _cellIndex = EditorGUILayout.Popup("Neuron Cell Source", _cellIndex, _cellOptions);
 
-                rendCellPath = _cellOptions[_cellIndex] + slash;
+                // Build path from menu selection
+                string cellVizPath = basePath + slash + _cellOptions[_cellIndex] + slash;
 
-                string colCellPath = rendCellPath;
+                // Find diameter selections for rendering and interaction
+                string cellColPath = cellVizPath;
                 switch (neuronSimulation.meshColScale)
                 {
                     case NeuronSimulation1D.MeshColScaling.x1:
-                        colCellPath += "1xDiameter" + slash;
+                        cellColPath += "1xDiameter" + slash;
                         break;
                     case NeuronSimulation1D.MeshColScaling.x2:
-                        colCellPath += "2xDiameter" + slash;
+                        cellColPath += "2xDiameter" + slash;
                         break;
                     case NeuronSimulation1D.MeshColScaling.x3:
-                        colCellPath += "3xDiameter" + slash;
+                        cellColPath += "3xDiameter" + slash;
                         break;
                     case NeuronSimulation1D.MeshColScaling.x4:
-                        colCellPath += "4xDiameter" + slash;
+                        cellColPath += "4xDiameter" + slash;
                         break;
                     case NeuronSimulation1D.MeshColScaling.x5:
-                        colCellPath += "5xDiameter" + slash;
+                        cellColPath += "5xDiameter" + slash;
                         break;
                     default:
                         Debug.LogError("ERROR");
                         break;
                 }
+                cellVizPath += "1xDiameter";
 
-                rendCellPath += "1xDiameter";
 
+                // Find refinement levels for rendering and interaction
                 string identifier = "x";
                 switch (neuronSimulation.refinementLevel)
                 {
@@ -83,29 +91,27 @@ namespace C2M2.NeuronalDynamics.Simulation
                         Debug.LogError("ERROR");
                         break;
                 }
-
-                string[] rendRefinementOptions = Directory.GetDirectories(rendCellPath);
-                string[] colRefinementOptions = Directory.GetDirectories(colCellPath);
+                string[] rendRefinementOptions = Directory.GetDirectories(cellVizPath);
+                string[] colRefinementOptions = Directory.GetDirectories(cellColPath);
 
                 for (int i = 0; i < rendRefinementOptions.Length; i++)
                 {
                     if (rendRefinementOptions[i].EndsWith(identifier))
                     {
-                        rendCellPath = rendRefinementOptions[i];
+                        cellVizPath = rendRefinementOptions[i];
                     }
                 }
                 for (int i = 0; i < colRefinementOptions.Length; i++)
                 {
                     if (colRefinementOptions[i].EndsWith(identifier))
                     {
-                        colCellPath = colRefinementOptions[i];
+                        cellColPath = colRefinementOptions[i];
                     }
                 }
 
+                // Get 1D, 3D, triangle files for rendering
                 string[] cellNames = new string[5];
-
-                // Get simulation and rendering files
-                string[] files = Directory.GetFiles(rendCellPath);
+                string[] files = Directory.GetFiles(cellVizPath);
                 foreach (string file in files)
                 {
                     // If this isn't a non-metadata ugx file,
@@ -120,7 +126,7 @@ namespace C2M2.NeuronalDynamics.Simulation
                 // Get interaction files
                 cellNames[3] = "NULL"; // Blown up mesh default
                 cellNames[4] = "NULL"; // Blown up mesh triangles default
-                files = Directory.GetFiles(colCellPath);
+                files = Directory.GetFiles(cellColPath);
 
                 foreach (string file in files)
                 {
@@ -133,21 +139,31 @@ namespace C2M2.NeuronalDynamics.Simulation
                     }
                 }
 
-
+                // Set file names in simulation script
                 neuronSimulation.cellFile3D = cellNames[0];
                 neuronSimulation.cellFile1D = cellNames[1];
                 neuronSimulation.cellFileTriangles = cellNames[2];
                 neuronSimulation.cellColliderFile3D = cellNames[3];
                 neuronSimulation.cellColliderFileTriangles = cellNames[4];
-
-                // Update the selected choice in the underlying object
-                //someClass.choice = _choices[_choiceIndex];
-
-                // Save the changes back to the object
-                //EditorUtility.SetDirty(target);
             }
+
             // Draw the default inspector
             DrawDefaultInspector();
+
+            return;
+
+            string[] BuildCellOptions(string basePath)
+            {
+                // Separate cell option names from full paths
+                string[] allPaths = Directory.GetDirectories(basePath);
+                string[] allPathEnds = new string[allPaths.Length];
+                for (int i = 0; i < allPaths.Length; i++)
+                {
+                    int pos = allPaths[i].LastIndexOf(slash) + 1;
+                    allPathEnds[i] = allPaths[i].Substring(pos, allPaths[i].Length - pos);
+                }
+                return allPathEnds;
+            }
 
         }
     }

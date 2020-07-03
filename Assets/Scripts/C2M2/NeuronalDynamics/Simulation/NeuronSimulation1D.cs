@@ -150,15 +150,15 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// <returns> Unity Mesh visualization of the 3D geometry. </returns>
         protected override Mesh BuildVisualization()
         {            
-            Mesh newMesh = new Mesh();
+            Mesh cellMesh = new Mesh();
             if (!dryRun)
             {
-                newMesh = Clean3DCell();
+                cellMesh = Clean3DCell();
                 if (visualize1D) Render1DCell();
                 BuildMeshCollider();
             }
 
-            return newMesh;
+            return cellMesh;
 
             Mesh Clean3DCell()
             {
@@ -174,13 +174,21 @@ namespace C2M2.NeuronalDynamics.Simulation
             }
             void BuildMeshCollider()
             {
-                Mesh blownupMesh = MapUtils.BuildMap(cellColliderFile3D, 
-                    cellFile1D, 
-                    false, 
-                    cellColliderFileTriangles).SurfaceGeometry.Mesh;
-
                 MeshColController meshColController = gameObject.AddComponent<MeshColController>();
-                meshColController.Mesh = blownupMesh;
+                // Use 1x scaling as the default case
+                if (meshColScale == MeshColScaling.x1 || cellColliderFile3D == "NULL" || cellColliderFileTriangles == "NULL")
+                {
+                    meshColController.Mesh = cellMesh;
+                }
+                else
+                {
+                    Mesh blownupMesh = MapUtils.BuildMap(cellColliderFile3D,
+                        cellFile1D,
+                        false,
+                        cellColliderFileTriangles).SurfaceGeometry.Mesh;
+
+                    meshColController.Mesh = blownupMesh;
+                }
             }
         }
     }
