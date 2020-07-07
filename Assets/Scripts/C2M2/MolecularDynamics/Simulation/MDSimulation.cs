@@ -15,6 +15,7 @@ namespace C2M2.MolecularDynamics.Simulation
     {
         public Transform a { get; private set; }
         public Transform b { get; private set; }
+
         LineRenderer renderer;
         public BondRenderer(Transform a, Transform b, float width = 1f)
         {
@@ -27,6 +28,7 @@ namespace C2M2.MolecularDynamics.Simulation
             renderer.endWidth = width;
             renderer.startColor = Color.black;
             renderer.endColor = Color.black;
+
             Update();
         }
         public void Update() => renderer.SetPositions(new Vector3[] { a.position, b.position });
@@ -73,6 +75,12 @@ namespace C2M2.MolecularDynamics.Simulation
         public int timestepCount = 50000;
         public float timestepSize = .1f;
         public float gamma = 0.1f;
+
+        // TODO: This needs to be read from a separate data file
+        public float boxLengthX = 58.065f;
+        public float boxLengthY = 58.065f;
+        public float boxLengthZ = 58.065f;
+
         protected float c = -1;
 
         protected Dictionary<Transform, int> particleLookup;
@@ -101,8 +109,7 @@ namespace C2M2.MolecularDynamics.Simulation
             mass = psfFile.mass;
             bonds = psfFile.bonds;
             angles = psfFile.angles;
-            types = psfFile.types;
-            
+            types = psfFile.types;       
 
             // Convert bonds and angles to 0 base
             for (int i = 0; i < bonds.Length; i++) bonds[i] = bonds[i] - 1;
@@ -275,7 +282,10 @@ namespace C2M2.MolecularDynamics.Simulation
                 int j = 0;
                 for (int i = 0; i < bonds.Length - 1; i += 2)
                 {
-                    bondRenderers[j] = new BondRenderer(sphereTransforms[bonds[i]], sphereTransforms[bonds[i + 1]], 0.001f);
+                    bondRenderers[j] = new BondRenderer(
+                        sphereTransforms[bonds[i]], 
+                        sphereTransforms[bonds[i + 1]], 
+                        0.001f);
                     j++;
                 }
             }
@@ -292,7 +302,10 @@ namespace C2M2.MolecularDynamics.Simulation
         protected override void UpdateVisChild(in Vector3[] simulationValues)
         {
             if (bondRenderers == null) return;
-            for(int i = 0; i < bondRenderers.Length; i++) bondRenderers[i].Update();
+            for (int i = 0; i < bondRenderers.Length; i++)
+            {
+                bondRenderers[i].Update();
+            }
         }
     }
 }

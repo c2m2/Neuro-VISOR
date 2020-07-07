@@ -16,11 +16,6 @@ namespace C2M2.MolecularDynamics.Simulation
         public float kappa = 6f;
         public float r0 = 3.65f;
 
-        // TODO: This needs to be read from a separate data file
-        public float boxLengthX = 58.065f;
-        public float boxLengthY = 58.065f;
-        public float boxLengthZ = 58.065f;
-
         private int[][] angle_topo = null;
 
         private Vector3[] force = null;
