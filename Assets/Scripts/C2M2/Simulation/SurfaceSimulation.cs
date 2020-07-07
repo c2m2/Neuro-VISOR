@@ -8,14 +8,17 @@ namespace C2M2.Simulation
     /// <summary>
     /// Simulation of type double[] for visualizing scalar fields on mesh surfaces
     /// </summary>
+    [RequireComponent(typeof(MeshFilter))]
+    [RequireComponent(typeof(MeshRenderer))]
     public abstract class SurfaceSimulation : Simulation<double[], Mesh>
     {
         #region Variables
-        public override Mesh viz { get; protected set; }
+
         /// <summary>
         /// Gradient for coloring each surface point based on their scalar values
         /// </summary>
         public Gradient gradient;
+
         /// <summary>
         /// Lookup table for more efficient color calculations on the gradient
         /// </summary>
@@ -26,6 +29,8 @@ namespace C2M2.Simulation
         public float globalMax = float.NegativeInfinity;
         [Tooltip("Must be set if extremaMethod is set to GlobalExtrema")]
         public float globalMin = float.PositiveInfinity;
+
+        protected Mesh colliderMesh = null;
 
         private MeshFilter mf;
         private MeshRenderer mr;
@@ -45,34 +50,34 @@ namespace C2M2.Simulation
         protected override void UpdateVisualization(in double[] newValues) => UpdateVisualization(newValues.ToFloat());
 
         #region Unity Methods
-        protected sealed override void OnAwake()
+        protected sealed override void OnAwake(Mesh viz)
         {
             if (!dryRun)
             {
-                InitMat();
-
-                InitColors();
-
-                mf.sharedMesh = viz;
-                VRRaycastableMesh raycastable = gameObject.AddComponent<VRRaycastableMesh>();
-                raycastable.SetSource(viz);
-
-                // Add custom grabbable here
-            }
-            return;
-
-            void InitMat()
-            {
                 // Safe check for existing MeshFilter, MeshRenderer
                 mf = GetComponent<MeshFilter>();
-                if (mf == null) mf = gameObject.AddComponent<MeshFilter>();
+                if(mf == null) mf = gameObject.AddComponent<MeshFilter>();
+                mf.sharedMesh = viz;
 
                 mr = GetComponent<MeshRenderer>();
                 if (mr == null) mr = gameObject.AddComponent<MeshRenderer>();
 
                 // Ensure the renderer has a vertex coloring material     
                 mr.material = GameManager.instance.vertexColorationMaterial;
+
+                InitColors();
+                
+                VRRaycastableMesh raycastable = gameObject.AddComponent<VRRaycastableMesh>();
+
+                Debug.Log(colliderMesh.name);
+                if (colliderMesh != null) raycastable.SetSource(colliderMesh);
+                else raycastable.SetSource(viz);
+
+                // Add custom grabbable here
+
             }
+            return;
+
             void InitColors()
             {
                 // Initialize the color lookup table

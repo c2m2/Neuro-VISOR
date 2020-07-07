@@ -1476,130 +1476,6 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 5843646974765894135}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &884125480
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 884125482}
-  - component: {fileID: 884125484}
-  - component: {fileID: 884125481}
-  m_Layer: 0
-  m_Name: HHSolver
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &884125481
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 884125480}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5d02d90e177c4004aadf43a897cf3e8a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  interactionType: 0
-  dryRun: 0
-  startOnAwake: 1
-  gradient:
-    serializedVersion: 2
-    key0: {r: 0, g: 0, b: 1, a: 1}
-    key1: {r: 0, g: 1, b: 1, a: 1}
-    key2: {r: 0, g: 1, b: 0, a: 0}
-    key3: {r: 1, g: 1, b: 0, a: 0}
-    key4: {r: 1, g: 0, b: 0, a: 0}
-    key5: {r: 0, g: 0, b: 0, a: 0}
-    key6: {r: 0, g: 0, b: 0, a: 0}
-    key7: {r: 0, g: 0, b: 0, a: 0}
-    ctime0: 0
-    ctime1: 16384
-    ctime2: 32768
-    ctime3: 49151
-    ctime4: 65535
-    ctime5: 0
-    ctime6: 0
-    ctime7: 0
-    atime0: 0
-    atime1: 65535
-    atime2: 0
-    atime3: 0
-    atime4: 0
-    atime5: 0
-    atime6: 0
-    atime7: 0
-    m_Mode: 0
-    m_NumColorKeys: 5
-    m_NumAlphaKeys: 2
-  extremaMethod: 2
-  globalMax: -Infinity
-  globalMin: Infinity
-  meshColScale: 0
-  refinementLevel: 1
-  cellFile1D: C:/Users/jacob/Desktop/C2M2/virtual-reality/Assets/StreamingAssets\NeuronalDynamics\ActiveCell\Cell2-0a\1xDiameter\Cell0-2a-1ref\0-2a.CNG_1d.ugx
-  cellFile3D: 
-  cellFileTriangles: C:/Users/jacob/Desktop/C2M2/virtual-reality/Assets/StreamingAssets\NeuronalDynamics\ActiveCell\Cell2-0a\1xDiameter\Cell0-2a-1ref\0-2a.CNG_tris.ugx
-  cellColliderFile3D: NULL
-  cellColliderFileTriangles: C:/Users/jacob/Desktop/C2M2/virtual-reality/Assets/StreamingAssets\NeuronalDynamics\ActiveCell\Cell2-0a\1xDiameter\Cell0-2a-1ref\0-2a.CNG_tris.ugx
-  visualize1D: 0
-  color1D:
-    serializedVersion: 2
-    rgba: 4278512639
-  lineWidth1D: 0.005
-  vstart: 55
-  endTime: 100
-  h: 0.27
-  k: 0.0027
-  HK_auto: 1
-  SomaOn: 1
-  numRuns: 0
-  randomPermute: 0
-  printMatrices: 0
-  printCellInfo: 0
-  printVolt_time: 1
-  res: 0.3
-  cap: 0.3
-  ni: 0.317677
-  mi: 0.0529325
-  hi: 0.596121
-  k_ONOFF: 1
-  gk: 36
-  ek: -2
-  na_ONOFF: 1
-  gna: 153
-  ena: 120
-  leak_ONOFF: 1
-  gl: 0.3
-  el: -10
---- !u!4 &884125482
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 884125480}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 4
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!33 &884125484
-MeshFilter:
-  m_ObjectHideFlags: 2
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 884125480}
-  m_Mesh: {fileID: 0}
 --- !u!1 &905720990 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5843646973417418017, guid: 70469a93359ee8b4e98c4c445b157af9,
@@ -2252,6 +2128,168 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1818162879
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1818162883}
+  - component: {fileID: 1818162882}
+  - component: {fileID: 1818162881}
+  - component: {fileID: 1818162880}
+  m_Layer: 0
+  m_Name: HHSolver
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1818162880
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1818162879}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d02d90e177c4004aadf43a897cf3e8a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  interactionType: 0
+  dryRun: 0
+  startOnAwake: 1
+  gradient:
+    serializedVersion: 2
+    key0: {r: 0, g: 0, b: 1, a: 1}
+    key1: {r: 0, g: 1, b: 1, a: 1}
+    key2: {r: 0, g: 1, b: 0, a: 0}
+    key3: {r: 1, g: 1, b: 0, a: 0}
+    key4: {r: 1, g: 0, b: 0, a: 0}
+    key5: {r: 0, g: 0, b: 0, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 0
+    ctime1: 16384
+    ctime2: 32768
+    ctime3: 49151
+    ctime4: 65535
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_NumColorKeys: 5
+    m_NumAlphaKeys: 2
+  extremaMethod: 2
+  globalMax: -Infinity
+  globalMin: Infinity
+  meshColScale: 3
+  refinementLevel: 1
+  cellFile1D: C:/Users/jacob/Desktop/C2M2/virtual-reality/Assets/StreamingAssets\NeuronalDynamics\ActiveCell\\Cell2-0a\1xDiameter\Cell0-2a-1ref\0-2a.CNG_1d.ugx
+  cellFile3D: C:/Users/jacob/Desktop/C2M2/virtual-reality/Assets/StreamingAssets\NeuronalDynamics\ActiveCell\\Cell2-0a\1xDiameter\Cell0-2a-1ref\0-2a.CNG.ugx
+  cellFileTriangles: C:/Users/jacob/Desktop/C2M2/virtual-reality/Assets/StreamingAssets\NeuronalDynamics\ActiveCell\\Cell2-0a\1xDiameter\Cell0-2a-1ref\0-2a.CNG_tris.ugx
+  cellColliderFile3D: C:/Users/jacob/Desktop/C2M2/virtual-reality/Assets/StreamingAssets\NeuronalDynamics\ActiveCell\\Cell2-0a\4xDiameter\Cell2-0a-1ref\0-2a.CNG.ugx
+  cellColliderFileTriangles: C:/Users/jacob/Desktop/C2M2/virtual-reality/Assets/StreamingAssets\NeuronalDynamics\ActiveCell\\Cell2-0a\4xDiameter\Cell2-0a-1ref\0-2a.CNG_tris.ugx
+  visualize1D: 0
+  color1D:
+    serializedVersion: 2
+    rgba: 4278512639
+  lineWidth1D: 0.005
+  vstart: 55
+  endTime: 100
+  h: 0.27
+  k: 0.0027
+  HK_auto: 1
+  SomaOn: 1
+  numRuns: 0
+  randomPermute: 0
+  printMatrices: 0
+  printCellInfo: 0
+  printVolt_time: 1
+  res: 0.3
+  cap: 0.3
+  ni: 0.317677
+  mi: 0.0529325
+  hi: 0.596121
+  k_ONOFF: 1
+  gk: 36
+  ek: -2
+  na_ONOFF: 1
+  gna: 153
+  ena: 120
+  leak_ONOFF: 1
+  gl: 0.3
+  el: -10
+--- !u!23 &1818162881
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1818162879}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+--- !u!33 &1818162882
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1818162879}
+  m_Mesh: {fileID: 0}
+--- !u!4 &1818162883
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1818162879}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -3.7807403, y: -0.59996116, z: -6.792868}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1830012931
 GameObject:

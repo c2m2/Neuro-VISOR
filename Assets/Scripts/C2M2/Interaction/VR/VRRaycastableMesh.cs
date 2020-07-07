@@ -38,6 +38,7 @@ namespace C2M2.Interaction.VR
             MeshFilter mf = gameObject.GetComponent<MeshFilter>();
             Mesh mesh = gameObject.GetComponent<MeshFilter>().mesh;
             if (mesh == null) throw new MeshNotFoundException();
+
             BuildMeshCollider(gameObject, raycastTargetObj, mesh);
             raycastTargetObj.AddComponent<Utils.DebugUtils.Actions.TransformResetter>().targetFrame = 2;
         }

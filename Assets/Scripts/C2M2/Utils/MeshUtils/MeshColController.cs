@@ -33,6 +33,7 @@ namespace C2M2.Utils.MeshUtils
 
                 // Apply new mesh
                 if (meshCol != null) meshCol.sharedMesh = mesh;
+                else Debug.LogError("Could not find mesh collider.");
             }
         }
     }

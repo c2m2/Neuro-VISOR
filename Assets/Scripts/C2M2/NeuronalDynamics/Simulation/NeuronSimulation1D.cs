@@ -46,14 +46,11 @@ namespace C2M2.NeuronalDynamics.Simulation
         private MappingInfo mapping;
 
         private readonly string ugxExt = ".ugx";
-        private readonly string spec3D = "_scaled_x2";
         private readonly string spec1D = "_1d";
         private readonly string specTris = "_tris";
-        private readonly string specBlownup = "_blown_up";
-        private string[] cellFileNames;
         private readonly string neuronCellFolder = "NeuronalDynamics";
         private readonly string activeCellFolder = "ActiveCell";
-
+        private string[] cellFileNames;
 
         /// <summary>
         /// Translate 1D vertex values to 3D values and pass them upwards for visualization
@@ -136,10 +133,10 @@ namespace C2M2.NeuronalDynamics.Simulation
 
         protected override void ReadData()
         {
-            //cellFileNames = BuildCellFileNames();
             // Read in 1D & 3D data and build a map between them
             mapping = MapUtils.BuildMap(cellFile1D, cellFile3D, false, cellFileTriangles);
             map = mapping.Data;
+
             // Pass the cell to simulation code
             SetNeuronCell(mapping.ModelGeometry);
         }
@@ -167,28 +164,66 @@ namespace C2M2.NeuronalDynamics.Simulation
                 mesh.RecalculateNormals();
                 return mesh;
             }
+
             void Render1DCell()
             {
                 Grid geom1D = mapping.ModelGeometry;
                 GameObject lines1D = gameObject.AddComponent<LinesRenderer>().Constr(geom1D, color1D, lineWidth1D);
             }
-            void BuildMeshCollider()
+
+            // Returns whichever mesh is used for the mesh collider
+            Mesh BuildMeshCollider()
             {
                 MeshColController meshColController = gameObject.AddComponent<MeshColController>();
+
+                // Build blownup mesh name
+                string scale = "";
+                switch (meshColScale)
+                {
+                    case (MeshColScaling.x1):
+                        scale = "x1";
+                        break;
+                    case (MeshColScaling.x2):
+                        scale = "x2";
+                        break;
+                    case (MeshColScaling.x3):
+                        scale = "x3";
+                        break;
+                    case (MeshColScaling.x4):
+                        scale = "x4";
+                        break;
+                    case (MeshColScaling.x5):
+                        scale = "x5";
+                        break;
+                    default:
+                        Debug.LogError("Cannot resolve mesh scale");
+                        break;
+                }
+
+                Mesh blownupMesh = null;
+
                 // Use 1x scaling as the default case
                 if (meshColScale == MeshColScaling.x1 || cellColliderFile3D == "NULL" || cellColliderFileTriangles == "NULL")
                 {
-                    meshColController.Mesh = cellMesh;
+                    blownupMesh = cellMesh;
+                    blownupMesh.name = blownupMesh.name + scale;
                 }
                 else
                 {
-                    Mesh blownupMesh = MapUtils.BuildMap(cellColliderFile3D,
+                    blownupMesh = MapUtils.BuildMap(cellColliderFile3D,
                         cellFile1D,
                         false,
                         cellColliderFileTriangles).SurfaceGeometry.Mesh;
 
-                    meshColController.Mesh = blownupMesh;
+                    
                 }
+
+                blownupMesh.name = blownupMesh.name + scale;
+
+                // Pass blownupMesh upwards to SurfaceSimulation
+                colliderMesh = blownupMesh;
+
+                return blownupMesh;
             }
         }
     }

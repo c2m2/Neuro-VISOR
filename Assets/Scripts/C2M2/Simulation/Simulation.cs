@@ -46,7 +46,7 @@ namespace C2M2.Simulation
         /// </remarks>
         protected abstract VizType BuildVisualization();
 
-        public abstract VizType viz { get; protected set; }
+        public VizType viz { get; protected set; }
 
         /// <summary>
         /// Read/initialize data here. ReadData is called before BuildVisualization
@@ -98,7 +98,7 @@ namespace C2M2.Simulation
             }
 
             // Run child awake methods first
-            OnAwake();
+            OnAwake(viz);
 
             if (startOnAwake) StartSimulation();
 
@@ -149,7 +149,7 @@ namespace C2M2.Simulation
             }
         }
         // Allow derived classes to run code in Awake/Start/Update if they choose
-        protected virtual void OnAwake() { }
+        protected virtual void OnAwake(VizType viz) { }
         protected virtual void OnStart() { }
         protected virtual void OnUpdate() { }
 
