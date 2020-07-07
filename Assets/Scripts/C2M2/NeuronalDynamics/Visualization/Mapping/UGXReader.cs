@@ -18,6 +18,7 @@ namespace C2M2.NeuronalDynamics.UGX
     /// <summary>
     /// Simple UGX reader class
     /// </summary>
+    /// Methods provided below will allow to read in UGX grids into Unity Meshes with additional / arbitrary attachment data
     public static class UGXReader
     {
         private static readonly byte MAPPING_FIELDS = 7;
@@ -45,6 +46,7 @@ namespace C2M2.NeuronalDynamics.UGX
 
         /// ReadUGX
         /// <summary>
+	/// Helper method to test a static grid
         /// </summary>
         /// <param name="grid"></param>
         /// <returns></returns>
@@ -58,7 +60,7 @@ namespace C2M2.NeuronalDynamics.UGX
         /// <summary>
         /// </summary>
         /// <param name="filename"> name of UGX file on disk </param>
-        /// <returns> </returns>
+ 	/// <PARAM NAME="grid"> grid instance </param>
         public static void ReadUGX(in string filename, ref Grid grid)
         {
             if (!UGX_EXTENSION.Equals(Path.GetExtension(filename), StringComparison.InvariantCultureIgnoreCase))
@@ -116,7 +118,7 @@ namespace C2M2.NeuronalDynamics.UGX
                                 vertices = new Vector3[size];
                                 for (int i = 0; i < size; i++)
                                 {
-                                    /// TOOD: Right/left handed coordinate system in UGX format? Matches Unity's?
+                                    /// Note: Be careful: Right/left handed coordinate systems need to match (UGX grid vs Unity Mesh!)
                                     vertices[i] = new Vector3(indices[i * 3], indices[i * 3 + 1], indices[i * 3 + 2]);
                                     grid.Vertices.Add(new Vertex(i));
                                 }
@@ -133,7 +135,7 @@ namespace C2M2.NeuronalDynamics.UGX
                                 List<Edge> edges = new List<Edge>(size);
                                 for (int i = 0; i < size; i++)
                                 {
-                                    //edges.Add(new Edge(new Vertex(indices[i * 2]), new Vertex(indices[(i * 2) + 1])));
+                                    // edges.Add(new Edge(new Vertex(indices[i * 2]), new Vertex(indices[(i * 2) + 1])));
                                     edges.Add(new Edge(grid.Vertices[indices[(i * 2)]], grid.Vertices[indices[(i * 2) + 1]]));
                                     grid.Vertices[indices[i * 2]].Neighbors.Add(grid.Vertices[indices[(i * 2) + 1]]);
                                     grid.Vertices[indices[(i * 2) + 1]].Neighbors.Add(grid.Vertices[indices[(i * 2)]]);
@@ -256,10 +258,8 @@ namespace C2M2.NeuronalDynamics.UGX
                                                 accessor[index] = new SynapseData(new UndefSynapse());
                                                 fieldIndex++;
                                                 break;
-
                                         }
                                     }
-
                                 }
 
                                 //////////////////////////////////////////////////////////////////////////////////////////

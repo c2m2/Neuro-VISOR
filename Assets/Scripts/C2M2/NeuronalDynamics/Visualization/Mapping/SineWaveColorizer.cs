@@ -9,6 +9,8 @@ namespace C2M2.NeuronalDynamics.UGX
     /// SineWaveColorizer
     /// <summary>
     /// A simple sine wave colorizer
+    /// The component colorizes a linear geometry or a cylinder surface by a sine wave pattern
+    /// Frequency and amplitude can be specified, for instance varying by 10 Hz between colors red and blue
     /// </summary>
     public class SineWaveColorizer : MonoBehaviour
     {

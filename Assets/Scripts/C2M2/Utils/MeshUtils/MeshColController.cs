@@ -14,7 +14,8 @@ namespace C2M2.Utils.MeshUtils
     public class MeshColController : MonoBehaviour
     {
         public MeshCollider meshCol = null;
-        public Mesh mesh
+        private Mesh mesh;
+        public Mesh Mesh
         {
             get { return mesh; }
             set
@@ -32,6 +33,7 @@ namespace C2M2.Utils.MeshUtils
 
                 // Apply new mesh
                 if (meshCol != null) meshCol.sharedMesh = mesh;
+                else Debug.LogError("Could not find mesh collider.");
             }
         }
     }

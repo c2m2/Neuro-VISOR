@@ -8,9 +8,9 @@ namespace C2M2.NeuronalDynamics.UGX
     /// </summary>
     public enum SynapseType : byte
     {
-        UNDEF,
-        ALPHA_POST,
-        EXP2
+        UNDEF, // no synapse type associated with this vertex
+        ALPHA_POST, // alpha post synapse
+        EXP2 // bi-exponential (pre) synapse
     }
 
     /// <summary>

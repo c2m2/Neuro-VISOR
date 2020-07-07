@@ -52,12 +52,12 @@ namespace C2M2.NeuronalDynamics.UGX
             return clone;
         }
     }
-
-    /// TODO: Make handler a singleton
+    
     /// AttachmentHandler
     /// <summary>
     /// The attachment handler allows managing attachments of grids
     /// </summary>
+    /// Note: AttachmentHandler could be a singleton
     public static class AttachmentHandler
     {
         // Registered attachments we are allowed to use
@@ -65,12 +65,13 @@ namespace C2M2.NeuronalDynamics.UGX
 
         // All registered attachments will be considered for parallel distribution
         /// <summary>
-        /// Distribute the attachments
+        /// Distribute mesh and attachments for grid in parallel
         /// </summary>
         /// <param name="grid"> a grid </param>
         public static void Distribute(in Grid grid)
         {
-            /// TODO: Distribute mesh and attachments for grid in parallel
+            UnityEngine.Debug.LogError("Currently not implemented");
+      
         }
 
         /// Attach

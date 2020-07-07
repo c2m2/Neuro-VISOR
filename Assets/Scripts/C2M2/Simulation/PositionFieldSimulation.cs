@@ -10,9 +10,7 @@ namespace C2M2.Simulation
     /// </summary>
     public abstract class PositionFieldSimulation : Simulation<Vector3[], Transform[]>
     {
-        public override Transform[] viz { get; protected set; }
-
-        protected override void OnAwake()
+        protected override void OnAwake(Transform[] viz)
         {
             if (!dryRun)
             {

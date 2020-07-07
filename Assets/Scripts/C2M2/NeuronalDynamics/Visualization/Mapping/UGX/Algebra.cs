@@ -28,6 +28,8 @@ namespace C2M2.NeuronalDynamics.UGX
         /// </summary>
         /// <param name="v">Vertex index</param>
         /// <param name="r">Reordering type</param>
+        /// <return> int </return>
+        /// Returns the DoF index
         public static int GetDoFIndex(in Vertex v, in Reordering r=null) {
             return GetDoFIndex(v.Id, r);
         }
@@ -39,6 +41,8 @@ namespace C2M2.NeuronalDynamics.UGX
         /// </summary>
         /// <param name="id">DOF index</param>
         /// <param name="r">Reordering type</param>
+        /// <return> int </return>
+        /// Returns the DoF index
         internal static int GetDoFIndex(in int id, in Reordering r=null) {
             return r?[id] ?? id;
         }
@@ -49,6 +53,8 @@ namespace C2M2.NeuronalDynamics.UGX
         /// </summary>
         /// <param name="v">Vertex index</param>
         /// <param name="r">Reordering type</param>
+        /// <return> int </return>
+        /// Returns the vertex index
         internal static int GetVertexIndex(in Vertex v, in Reordering r=null) {
             return GetVertexIndex(v.Id, r);
         }
@@ -59,6 +65,8 @@ namespace C2M2.NeuronalDynamics.UGX
         /// </summary>
         /// <param name="id">DOF index</param>
         /// <param name="r">Reordering type</param>
+        /// <return> int </return>
+        /// Returns the vertex index
         internal static int GetVertexIndex(in int id, in Reordering r = null) {
             return r?[id] ?? id; 
         }
@@ -72,9 +80,11 @@ namespace C2M2.NeuronalDynamics.UGX
         /// </summary>
         /// <param name="grid">a grid </param>
         /// <param name="filename">output filename</param>
+        /// <return> Reordering </return>
+        /// Returns the matrix reordering
         internal static Reordering ReorderMatrix(Grid grid, in string filename="test.csv")
         {
-            UnityEngine.Debug.LogError("Reordering matrix!");
+           UnityEngine.Debug.LogError("Reordering matrix!");
    
            List<Vertex> vertices2 = grid.Vertices;
            List<Edge> edges2 = grid.Edges;

@@ -28,6 +28,9 @@ namespace C2M2.NeuronalDynamics.UGX
         /// <summary>
         /// Access the model geometry, surface geometry and mapping data
         /// </summary>
+        /// <param name="grid1d"> 1d model geometry </param>
+        /// <param name="grid2d"> Surface geoemtry </param>
+        /// <param name="map2d1d"> 2d to 1d mapping data </param>
         public MappingInfo(in Grid grid1d, in Grid grid2d, in Dictionary<int, Tuple<int, int, double>> map2d1d)
         {
             ModelGeometry = grid1d;
@@ -35,7 +38,11 @@ namespace C2M2.NeuronalDynamics.UGX
             Data = map2d1d;
         }
     }
-    // TODO: Replace Tuple<int, int, double> with this struct
+    
+    /// <summary>
+    /// A map entry represents mapping data for one vertex pair v1, v2 and a scalar lambda
+    /// Note: Lambda ist used to determine how to interpolate between v1 and v2
+    /// </summary>
     public readonly struct MapEntry
     {
         public readonly int v1;
@@ -51,7 +58,7 @@ namespace C2M2.NeuronalDynamics.UGX
         /// BuildMap
         /// <summary>
         /// Build the meshes of the model geometry and surface geometry as well as the 2d->1d mapping
-        /// TODO: New optimized meshes produced with ug4 will be triangulated and contain the mapping data.
+
         /// Thus the additional geom3dtris geometry will be discarded in the future. 
         /// </summary>
         /// <param name="geom1d"> Filename of 1d (model) geometry </param>
@@ -59,7 +66,8 @@ namespace C2M2.NeuronalDynamics.UGX
         /// <param name="geomTris"> Filename of 2d (surface) geometry for visualitation </param>
         /// <param name="validate"> Validate XML file (default is not to validate) </param>
         /// <returns> The mapping information </returns>
-        /// <see cref="MappingInfo"> MappingInfo struct for details </see>A
+        /// <see cref="MappingInfo"> MappingInfo struct for details </see>
+        /// Note: Mapping data could be encapsulated also in the triangulated mesh, thus eliminating the third mesh parameter
         public static MappingInfo
             BuildMap(in string geom1d, in string geom2d, in bool validate = false, in string geomTris = null)
         {
@@ -112,12 +120,15 @@ namespace C2M2.NeuronalDynamics.UGX
         /// <param name="geom1d"></param>
         /// <param name="geom2d"></param>
         /// <param name="validate"></param>
-        /// <returns></returns>
+        /// <returns> MappingInfo </returns>
         public static MappingInfo BuildMap(in string geom1d, in string geom2d, in bool validate = false)
         {
             return BuildMap(geom1d, geom2d, validate, null);
         }
 
+        /// <summary>
+        /// Delegate to build a default map for testing purposes
+        /// </summary>
         public static MappingInfo BuildMap()
         {
             return BuildMap(@"C:/Users/tug41634/Desktop/C2M2/c2m2-vr-grids/Mapping/after_regularize.ugx",

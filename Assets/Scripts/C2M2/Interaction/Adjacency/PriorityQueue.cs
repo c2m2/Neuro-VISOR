@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace C2M2.Interaction.Adjacency
 {
-    /// <summary> A priority queue represented as a binary heap </summary>
+
+    /// <summary> 
+    /// A priority queue represented as a binary heap
+    /// </summary>
     public class PriorityQueue
     {
         /// <summary> Data for the priority queue </summary>
@@ -48,6 +51,7 @@ namespace C2M2.Interaction.Adjacency
             }
         }
         /// <summary> Add an item to the queue </summary>
+        /// <param name="item"> A node </param>
         public void Enqueue(Node item)
         {
             data.Add(item);
@@ -107,6 +111,7 @@ namespace C2M2.Interaction.Adjacency
             return s;
         }
         /// <summary> Check for the consistency of the priority queue </summary>
+        /// <returns> bool </returns>
         public bool IsConsistent()
         {
             if (data.Count == 0) return true;

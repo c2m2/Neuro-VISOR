@@ -119,13 +119,12 @@ namespace C2M2.NeuronalDynamics.UGX
         /// <summary>
         /// Clears the attachment with name from the attachment lists for this grid
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="name"> Name of attachment </param>
         public void Clear(in string name)
         {
             AttachmentInfo.Types.Remove(name);
             AttachmentInfo.Data.Remove(name);
         }
-
     }
 
     /// Vertex
