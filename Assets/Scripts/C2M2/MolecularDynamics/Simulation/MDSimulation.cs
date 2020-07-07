@@ -36,6 +36,22 @@ namespace C2M2.MolecularDynamics.Simulation
     /// </summary>
     public abstract class MDSimulation : PositionFieldSimulation
     {
+        protected class Vector3Int
+        {
+            public int x = 0;
+            public int y = 0;
+            public int z = 0;
+            
+            public Vector3Int(int x, int y, int z)
+            {
+                this.x = x;
+                this.y = y;
+                this.z = z;
+            }
+
+            public static Vector3Int zero = new Vector3Int(0, 0, 0);
+        }
+
         // Folder path to PDB and PSF files
         private readonly string path = Application.streamingAssetsPath + @"/MolecularDynamics/";
         [Tooltip("Path to PDB file, relative to Assets/StreamingAssets/MolecularDynamics/")]
@@ -60,10 +76,11 @@ namespace C2M2.MolecularDynamics.Simulation
         protected float c = -1;
 
         protected Dictionary<Transform, int> particleLookup;
-        protected Vector3[] x = null;
+        protected Vector3[] coord = null;
         /// <summary> Velocity of each particle </summary>
-        protected Vector3[] v = null;
+        protected Vector3[] vel = null;
         protected Vector3[] r = null;
+        protected Vector3Int[] pbcFlag = null;
         /// <summary> Each two indices represents one bond. </summary>
         /// <remarks>
         /// If bonds[0] = 10 and bonds[1] = 15, then the particles at x[10] & x[15] represent a bonded pair.
@@ -85,20 +102,29 @@ namespace C2M2.MolecularDynamics.Simulation
             bonds = psfFile.bonds;
             angles = psfFile.angles;
             types = psfFile.types;
+            
 
             // Convert bonds and angles to 0 base
             for (int i = 0; i < bonds.Length; i++) bonds[i] = bonds[i] - 1;
             for (int i = 0; i < angles.Length; i++) angles[i] = angles[i] - 1;
 
             PDBFile pdbFile = PDBReader.ReadFile(path + pdbPath);
-            x = pdbFile.pos;
+            coord = pdbFile.pos;
 
-            // Initialize v
-            v = new Vector3[x.Length];
-            for (int i = 0; i < v.Length; i++)
+            // Initialize v's to zero
+            vel = new Vector3[coord.Length];
+            for (int i = 0; i < vel.Length; i++)
             {
-                v[i] = Vector3.zero;
+                vel[i] = Vector3.zero;
             }
+
+            // Initialize pbc flags to zero
+            pbcFlag = new Vector3Int[coord.Length];
+            for(int i = 0; i < pbcFlag.Length; i++)
+            {
+                pbcFlag[i] = Vector3Int.zero;
+            }
+
         }
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
@@ -107,7 +133,7 @@ namespace C2M2.MolecularDynamics.Simulation
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         protected override Transform[] BuildVisualization()
         {
-            Transform[] transforms = RenderSpheres(x, types, radius);
+            Transform[] transforms = RenderSpheres(coord, types, radius);
 
             bond_topo = BuildBondTopology(bonds);
 
@@ -224,6 +250,8 @@ namespace C2M2.MolecularDynamics.Simulation
                     ys[i] = sphereTransforms[i].position.y;
                     zs[i] = sphereTransforms[i].position.z;
                 }
+
+                // TODO: Need max of absolute values, not just max's here
 
                 float[] boundsArray = { xs.Max(), ys.Max(), zs.Max() };
                 float max = boundsArray.Max();

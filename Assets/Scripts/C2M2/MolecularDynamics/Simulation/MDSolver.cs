@@ -25,7 +25,7 @@ namespace C2M2.MolecularDynamics.Simulation
         //RaycastHit lastHit = new RaycastHit();
         public override Vector3[] GetValues()
         {
-            return x;
+            return coord;
         }
 
 
@@ -139,14 +139,14 @@ namespace C2M2.MolecularDynamics.Simulation
 
 	        //instantiate a normal dist.
 	        var normal = Normal.WithMeanPrecision(0.0, 1.0);
-	        Vector3[] force = Force(x,bond_topo); // + angle_Force(x,angle_topo);
+	        Vector3[] force = Force(coord,bond_topo); // + angle_Force(x,angle_topo);
                                                   //Vector3[] angle = angle_Force(x);
 
             // Iterate over time
             for (int t = 0; t < nT; t++)
 	        {      
                 // iterate over the atoms
-                for(int i = 0; i < x.Length; i++)
+                for(int i = 0; i < coord.Length; i++)
                 {
                     float coeff = Convert.ToSingle(Math.Sqrt(kb*T*(1-a*a)/mass[i]));
                     double rxx = normal.Sample();
@@ -170,13 +170,13 @@ namespace C2M2.MolecularDynamics.Simulation
                     }
                     v[i]=v[i]+(dt*dt/2/m)*(force[i]+angle[i] + pushTerm);
                     */
-                    v[i] = v[i] + (dt*dt/2/mass[i]) * (force[i]);
-		            x[i] = x[i] + (dt/2) * v[i];
-                    v[i]=a*v[i] + coeff * r;
-		            x[i]=x[i] + (dt/2) * v[i];
+                    vel[i] = vel[i] + (dt*dt/2/mass[i]) * (force[i]);
+		            coord[i] = coord[i] + (dt/2) * vel[i];
+                    vel[i]=a*vel[i] + coeff * r;
+		            coord[i]=coord[i] + (dt/2) * vel[i];
                 }
 
-		        force = Force(x,bond_topo);
+		        force = Force(coord,bond_topo);
 
                 /*GameManager.instance.DebugLogSafe("force[1043]: " + force[1043]
                     + "\nx[1043]: " + x[1043]
@@ -184,9 +184,9 @@ namespace C2M2.MolecularDynamics.Simulation
 		    + "\nm[1043]: " + mass[1043]);
                 //angle = angle_Force(x); */
 
-                for(int i = 0; i < x.Length; i++)
+                for(int i = 0; i < coord.Length; i++)
                 {
-                    v[i] = v[i] + (dt*dt/2/mass[i]) * (force[i]);
+                    vel[i] = vel[i] + (dt*dt/2/mass[i]) * (force[i]);
                 }
             }
             Debug.Log("ExampleMDSimulation complete.");

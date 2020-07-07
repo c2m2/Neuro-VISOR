@@ -16,15 +16,21 @@ namespace C2M2.MolecularDynamics.Simulation
         public float kappa = 6f;
         public float r0 = 3.65f;
 
-    	private int[][] angle_topo = null;
+        // TODO: This needs to be read from a separate data file
+        public float boxLengthX = 58.065f;
+        public float boxLengthY = 58.065f;
+        public float boxLengthZ = 58.065f;
+
+        private int[][] angle_topo = null;
 
         private Vector3[] force = null;
+
         
         // OPTION 2:
         //RaycastHit lastHit = new RaycastHit();
         public override Vector3[] GetValues()
         {
-            return x;
+            return coord;
         }
 
 
@@ -117,12 +123,12 @@ namespace C2M2.MolecularDynamics.Simulation
 
 	        //instantiate a normal dist.
 	        var normal = Normal.WithMeanPrecision(0.0, 1.0);
-	        force = Force(x,bond_topo); // + angle_Force(x,angle_topo);
+	        force = Force(coord,bond_topo); // + angle_Force(x,angle_topo);
             // Iterate over time
             for (int t = 0; t < nT; t++)
 	        {
                 // iterate over the atoms
-                for(int i = 0; i < x.Length; i++)
+                for(int i = 0; i < coord.Length; i++)
                 {
                     float coeff = Convert.ToSingle(Math.Sqrt(kb*T*(1-c*c)/mass[i]));
                     double rxx = normal.Sample();
@@ -136,20 +142,49 @@ namespace C2M2.MolecularDynamics.Simulation
                      
                     Vector3 r = new Vector3(rx,ry,rz);
 
-                    v[i] = v[i] + (dt*dt/2/mass[i]) * (force[i]);
-		            x[i] = x[i] + (dt/2) * v[i];
-                    v[i] = c * v[i] + coeff * r;
-		            x[i] = x[i] + (dt/2) * v[i];
+                    vel[i] = vel[i] + (dt*dt/2/mass[i]) * (force[i]);
+		            coord[i] = coord[i] + (dt/2) * vel[i];
+
+                    vel[i] = c * vel[i] + coeff * r;
+		            coord[i] = coord[i] + (dt/2) * vel[i];
+                   
                 }
 
-		        force = Force(x,bond_topo);
+                ResolvePBC();
 
-                for(int i = 0; i < x.Length; i++)
+                force = Force(coord,bond_topo);
+
+                for(int i = 0; i < coord.Length; i++)
                 {
-                    v[i] = v[i] + (dt*dt/2/mass[i]) * (force[i]);
+                    vel[i] = vel[i] + (dt*dt/2/mass[i]) * (force[i]);
                 }
             }
             Debug.Log("ExampleMDSimulation complete.");
+        }
+        void ResolvePBC()
+        {
+            float boxLengthX2 = boxLengthX * 2;
+            float boxLengthY2 = boxLengthY * 2;
+            float boxLengthZ2 = boxLengthZ * 2;
+
+            // Find if any position has gone beyond box limits, set flag if so
+            for (int i = 0; i < coord.Length; i++)
+            {
+                // Number of times that coord[i] has crossed the boundary in this timestep
+                int x = (int)(coord[i].x / boxLengthX);
+                int y = (int)(coord[i].y / boxLengthY);
+                int z = (int)(coord[i].z / boxLengthZ);
+
+                // Reset coord[i] to the beginning of the box if necessary
+                coord[i].x -= boxLengthX2 * x;
+                coord[i].y -= boxLengthX2 * y;
+                coord[i].z -= boxLengthX2 * z;
+
+                // Net cumulative times that coord[i] has crossed the boundary
+                pbcFlag[i].x += x;
+                pbcFlag[i].y += y;
+                pbcFlag[i].z += z;
+            }
         }
     }
 }
