@@ -1,9 +1,5 @@
 ﻿using System;
-using System.IO;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using MathNet.Numerics.Random;
 using MathNet.Numerics.Distributions;
 using C2M2.MolecularDynamics.Visualization;
 namespace C2M2.MolecularDynamics.Simulation
@@ -38,7 +34,7 @@ namespace C2M2.MolecularDynamics.Simulation
         {
             if (force == null) return;
             int particleHit = particleLookup[hit.transform.parent];
-            force[particleHit] += (-100 * hit.normal) / hit.distance;
+            force[particleHit] += (-100 * hit.normal) / hit.distance; // Dividing by distance allows closer touches to have stronger effect
         }
 
         /// <summary>
@@ -98,7 +94,7 @@ namespace C2M2.MolecularDynamics.Simulation
                 //f[i] += angle_Force(pos,angle_topo); //harmonic angle forces
             //}
             float pre_factor = -kappa_theta*(theta-theta_0)/(1+(g/h)*(g/h));
-		    Debug.Log(theta);
+
   		    f[0] = pre_factor*(h*g_x1-g*h_x1)/h/h;
 		    f[1] = pre_factor*(h*g_x2-g*h_x2)/h/h;
 		    f[2] = pre_factor*(h*g_x3-g*h_x3)/h/h;
@@ -158,9 +154,9 @@ namespace C2M2.MolecularDynamics.Simulation
         }
         void ResolvePBC()
         {
-            float boxLengthX2 = boxLengthX * 2;
-            float boxLengthY2 = boxLengthY * 2;
-            float boxLengthZ2 = boxLengthZ * 2;
+            float boxLengthXx2 = boxLengthX * 2;
+            float boxLengthYx2 = boxLengthY * 2;
+            float boxLengthZx2 = boxLengthZ * 2;
 
             // Find if any position has gone beyond box limits, set flag if so
             for (int i = 0; i < coord.Length; i++)
@@ -171,9 +167,9 @@ namespace C2M2.MolecularDynamics.Simulation
                 int z = (int)(coord[i].z / boxLengthZ);
 
                 // Reset coord[i] to the beginning of the box if necessary
-                coord[i].x -= boxLengthX2 * x;
-                coord[i].y -= boxLengthX2 * y;
-                coord[i].z -= boxLengthX2 * z;
+                coord[i].x -= boxLengthXx2 * x;
+                coord[i].y -= boxLengthXx2 * y;
+                coord[i].z -= boxLengthXx2 * z;
 
                 // Net cumulative times that coord[i] has crossed the boundary
                 pbcFlag[i].x += x;
