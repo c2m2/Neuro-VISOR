@@ -8,6 +8,7 @@ using System.Linq;
 namespace C2M2.MolecularDynamics.Simulation
 {
     using Utils;
+
     /// <summary>
     /// Stores and updates information needed to render bonds
     /// </summary>
@@ -15,9 +16,10 @@ namespace C2M2.MolecularDynamics.Simulation
     {
         public Transform a { get; private set; }
         public Transform b { get; private set; }
+        public float maxLength { get; private set; }
 
         LineRenderer renderer;
-        public BondRenderer(Transform a, Transform b, float width = 1f)
+        public BondRenderer(Transform a, Transform b, float width = 1f, float maxLength = float.PositiveInfinity)
         {
             this.a = a;
             this.b = b;
@@ -29,10 +31,19 @@ namespace C2M2.MolecularDynamics.Simulation
             renderer.startColor = Color.black;
             renderer.endColor = Color.black;
 
+            this.maxLength = maxLength;
+
             Update();
         }
-        public void Update() => renderer.SetPositions(new Vector3[] { a.position, b.position });
+        public void Update()
+        {
+            if (Vector3.Distance(a.position, b.position) < maxLength)
+                renderer.SetPositions(new Vector3[] { a.position, b.position });
+            else
+                renderer.SetPositions(new Vector3[] { Vector3.zero, Vector3.zero });
+        }
     }
+    
     /// <summary>
     /// Reads data files and creates and updates visualizations for molecular dynamics systemss
     /// </summary>
@@ -68,6 +79,7 @@ namespace C2M2.MolecularDynamics.Simulation
         public Color[] atomColors = new Color[] { Color.cyan, Color.gray };
 
         public Material bondMaterial;
+        public float maxBondLength = 10f;
 
         public enum MethodType { gjI, gjII, gjIII }
         public MethodType methodType = MethodType.gjI;
@@ -184,6 +196,7 @@ namespace C2M2.MolecularDynamics.Simulation
                     else uniqueCols[i] = UnityEngine.Random.ColorHSV();
                 }
                 atomColors = uniqueCols;
+
                 // Create a material for each unique atom type and add it to a dictionary
                 Dictionary<string, Material> matLookup = new Dictionary<string, Material>(ts.Length);
                 for (int i = 0; i < atomTypes.Length; i++)
@@ -278,6 +291,9 @@ namespace C2M2.MolecularDynamics.Simulation
             }
             void RenderBonds(int[] bonds, Transform[] sphereTransforms)
             {
+                // The max bond length should be 1/3 of the shortest edge length
+                //float maxLength = Math.Min(Math.Min(boxLengthX, boxLengthY), boxLengthZ) / 3;
+
                 bondRenderers = new BondRenderer[bonds.Length / 2];
                 int j = 0;
                 for (int i = 0; i < bonds.Length - 1; i += 2)
@@ -285,7 +301,8 @@ namespace C2M2.MolecularDynamics.Simulation
                     bondRenderers[j] = new BondRenderer(
                         sphereTransforms[bonds[i]], 
                         sphereTransforms[bonds[i + 1]], 
-                        0.001f);
+                        0.001f,
+                        maxBondLength);
                     j++;
                 }
             }
