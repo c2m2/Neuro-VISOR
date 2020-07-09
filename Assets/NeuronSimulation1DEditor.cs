@@ -40,7 +40,6 @@ namespace C2M2.NeuronalDynamics.Simulation
 
                 // Build path from menu selection
                 string cellVizPath = basePath + slash + _cellOptions[_cellIndex] + slash;
-                Debug.Log(cellVizPath);
 
                 // Find diameter selections for rendering and interaction
                 string cellColPath = cellVizPath;

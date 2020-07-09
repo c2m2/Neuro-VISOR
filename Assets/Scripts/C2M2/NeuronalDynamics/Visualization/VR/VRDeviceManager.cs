@@ -16,6 +16,8 @@ namespace C2M2.Visualization.VR
     [ExecuteInEditMode]
     public class VRDeviceManager : MonoBehaviour
     {
+        public GameObject fpsOverlay = null;
+        public GameObject fpsTVScreen = null;
         private MovingOVRHeadsetEmulator emulator;
         private MouseEventSignaler signaler;
         private OVRPlayerController playerController;
@@ -29,7 +31,9 @@ namespace C2M2.Visualization.VR
             playerController = GetComponent<OVRPlayerController>();
 
             emulator.enabled = !playerController.enabled;
-            signaler.enabled = !playerController.enabled;
+            signaler.enabled = emulator.enabled;
+            if (fpsOverlay != null) fpsOverlay.SetActive(emulator.enabled);
+            if (fpsTVScreen != null) fpsTVScreen.SetActive(playerController.enabled);
         }
     }
 }
