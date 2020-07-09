@@ -8,13 +8,16 @@ namespace C2M2.Simulation
     /// <summary>
     /// Simulation of type Vector3[] for simulating positional fields
     /// </summary>
-    public abstract class PositionFieldSimulation : Simulation<Vector3[], Transform[]>
+    public abstract class PositionFieldSimulation : Simulation<Vector3[], Transform[], VRRaycastableColliders, VRGrabbableColliders>
     {
         protected override void OnAwake(Transform[] viz)
         {
             if (!dryRun)
             {
                 Vector3[] pos = new Vector3[viz.Length];
+
+                // Add custom grabbable here
+               // gameObject.AddComponent<VRGrabbableColliders>();
 
                 Collider[] colliders = new Collider[viz.Length];
                 for (int i = 0; i < viz.Length; i++)
@@ -23,10 +26,8 @@ namespace C2M2.Simulation
                 }
 
                 VRRaycastableColliders raycastable = gameObject.AddComponent<VRRaycastableColliders>();
-
                 raycastable.SetSource(colliders);
 
-                // Add custom grabbable here
             }
         }
 

@@ -11,7 +11,7 @@ namespace C2M2.Simulation.Samples
     /// <remarks>
     /// Good for testing interaction features
     /// </remarks>
-    public class MeshSimulation : SurfaceSimulation
+    public class MeshSimulation : Simulation.MeshSimulation
     {
         private double[] scalars;
 

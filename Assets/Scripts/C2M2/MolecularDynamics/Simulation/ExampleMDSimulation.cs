@@ -6,6 +6,7 @@ namespace C2M2.MolecularDynamics.Simulation
 {
     public class ExampleMDSimulation : MDSimulation
     {
+        [Header("Simulation Parameters")]
         public float kb = 0.001987f; //kcal per mol
         public float T = 100.0f; //K
 
@@ -13,7 +14,6 @@ namespace C2M2.MolecularDynamics.Simulation
         public float r0 = 3.65f;
 
         private int[][] angle_topo = null;
-
         private Vector3[] force = null;
 
         
@@ -23,7 +23,6 @@ namespace C2M2.MolecularDynamics.Simulation
         {
             return coord;
         }
-
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
@@ -152,6 +151,7 @@ namespace C2M2.MolecularDynamics.Simulation
             }
             Debug.Log("ExampleMDSimulation complete.");
         }
+
         void ResolvePBC()
         {
             float boxLengthXx2 = boxLengthX * 2;

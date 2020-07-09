@@ -13,7 +13,7 @@ namespace C2M2.Simulation.Samples
     ///
     /// <remarks>   Jacob, 4/29/2020. </remarks>
     ////////////////////////////////////////////////////////////////////////////////////////////////////
-    public class CombinedMeshSimulation : SurfaceSimulation
+    public class CombinedMeshSimulation : Simulation.MeshSimulation
     {
         private double[] values;
 

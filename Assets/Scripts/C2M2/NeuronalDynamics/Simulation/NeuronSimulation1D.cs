@@ -19,7 +19,7 @@ namespace C2M2.NeuronalDynamics.Simulation
     /// <remarks>
     /// 1D Neuron surface simulations should derive from this class.
     /// </remarks>
-    public abstract class NeuronSimulation1D : SurfaceSimulation
+    public abstract class NeuronSimulation1D : MeshSimulation
     {   
         public enum MeshColScaling { x1, x2, x3, x4, x5 }
         [Header("3D Visualization")]
@@ -44,13 +44,6 @@ namespace C2M2.NeuronalDynamics.Simulation
         ///<summary> Lookup a 3D vert and get back two 1D indices and a lambda value for them </summary>
         private Dictionary<int, Tuple<int, int, double>> map;
         private MappingInfo mapping;
-
-        private readonly string ugxExt = ".ugx";
-        private readonly string spec1D = "_1d";
-        private readonly string specTris = "_tris";
-        private readonly string neuronCellFolder = "NeuronalDynamics";
-        private readonly string activeCellFolder = "ActiveCell";
-        private string[] cellFileNames;
 
         /// <summary>
         /// Translate 1D vertex values to 3D values and pass them upwards for visualization
@@ -213,9 +206,7 @@ namespace C2M2.NeuronalDynamics.Simulation
                     blownupMesh = MapUtils.BuildMap(cellColliderFile3D,
                         cellFile1D,
                         false,
-                        cellColliderFileTriangles).SurfaceGeometry.Mesh;
-
-                    
+                        cellColliderFileTriangles).SurfaceGeometry.Mesh;             
                 }
 
                 blownupMesh.name = blownupMesh.name + scale;

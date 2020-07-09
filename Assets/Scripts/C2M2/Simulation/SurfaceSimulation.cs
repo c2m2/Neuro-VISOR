@@ -10,7 +10,7 @@ namespace C2M2.Simulation
     /// </summary>
     [RequireComponent(typeof(MeshFilter))]
     [RequireComponent(typeof(MeshRenderer))]
-    public abstract class SurfaceSimulation : Simulation<double[], Mesh>
+    public abstract class MeshSimulation : Simulation<double[], Mesh, VRRaycastableMesh, VRGrabbableMesh>
     {
         #region Variables
 
@@ -74,7 +74,7 @@ namespace C2M2.Simulation
                 else raycastable.SetSource(viz);
 
                 // Add custom grabbable here
-
+                gameObject.AddComponent<VRGrabbableMesh>();
             }
             return;
 

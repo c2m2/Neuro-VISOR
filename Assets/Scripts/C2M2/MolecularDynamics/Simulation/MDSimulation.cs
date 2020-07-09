@@ -101,6 +101,7 @@ namespace C2M2.MolecularDynamics.Simulation
         protected Vector3[] vel = null;
         protected Vector3[] r = null;
         protected Vector3Int[] pbcFlag = null;
+
         /// <summary> Each two indices represents one bond. </summary>
         /// <remarks>
         /// If bonds[0] = 10 and bonds[1] = 15, then the particles at x[10] & x[15] represent a bonded pair.
@@ -113,7 +114,6 @@ namespace C2M2.MolecularDynamics.Simulation
 
         private BondRenderer[] bondRenderers;
         private Shader shader;
-
 
         protected override void ReadData()
         {
@@ -222,6 +222,7 @@ namespace C2M2.MolecularDynamics.Simulation
 
                 return ts;
             }
+
             int[][] BuildBondTopology(int[] bonds)
             {
                 int maxInd = bonds.Max();
@@ -255,6 +256,7 @@ namespace C2M2.MolecularDynamics.Simulation
                 //Debug.Log(bond_topo[0][1]);
                 return bond_topo;
             }
+
             void ResizeField(Transform[] sphereTransforms)
             {
                 // Separate transform positions into their parts
@@ -307,9 +309,11 @@ namespace C2M2.MolecularDynamics.Simulation
                 }
             }
         }
+
         private float gjI(float gamma, float dt) => (1 - gamma * dt / 2) / (1 + gamma * dt / 2);
         private float gjII(float gamma, float dt) => (float)System.Math.Exp(-gamma * dt);
         private float gjIII(float gamma, float dt) => 1 - (gamma * dt);
+
         /// <summary>
         /// Used here to update bond visualization.
         /// </summary>

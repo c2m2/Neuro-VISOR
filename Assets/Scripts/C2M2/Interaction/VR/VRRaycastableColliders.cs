@@ -23,7 +23,6 @@ namespace C2M2.Interaction.VR {
                 target.transform.localPosition = Vector3.zero;
                 target.transform.eulerAngles = Vector3.zero;
                 target.transform.localScale = Vector3.one;
-                
             }
             this.source = copy;
         }

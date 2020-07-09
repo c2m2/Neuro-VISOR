@@ -10,7 +10,7 @@ namespace C2M2.Simulation
     /// Provides an base interface for simulations using a general data type T
     /// </summary>
     /// <typeparam name="ValueType"> Type of simulation values </typeparam>
-    public abstract class Simulation<ValueType, VizType> : Interactable
+    public abstract class Simulation<ValueType, VizType, RaycastType, GrabType> : Interactable
     {
         [Tooltip("Run simulation code without visualization or interaction features")]
         /// <summary>
