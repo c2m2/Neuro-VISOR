@@ -17,7 +17,7 @@ namespace C2M2.Simulation
                 Vector3[] pos = new Vector3[viz.Length];
 
                 // Add custom grabbable here
-                // gameObject.AddComponent<VRGrabbableColliders>();
+                gameObject.AddComponent<VRGrabbableColliders>();
 
                 Collider[] colliders = new Collider[viz.Length];
                 for (int i = 0; i < viz.Length; i++)

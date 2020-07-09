@@ -25,126 +25,132 @@ namespace C2M2.NeuronalDynamics.Simulation
 
         public override void OnInspectorGUI()
         {
-            // Skip all of this if we're in runtime
-            if (!Application.isPlaying)
+            try
             {
-                var neuronSimulation = target as NeuronSimulation1D;
-
-                string basePath = Application.streamingAssetsPath + slash + neuronCellFolder + slash + activeCellFolder + slash;
-
-                string[] _cellOptions = new[] { "No cells found" };
-                _cellOptions = BuildCellOptions(basePath);
-
-                // Build dropdown menu
-                int _cellIndex = 0;
-                _cellIndex = EditorGUILayout.Popup("Neuron Cell Source", _cellIndex, _cellOptions);
-
-                // Build path from menu selection
-                string cellVizPath = basePath + slash + _cellOptions[_cellIndex] + slash;
-
-                // Find diameter selections for rendering and interaction
-                string cellColPath = cellVizPath;
-                switch (neuronSimulation.meshColScale)
+                // Skip all of this if we're in runtime
+                if (!Application.isPlaying)
                 {
-                    case NeuronSimulation1D.MeshColScaling.x1:
-                        cellColPath += "1xDiameter" + slash;
-                        break;
-                    case NeuronSimulation1D.MeshColScaling.x2:
-                        cellColPath += "2xDiameter" + slash;
-                        break;
-                    case NeuronSimulation1D.MeshColScaling.x3:
-                        cellColPath += "3xDiameter" + slash;
-                        break;
-                    case NeuronSimulation1D.MeshColScaling.x4:
-                        cellColPath += "4xDiameter" + slash;
-                        break;
-                    case NeuronSimulation1D.MeshColScaling.x5:
-                        cellColPath += "5xDiameter" + slash;
-                        break;
-                    default:
-                        Debug.LogError("ERROR");
-                        break;
-                }
-                cellVizPath += "1xDiameter";
+                    var neuronSimulation = target as NeuronSimulation1D;
 
+                    string basePath = Application.streamingAssetsPath + slash + neuronCellFolder + slash + activeCellFolder + slash;
 
-                // Find refinement levels for rendering and interaction
-                string identifier = "x";
-                switch (neuronSimulation.refinementLevel)
-                {
-                    case NeuronSimulation1D.RefinementLevel.x0:
-                        identifier = "0ref";
-                        break;
-                    case NeuronSimulation1D.RefinementLevel.x1:
-                        identifier = "1ref";
-                        break;
-                    case NeuronSimulation1D.RefinementLevel.x2:
-                        identifier = "2ref";
-                        break;
-                    case NeuronSimulation1D.RefinementLevel.x3:
-                        identifier = "3ref";
-                        break;
-                    case NeuronSimulation1D.RefinementLevel.x4:
-                        identifier = "4ref";
-                        break;
-                    default:
-                        Debug.LogError("ERROR");
-                        break;
-                }
-                string[] rendRefinementOptions = Directory.GetDirectories(cellVizPath);
-                string[] colRefinementOptions = Directory.GetDirectories(cellColPath);
+                    string[] _cellOptions = new[] { "No cells found" };
+                    _cellOptions = BuildCellOptions(basePath);
 
-                for (int i = 0; i < rendRefinementOptions.Length; i++)
-                {
-                    if (rendRefinementOptions[i].EndsWith(identifier))
+                    // Build dropdown menu
+                    int _cellIndex = 0;
+                    _cellIndex = EditorGUILayout.Popup("Neuron Cell Source", _cellIndex, _cellOptions);
+
+                    // Build path from menu selection
+                    string cellVizPath = basePath + slash + _cellOptions[_cellIndex] + slash;
+
+                    // Find diameter selections for rendering and interaction
+                    string cellColPath = cellVizPath;
+                    switch (neuronSimulation.meshColScale)
                     {
-                        cellVizPath = rendRefinementOptions[i];
+                        case NeuronSimulation1D.MeshColScaling.x1:
+                            cellColPath += "1xDiameter" + slash;
+                            break;
+                        case NeuronSimulation1D.MeshColScaling.x2:
+                            cellColPath += "2xDiameter" + slash;
+                            break;
+                        case NeuronSimulation1D.MeshColScaling.x3:
+                            cellColPath += "3xDiameter" + slash;
+                            break;
+                        case NeuronSimulation1D.MeshColScaling.x4:
+                            cellColPath += "4xDiameter" + slash;
+                            break;
+                        case NeuronSimulation1D.MeshColScaling.x5:
+                            cellColPath += "5xDiameter" + slash;
+                            break;
+                        default:
+                            Debug.LogError("ERROR");
+                            break;
                     }
-                }
-                for (int i = 0; i < colRefinementOptions.Length; i++)
-                {
-                    if (colRefinementOptions[i].EndsWith(identifier))
+                    cellVizPath += "1xDiameter";
+
+
+                    // Find refinement levels for rendering and interaction
+                    string identifier = "x";
+                    switch (neuronSimulation.refinementLevel)
                     {
-                        cellColPath = colRefinementOptions[i];
+                        case NeuronSimulation1D.RefinementLevel.x0:
+                            identifier = "0ref";
+                            break;
+                        case NeuronSimulation1D.RefinementLevel.x1:
+                            identifier = "1ref";
+                            break;
+                        case NeuronSimulation1D.RefinementLevel.x2:
+                            identifier = "2ref";
+                            break;
+                        case NeuronSimulation1D.RefinementLevel.x3:
+                            identifier = "3ref";
+                            break;
+                        case NeuronSimulation1D.RefinementLevel.x4:
+                            identifier = "4ref";
+                            break;
+                        default:
+                            Debug.LogError("ERROR");
+                            break;
                     }
-                }
+                    string[] rendRefinementOptions = Directory.GetDirectories(cellVizPath);
+                    string[] colRefinementOptions = Directory.GetDirectories(cellColPath);
 
-                // Get 1D, 3D, triangle files for rendering
-                string[] cellNames = new string[5];
-                string[] files = Directory.GetFiles(cellVizPath);
-                foreach (string file in files)
-                {
-                    // If this isn't a non-metadata ugx file,
-                    if (!file.EndsWith(".meta") && file.EndsWith(ugxExt))
+                    for (int i = 0; i < rendRefinementOptions.Length; i++)
                     {
-                        if (file.EndsWith(spec1D + ugxExt)) cellNames[1] = file;  // 1D cell
-                        else if (file.EndsWith(specTris + ugxExt)) cellNames[2] = file;    // Triangles
-                        else if (file.EndsWith(ugxExt)) cellNames[0] = file;     // If it isn't specified as 1D or triangles, it's most likely 3D
+                        if (rendRefinementOptions[i].EndsWith(identifier))
+                        {
+                            cellVizPath = rendRefinementOptions[i];
+                        }
                     }
-                }
-
-                // Get interaction files
-                cellNames[3] = "NULL"; // Blown up mesh default
-                cellNames[4] = "NULL"; // Blown up mesh triangles default
-                files = Directory.GetFiles(cellColPath);
-
-                foreach (string file in files)
-                {
-                    // If this isn't a non-metadata ugx file,
-                    if (!file.EndsWith(".meta"))
+                    for (int i = 0; i < colRefinementOptions.Length; i++)
                     {
-                        if (file.EndsWith(spec1D + ugxExt)) ; // 1D cell isn't needed for the blownup mesh
-                        else if (file.EndsWith(specTris + ugxExt)) cellNames[4] = file;    // Triangles
-                        else if (file.EndsWith(ugxExt)) cellNames[3] = file;    // If it isn't specified as 1D or triangles, it's most likely 3D
+                        if (colRefinementOptions[i].EndsWith(identifier))
+                        {
+                            cellColPath = colRefinementOptions[i];
+                        }
                     }
-                }
 
-                // Set file names in simulation script
-                neuronSimulation.cellFile3D = cellNames[0];
-                neuronSimulation.cellFile1D = cellNames[1];
-                neuronSimulation.cellFileTriangles = cellNames[2];
-                neuronSimulation.cellColliderFile3D = cellNames[3];
-                neuronSimulation.cellColliderFileTriangles = cellNames[4];
+                    // Get 1D, 3D, triangle files for rendering
+                    string[] cellNames = new string[5];
+                    string[] files = Directory.GetFiles(cellVizPath);
+                    foreach (string file in files)
+                    {
+                        // If this isn't a non-metadata ugx file,
+                        if (!file.EndsWith(".meta") && file.EndsWith(ugxExt))
+                        {
+                            if (file.EndsWith(spec1D + ugxExt)) cellNames[1] = file;  // 1D cell
+                            else if (file.EndsWith(specTris + ugxExt)) cellNames[2] = file;    // Triangles
+                            else if (file.EndsWith(ugxExt)) cellNames[0] = file;     // If it isn't specified as 1D or triangles, it's most likely 3D
+                        }
+                    }
+
+                    // Get interaction files
+                    cellNames[3] = "NULL"; // Blown up mesh default
+                    cellNames[4] = "NULL"; // Blown up mesh triangles default
+                    files = Directory.GetFiles(cellColPath);
+
+                    foreach (string file in files)
+                    {
+                        // If this isn't a non-metadata ugx file,
+                        if (!file.EndsWith(".meta"))
+                        {
+                            if (file.EndsWith(spec1D + ugxExt)) ; // 1D cell isn't needed for the blownup mesh
+                            else if (file.EndsWith(specTris + ugxExt)) cellNames[4] = file;    // Triangles
+                            else if (file.EndsWith(ugxExt)) cellNames[3] = file;    // If it isn't specified as 1D or triangles, it's most likely 3D
+                        }
+                    }
+
+                    // Set file names in simulation script
+                    neuronSimulation.cellFile3D = cellNames[0];
+                    neuronSimulation.cellFile1D = cellNames[1];
+                    neuronSimulation.cellFileTriangles = cellNames[2];
+                    neuronSimulation.cellColliderFile3D = cellNames[3];
+                    neuronSimulation.cellColliderFileTriangles = cellNames[4];
+                }
+            }catch(Exception e)
+            {
+                Debug.LogError(e);
             }
 
             // Draw the default inspector
