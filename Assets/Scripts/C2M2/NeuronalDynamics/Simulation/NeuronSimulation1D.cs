@@ -28,11 +28,11 @@ namespace C2M2.NeuronalDynamics.Simulation
         public enum RefinementLevel { x0, x1, x2, x3, x4 }
         public RefinementLevel refinementLevel = RefinementLevel.x1;
 
-        public string cellFile1D = "NULL";
-        public string cellFile3D = "NULL";
-        public string cellFileTriangles = "NULL";
-        public string cellColliderFile3D = "NULL";
-        public string cellColliderFileTriangles = "NULL";
+        public string cell1DPath = "NULL";
+        public string cell3DPath = "NULL";
+        public string cellTrianglesPath = "NULL";
+        public string cell3DColliderPath = "NULL";
+        public string cellTrianglesColliderPath = "NULL";
 
         [Header("1D Visualization")]
         public bool visualize1D = false;
@@ -127,7 +127,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         protected override void ReadData()
         {
             // Read in 1D & 3D data and build a map between them
-            mapping = MapUtils.BuildMap(cellFile1D, cellFile3D, false, cellFileTriangles);
+            mapping = MapUtils.BuildMap(cell1DPath, cell3DPath, false, cellTrianglesPath);
             map = mapping.Data;
 
             // Pass the cell to simulation code
@@ -196,17 +196,17 @@ namespace C2M2.NeuronalDynamics.Simulation
                 Mesh blownupMesh = null;
 
                 // Use 1x scaling as the default case
-                if (meshColScale == MeshColScaling.x1 || cellColliderFile3D == "NULL" || cellColliderFileTriangles == "NULL")
+                if (meshColScale == MeshColScaling.x1 || cell3DColliderPath == "NULL" || cellTrianglesColliderPath == "NULL")
                 {
                     blownupMesh = cellMesh;
                     blownupMesh.name = blownupMesh.name + scale;
                 }
                 else
                 {
-                    blownupMesh = MapUtils.BuildMap(cellColliderFile3D,
-                        cellFile1D,
+                    blownupMesh = MapUtils.BuildMap(cell3DColliderPath,
+                        cell1DPath,
                         false,
-                        cellColliderFileTriangles).SurfaceGeometry.Mesh;             
+                        cellTrianglesColliderPath).SurfaceGeometry.Mesh;             
                 }
 
                 blownupMesh.name = blownupMesh.name + scale;

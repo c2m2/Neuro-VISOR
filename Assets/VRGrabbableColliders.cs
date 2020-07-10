@@ -6,6 +6,7 @@ namespace C2M2.Interaction.VR
 {
     public class VRGrabbableColliders : MonoBehaviour
     {
+        public Collider[] source = null;
         private void Awake()
         {
             Rigidbody rb = gameObject.AddComponent<Rigidbody>();
@@ -18,7 +19,15 @@ namespace C2M2.Interaction.VR
         {
             // Initialize new collider array
             Collider[] allColliders = new Collider[1];
-            allColliders = gameObject.GetComponentsInChildren<Collider>();
+            if(source == null)
+            {
+                allColliders = gameObject.GetComponentsInChildren<Collider>();
+            }
+            else
+            {
+                allColliders = source;
+            }
+                 
             List<Collider> grabColliders = new List<Collider>(allColliders.Length / 2);
             for(int i = 0; i < allColliders.Length; i++)
             {

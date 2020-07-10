@@ -143,8 +143,8 @@ namespace C2M2.MolecularDynamics.Simulation
             {
                 pbcFlag[i] = Vector3Int.zero;
             }
-
         }
+
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
         /// Reads and stores PDB and PSF data, uses the data to build the system visualization
@@ -291,6 +291,7 @@ namespace C2M2.MolecularDynamics.Simulation
                 Transform mol = sphereTransforms[0].parent;
                 mol.localScale = new Vector3(xScale, yScale, zScale);
             }
+
             void RenderBonds(int[] bonds, Transform[] sphereTransforms)
             {
                 // The max bond length should be 1/3 of the shortest edge length
