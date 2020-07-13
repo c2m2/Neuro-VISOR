@@ -13,6 +13,44 @@ using Grid = C2M2.NeuronalDynamics.UGX.Grid;
 
 namespace C2M2.NeuronalDynamics.Simulation
 {
+    public struct CellPathPacket
+    {
+        public string name { get; private set; }
+        public string path1D { get; private set; }
+        public string path3D { get; private set; }
+        public string pathTris { get; private set; }
+
+        public CellPathPacket(string path1D, string path3D, string pathTris, string name = "")
+        {
+            this.name = name;
+            this.path1D = path1D;
+            this.path3D = path3D;
+            this.pathTris = pathTris;
+        }
+        /// <summary>
+        /// Provide the absolute path to a directory containing all of the files
+        /// </summary>
+        public CellPathPacket(string sourceDir, string name = "")
+        {
+            this.name = name;
+            // Default values
+            this.path1D = "NULL";
+            this.path3D = "NULL";
+            this.pathTris = "NULL";
+
+            string[] files = Directory.GetFiles(sourceDir);
+            foreach (string file in files)
+            {
+                // If this isn't a non-metadata ugx file,
+                if (!file.EndsWith(".meta") && file.EndsWith(".ugx"))
+                {
+                    if (file.EndsWith("_1d.ugx")) path1D = file;  // 1D cell
+                    else if (file.EndsWith("tris.ugx")) pathTris = file;    // Triangles
+                    else if (file.EndsWith(".ugx")) path3D = file;     // If it isn't specified as 1D or triangles, it's most likely 3D
+                }
+            }
+        }
+    }
     /// <summary>
     /// Provide an interface for 1D neuron-surface simulations to be visualized and interacted with
     /// </summary>
@@ -28,11 +66,20 @@ namespace C2M2.NeuronalDynamics.Simulation
         public enum RefinementLevel { x0, x1, x2, x3, x4 }
         public RefinementLevel refinementLevel = RefinementLevel.x1;
 
+        public string cell1xPath = "NULL";
+        public string cell2xPath = "NULL";
+        public string cell3xPath = "NULL";
+        public string cell4xPath = "NULL";
+        public string cell5xPath = "NULL";
+
+        /*
         public string cell1DPath = "NULL";
         public string cell3DPath = "NULL";
         public string cellTrianglesPath = "NULL";
         public string cell3DColliderPath = "NULL";
         public string cellTrianglesColliderPath = "NULL";
+        */
+    
 
         [Header("1D Visualization")]
         public bool visualize1D = false;
@@ -44,6 +91,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         ///<summary> Lookup a 3D vert and get back two 1D indices and a lambda value for them </summary>
         private Dictionary<int, Tuple<int, int, double>> map;
         private MappingInfo mapping;
+
 
         /// <summary>
         /// Translate 1D vertex values to 3D values and pass them upwards for visualization
@@ -126,8 +174,15 @@ namespace C2M2.NeuronalDynamics.Simulation
 
         protected override void ReadData()
         {
+            CellPathPacket pathPacket = new CellPathPacket(cell1xPath, "1xDiameter");   
+            ReadCellFiles(pathPacket);
+        }
+
+        private void ReadCellFiles(CellPathPacket cellPaths)
+        {
             // Read in 1D & 3D data and build a map between them
-            mapping = MapUtils.BuildMap(cell1DPath, cell3DPath, false, cellTrianglesPath);
+            Debug.Log("Cell1d: " + cellPaths.path1D + "\ncell3d: " + cellPaths.path3D + "\ncellTris: " + cellPaths.pathTris);
+            mapping = MapUtils.BuildMap(cellPaths.path1D, cellPaths.path3D, false, cellPaths.pathTris);
             map = mapping.Data;
 
             // Pass the cell to simulation code
@@ -168,24 +223,31 @@ namespace C2M2.NeuronalDynamics.Simulation
             Mesh BuildMeshCollider()
             {
                 MeshColController meshColController = gameObject.AddComponent<MeshColController>();
+                Mesh blownupMesh = null;
+
 
                 // Build blownup mesh name
+                CellPathPacket cellPathPacket = new CellPathPacket();
                 string scale = "";
                 switch (meshColScale)
                 {
                     case (MeshColScaling.x1):
-                        scale = "x1";
+                        blownupMesh = cellMesh;
                         break;
                     case (MeshColScaling.x2):
+                        cellPathPacket = new CellPathPacket(cell2xPath);
                         scale = "x2";
                         break;
                     case (MeshColScaling.x3):
+                        cellPathPacket = new CellPathPacket(cell3xPath);
                         scale = "x3";
                         break;
                     case (MeshColScaling.x4):
+                        cellPathPacket = new CellPathPacket(cell4xPath);
                         scale = "x4";
                         break;
                     case (MeshColScaling.x5):
+                        cellPathPacket = new CellPathPacket(cell5xPath);
                         scale = "x5";
                         break;
                     default:
@@ -193,20 +255,13 @@ namespace C2M2.NeuronalDynamics.Simulation
                         break;
                 }
 
-                Mesh blownupMesh = null;
-
                 // Use 1x scaling as the default case
-                if (meshColScale == MeshColScaling.x1 || cell3DColliderPath == "NULL" || cellTrianglesColliderPath == "NULL")
+                if (meshColScale != MeshColScaling.x1)
                 {
-                    blownupMesh = cellMesh;
-                    blownupMesh.name = blownupMesh.name + scale;
-                }
-                else
-                {
-                    blownupMesh = MapUtils.BuildMap(cell3DColliderPath,
-                        cell1DPath,
+                    blownupMesh = MapUtils.BuildMap(cellPathPacket.path3D,
+                        cellPathPacket.path1D,
                         false,
-                        cellTrianglesColliderPath).SurfaceGeometry.Mesh;             
+                        cellPathPacket.pathTris).SurfaceGeometry.Mesh;             
                 }
 
                 blownupMesh.name = blownupMesh.name + scale;
