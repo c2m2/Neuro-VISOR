@@ -26,18 +26,31 @@ namespace C2M2.Interaction.UI
             {
                 buttonLookup.Add(buttons[i], i);
             }
+
+            SetDefaultState();
         }
 
         public void HighlightButton(ButtonHighlight target)
         {
+            int index = buttonLookup[target];
+            HighlightButton(index);
+        }
+
+        public void HighlightButton(int index)
+        {
             // Unhighlight all buttons
-            foreach(ButtonHighlight button in buttons)
+            foreach (ButtonHighlight button in buttons)
             {
                 button.Unhighlight();
             }
 
             // Highlight target button
-            buttons[buttonLookup[target]].Highlight();
+            buttons[index].Highlight();
+        }
+
+        private void SetDefaultState()
+        {
+            HighlightButton(0);
         }
     }
 }

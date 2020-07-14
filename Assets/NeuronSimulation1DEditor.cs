@@ -10,60 +10,21 @@ namespace C2M2.NeuronalDynamics.Simulation
     [CustomEditor(typeof(NeuronSimulation1D), true)]
     public class NeuronSimulation1DEditor : Editor
     {
-
-        private readonly char slash = Path.DirectorySeparatorChar;
-        private readonly string activeCellFolder = "ActiveCell";
-        private readonly string neuronCellFolder = "NeuronalDynamics";
-        private readonly string ugxExt = ".ugx";
-        private readonly string spec1D = "_1d";
-        private readonly string specTris = "_tris";
-        private string basePath = "NULL";
-        private string[] cellFileNames;
-
         private int _cellIndex = 0;
         private int prevIndex = -1;
-        private NeuronSimulation1D.MeshColScaling prevScale = NeuronSimulation1D.MeshColScaling.x1;
+        private NeuronSimulation1D.MeshScaling prevScale = NeuronSimulation1D.MeshScaling.x1;
         private NeuronSimulation1D.RefinementLevel prevRef = NeuronSimulation1D.RefinementLevel.x1;
 
-        private void Awake()
+        private string lastPath = "";
+        NeuronSimulation1D neuronSimulation;
+
+        public void Awake()
         {
-            basePath = Application.streamingAssetsPath + slash + neuronCellFolder + slash + activeCellFolder + slash;
+            neuronSimulation = target as NeuronSimulation1D;
         }
-
-        /*static void Apply(string directory)
-        {
-            Texture2D texture = Selection.activeObject as Texture2D;
-            if (texture == null)
-            {
-                EditorUtility.DisplayDialog("Select Texture", "You must select a texture first!", "OK");
-                return;
-            }
-
-
-            if (path.Length != 0)
-            {
-                var fileContent = File.ReadAllBytes(path);
-                texture.LoadImage(fileContent);
-            }
-        }*/
-
-        float thumbnailWidth = 70;
-        float thumbnailHeight = 70;
-        float labelWidth = 150f;
-        string lastPath = "";
-
-        string path1x = "NULL";
-        string path2x = "NULL";
-        string path3x = "NULL";
-        string path4x = "NULL";
-        string path5x = "NULL";
 
         public override void OnInspectorGUI()
         {
-            string cellPath = "";
-            string cellColPath = "";
-
-            var neuronSimulation = target as NeuronSimulation1D;
             if (!Application.isPlaying)
             { 
                 DrawTextField(ref neuronSimulation.cell1xPath, "Cell Path Diameter 1x");
@@ -85,19 +46,6 @@ namespace C2M2.NeuronalDynamics.Simulation
             DrawDefaultInspector();
 
             return;
-
-            string[] BuildCellOptions(string basePath)
-            {
-                // Separate cell option names from full paths
-                string[] allPaths = Directory.GetDirectories(basePath);
-                string[] allPathEnds = new string[allPaths.Length];
-                for (int i = 0; i < allPaths.Length; i++)
-                {
-                    int pos = allPaths[i].LastIndexOf(slash) + 1;
-                    allPathEnds[i] = allPaths[i].Substring(pos, allPaths[i].Length - pos);
-                }
-                return allPathEnds;
-            }
 
             string DrawTextField(ref string target, string name = "")
             {

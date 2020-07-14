@@ -546,6 +546,7 @@ GameObject:
   - component: {fileID: 84921937}
   - component: {fileID: 84921936}
   - component: {fileID: 84921935}
+  - component: {fileID: 84921940}
   m_Layer: 8
   m_Name: 2xButton
   m_TagString: Untagged
@@ -628,6 +629,17 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 84921940}
+        m_MethodName: Switch
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: C2M2.Interaction.RaycastPressEvents+RaycastHitEvent, Assembly-CSharp,
       Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
   onHoldPress:
@@ -662,6 +674,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 84921933}
   m_CullTransparentMesh: 0
+--- !u!114 &84921940
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 84921933}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d23872867050766499a857f583196f88, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  neuronSimulation1D: {fileID: 1818162880}
+  changeViz: 1
+  meshScale: 1
 --- !u!1 &85782268
 GameObject:
   m_ObjectHideFlags: 0
@@ -2391,6 +2418,7 @@ GameObject:
   - component: {fileID: 405588340}
   - component: {fileID: 405588339}
   - component: {fileID: 405588338}
+  - component: {fileID: 405588343}
   m_Layer: 8
   m_Name: 5xButton
   m_TagString: Untagged
@@ -2473,6 +2501,17 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 405588343}
+        m_MethodName: Switch
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: C2M2.Interaction.RaycastPressEvents+RaycastHitEvent, Assembly-CSharp,
       Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
   onHoldPress:
@@ -2507,6 +2546,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 405588336}
   m_CullTransparentMesh: 0
+--- !u!114 &405588343
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 405588336}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d23872867050766499a857f583196f88, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  neuronSimulation1D: {fileID: 1818162880}
+  changeViz: 1
+  meshScale: 4
 --- !u!1 &414719528
 GameObject:
   m_ObjectHideFlags: 0
@@ -3118,6 +3172,7 @@ GameObject:
   - component: {fileID: 494834595}
   - component: {fileID: 494834593}
   - component: {fileID: 494834594}
+  - component: {fileID: 494834599}
   m_Layer: 8
   m_Name: 4xButton
   m_TagString: Untagged
@@ -3179,6 +3234,17 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 494834599}
+        m_MethodName: Switch
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: C2M2.Interaction.RaycastPressEvents+RaycastHitEvent, Assembly-CSharp,
       Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
   onHoldPress:
@@ -3234,6 +3300,21 @@ RectTransform:
   m_AnchoredPosition: {x: 200, y: 129}
   m_SizeDelta: {x: 40, y: 40}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &494834599
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 494834592}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d23872867050766499a857f583196f88, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  neuronSimulation1D: {fileID: 1818162880}
+  changeViz: 0
+  meshScale: 3
 --- !u!1 &504020900
 GameObject:
   m_ObjectHideFlags: 0
@@ -4059,6 +4140,7 @@ GameObject:
   - component: {fileID: 612362761}
   - component: {fileID: 612362764}
   - component: {fileID: 612362763}
+  - component: {fileID: 612362758}
   m_Layer: 8
   m_Name: 1xButton
   m_TagString: Untagged
@@ -4087,6 +4169,21 @@ RectTransform:
   m_AnchoredPosition: {x: -400, y: 129}
   m_SizeDelta: {x: 40, y: 40}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &612362758
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 612362756}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d23872867050766499a857f583196f88, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  neuronSimulation1D: {fileID: 1818162880}
+  changeViz: 1
+  meshScale: 0
 --- !u!222 &612362760
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -4116,6 +4213,17 @@ MonoBehaviour:
         m_Arguments:
           m_ObjectArgument: {fileID: 612362764}
           m_ObjectArgumentAssemblyTypeName: C2M2.Interaction.UI.ButtonHighlight, Assembly-CSharp
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 612362758}
+        m_MethodName: Switch
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -6340,6 +6448,7 @@ GameObject:
   - component: {fileID: 1145566352}
   - component: {fileID: 1145566350}
   - component: {fileID: 1145566351}
+  - component: {fileID: 1145566356}
   m_Layer: 8
   m_Name: 3xButton
   m_TagString: Untagged
@@ -6401,6 +6510,17 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 1145566356}
+        m_MethodName: Switch
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 3
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: C2M2.Interaction.RaycastPressEvents+RaycastHitEvent, Assembly-CSharp,
       Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
   onHoldPress:
@@ -6456,6 +6576,21 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 129}
   m_SizeDelta: {x: 40, y: 40}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1145566356
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1145566349}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d23872867050766499a857f583196f88, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  neuronSimulation1D: {fileID: 1818162880}
+  changeViz: 0
+  meshScale: 2
 --- !u!1 &1195404900
 GameObject:
   m_ObjectHideFlags: 0
@@ -7094,6 +7229,7 @@ GameObject:
   - component: {fileID: 1446264792}
   - component: {fileID: 1446264791}
   - component: {fileID: 1446264790}
+  - component: {fileID: 1446264795}
   m_Layer: 8
   m_Name: 5xButton
   m_TagString: Untagged
@@ -7176,6 +7312,17 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 1446264795}
+        m_MethodName: Switch
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: C2M2.Interaction.RaycastPressEvents+RaycastHitEvent, Assembly-CSharp,
       Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
   onHoldPress:
@@ -7210,6 +7357,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1446264788}
   m_CullTransparentMesh: 0
+--- !u!114 &1446264795
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1446264788}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d23872867050766499a857f583196f88, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  neuronSimulation1D: {fileID: 1818162880}
+  changeViz: 0
+  meshScale: 4
 --- !u!1 &1455503061
 GameObject:
   m_ObjectHideFlags: 0
@@ -7899,6 +8061,7 @@ GameObject:
   - component: {fileID: 1623749446}
   - component: {fileID: 1623749444}
   - component: {fileID: 1623749445}
+  - component: {fileID: 1623749450}
   m_Layer: 8
   m_Name: 2xButton
   m_TagString: Untagged
@@ -7960,6 +8123,17 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 1623749450}
+        m_MethodName: Switch
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 2
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: C2M2.Interaction.RaycastPressEvents+RaycastHitEvent, Assembly-CSharp,
       Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
   onHoldPress:
@@ -8015,6 +8189,21 @@ RectTransform:
   m_AnchoredPosition: {x: -200, y: 129}
   m_SizeDelta: {x: 40, y: 40}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1623749450
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1623749443}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d23872867050766499a857f583196f88, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  neuronSimulation1D: {fileID: 1818162880}
+  changeViz: 0
+  meshScale: 1
 --- !u!1 &1639235148
 GameObject:
   m_ObjectHideFlags: 0
@@ -8029,6 +8218,7 @@ GameObject:
   - component: {fileID: 1639235151}
   - component: {fileID: 1639235149}
   - component: {fileID: 1639235150}
+  - component: {fileID: 1639235155}
   m_Layer: 8
   m_Name: 1xButton
   m_TagString: Untagged
@@ -8090,6 +8280,17 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 1639235155}
+        m_MethodName: Switch
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 1
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: C2M2.Interaction.RaycastPressEvents+RaycastHitEvent, Assembly-CSharp,
       Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
   onHoldPress:
@@ -8145,6 +8346,21 @@ RectTransform:
   m_AnchoredPosition: {x: -400, y: 129}
   m_SizeDelta: {x: 40, y: 40}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1639235155
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1639235148}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d23872867050766499a857f583196f88, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  neuronSimulation1D: {fileID: 1818162880}
+  changeViz: 0
+  meshScale: 0
 --- !u!1 &1642362549
 GameObject:
   m_ObjectHideFlags: 0
@@ -8867,13 +9083,14 @@ MonoBehaviour:
   extremaMethod: 2
   globalMax: -Infinity
   globalMin: Infinity
+  meshScale: 0
   meshColScale: 2
   refinementLevel: 1
-  cell1xPath: NULL
-  cell2xPath: NULL
-  cell3xPath: NULL
-  cell4xPath: NULL
-  cell5xPath: NULL
+  cell1xPath: C:/Users/jacob/Desktop/C2M2/virtual-reality/Assets/StreamingAssets/NeuronalDynamics/ActiveCell/Cell2-0a/1xDiameter/Cell0-2a-1ref
+  cell2xPath: C:/Users/jacob/Desktop/C2M2/virtual-reality/Assets/StreamingAssets/NeuronalDynamics/ActiveCell/Cell2-0a/2xDiameter/Cell2-0a-1ref
+  cell3xPath: C:/Users/jacob/Desktop/C2M2/virtual-reality/Assets/StreamingAssets/NeuronalDynamics/ActiveCell/Cell2-0a/3xDiameter/Cell2-0a-1ref
+  cell4xPath: C:/Users/jacob/Desktop/C2M2/virtual-reality/Assets/StreamingAssets/NeuronalDynamics/ActiveCell/Cell2-0a/4xDiameter/Cell2-0a-1ref
+  cell5xPath: C:/Users/jacob/Desktop/C2M2/virtual-reality/Assets/StreamingAssets/NeuronalDynamics/ActiveCell/Cell2-0a/5xDiameter/Cell2-0a-1ref
   visualize1D: 0
   color1D:
     serializedVersion: 2
@@ -9143,6 +9360,7 @@ GameObject:
   - component: {fileID: 1830665394}
   - component: {fileID: 1830665393}
   - component: {fileID: 1830665392}
+  - component: {fileID: 1830665397}
   m_Layer: 8
   m_Name: 4xButton
   m_TagString: Untagged
@@ -9225,6 +9443,17 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 1830665397}
+        m_MethodName: Switch
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: C2M2.Interaction.RaycastPressEvents+RaycastHitEvent, Assembly-CSharp,
       Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
   onHoldPress:
@@ -9259,6 +9488,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1830665390}
   m_CullTransparentMesh: 0
+--- !u!114 &1830665397
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1830665390}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d23872867050766499a857f583196f88, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  neuronSimulation1D: {fileID: 1818162880}
+  changeViz: 1
+  meshScale: 3
 --- !u!1 &1845977080
 GameObject:
   m_ObjectHideFlags: 0
@@ -9963,6 +10207,7 @@ GameObject:
   - component: {fileID: 2004883565}
   - component: {fileID: 2004883564}
   - component: {fileID: 2004883563}
+  - component: {fileID: 2004883568}
   m_Layer: 8
   m_Name: 3xButton
   m_TagString: Untagged
@@ -10045,6 +10290,17 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 2004883568}
+        m_MethodName: Switch
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: C2M2.Interaction.RaycastPressEvents+RaycastHitEvent, Assembly-CSharp,
       Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
   onHoldPress:
@@ -10079,6 +10335,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2004883561}
   m_CullTransparentMesh: 0
+--- !u!114 &2004883568
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2004883561}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d23872867050766499a857f583196f88, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  neuronSimulation1D: {fileID: 1818162880}
+  changeViz: 1
+  meshScale: 2
 --- !u!1 &2066163154
 GameObject:
   m_ObjectHideFlags: 0

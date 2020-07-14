@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System;
 using C2M2.NeuronalDynamics.UGX;
+using Math = C2M2.Utils.Math;
 using C2M2.Utils.DebugUtils;
 using C2M2.Utils.MeshUtils;
 using C2M2.Interaction;
@@ -59,18 +60,19 @@ namespace C2M2.NeuronalDynamics.Simulation
     /// </remarks>
     public abstract class NeuronSimulation1D : MeshSimulation
     {   
-        public enum MeshColScaling { x1, x2, x3, x4, x5 }
+        public enum MeshScaling { x1 = 0, x2 = 1, x3 = 2, x4 = 3, x5 = 4}
         [Header("3D Visualization")]
         [Tooltip("Which mesh scale to use for the mesh collider used for raycasting. Larger meshes will be easier to interact with, but less accurate")]
-        public MeshColScaling meshColScale = MeshColScaling.x1;
+        public MeshScaling meshScale = MeshScaling.x1;
+        public MeshScaling meshColScale = MeshScaling.x1;
         public enum RefinementLevel { x0, x1, x2, x3, x4 }
         public RefinementLevel refinementLevel = RefinementLevel.x1;
 
-        public string cell1xPath = "NULL";
-        public string cell2xPath = "NULL";
-        public string cell3xPath = "NULL";
-        public string cell4xPath = "NULL";
-        public string cell5xPath = "NULL";
+        public string cell1xPath;
+        public string cell2xPath;
+        public string cell3xPath;
+        public string cell4xPath;
+        public string cell5xPath;
 
         /*
         public string cell1DPath = "NULL";
@@ -91,6 +93,9 @@ namespace C2M2.NeuronalDynamics.Simulation
         ///<summary> Lookup a 3D vert and get back two 1D indices and a lambda value for them </summary>
         private Dictionary<int, Tuple<int, int, double>> map;
         private MappingInfo mapping;
+
+        private MeshColController meshColController = null;
+        private Mesh[] scaledMeshes = new Mesh[5];
 
 
         /// <summary>
@@ -174,15 +179,13 @@ namespace C2M2.NeuronalDynamics.Simulation
 
         protected override void ReadData()
         {
-            CellPathPacket pathPacket = new CellPathPacket(cell1xPath, "1xDiameter");   
-            ReadCellFiles(pathPacket);
-        }
+            CellPathPacket pathPacket = new CellPathPacket(cell1xPath, "1xDiameter");
 
-        private void ReadCellFiles(CellPathPacket cellPaths)
-        {
             // Read in 1D & 3D data and build a map between them
-            Debug.Log("Cell1d: " + cellPaths.path1D + "\ncell3d: " + cellPaths.path3D + "\ncellTris: " + cellPaths.pathTris);
-            mapping = MapUtils.BuildMap(cellPaths.path1D, cellPaths.path3D, false, cellPaths.pathTris);
+            mapping = MapUtils.BuildMap(pathPacket.path1D,
+                pathPacket.path3D,
+                false,
+                pathPacket.pathTris);
             map = mapping.Data;
 
             // Pass the cell to simulation code
@@ -198,55 +201,65 @@ namespace C2M2.NeuronalDynamics.Simulation
             Mesh cellMesh = new Mesh();
             if (!dryRun)
             {
-                cellMesh = Clean3DCell();
+                cellMesh = Clean3DCell(cellMesh);
+
+                scaledMeshes[(int)MeshScaling.x1] = cellMesh;
+
                 if (visualize1D) Render1DCell();
-                BuildMeshCollider();
+
+                meshColController = gameObject.AddComponent<MeshColController>();
+
+                // Pass blownupMesh upwards to SurfaceSimulation
+                colliderMesh = BuildMesh(meshColScale);
             }
 
             return cellMesh;
-
-            Mesh Clean3DCell()
-            {
-                Mesh mesh = mapping.SurfaceGeometry.Mesh;
-                mesh.Rescale(transform, new Vector3(4, 4, 4));
-                mesh.RecalculateNormals();
-                return mesh;
-            }
 
             void Render1DCell()
             {
                 Grid geom1D = mapping.ModelGeometry;
                 GameObject lines1D = gameObject.AddComponent<LinesRenderer>().Constr(geom1D, color1D, lineWidth1D);
             }
+        }
 
-            // Returns whichever mesh is used for the mesh collider
-            Mesh BuildMeshCollider()
+        Mesh Clean3DCell(Mesh mesh)
+        {
+            mesh = mapping.SurfaceGeometry.Mesh;
+            mesh.Rescale(transform, new Vector3(4, 4, 4));
+            mesh.RecalculateNormals();
+            return mesh;
+        }
+
+
+        // Returns whichever mesh is used for the mesh collider
+        private Mesh BuildMesh(MeshScaling meshScale)
+        {
+            if (scaledMeshes[(int)meshScale] == null)
             {
-                MeshColController meshColController = gameObject.AddComponent<MeshColController>();
-                Mesh blownupMesh = null;
-
+                Mesh mesh = null;
 
                 // Build blownup mesh name
                 CellPathPacket cellPathPacket = new CellPathPacket();
                 string scale = "";
-                switch (meshColScale)
+                switch (meshScale)
                 {
-                    case (MeshColScaling.x1):
-                        blownupMesh = cellMesh;
+                    case (MeshScaling.x1):
+                        cellPathPacket = new CellPathPacket(cell1xPath);
+                        scale = "x1";
                         break;
-                    case (MeshColScaling.x2):
+                    case (MeshScaling.x2):
                         cellPathPacket = new CellPathPacket(cell2xPath);
                         scale = "x2";
                         break;
-                    case (MeshColScaling.x3):
+                    case (MeshScaling.x3):
                         cellPathPacket = new CellPathPacket(cell3xPath);
                         scale = "x3";
                         break;
-                    case (MeshColScaling.x4):
+                    case (MeshScaling.x4):
                         cellPathPacket = new CellPathPacket(cell4xPath);
                         scale = "x4";
                         break;
-                    case (MeshColScaling.x5):
+                    case (MeshScaling.x5):
                         cellPathPacket = new CellPathPacket(cell5xPath);
                         scale = "x5";
                         break;
@@ -255,22 +268,62 @@ namespace C2M2.NeuronalDynamics.Simulation
                         break;
                 }
 
-                // Use 1x scaling as the default case
-                if (meshColScale != MeshColScaling.x1)
-                {
-                    blownupMesh = MapUtils.BuildMap(cellPathPacket.path3D,
-                        cellPathPacket.path1D,
-                        false,
-                        cellPathPacket.pathTris).SurfaceGeometry.Mesh;             
-                }
+                mesh = MapUtils.BuildMap(cellPathPacket.path3D,
+                    cellPathPacket.path1D,
+                    false,
+                    cellPathPacket.pathTris).SurfaceGeometry.Mesh;
 
-                blownupMesh.name = blownupMesh.name + scale;
+                mesh.name = mesh.name + scale;
 
-                // Pass blownupMesh upwards to SurfaceSimulation
-                colliderMesh = blownupMesh;
-
-                return blownupMesh;
+                scaledMeshes[(int)meshScale] = mesh;
             }
+
+            return scaledMeshes[(int)meshScale];
+        }
+
+        public void SwitchColliderMesh(int scale)
+        {
+            // 1 <= scale <= 5
+            scale = Math.Min(Math.Max(scale, 0), 4);
+            if(scaledMeshes[scale] == null)
+            {
+                BuildMesh((MeshScaling)scale);
+            }
+            meshColController.Mesh = scaledMeshes[scale];
+        }
+
+        public void SwitchMesh(int scale)
+        {
+            // 1 <= scale <= 5
+            scale = Math.Min(Math.Max(scale, 0), 4);
+            MeshScaling meshscale = (MeshScaling)scale;
+            Debug.Log("Scale: " + scale + "\nMeshScaling: " + meshscale);
+            if (scaledMeshes[scale] == null)
+            {
+                BuildMesh(meshscale);
+            }
+
+            MeshFilter mf = GetComponent<MeshFilter>();
+
+            if (mf != null) mf.sharedMesh = scaledMeshes[scale];
+            else Debug.LogError("No MeshFilter found on " + name);
+        }
+
+        /// <summary>
+        /// Switch the visualization or collider mesh
+        /// </summary>
+        /// <param name="mesh"></param>
+        private void SwitchColliderMesh(Mesh mesh)
+        {
+            if(meshColController != null)
+            {
+                if (mesh != null)
+                {
+                    meshColController.Mesh = mesh;
+                }
+                else Debug.LogError("Mesh given for collider is invalid.");
+            }
+            else Debug.LogError("No MeshColController found.");
         }
     }
 }
