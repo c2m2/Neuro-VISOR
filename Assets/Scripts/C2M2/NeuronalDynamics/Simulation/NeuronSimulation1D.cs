@@ -45,7 +45,7 @@ namespace C2M2.NeuronalDynamics.Simulation
                 if (!file.EndsWith(".meta") && file.EndsWith(".ugx"))
                 {
                     if (file.EndsWith("_1d.ugx")) path1D = file;  // 1D cell
-                    else if (file.EndsWith("tris.ugx")) pathTris = file;    // Triangles
+                    else if (file.EndsWith("_tris.ugx")) pathTris = file;    // Triangles
                     else if (file.EndsWith(".ugx")) path3D = file;     // If it isn't specified as 1D or triangles, it's most likely 3D
                 }
             }
