@@ -21,6 +21,8 @@ namespace C2M2
         public Material vertexColorationMaterial;
         public Material lineRendMaterial;
 
+        [Tooltip("Used as an anchor point for neuron diameter control panel")]
+        public Transform whiteboard = null;
         public Vector3 objectScaleDefault = new Vector3(1f, 1f, 1f);
         //[Header("Raycasters")]
         public RaycastForward rightRaycaster;

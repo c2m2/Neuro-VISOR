@@ -211,6 +211,8 @@ namespace C2M2.NeuronalDynamics.Simulation
 
                 // Pass blownupMesh upwards to SurfaceSimulation
                 colliderMesh = BuildMesh(meshColScale);
+
+                BuildUI();
             }
 
             return cellMesh;
@@ -220,6 +222,19 @@ namespace C2M2.NeuronalDynamics.Simulation
                 Grid geom1D = mapping.ModelGeometry;
                 GameObject lines1D = gameObject.AddComponent<LinesRenderer>().Constr(geom1D, color1D, lineWidth1D);
             }
+        }
+
+        private void BuildUI()
+        {
+            // Instantiate neuron diameter control panel, announce active simulation to each button
+            GameObject diameterControlPanel = Resources.Load("Prefabs/NeuronDiameterControls") as GameObject;
+            SwitchNeuronMesh[] buttons = diameterControlPanel.GetComponentsInChildren<SwitchNeuronMesh>();
+            foreach(SwitchNeuronMesh button in buttons)
+            {
+                button.neuronSimulation1D = this;
+            }
+
+            GameObject.Instantiate(diameterControlPanel, GameManager.instance.whiteboard);
         }
 
         Mesh Clean3DCell(Mesh mesh)
@@ -297,7 +312,7 @@ namespace C2M2.NeuronalDynamics.Simulation
             // 1 <= scale <= 5
             scale = Math.Min(Math.Max(scale, 0), 4);
             MeshScaling meshscale = (MeshScaling)scale;
-            Debug.Log("Scale: " + scale + "\nMeshScaling: " + meshscale);
+
             if (scaledMeshes[scale] == null)
             {
                 BuildMesh(meshscale);
