@@ -7,6 +7,7 @@ namespace C2M2.Interaction.UI
     public class ButtonHighlightManager : MonoBehaviour
     {
         public ButtonHighlight[] buttons = null;
+        public int activeIndex { get; private set; } = -1;
 
         private Dictionary<ButtonHighlight, int> buttonLookup;
 
@@ -46,6 +47,8 @@ namespace C2M2.Interaction.UI
 
             // Highlight target button
             buttons[index].Highlight();
+
+            activeIndex = index;
         }
 
         private void SetDefaultState()
