@@ -63,8 +63,8 @@ namespace C2M2.NeuronalDynamics.Simulation
         public enum MeshScaling { x1 = 0, x2 = 1, x3 = 2, x4 = 3, x5 = 4}
         [Header("3D Visualization")]
         [Tooltip("Which mesh scale to use for the mesh collider used for raycasting. Larger meshes will be easier to interact with, but less accurate")]
-        public MeshScaling meshScale = MeshScaling.x1;
-        public MeshScaling meshColScale = MeshScaling.x1;
+        private MeshScaling meshScale = MeshScaling.x1;
+        private MeshScaling meshColScale = MeshScaling.x1;
         public enum RefinementLevel { x0, x1, x2, x3, x4 }
         public RefinementLevel refinementLevel = RefinementLevel.x1;
 
@@ -237,6 +237,15 @@ namespace C2M2.NeuronalDynamics.Simulation
             GameObject.Instantiate(diameterControlPanel, GameManager.instance.whiteboard);
         }
 
+        public void RescaleMesh(Vector3 newSize)
+        {
+            MeshFilter mf = GetComponent<MeshFilter>();
+            if (mf != null && mf.sharedMesh != null)
+            {
+                mf.sharedMesh.Rescale(transform, newSize);
+            }
+        }
+
         Mesh Clean3DCell(Mesh mesh)
         {
             mesh = mapping.SurfaceGeometry.Mesh;
@@ -299,26 +308,19 @@ namespace C2M2.NeuronalDynamics.Simulation
         }
 
         public void SwitchColliderMesh(int scale)
-        {
-            // 1 <= scale <= 5
-            scale = Math.Min(Math.Max(scale, 0), 4);
-            if(scaledMeshes[scale] == null)
-            {
-                BuildMesh((MeshScaling)scale);
-            }
+        {    
+            scale = Math.Clamp(scale, 0, 4);
+
+            if(scaledMeshes[scale] == null) BuildMesh((MeshScaling)scale);
+
             meshColController.Mesh = scaledMeshes[scale];
         }
 
         public void SwitchMesh(int scale)
         {
-            // 1 <= scale <= 5
-            scale = Math.Min(Math.Max(scale, 0), 4);
-            MeshScaling meshscale = (MeshScaling)scale;
+            scale = Math.Clamp(scale, 0, 4);
 
-            if (scaledMeshes[scale] == null)
-            {
-                BuildMesh(meshscale);
-            }
+            if (scaledMeshes[scale] == null) BuildMesh((MeshScaling)scale);
 
             MeshFilter mf = GetComponent<MeshFilter>();
 
