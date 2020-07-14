@@ -288,8 +288,10 @@ namespace C2M2.NeuronalDynamics.Simulation
                     false,
                     cellPathPacket.pathTris).SurfaceGeometry.Mesh;
 
-                mesh.name = mesh.name + scale;
+                mesh.RecalculateNormals();
 
+                mesh.name = mesh.name + scale;
+                
                 scaledMeshes[(int)meshScale] = mesh;
             }
 
