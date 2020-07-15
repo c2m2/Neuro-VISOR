@@ -47,7 +47,6 @@ namespace C2M2.Interaction.UI
 
             // Highlight target button
             buttons[index].Highlight();
-
             activeIndex = index;
         }
 

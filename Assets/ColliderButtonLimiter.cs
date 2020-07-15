@@ -15,7 +15,8 @@ namespace C2M2.Interaction.UI {
             if(colController.activeIndex < vizController.activeIndex)
             {
                 colController.HighlightButton(vizController.activeIndex);
-                colController.buttons[colController.activeIndex].gameObject.GetComponent<RaycastPressEvents>().OnPress.Invoke(new RaycastHit());
+                ButtonHighlight correctButton = colController.buttons[colController.activeIndex];
+                correctButton.gameObject.GetComponent<RaycastPressEvents>().OnPress.Invoke(new RaycastHit());
             }
         }
     }
