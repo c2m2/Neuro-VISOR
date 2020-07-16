@@ -75,7 +75,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         public string filePath { get; private set; }
         public MappingInfo data { get; private set; }
        
-        public Mesh mesh
+        public Mesh mesh 
         {
             get
             {
