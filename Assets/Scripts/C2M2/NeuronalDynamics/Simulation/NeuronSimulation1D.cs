@@ -68,6 +68,41 @@ namespace C2M2.NeuronalDynamics.Simulation
             this.lambda = lambda;
         }
     }
+
+    public struct CellInfo
+    {
+        public string name { get; private set; }
+        public string filePath { get; private set; }
+        public MappingInfo data { get; private set; }
+       
+        public Mesh mesh
+        {
+            get
+            {
+                return data.SurfaceGeometry.Mesh;
+            }
+        }
+        public CellInfo(string filePath, string name = "")
+        {
+            this.name = name;
+            this.filePath = filePath;
+            CellPathPacket paths = new CellPathPacket(filePath);
+
+            if (paths.path3D != "NULL" && paths.path1D != "NULL" && paths.pathTris != "NULL")
+            {
+                data = MapUtils.BuildMap(paths.path3D, paths.path1D, false, paths.pathTris);
+            }
+            else
+            {
+                string s = "";
+                if (paths.path3D == "NULL") s += " [3D Cell] ";
+                if (paths.path1D == "NULL") s += " [1D Cell] ";
+                if (paths.pathTris == "NULL") s += " [Cell Triangles] ";
+                throw new NullReferenceException("Null paths found for " + s);
+            }
+
+        }
+    }
     /// <summary>
     /// Provide an interface for 1D neuron-surface simulations to be visualized and interacted with
     /// </summary>
@@ -84,6 +119,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         public enum RefinementLevel { x0, x1, x2, x3, x4 }
         public RefinementLevel refinementLevel = RefinementLevel.x1;
 
+        // Need mesh options for each refinement, diameter level
         public string cell1xPath;
         public string cell2xPath;
         public string cell3xPath;
@@ -130,23 +166,6 @@ namespace C2M2.NeuronalDynamics.Simulation
             //double[] scalars3D = new double[map.Length];
             for (int i = 0; i < map.Length; i++)
             { // for each 3D point,
-              /*
-              int v1Da = map[i].Item1;
-              int v1Db = map[i].Item2;
-
-              double lambda = map[i].Item3;
-              // Get original 1D values:
-              double val1Da = scalars1D[v1Da];
-              double val1Db = scalars1D[v1Db];
-
-                // Get original 1D values:
-                double val1Da = scalars1D[v1Da];
-                double val1Db = scalars1D[v1Db];
-                // Take an weighted average using lambda
-                // Equivalent to [lambda * val1Db + (1 - lambda) * val1Da]        
-                double newVal = lambda * (val1Db - val1Da) + val1Da;
-
-                */
 
                 // Take an weighted average using lambda
                 // Equivalent to [lambda * val1Db + (1 - lambda) * val1Da]        

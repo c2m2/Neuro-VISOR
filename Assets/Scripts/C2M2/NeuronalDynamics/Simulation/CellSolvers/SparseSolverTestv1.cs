@@ -293,6 +293,11 @@ namespace C2M2.NeuronalDynamics.Simulation
                     tw.Close();
                 }
                 GameManager.instance.DebugLogSafe("Simulation Over.");
+
+                void ReactionStep()
+                {
+
+                }
             }
         }
 
