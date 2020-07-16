@@ -53,6 +53,22 @@ namespace C2M2.NeuronalDynamics.Simulation
         }
     }
     /// <summary>
+    /// Stores two 1D indices and a lambda value for a 3D vertex
+    /// </summary>
+    public struct Vert3D1DPair
+    {
+        public int v1 { get; private set; }
+        public int v2 { get; private set; }
+        public double lambda { get; private set; }
+
+        public Vert3D1DPair(int v1, int v2, double lambda)
+        {
+            this.v1 = v1;
+            this.v2 = v2;
+            this.lambda = lambda;
+        }
+    }
+    /// <summary>
     /// Provide an interface for 1D neuron-surface simulations to be visualized and interacted with
     /// </summary>
     /// <remarks>
@@ -91,11 +107,14 @@ namespace C2M2.NeuronalDynamics.Simulation
         protected Grid grid1D;
 
         ///<summary> Lookup a 3D vert and get back two 1D indices and a lambda value for them </summary>
-        private Dictionary<int, Tuple<int, int, double>> map;
+        //private Dictionary<int, Tuple<int, int, double>> map;
+        private Vert3D1DPair[] map;
         private MappingInfo mapping;
 
         private MeshColController meshColController = null;
         private Mesh[] scaledMeshes = new Mesh[5];
+
+        private double[] scalars3D = new double[0];
 
 
         /// <summary>
@@ -108,19 +127,31 @@ namespace C2M2.NeuronalDynamics.Simulation
 
             if (scalars1D == null) { return null; }
 
-            double[] scalars3D = new double[map.Count];
-            for (int i = 0; i < map.Count; i++)
+            //double[] scalars3D = new double[map.Length];
+            for (int i = 0; i < map.Length; i++)
             { // for each 3D point,
-                int v1Da = map[i].Item1;
-                int v1Db = map[i].Item2;
+              /*
+              int v1Da = map[i].Item1;
+              int v1Db = map[i].Item2;
 
-                double lambda = map[i].Item3;
+              double lambda = map[i].Item3;
+              // Get original 1D values:
+              double val1Da = scalars1D[v1Da];
+              double val1Db = scalars1D[v1Db];
+
                 // Get original 1D values:
                 double val1Da = scalars1D[v1Da];
                 double val1Db = scalars1D[v1Db];
                 // Take an weighted average using lambda
                 // Equivalent to [lambda * val1Db + (1 - lambda) * val1Da]        
                 double newVal = lambda * (val1Db - val1Da) + val1Da;
+
+                */
+
+                // Take an weighted average using lambda
+                // Equivalent to [lambda * val1Db + (1 - lambda) * val1Da]        
+                double newVal = map[i].lambda * (scalars1D[map[i].v2] - scalars1D[map[i].v1]) + scalars1D[map[i].v1];
+
                 scalars3D[i] = newVal;
             }
 
@@ -143,6 +174,7 @@ namespace C2M2.NeuronalDynamics.Simulation
                 double val3D = newValues[i].Item2;
 
                 // Translate into two 1D vert indices and a lambda weight
+                /*
                 double lambda = map[vert3D].Item3;
                 double val1D = (1 - lambda) * val3D;
                 new1DValues[j] = new Tuple<int, double>(map[vert3D].Item1, val1D);
@@ -150,7 +182,14 @@ namespace C2M2.NeuronalDynamics.Simulation
                 // Weight newVal by (lambda) for second 1D vert                    
                 val1D = lambda * val3D;
                 new1DValues[j + 1] = new Tuple<int, double>(map[vert3D].Item2, val1D);
+                */
 
+                double val1D = (1 - map[vert3D].lambda) * val3D;
+                new1DValues[j] = new Tuple<int, double>(map[vert3D].v1, val1D);
+
+                // Weight newVal by (lambda) for second 1D vert                    
+                val1D = map[vert3D].lambda * val3D;
+                new1DValues[j + 1] = new Tuple<int, double>(map[vert3D].v2, val1D);
                 // Move up two spots in 1D array
                 j += 2;
             }
@@ -186,7 +225,15 @@ namespace C2M2.NeuronalDynamics.Simulation
                 pathPacket.path3D,
                 false,
                 pathPacket.pathTris);
-            map = mapping.Data;
+            //map = mapping.Data;
+            // Convert dictionary to array for speed
+            map = new Vert3D1DPair[mapping.Data.Count];
+            foreach(KeyValuePair<int, Tuple<int, int, double>> entry in mapping.Data)
+            {
+                map[entry.Key] = new Vert3D1DPair(entry.Value.Item1, entry.Value.Item2, entry.Value.Item3);
+            }
+
+            scalars3D = new double[map.Length];
 
             // Pass the cell to simulation code
             SetNeuronCell(mapping.ModelGeometry);
