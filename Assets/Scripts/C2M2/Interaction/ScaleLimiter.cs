@@ -50,10 +50,10 @@ namespace C2M2.Interaction {
             }
 
             if (maxScale.Equals(Vector3.zero))
-                maxScale = GameManager.instance.objMaxScale;
+                maxScale = GameManager.instance.objScaleMax;
 
             if (minScale.Equals(Vector3.zero))
-                minScale = GameManager.instance.objMinScale;
+                minScale = GameManager.instance.objScaleMin;
 
         }
         // Update is called once per frame

@@ -16,33 +16,34 @@ namespace C2M2
         public int mainThreadId { get; private set; } = -1;
         public string assetsPath { get; private set; } = null;
 
-        [Header("Environment")]
+        [Header("Materials")]
         public Material defaultMaterial;
         public Material vertexColorationMaterial;
         public Material lineRendMaterial;
 
         [Tooltip("Used as an anchor point for neuron diameter control panel")]
         public Transform whiteboard = null;
-        public Vector3 objDefaultScale = new Vector3(1f, 1f, 1f);
-        public Vector3 objMaxScale = new Vector3(4f, 4f, 4f);
-        public Vector3 objMinScale = new Vector3(0.3f, 0.3f, 0.3f);
-        //[Header("Raycasters")]
-        public RaycastForward rightRaycaster;
-        public RaycastForward leftRaycaster;
+        public Vector3 objScaleDefault = new Vector3(2f, 2f, 2f);
+        public Vector3 objScaleMax = new Vector3(4f, 4f, 4f);
+        public Vector3 objScaleMin = new Vector3(0.3f, 0.3f, 0.3f);
+
         [Header("OVR Player Controller")]
         public GameObject ovrRightHandAnchor = null;
         public GameObject ovrLeftHandAnchor = null;
         public OVRPlayerController ovrPlayerController { get; set; } = null;
         public GameObject nonVRCamera { get; set; } = null;
-        [Header("Menu")]
-        public GameObject menu = null;
-        [Header("Raycast Keyboard")]
-        public GameObject raycastKeyboardPrefab;
-        public RaycastKeyboard raycastKeyboard { get; set; }
-        public Transform menuSnapPosition;
+
         [Header("FPS Counter")]
         public Utils.DebugUtils.FPSCounter fpsCounter;
         private bool isRunning = false;
+
+        [Header("Obsolete")]
+        public RaycastForward rightRaycaster;
+        public RaycastForward leftRaycaster;
+        public GameObject menu = null;
+        public GameObject raycastKeyboardPrefab;
+        public RaycastKeyboard raycastKeyboard { get; set; }
+        public Transform menuSnapPosition;
 
         private void Awake()
         {

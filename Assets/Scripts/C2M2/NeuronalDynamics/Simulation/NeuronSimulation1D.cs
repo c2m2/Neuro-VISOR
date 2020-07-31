@@ -288,26 +288,34 @@ namespace C2M2.NeuronalDynamics.Simulation
                 Grid geom1D = mapping.ModelGeometry;
                 GameObject lines1D = gameObject.AddComponent<LinesRenderer>().Constr(geom1D, color1D, lineWidth1D);
             }
-        }
-
-        private void InitUI()
-        {
-            // Instantiate neuron diameter control panel, announce active simulation to each button
-            GameObject diameterControlPanel = Resources.Load("Prefabs/NeuronDiameterControls") as GameObject;
-            SwitchNeuronMesh[] buttons = diameterControlPanel.GetComponentsInChildren<SwitchNeuronMesh>();
-            foreach(SwitchNeuronMesh button in buttons)
+            void InitUI()
             {
-                button.neuronSimulation1D = this;
+                // Instantiate neuron diameter control panel, announce active simulation to each button
+                GameObject diameterControlPanel = Resources.Load("Prefabs/NeuronDiameterControls") as GameObject;
+                SwitchNeuronMesh[] buttons = diameterControlPanel.GetComponentsInChildren<SwitchNeuronMesh>();
+                foreach (SwitchNeuronMesh button in buttons)
+                {
+                    button.neuronSimulation1D = this;
+                }
+
+                GameObject.Instantiate(diameterControlPanel, GameManager.instance.whiteboard);
+
+                // Instantiate a ruler to allow the cell to be scaled interactively
+                GameObject ruler = Resources.Load("Prefabs/Ruler") as GameObject;
+                ruler.GetComponent<GrabbableRuler>().scaleTarget = transform;
+                GameObject.Instantiate(ruler);
+
+                gameObject.AddComponent<ScaleLimiter>();
             }
 
-            GameObject.Instantiate(diameterControlPanel, GameManager.instance.whiteboard);
+            Mesh Clean3DCell(Mesh mesh)
+            {
+                mesh = mapping.SurfaceGeometry.Mesh;
+                mesh.Rescale(transform, new Vector3(4, 4, 4));
+                mesh.RecalculateNormals();
+                return mesh;
+            }
 
-            // Instantiate a ruler to allow the cell to be scaled interactively
-            GameObject ruler = Resources.Load("Prefabs/Ruler") as GameObject;
-            ruler.GetComponent<GrabbableRuler>().scaleTarget = transform;
-            GameObject.Instantiate(ruler);
-
-            gameObject.AddComponent<ScaleLimiter>();
         }
 
         public void RescaleMesh(Vector3 newSize)
@@ -317,14 +325,6 @@ namespace C2M2.NeuronalDynamics.Simulation
             {
                 mf.sharedMesh.Rescale(transform, newSize);
             }
-        }
-
-        Mesh Clean3DCell(Mesh mesh)
-        {
-            mesh = mapping.SurfaceGeometry.Mesh;
-            mesh.Rescale(transform, new Vector3(4, 4, 4));
-            mesh.RecalculateNormals();
-            return mesh;
         }
 
 
