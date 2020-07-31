@@ -23,7 +23,9 @@ namespace C2M2
 
         [Tooltip("Used as an anchor point for neuron diameter control panel")]
         public Transform whiteboard = null;
-        public Vector3 objectScaleDefault = new Vector3(1f, 1f, 1f);
+        public Vector3 objDefaultScale = new Vector3(1f, 1f, 1f);
+        public Vector3 objMaxScale = new Vector3(4f, 4f, 4f);
+        public Vector3 objMinScale = new Vector3(0.3f, 0.3f, 0.3f);
         //[Header("Raycasters")]
         public RaycastForward rightRaycaster;
         public RaycastForward leftRaycaster;

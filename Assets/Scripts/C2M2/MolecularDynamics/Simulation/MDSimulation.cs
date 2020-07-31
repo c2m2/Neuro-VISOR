@@ -278,7 +278,7 @@ namespace C2M2.MolecularDynamics.Simulation
                 float[] boundsArray = { xs.Max(), ys.Max(), zs.Max() };
                 float max = boundsArray.Max();
 
-                Vector3 targetSize = GameManager.instance.objectScaleDefault;
+                Vector3 targetSize = GameManager.instance.objDefaultScale;
                 float[] targetArray = { targetSize.x, targetSize.y, targetSize.z };
                 float min = targetArray.Min();
 

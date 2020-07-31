@@ -32,7 +32,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         //Simulation parameters
         [Header("Simulation Parameters")]
         public double vstart = 55;                        // 55 [mV]
-        public double endTime = 100;                     // End time value
+        public double endTime = 100;                      // End time value
         public double h = 0.27;                           // User enters spatial step size
         public double k = 0.0027;                         // User enters time step size
         public bool HK_auto = true;                       // auto choose H and K
