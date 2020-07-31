@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System;
+using UnityEngine;
 
 namespace C2M2.NeuronalDynamics.UGX
 {
@@ -32,7 +33,7 @@ namespace C2M2.NeuronalDynamics.UGX
 
         public NeuronCell(Grid grid)
         {
-
+            Debug.Log("grid.Edges.Count: " + grid.Edges.Count + "\nvertexCount: " + grid.Mesh.vertexCount);
             AttachmentHandler.Available();
             NodeData tempNode = new NodeData();
             VertexAttachementAccessor<DiameterData> accessor = new VertexAttachementAccessor<DiameterData>(grid);
