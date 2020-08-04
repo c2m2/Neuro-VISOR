@@ -68,6 +68,7 @@ namespace C2M2.NeuronalDynamics.Tests
 
 		go.GetComponent<MeshRenderer>().material = new Material ( Shader.Find ( "Particles/Standard Surface" ) );
 		if (isMappingChecked) {
+
 		  MappingInfo mapping = MapUtils.BuildMap ( cellFiles[1], cellFiles[0], false, cellFiles[2] );
 		  foreach ( var item in mapping.Data ) {
 		       if (Vector3.Distance(vertices2d[item.Key], vertices[item.Value.Item1]) > (thresh * diams[item.Key].Diameter)) {

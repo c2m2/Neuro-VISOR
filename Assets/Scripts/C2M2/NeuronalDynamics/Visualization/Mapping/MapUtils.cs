@@ -96,6 +96,7 @@ namespace C2M2.NeuronalDynamics.UGX
             Dictionary<int, Tuple<int, int, double>> map2d1d = new Dictionary<int, Tuple<int, int, double>>();
             int size1d = grid1d.Mesh.vertices.Length;
             int size3d = grid2d.Mesh.vertices.Length;
+            Debug.Log("size1d: " + size1d + "\nsize3d: " + size3d);
 
             Vector3[] vertices = grid1d.Mesh.vertices;
 
