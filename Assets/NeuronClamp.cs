@@ -4,9 +4,8 @@ using UnityEngine;
 using C2M2.NeuronalDynamics.Simulation;
 using C2M2.Utils.MeshUtils;
 
-namespace C2M2.NeuronalDynamics.Interaction {
-
-    [RequireComponent(typeof(MeshFilter))]
+namespace C2M2.NeuronalDynamics.Interaction
+{
     [RequireComponent(typeof(MeshRenderer))]
     [RequireComponent(typeof(OVRGrabbable))]
     public class NeuronClamp : MonoBehaviour
@@ -19,42 +18,52 @@ namespace C2M2.NeuronalDynamics.Interaction {
 
         public bool use1DVerts = true;
 
+        public Material activeMaterial = null;
+        public Material inactiveMaterial = null;
+
         public LayerMask layerMask;
         public NeuronSimulation1D activeTarget = null;
 
-        private List<int> targetPoints;
-        private Tuple<int, double>[] newValues;
+        private Tuple<int, double>[] newValues = null;
 
-        private Vector3 thisLastPos;
+        private Vector3 lastLocalPos;
+        private bool[] posSettled;
+        private int framesToSette = 10;
+
         private Vector3 simLastPos;
-        private bool ClampMoved { get { return !thisLastPos.Equals(transform.position); } }
-        private bool NeuronMoved { get { return !simLastPos.Equals(activeTarget.transform.position); } }
+        private bool ClampMoved { get { return !lastLocalPos.Equals(transform.localPosition); } }
+        private bool ClampSettled {
+            get
+            {
+                for(int i = 0; i < posSettled.Length; i++)
+                {
+                    if (!posSettled[i]) return false;
+                }
+                return true;
+            }
+        }
         private float radius = -1;
-        private float MaxX { get { return transform.localPosition.x + radius; } }
-        private float MaxY { get { return transform.localPosition.y + radius; } }
-        private float MaxZ { get { return transform.localPosition.z + radius; } }
-        private float MinX { get { return transform.localPosition.x - radius; } }
-        private float MinY { get { return transform.localPosition.y - radius; } }
-        private float MinZ { get { return transform.localPosition.z - radius; } }
 
-        private MeshFilter mf;
         private OVRGrabbable grabbable;
+        private MeshRenderer mr;
         private Bounds bounds;
 
 
 
         private void Awake()
         {
+            mr = GetComponent<MeshRenderer>();
+            bounds = mr.bounds;
+            grabbable = GetComponent<OVRGrabbable>();
+
             if (layerMask.Equals(default(LayerMask)))
             {
                 layerMask = LayerMask.GetMask(new string[] { "Raycast" });
             }
 
-            bounds = GetComponent<MeshRenderer>().bounds;
-            mf = GetComponent<MeshFilter>();
-            grabbable = GetComponent<OVRGrabbable>();
-
             UpdateRadius();
+
+            posSettled = new bool[framesToSette];
         }
 
         private void Update()
@@ -63,7 +72,7 @@ namespace C2M2.NeuronalDynamics.Interaction {
             {
                 // If the clamp is moving, it shouldnt look for a target or have valid points/values
                 ClearTarget();
-                clampLive = false;
+                DeactivateClamp();
             }
             else
             {
@@ -76,7 +85,7 @@ namespace C2M2.NeuronalDynamics.Interaction {
                     { 
                         // If we didn't find a target, clamp should be parented by nothing 
                         ClearTarget();
-                        clampLive = false;
+                        DeactivateClamp();
                         return;
                     }
                 }
@@ -86,8 +95,7 @@ namespace C2M2.NeuronalDynamics.Interaction {
                 {
                     if(newValues == null || prevPower != clampPower)
                     {
-                        targetPoints = GetHitPoints();
-                        newValues = GetNewVals(targetPoints);
+                        newValues = GetNewVals(GetHitPoints());
 
                         if (prevPower != clampPower) prevPower = clampPower;
                     }
@@ -97,16 +105,8 @@ namespace C2M2.NeuronalDynamics.Interaction {
                    
                 }
             }
-            if(transform.parent == null)
-            {
-                Debug.Log("world position: " + transform.position.ToString("F5") + "\nlocalScale: " + transform.localScale + "\nparent: null");
-            }
-            else
-            {
-                Debug.Log("world position: " + transform.position.ToString("F5") + "\nlocalScale: " + transform.localScale + "\nparent: " + transform.parent.name);
-            }
             
-            thisLastPos = transform.position;
+            lastLocalPos = transform.localPosition;           
         }
 
         private bool LookForNewTarget()
@@ -124,11 +124,12 @@ namespace C2M2.NeuronalDynamics.Interaction {
             if (activeTarget == null) return false;
 
             // Set simulation to be parent of clamp so that it follows
-            //Vector3 posTemp = transform.position;
-           // transform.parent = activeTarget.transform;
-            transform.SetParent(activeTarget.transform, true);
-            //transform.position = posTemp;
 
+            transform.SetParent(activeTarget.transform, true);
+            // Translate last location to local space
+            lastLocalPos = transform.InverseTransformPoint(lastLocalPos);
+            //transform.position = posTemp;
+            Debug.Log("Clamp childed under " + activeTarget.name + "\nlocalPos: " + transform.localPosition.ToString("F5") + "\nlastLocalPos: " + lastLocalPos.ToString("F5"));
             UpdateRadius();
             return true;
         }
@@ -136,17 +137,24 @@ namespace C2M2.NeuronalDynamics.Interaction {
         {
             if (activeTarget != null)
             {
-                activeTarget = null;
+                // Transform local position to world space
+                lastLocalPos = transform.TransformPoint(lastLocalPos);
 
-                // Set null parent since clamp is no longer following parent
-               // Vector3 posTemp = transform.position;
+                activeTarget = null;
+                newValues = null;
+
+                // Free clamp from following simulation
                 transform.SetParent(null, true);
-                //transform.position = posTemp;
+
+                Debug.Log("Clamped unchilded.\nlocalPos: " + transform.localPosition.ToString("F5") + "\nlastLocalPos: " + lastLocalPos.ToString("F5"));
             }
         }
         private List<int> GetHitPoints()
         {
             List<int> hitPoints = new List<int>();
+
+            if (activeTarget == null) return hitPoints;
+
             MeshFilter mf = activeTarget.GetComponent<MeshFilter>();
             if (mf == null) return hitPoints;
 
@@ -164,7 +172,6 @@ namespace C2M2.NeuronalDynamics.Interaction {
                     hitPoints.Add(i);
                 }
             }
-            //ClampContains(verts[0]);
 
             return hitPoints;
         }
@@ -179,6 +186,12 @@ namespace C2M2.NeuronalDynamics.Interaction {
             return newVals;
         }
 
+        private float MaxX { get { return transform.localPosition.x + radius; } }
+        private float MaxY { get { return transform.localPosition.y + radius; } }
+        private float MaxZ { get { return transform.localPosition.z + radius; } }
+        private float MinX { get { return transform.localPosition.x - radius; } }
+        private float MinY { get { return transform.localPosition.y - radius; } }
+        private float MinZ { get { return transform.localPosition.z - radius; } }
         private bool ClampContains(in Vector3 point)
         {
             //activeTarget.transform.TransformPoint(point);
@@ -194,6 +207,32 @@ namespace C2M2.NeuronalDynamics.Interaction {
         private void UpdateRadius()
         {
             radius = transform.localScale.x / 2;
+        }
+
+        public void ActivateClamp()
+        {
+            clampLive = true;
+            if (activeMaterial != null)
+            {
+                mr.material = activeMaterial;
+            }
+          
+            //mr.material.color = activeCol;
+        }
+        public void DeactivateClamp()
+        {
+            clampLive = false;
+            if (inactiveMaterial != null)
+            {
+                mr.material = inactiveMaterial;
+            }
+            //mr.material.color = inactiveCol;
+        }
+
+        public void ToggleClamp()
+        {
+            if (clampLive) DeactivateClamp();
+            else ActivateClamp();
         }
     }
 }

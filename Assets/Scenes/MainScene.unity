@@ -2172,13 +2172,15 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 804375218}
+  - component: {fileID: 804375223}
+  - component: {fileID: 804375222}
   - component: {fileID: 804375219}
   - component: {fileID: 804375217}
   - component: {fileID: 804375216}
   - component: {fileID: 804375220}
   - component: {fileID: 804375215}
   - component: {fileID: 804375221}
-  m_Layer: 12
+  m_Layer: 8
   m_Name: Clamp
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2215,7 +2217,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: bf5599eaebc729b4f86d601a473ae5e8, type: 2}
+  - {fileID: 2100000, guid: b5682c8bb520e8a46bbeab52c1a74097, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -2270,7 +2272,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   clampLive: 0
-  clampPower: 0.10000000149011612
+  clampPower: 0.1
+  use1DVerts: 1
+  activeMaterial: {fileID: 2100000, guid: 35c891bae7ccbb440a4193edaae59b1a, type: 2}
+  inactiveMaterial: {fileID: 2100000, guid: b5682c8bb520e8a46bbeab52c1a74097, type: 2}
   layerMask:
     serializedVersion: 2
     m_Bits: 256
@@ -2309,6 +2314,58 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &804375222
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 804375214}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2066920c5141f0e4ca235394b5f8bd4a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  onPress:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 804375219}
+        m_MethodName: ToggleClamp
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_TypeName: C2M2.Interaction.RaycastPressEvents+RaycastHitEvent, Assembly-CSharp,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+  onHoldPress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: C2M2.Interaction.RaycastPressEvents+RaycastHitEvent, Assembly-CSharp,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+  onEndPress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: C2M2.Interaction.RaycastPressEvents+RaycastHitEvent, Assembly-CSharp,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+--- !u!114 &804375223
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 804375214}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6dee7b5c4ddc78f44b1b1919d3ea115d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rightTrigger: {fileID: 804375222}
+  leftTrigger: {fileID: 804375222}
 --- !u!1 &836224700
 GameObject:
   m_ObjectHideFlags: 0
