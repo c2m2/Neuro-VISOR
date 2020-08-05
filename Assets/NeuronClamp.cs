@@ -48,8 +48,6 @@ namespace C2M2.NeuronalDynamics.Interaction
         private MeshRenderer mr;
         private Bounds bounds;
 
-
-
         private void Awake()
         {
             mr = GetComponent<MeshRenderer>();
@@ -66,7 +64,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             posSettled = new bool[framesToSette];
         }
 
-        private void Update()
+        private void FixedUpdate()
         {
             if (ClampMoved || grabbable.isGrabbed)
             {
