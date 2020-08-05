@@ -122,11 +122,11 @@ namespace C2M2.NeuronalDynamics.Interaction
             if (activeTarget == null) return false;
 
             // Set simulation to be parent of clamp so that it follows
-
             transform.SetParent(activeTarget.transform, true);
+
             // Translate last location to local space
             lastLocalPos = transform.InverseTransformPoint(lastLocalPos);
-            //transform.position = posTemp;
+
             Debug.Log("Clamp childed under " + activeTarget.name + "\nlocalPos: " + transform.localPosition.ToString("F5") + "\nlastLocalPos: " + lastLocalPos.ToString("F5"));
             UpdateRadius();
             return true;
