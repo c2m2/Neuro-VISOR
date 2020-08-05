@@ -48,7 +48,7 @@ namespace C2M2.NeuronalDynamics.Simulation
             U.SetSubVector(0, myCell.vertCount, initialConditions(myCell.vertCount));
         }
 
-        protected override double[] Get1DValues()
+        public override double[] Get1DValues()
         {
             double[] curVals = null;
             if (i > -1)
@@ -59,7 +59,7 @@ namespace C2M2.NeuronalDynamics.Simulation
             return curVals;
         }
         // Receive new simulation 1D index/value pairings
-        protected override void Set1DValues(Tuple<int, double>[] newValues)
+        public override void Set1DValues(Tuple<int, double>[] newValues)
         {
             foreach (Tuple<int, double> newVal in newValues)
             {

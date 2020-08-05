@@ -48,7 +48,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         // Keep track of i locally so that we know which simulation frame to send to other scripts
         private int i = -1;
 
-        protected override double[] Get1DValues()
+        public override double[] Get1DValues()
         {
             //return (U != null && i > -1) ? U.SubMatrix(0, U.RowCount, i, 1).ToColumnMajorArray() : null;
             Debug.Log("Here is state: " + U.ToString());
@@ -57,7 +57,7 @@ namespace C2M2.NeuronalDynamics.Simulation
             return (U != null) ? U.SubVector(0, myCell.vertCount).ToArray() : null;
         }
         // Receive new simulation 1D index/value pairings
-        protected override void Set1DValues(Tuple<int, double>[] newValues)
+        public override void Set1DValues(Tuple<int, double>[] newValues)
         {
             foreach (Tuple<int, double> newVal in newValues)
             {

@@ -140,6 +140,8 @@ namespace C2M2.NeuronalDynamics.Simulation
         public Color32 color1D = Color.yellow;
         public float lineWidth1D = 0.005f;
 
+        public Vector3[] Verts1D { get { return mapping.ModelGeometry.Mesh.vertices; } }
+
         protected Grid grid1D;
 
         ///<summary> Lookup a 3D vert and get back two 1D indices and a lambda value for them </summary>
@@ -183,6 +185,15 @@ namespace C2M2.NeuronalDynamics.Simulation
         {
             Tuple<int, double>[] newValues = RaycastSimHeaterDiscrete.HitToTriangles(hit);
 
+            SetValues(newValues);
+        }
+
+        /// <summary>
+        /// Translate 3D vertex values to 1D values, and pass them downwards for interaction
+        /// </summary>
+        public void SetValues(Tuple<int, double>[] newValues)
+        {
+
             // Each 3D index will have TWO associated 1D vertices
             Tuple<int, double>[] new1DValues = new Tuple<int, double>[2 * newValues.Length];
             int j = 0;
@@ -193,16 +204,6 @@ namespace C2M2.NeuronalDynamics.Simulation
                 double val3D = newValues[i].Item2;
 
                 // Translate into two 1D vert indices and a lambda weight
-                /*
-                double lambda = map[vert3D].Item3;
-                double val1D = (1 - lambda) * val3D;
-                new1DValues[j] = new Tuple<int, double>(map[vert3D].Item1, val1D);
-
-                // Weight newVal by (lambda) for second 1D vert                    
-                val1D = lambda * val3D;
-                new1DValues[j + 1] = new Tuple<int, double>(map[vert3D].Item2, val1D);
-                */
-
                 double val1D = (1 - map[vert3D].lambda) * val3D;
                 new1DValues[j] = new Tuple<int, double>(map[vert3D].v1, val1D);
 
@@ -221,13 +222,13 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// Requires deived classes to know how to receive one value to add onto each 1D vert index
         /// </summary>
         /// <param name="newValuess"> List of 1D vert indices and values to add onto that index. </param>
-        protected abstract void Set1DValues(Tuple<int, double>[] newValuess);
+        public abstract void Set1DValues(Tuple<int, double>[] newValuess);
 
         /// <summary>
         /// Requires derived classes to know how to make available one value for each 1D vertex
         /// </summary>
         /// <returns></returns>
-        protected abstract double[] Get1DValues();
+        public abstract double[] Get1DValues();
 
         /// <summary>
         /// Pass the UGX 1D and 3D cells to simulation code
@@ -279,6 +280,9 @@ namespace C2M2.NeuronalDynamics.Simulation
                 colliderMesh = BuildMesh(meshColScale);
 
                 InitUI();
+
+                // Let neuron clamps lookup a triangle by its vertex
+                gameObject.AddComponent<TriLookup>();
             }
 
             return cellMesh;

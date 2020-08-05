@@ -79,7 +79,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         }
 
         // Send simulation 1D values 
-        protected override double[] Get1DValues()
+        public override double[] Get1DValues()
         {
             double[] curVals = null;
             try
@@ -100,7 +100,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         }
 
         // Receive new simulation 1D index/value pairings
-        protected override void Set1DValues(Tuple<int, double>[] newValues)
+        public override void Set1DValues(Tuple<int, double>[] newValues)
         {
             try
             {

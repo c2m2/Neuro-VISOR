@@ -56,13 +56,13 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// <returns>
         /// Simulation scalars at current timestep. Returns null if simulation isn't started
         /// </returns>
-        protected override double[] Get1DValues()
+        public override double[] Get1DValues()
         {
             if (U != null && i > -1) return U.SubMatrix(0, U.RowCount, i, 1).ToColumnMajorArray();
             else return null;
         }
         // Receive new simulation 1D index/value pairings
-        protected override void Set1DValues(Tuple<int, double>[] newValues)
+        public override void Set1DValues(Tuple<int, double>[] newValues)
         {
             foreach(Tuple<int, double> newVal in newValues)
             {

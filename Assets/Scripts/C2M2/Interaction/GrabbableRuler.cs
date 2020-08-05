@@ -36,11 +36,8 @@ namespace C2M2.Interaction {
             
             // Assumea object is at GameManager.instance.objDefaultScale
             handleB.localPosition = new Vector3(((maxX - minX) / 2), handleB.localPosition.y, handleB.localPosition.z);
-            Debug.Log("handleB position: " + handleB.position.ToString("F5"));
             origScale = scaleTarget.localScale;
             origDist = CurDist;
-
-            Debug.Log("origScale: " + origScale.ToString("F5") + "\norigDist: " + origDist);
 
             InitLineRend();
         }
@@ -71,7 +68,6 @@ namespace C2M2.Interaction {
         {
             LimitHandlePos();
 
-            Debug.Log("NewScale: " + NewScale.ToString("F5"));
             scaleTarget.localScale = NewScale;
 
             lineRend.SetPositions(HandlePositions);
@@ -102,7 +98,6 @@ namespace C2M2.Interaction {
             {
                 handleB.localPosition = new Vector3(maxX, handleB.localPosition.y, handleB.localPosition.z);
             }
-            Debug.Log("handleB position: " + handleB.position.ToString("F5"));
         }
     }
 }
