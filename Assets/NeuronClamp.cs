@@ -64,7 +64,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             if (ClampMoved || grabbable.isGrabbed)
             {
                 // If the clamp is moving, it shouldnt look for a target or have valid points/values
-                ClearTarget();
+                Unattach();
                 DeactivateClamp();
             }
             else
@@ -72,12 +72,12 @@ namespace C2M2.NeuronalDynamics.Interaction
                 // If our clamp stops moving, look for a simulation to target
                 if (activeTarget == null)
                 {
-                    LookForNewTarget();
+                    TryAttachCell();
                     // If we find a valid target, get the points to update values for
                     if(activeTarget == null)
                     { 
                         // If we didn't find a target, clamp should be parented by nothing 
-                        ClearTarget();
+                        Unattach();
                         DeactivateClamp();
                         return;
                     }
@@ -102,7 +102,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             lastLocalPos = transform.localPosition;           
         }
 
-        private bool LookForNewTarget()
+        private bool TryAttachCell()
         {
             Collider[] hits = Physics.OverlapBox(transform.position, LocalExtents, transform.rotation, layerMask.value);
             if(hits.Length == 0)
@@ -126,7 +126,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             UpdateMaxMin();
             return true;
         }
-        private void ClearTarget()
+        private void Unattach()
         {
             if (activeTarget != null)
             {
