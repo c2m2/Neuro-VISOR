@@ -7,7 +7,6 @@ using C2M2.Utils.MeshUtils;
 namespace C2M2.NeuronalDynamics.Interaction
 {
     [RequireComponent(typeof(MeshRenderer))]
-    [RequireComponent(typeof(OVRGrabbable))]
     public class NeuronClamp : MonoBehaviour
     {
         [Tooltip("Trigger for clamp, won't send values unless set to true")]
@@ -24,32 +23,30 @@ namespace C2M2.NeuronalDynamics.Interaction
         public LayerMask layerMask;
         public NeuronSimulation1D activeTarget = null;
 
+
         private Tuple<int, double>[] newValues = null;
 
         private Vector3 lastLocalPos;
-        private bool[] posSettled;
-        private int framesToSette = 10;
 
         private Vector3 simLastPos;
         private bool ClampMoved { get { return !lastLocalPos.Equals(transform.localPosition); } }
-        private bool ClampSettled {
-            get
-            {
-                for(int i = 0; i < posSettled.Length; i++)
-                {
-                    if (!posSettled[i]) return false;
-                }
-                return true;
-            }
-        }
-        private float radius = -1;
 
         private OVRGrabbable grabbable;
         private MeshRenderer mr;
         private Bounds bounds;
+        private Vector3 LocalExtents { get { return transform.localScale / 2; } }
+        private BoxHandleResizer handles;
+        private Transform handlesParent;
 
         private void Awake()
         {
+            handles = GetComponent<BoxHandleResizer>() ?? GetComponentInChildren<BoxHandleResizer>();
+            if (handles != null)
+            {
+                handlesParent = handles.center.parent;
+                handlesParent.parent = null;
+            }
+
             mr = GetComponent<MeshRenderer>();
             bounds = mr.bounds;
             grabbable = GetComponent<OVRGrabbable>();
@@ -59,9 +56,7 @@ namespace C2M2.NeuronalDynamics.Interaction
                 layerMask = LayerMask.GetMask(new string[] { "Raycast" });
             }
 
-            UpdateRadius();
-
-            posSettled = new bool[framesToSette];
+            UpdateMaxMin();
         }
 
         private void FixedUpdate()
@@ -109,7 +104,7 @@ namespace C2M2.NeuronalDynamics.Interaction
 
         private bool LookForNewTarget()
         {
-            Collider[] hits = Physics.OverlapSphere(transform.position, radius, layerMask.value);
+            Collider[] hits = Physics.OverlapBox(transform.position, LocalExtents, transform.rotation, layerMask.value);
             if(hits.Length == 0)
             {
                 activeTarget = null;
@@ -128,7 +123,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             lastLocalPos = transform.InverseTransformPoint(lastLocalPos);
 
             Debug.Log("Clamp childed under " + activeTarget.name + "\nlocalPos: " + transform.localPosition.ToString("F5") + "\nlastLocalPos: " + lastLocalPos.ToString("F5"));
-            UpdateRadius();
+            UpdateMaxMin();
             return true;
         }
         private void ClearTarget()
@@ -159,10 +154,9 @@ namespace C2M2.NeuronalDynamics.Interaction
             Mesh mesh = mf.sharedMesh ?? mf.mesh;
             if (mesh == null) return hitPoints;
 
-            UpdateRadius();
+            UpdateMaxMin();
 
             Vector3[] verts = use1DVerts ? activeTarget.Verts1D : mesh.vertices;
-
             for (int i = 0; i < verts.Length; i++)
             {
                 if (ClampContains(verts[i]))
@@ -184,27 +178,24 @@ namespace C2M2.NeuronalDynamics.Interaction
             return newVals;
         }
 
-        private float MaxX { get { return transform.localPosition.x + radius; } }
-        private float MaxY { get { return transform.localPosition.y + radius; } }
-        private float MaxZ { get { return transform.localPosition.z + radius; } }
-        private float MinX { get { return transform.localPosition.x - radius; } }
-        private float MinY { get { return transform.localPosition.y - radius; } }
-        private float MinZ { get { return transform.localPosition.z - radius; } }
+        private Vector3 maxLocalPos;
+        private Vector3 minLocalPos;
         private bool ClampContains(in Vector3 point)
         {
             //activeTarget.transform.TransformPoint(point);
             //Debug.Log("transform.localPosition: " + transform.localPosition.ToString("F5"));
             //Debug.Log("point: " + point);
             //Debug.Log("radius: " + radius);
-            if (point.x > MinX && point.x < MaxX
-                && point.y > MinY && point.y < MaxY
-                && point.z > MinZ && point.z < MaxZ) return true;
+            if (point.x > minLocalPos.x && point.y > minLocalPos.y && point.z > minLocalPos.z
+                && point.x < maxLocalPos.x && point.y < maxLocalPos.y && point.z < maxLocalPos.z)
+                return true;
             else return false;
         }
-
-        private void UpdateRadius()
+        
+        private void UpdateMaxMin()
         {
-            radius = transform.localScale.x / 2;
+            maxLocalPos = transform.localPosition + LocalExtents;
+            minLocalPos = transform.localPosition - LocalExtents;
         }
 
         public void ActivateClamp()
