@@ -73,7 +73,7 @@ public class BoxHandleResizer : MonoBehaviour
         }
         if (target == null)
         {
-            target = transform;
+            target = transform.parent ?? transform;
         }
 
         origScale = target.localScale;
@@ -90,12 +90,15 @@ public class BoxHandleResizer : MonoBehaviour
         if (HasChanged)
         {
             transform.parent = null;
+
             center.position = transform.position;
             target.transform.position = Center;
             target.transform.localScale = NewScale;
 
             UpdateHandlePosScale();
+
             transform.parent = target;
+
             ResetHasChanged();
         }
 
