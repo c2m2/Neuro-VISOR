@@ -2053,9 +2053,9 @@ GameObject:
   - component: {fileID: 722225474}
   - component: {fileID: 722225477}
   - component: {fileID: 722225476}
-  - component: {fileID: 722225475}
   - component: {fileID: 722225478}
   - component: {fileID: 722225479}
+  - component: {fileID: 722225475}
   m_Layer: 13
   m_Name: VertAnchor
   m_TagString: Untagged
@@ -2077,8 +2077,8 @@ Transform:
   m_Father: {fileID: 804375218}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &722225475
-BoxCollider:
+--- !u!135 &722225475
+SphereCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -2088,8 +2088,8 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Radius: 0.50000006
+  m_Center: {x: 0, y: 0.00000047683716, z: 0}
 --- !u!23 &722225476
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -2134,7 +2134,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 722225473}
-  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!114 &722225478
 MonoBehaviour:
   m_ObjectHideFlags: 0
