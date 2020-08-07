@@ -12,7 +12,6 @@ namespace C2M2.NeuronalDynamics.Interaction
         public bool clampLive = false;
         [Range(0, 1)]
         public double clampPower = 0.1;
-        private double prevPower = 0.1;
 
         public bool use1DVerts = true;
 
@@ -37,13 +36,18 @@ namespace C2M2.NeuronalDynamics.Interaction
         private BoxHandleResizer handles;
         private Transform handlesParent;
 
+        private void Awake()
+        {
+            mr = GetComponent<MeshRenderer>();
+        }
+
         private void FixedUpdate()
         {
             if(activeTarget != null)
             {
                 if (clampLive)
                 {
-                    activeTarget.SetValues(newValues);
+                    activeTarget.Set1DValues(newValues);
                 }
             }
         }
@@ -53,9 +57,11 @@ namespace C2M2.NeuronalDynamics.Interaction
             if(activeTarget == null)
             {
                 activeTarget = simulation;
+                transform.parent = simulation.transform;
                 int ind = GetNearestPoint(activeTarget, contactPoint);
                 Tuple<int, double> newVal = new Tuple<int, double>(ind, clampPower);
                 newValues = new Tuple<int, double>[] { newVal };
+
             }
 
             return activeTarget;
@@ -66,6 +72,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             {
                 activeTarget = null;
             }
+            Destroy(this);
         }
 
         private int GetNearestPoint(NeuronSimulation1D simulation, Vector3 worldPoint)
@@ -107,9 +114,11 @@ namespace C2M2.NeuronalDynamics.Interaction
                 + "\nlocalPoint: " + localPoint.ToString("F5")
                 + "\nworldPoint: " + worldPoint.ToString("F5")
                 + "\nverts.Length: " + verts.Length);
+
+            transform.localPosition = nearestPos;
             return nearestVertInd;
         }
-        
+
         /*
         private List<int> GetHitPoints()
         {
@@ -166,6 +175,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             maxLocalPos = transform.localPosition + LocalExtents;
             minLocalPos = transform.localPosition - LocalExtents;
         }
+                */
 
         public void ActivateClamp()
         {
@@ -192,6 +202,5 @@ namespace C2M2.NeuronalDynamics.Interaction
             if (clampLive) DeactivateClamp();
             else ActivateClamp();
         }
-        */
     }
 }

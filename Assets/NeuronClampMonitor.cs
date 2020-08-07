@@ -17,7 +17,7 @@ namespace C2M2.NeuronalDynamics.Interaction {
             rb.isKinematic = false;
             if(clamp == null)
             {
-                clamp = GetComponentInParent<NeuronClamp>();
+                clamp = GetComponent<NeuronClamp>() ?? GetComponentInParent<NeuronClamp>();
                 if(clamp == null)
                 {
                     Debug.LogError("No NeuronClamp found for NeuronClampMonitor.");

@@ -193,7 +193,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// </summary>
         public void SetValues(Tuple<int, double>[] newValues)
         {
-
+            string s = "Adding values: ";
             // Each 3D index will have TWO associated 1D vertices
             Tuple<int, double>[] new1DValues = new Tuple<int, double>[2 * newValues.Length];
             int j = 0;
