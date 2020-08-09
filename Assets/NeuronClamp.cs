@@ -33,8 +33,6 @@ namespace C2M2.NeuronalDynamics.Interaction
         private MeshRenderer mr;
         private Bounds bounds;
         private Vector3 LocalExtents { get { return transform.localScale / 2; } }
-        private BoxHandleResizer handles;
-        private Transform handlesParent;
 
         private void Awake()
         {

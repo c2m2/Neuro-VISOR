@@ -8,7 +8,7 @@ namespace C2M2.NeuronalDynamics.Interaction
     public class NeuronClampInstantiator : MonoBehaviour
     {
         public GameObject ClampPrefab = null;
-        private NeuronClamp curClamp = null;
+        public NeuronClamp curClamp = null;
         public OVRInput.Button button = OVRInput.Button.One;
         public List<NeuronClamp> allClamps = new List<NeuronClamp>();
         public Transform clampAnchor = null;
@@ -26,12 +26,22 @@ namespace C2M2.NeuronalDynamics.Interaction
         void Update()
         {
             // If our clamp has latched onto a simulation, add another clamp
-            if(curClamp.transform.parent != transform)
+            if (curClamp != null)
             {
-                allClamps.Add(curClamp);
-                curClamp = null;
+                if (curClamp.transform.parent == null || curClamp.transform.parent != clampAnchor)
+                {
+                    allClamps.Add(curClamp);
+                    curClamp = null;
+                }
+            }
+
+            // Instantiate a new clamp if requested
+            if (Input.GetKeyDown(KeyCode.N) && curClamp == null)
+            {
                 InstantiateClamp();
             }
+
+            // Toggle clamps if requested
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 Debug.Log("Toggling all clamps");
