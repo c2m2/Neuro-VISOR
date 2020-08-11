@@ -8,8 +8,7 @@ namespace C2M2.NeuronalDynamics.Interaction
 {
     public class NeuronClamp : MonoBehaviour
     {
-        [Tooltip("Trigger for clamp, won't send values unless set to true")]
-        public bool clampLive = false;
+        public bool clampLive { get; private set; } = false;
         [Range(0, 1)]
         public double clampPower = 0.1;
 
@@ -18,7 +17,6 @@ namespace C2M2.NeuronalDynamics.Interaction
         public Material activeMaterial = null;
         public Material inactiveMaterial = null;
 
-        public LayerMask layerMask;
         public NeuronSimulation1D activeTarget = null;
 
 
@@ -48,29 +46,6 @@ namespace C2M2.NeuronalDynamics.Interaction
                     activeTarget.Set1DValues(newValues);
                 }
             }
-        }
-
-        public NeuronSimulation1D ReportSimulation(NeuronSimulation1D simulation, Vector3 contactPoint)
-        {
-            if(activeTarget == null)
-            {
-                activeTarget = simulation;
-                transform.parent = simulation.transform;
-                int ind = GetNearestPoint(activeTarget, contactPoint);
-                Tuple<int, double> newVal = new Tuple<int, double>(ind, clampPower);
-                newValues = new Tuple<int, double>[] { newVal };
-
-            }
-
-            return activeTarget;
-        }
-        public void ReportExit(NeuronSimulation1D simulation)
-        {
-            if(activeTarget == simulation)
-            {
-                activeTarget = null;
-            }
-            Destroy(this);
         }
 
         private int GetNearestPoint(NeuronSimulation1D simulation, Vector3 worldPoint)
@@ -114,66 +89,9 @@ namespace C2M2.NeuronalDynamics.Interaction
                 + "\nverts.Length: " + verts.Length);
 
             transform.localPosition = nearestPos;
+            this.name = "AttachedNeuronClamp" + nearestVertInd;
             return nearestVertInd;
         }
-
-        /*
-        private List<int> GetHitPoints()
-        {
-            List<int> hitPoints = new List<int>();
-
-            if (activeTarget == null) return hitPoints;
-
-            MeshFilter mf = activeTarget.GetComponent<MeshFilter>();
-            if (mf == null) return hitPoints;
-
-            Mesh mesh = mf.sharedMesh ?? mf.mesh;
-            if (mesh == null) return hitPoints;
-
-            UpdateMaxMin();
-
-            Vector3[] verts = use1DVerts ? activeTarget.Verts1D : mesh.vertices;
-            for (int i = 0; i < verts.Length; i++)
-            {
-                if (ClampContains(verts[i]))
-                {
-                    hitPoints.Add(i);
-                }
-            }
-
-            return hitPoints;
-        }
-
-        private Tuple<int, double>[] GetNewVals(List<int> hitPoints)
-        {
-            Tuple<int, double>[] newVals = new Tuple<int, double>[hitPoints.Count];
-            for (int i = 0; i < newVals.Length; i++)
-            {
-                newVals[i] = new Tuple<int, double>(hitPoints[i], clampPower);
-            }
-            return newVals;
-        }
-
-        private Vector3 maxLocalPos;
-        private Vector3 minLocalPos;
-        private bool ClampContains(in Vector3 point)
-        {
-            //activeTarget.transform.TransformPoint(point);
-            //Debug.Log("transform.localPosition: " + transform.localPosition.ToString("F5"));
-            //Debug.Log("point: " + point);
-            //Debug.Log("radius: " + radius);
-            if (point.x > minLocalPos.x && point.y > minLocalPos.y && point.z > minLocalPos.z
-                && point.x < maxLocalPos.x && point.y < maxLocalPos.y && point.z < maxLocalPos.z)
-                return true;
-            else return false;
-        }
-        
-        private void UpdateMaxMin()
-        {
-            maxLocalPos = transform.localPosition + LocalExtents;
-            minLocalPos = transform.localPosition - LocalExtents;
-        }
-                */
 
         public void ActivateClamp()
         {
@@ -199,6 +117,49 @@ namespace C2M2.NeuronalDynamics.Interaction
         {
             if (clampLive) DeactivateClamp();
             else ActivateClamp();
+        }
+
+        // Scan new targets for ND simulations
+        private void OnTriggerEnter(Collider other)
+        {
+            if (activeTarget == null)
+            {
+                NeuronSimulation1D simulation = other.GetComponentInParent<NeuronSimulation1D>() ?? other.GetComponent<NeuronSimulation1D>();
+                if (simulation != null)
+                {
+                    ReportSimulation(simulation, transform.position);
+
+                }
+            }
+        }
+
+        public NeuronSimulation1D ReportSimulation(NeuronSimulation1D simulation, Vector3 contactPoint)
+        {
+            if (activeTarget == null)
+            {
+                activeTarget = simulation;
+                transform.parent = simulation.transform;
+                int ind = GetNearestPoint(activeTarget, contactPoint);
+                Tuple<int, double> newVal = new Tuple<int, double>(ind, clampPower);
+                newValues = new Tuple<int, double>[] { newVal };
+
+            }
+
+            return activeTarget;
+        }
+
+        private void OnTriggerExit(Collider other)
+        {
+            if (activeTarget != null)
+            {
+                if (activeTarget == other.GetComponentInParent<NeuronSimulation1D>() || activeTarget == other.GetComponent<NeuronSimulation1D>())
+                {
+                    activeTarget = null;
+                    // Only a clamp instantiator should be allowed to remove a NeuronClamp from a simulation
+                    if (transform.parent == null || transform.parent.GetComponent<NeuronClampAnchor>() == null)
+                        Destroy(this);
+                }
+            }
         }
     }
 }

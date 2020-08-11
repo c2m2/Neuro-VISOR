@@ -3762,6 +3762,40 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1950825764}
   m_CullTransparentMesh: 0
+--- !u!1 &2001918704 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1536379131169926767, guid: 32bea0af3ff8fa64a86f3c1488c6020a,
+    type: 3}
+  m_PrefabInstance: {fileID: 5824598055005420439}
+  m_PrefabAsset: {fileID: 0}
+--- !u!135 &2001918705
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2001918704}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.2
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &2001918706
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2001918704}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9120a3f0a5cf0f4fa7998d4461a515c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  removeButton: 2
+  toggleButton: 4
+  curClamp: {fileID: 0}
 --- !u!1 &2128362492
 GameObject:
   m_ObjectHideFlags: 0
@@ -4129,6 +4163,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: ClampInstantiator
       objectReference: {fileID: 0}
+    - target: {fileID: 1536379131169926767, guid: 32bea0af3ff8fa64a86f3c1488c6020a,
+        type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 5824598055832637702, guid: 32bea0af3ff8fa64a86f3c1488c6020a,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -4195,6 +4234,31 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 7051469727396962550, guid: 4565241fccd266147a078e252b27d27f,
         type: 3}
+    - target: {fileID: 5824598054789376689, guid: 32bea0af3ff8fa64a86f3c1488c6020a,
+        type: 3}
+      propertyPath: toggleClampsButton
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062205095720868987, guid: 32bea0af3ff8fa64a86f3c1488c6020a,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5824598054789376688, guid: 32bea0af3ff8fa64a86f3c1488c6020a,
+        type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
+    - target: {fileID: 5824598054789376690, guid: 32bea0af3ff8fa64a86f3c1488c6020a,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5824598054789376690, guid: 32bea0af3ff8fa64a86f3c1488c6020a,
+        type: 3}
+      propertyPath: m_Center.y
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 32bea0af3ff8fa64a86f3c1488c6020a, type: 3}
 --- !u!1001 &5843646974765894135

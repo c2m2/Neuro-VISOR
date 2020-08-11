@@ -4,14 +4,39 @@ using UnityEngine;
 
 namespace C2M2.NeuronalDynamics.Interaction
 {
-    
+    /// <summary>
+    /// Instantiates NeuronClamps, keeps track of them, 
+    /// </summary>
+    [RequireComponent(typeof(OVRGrabbable))]
     public class NeuronClampInstantiator : MonoBehaviour
     {
         public GameObject ClampPrefab = null;
         public NeuronClamp curClamp = null;
-        public OVRInput.Button button = OVRInput.Button.One;
         public List<NeuronClamp> allClamps = new List<NeuronClamp>();
         public Transform clampAnchor = null;
+
+        [Header("Input")]
+        private bool inputOn = true;
+        public bool InputOn { get; set; }
+        public OVRInput.Button createDestroyButton = OVRInput.Button.Two;
+        private KeyCode createDestroyKey = KeyCode.N;
+        public bool CreateDestroyRequested
+        {
+            get
+            {
+                return (OVRInput.GetDown(createDestroyButton) || Input.GetKeyDown(createDestroyKey));
+            }
+        }
+        public OVRInput.Button toggleClampsButton = OVRInput.Button.Three;
+        private KeyCode toggleKey = KeyCode.Space;
+        public bool ToggleRequested
+        {
+            get
+            {
+                return OVRInput.GetDown(toggleClampsButton) || Input.GetKeyDown(toggleKey);
+            }
+        }
+
         private void Awake()
         {
             if (ClampPrefab == null || clampAnchor == null)
@@ -30,24 +55,37 @@ namespace C2M2.NeuronalDynamics.Interaction
             {
                 if (curClamp.transform.parent == null || curClamp.transform.parent != clampAnchor)
                 {
-                    allClamps.Add(curClamp);
                     curClamp = null;
                 }
             }
 
             // Instantiate a new clamp if requested
-            if (Input.GetKeyDown(KeyCode.N) && curClamp == null)
+            if (InputOn)
             {
-                InstantiateClamp();
+                ListenForClampCreation();
+                ListenForClampToggle();
             }
+        }
 
-            // Toggle clamps if requested
-            if (Input.GetKeyDown(KeyCode.Space))
+        private void ListenForClampCreation()
+        {
+            if (CreateDestroyRequested)
             {
-                Debug.Log("Toggling all clamps");
-                foreach(NeuronClamp clamp in allClamps)
+                if (curClamp == null) InstantiateClamp();
+                else
                 {
-                    if(clamp != null)
+                    DestroyClamp(curClamp);
+                }
+            }
+        }
+        private void ListenForClampToggle()
+        {
+            // Toggle clamps if requested
+            if (allClamps.Count > 0 && ToggleRequested)
+            {
+                foreach (NeuronClamp clamp in allClamps)
+                {
+                    if (clamp != null)
                     {
                         clamp.ToggleClamp();
                     }
@@ -55,13 +93,21 @@ namespace C2M2.NeuronalDynamics.Interaction
             }
         }
 
-        private void InstantiateClamp()
+        public void InstantiateClamp()
         {
             if (curClamp == null)
             {
                 curClamp = Instantiate(ClampPrefab, clampAnchor ?? transform).GetComponent<NeuronClamp>();
                 curClamp.transform.localPosition = Vector3.zero;
+                curClamp.name = "UnattachedNeuronClamp";
+                allClamps.Add(curClamp);
             }
+        }
+        public void DestroyClamp(NeuronClamp clamp)
+        {
+            allClamps.Remove(clamp);
+            Destroy(clamp.gameObject);
+            curClamp = null;
         }
     }
 }
