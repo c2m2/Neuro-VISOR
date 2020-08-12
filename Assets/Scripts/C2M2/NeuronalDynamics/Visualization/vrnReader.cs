@@ -1,18 +1,18 @@
 #region includes
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Collections.Generic;
 using System.IO.Compression;
 using System.IO;
 using System;
 using System.Linq;
+using UnityEngine;
+using UnityEditor;
 #endregion
 
 namespace C2M2.NeuronalDynamics.Visualization
 {
     namespace vrn
     {
-        public sealed class vrnReader
+        public sealed class vrnReader : MonoBehaviour
         {
             /// GEOMETRY
             /// <summary>
@@ -62,7 +62,7 @@ namespace C2M2.NeuronalDynamics.Visualization
                 {
                     var file = archive.GetEntry("MetaInfo.json");
                     _ = file ?? throw new ArgumentNullException(nameof(file));
-                    geometry = JsonSerializer.Deserialize<Geometry>(File.ReadAllText(file.FullName).ToString());
+                    geometry = JsonUtility.FromJson<Geometry>(new StreamReader(file.Open()).ReadToEnd().ToString());
                     loaded = true;
                 }
             }
@@ -71,16 +71,15 @@ namespace C2M2.NeuronalDynamics.Visualization
             /// <summary>
             /// Read a file from the .vrn archive
             /// </summary>
-            private string read(in string meshName)
+            private Stream read(in string meshName)
             {
                 string name = Path.GetTempPath() + Path.GetRandomFileName();
                 using (ZipArchive archive = ZipFile.Open(this.fileName, ZipArchiveMode.Read))
                 {
                     var file = archive.GetEntry(meshName);
                     _ = file ?? throw new ArgumentNullException(nameof(file));
-                    file.ExtractToFile(name);
+                    return file.Open();
                 }
-                return name;
             }
 
             /// RETRIEVE_1D_MESH
@@ -94,7 +93,7 @@ namespace C2M2.NeuronalDynamics.Visualization
                 if (!loaded) load();
                 int index = geometry.geom1d.FindIndex
                 (geom => Int16.Parse(geom.refinement) == refinement);
-                return (read(geometry.geom1d[index != -1 ? index : 0].name));
+                return geometry.geom1d[index != -1 ? index : 0].name;
             }
 
             /// RETRIEVE_2D_MESH
@@ -108,7 +107,7 @@ namespace C2M2.NeuronalDynamics.Visualization
                 if (!loaded) load();
                 int index = geometry.geom2d.FindIndex
                 (geom => Double.Parse(geom.inflation) == inflation);
-                return read(geometry.geom2d[index != -1 ? index : 0].name);
+                return geometry.geom2d[index != -1 ? index : 0].name;
             }
 
             /// VRNREADER
@@ -117,6 +116,30 @@ namespace C2M2.NeuronalDynamics.Visualization
             /// </summary>
             /// <param name="fileName"> Archive's file name (.vrn file) </param>
             public vrnReader(in string fileName) => this.fileName = fileName;
+        
+        
+        public void Start() {
+	  
+	  UnityEngine.Debug.Log(Application.dataPath);
+	             string fileName = Application.dataPath + "/test.vrn";
+                try
+                {
+                    vrnReader reader = new vrnReader(fileName);
+                    /// Get 1d mesh (0-th refinement aka coarse grid)
+                    Console.WriteLine(reader.retrieve_1d_mesh(0));
+                    UnityEngine.Debug.Log(reader.retrieve_1d_mesh(0));
+                         
+                    /// Get inflated 2d mesh by a factor of 2.5
+                    Console.WriteLine(reader.retrieve_2d_mesh(2.5));
+                }
+                catch (Exception ex) when (ex is System.IO.FileNotFoundException || ex is System.ArgumentNullException)
+                {
+		    UnityEngine.Debug.Log("file not found!");
+		    UnityEngine.Debug.Log(ex);
+                    Console.WriteLine($"File not found: {fileName}!");
+                    Console.WriteLine(ex);
+                }
+	    }
         }
 
         /// EXAMPLE
@@ -133,6 +156,7 @@ namespace C2M2.NeuronalDynamics.Visualization
                     vrnReader reader = new vrnReader(fileName);
                     /// Get 1d mesh (0-th refinement aka coarse grid)
                     Console.WriteLine(reader.retrieve_1d_mesh(0));
+                         
                     /// Get inflated 2d mesh by a factor of 2.5
                     Console.WriteLine(reader.retrieve_2d_mesh(2.5));
                 }
