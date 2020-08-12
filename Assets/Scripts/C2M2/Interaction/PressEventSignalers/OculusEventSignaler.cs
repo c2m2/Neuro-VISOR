@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections;
 
 namespace C2M2.Interaction.Signaling
 {
@@ -22,15 +23,22 @@ namespace C2M2.Interaction.Signaling
         [Tooltip("Line renderer color when holding a click")]
         public Color pressedColor = new Color(1f, 0.6f, 0f);
 
+        public Transform localAvatar;
+        public bool isLeftHand = false;
+
         protected override void OnAwake()
         {
             lineRend = gameObject.GetComponentInChildren<LineRenderer>();
             if (lineRend == null) { Debug.LogWarning("Couldn't find line renderer in RaycastForward"); }
+
+
         }
         protected override void OnStart()
         {
             // WARNING: Don't call this method in Awake( )
             lineRend.SetEndpointColors(unpressedColor);
+
+            StartCoroutine(SearchForHand(100));
         }
         protected override bool BeginRaycastingCondition()
         {
@@ -68,15 +76,18 @@ namespace C2M2.Interaction.Signaling
         [Tooltip("The renderer component for the static pointed hand ")]
         public MeshRenderer staticHand;
         [Tooltip("This is the default Oculus hand object, usually hand_right or hand_left")]
-        public UnityEngine.GameObject defaultHand;
+        private UnityEngine.GameObject defaultHand = null;
         /// <summary>
         /// Enable/disable static raycasting hand model and default hand
         /// </summary>
         /// <param name="active"> True to enable static hand, false to enable regular OVR hand</param>
         private void StaticHandSetActive(bool active)
         {
-            staticHand.enabled = active;
-            defaultHand.SetActive(!active);
+            if (defaultHand != null && staticHand != null)
+            {
+                staticHand.enabled = active;
+                defaultHand.SetActive(!active);
+            }
         }
         /// <summary>
         /// Enable/Disable line renderer depending on if raycasting mode is enabled
@@ -106,6 +117,22 @@ namespace C2M2.Interaction.Signaling
             else if (distancePressed && hit.distance < clickDistance * 3) return true;
             // We either haven't clicked yet, or we're too far. Don't trigger a hold
             else return false;
+        }
+
+        private IEnumerator SearchForHand(int waitFrames)
+        {
+            int maxFrames = 100;
+            string handName = isLeftHand ? "hand_left" : "hand_right";
+
+            while(defaultHand == null)
+            {
+                defaultHand = GameObject.Find(handName);
+                maxFrames--;
+                if (maxFrames == 0) break;
+                yield return null;
+            }
+
+            if (defaultHand == null) Debug.LogError("No hand found!");
         }
     }
 }
