@@ -56,12 +56,41 @@ namespace C2M2.NeuronalDynamics.UGX
             ReadUGX(@"C:/Users/tug41634/Desktop/cube_3d.ugx", ref grid);
         }
 
+
+	public static void Read1DUGX(in string archive, in int refinement, ref Grid grid) {
+		  vrnReader reader = new vrnReader(archive);
+		  string meshName = reader.retrieve_1d_mesh(refinement);
+		  using (ZipArchive archive = ZipFile.Open(archive, ZipArchiveMode.Read))
+                  {
+                    var file = archive.GetEntry(meshName);
+                    _ = file ?? throw new ArgumentNullException(nameof(file));
+                     ReadUGX(file.Open(), grid);
+		  }
+	}
+	
+	public static void Read2DUGX(in string archive, in double inflation, ref Grid grid) {
+		  vrnReader reader = new vrnReader(archive);
+		  reader.retrieve_2d_mesh(inflation)
+		  string meshName = reader.retrieve_1d_mesh(refinement);
+		  using (ZipArchive archive = ZipFile.Open(archive, ZipArchiveMode.Read))
+                  {
+                    var file = archive.GetEntry(meshName);
+                    _ = file ?? throw new ArgumentNullException(nameof(file));
+                    ReadUGX(file.Open(), grid);
+		  }
+	}
+	
+	public static void ReadUGX(in string filename, ref Grid grid) {
+		ReadUGX(File.OpenRead(filename), grid);
+	}
+		
+		
         /// ReadUGX
         /// <summary>
         /// </summary>
         /// <param name="filename"> name of UGX file on disk </param>
  	/// <PARAM NAME="grid"> grid instance </param>
-        public static void ReadUGX(in string filename, ref Grid grid)
+        public static void ReadUGX(in Stream filename, ref Grid grid)
         {
             if (!UGX_EXTENSION.Equals(Path.GetExtension(filename), StringComparison.InvariantCultureIgnoreCase))
             {
