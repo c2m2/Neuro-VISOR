@@ -951,7 +951,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 1246904545894575464}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 475776573}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0950df82e7936c84983497630bde5b54, type: 3}
   m_Name: 
@@ -2757,7 +2757,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1601653133
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2853,52 +2853,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
---- !u!1 &1625050118 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 5824598054789376691, guid: 32bea0af3ff8fa64a86f3c1488c6020a,
-    type: 3}
-  m_PrefabInstance: {fileID: 5824598055005420439}
-  m_PrefabAsset: {fileID: 0}
---- !u!65 &1625050119 stripped
-BoxCollider:
-  m_CorrespondingSourceObject: {fileID: 5824598054789376690, guid: 32bea0af3ff8fa64a86f3c1488c6020a,
-    type: 3}
-  m_PrefabInstance: {fileID: 5824598055005420439}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1625050120
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1625050118}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 02d61468f8b77ae4b92c344bc9a600fb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_allowOffhandGrab: 1
-  m_snapPosition: 0
-  m_snapOrientation: 0
-  m_snapOffset: {fileID: 0}
-  m_grabPoints:
-  - {fileID: 1625050119}
---- !u!54 &1625050121
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1625050118}
-  serializedVersion: 2
-  m_Mass: 1
-  m_Drag: Infinity
-  m_AngularDrag: Infinity
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
 --- !u!1 &1686364858
 GameObject:
   m_ObjectHideFlags: 0
@@ -3075,7 +3029,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1763904072
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3905,7 +3859,7 @@ PrefabInstance:
     - target: {fileID: 1246904545451624253, guid: 3cd62f4122818be4585249f5083a977d,
         type: 3}
       propertyPath: m_Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1246904545451624240, guid: 3cd62f4122818be4585249f5083a977d,
         type: 3}
@@ -3980,12 +3934,12 @@ PrefabInstance:
     - target: {fileID: 1246904545451624250, guid: 3cd62f4122818be4585249f5083a977d,
         type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1246904545451624251, guid: 3cd62f4122818be4585249f5083a977d,
         type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1246904544822792157, guid: 3cd62f4122818be4585249f5083a977d,
         type: 3}
@@ -4963,11 +4917,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 9043822889724945539, guid: 170c7fd960f71ba4f94f7a2b0fb17726,
-        type: 3}
-      propertyPath: m_Name
-      value: NeuronClampInstantiator
-      objectReference: {fileID: 0}
     - target: {fileID: 1272943665652909156, guid: 170c7fd960f71ba4f94f7a2b0fb17726,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -5022,6 +4971,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9043822889724945539, guid: 170c7fd960f71ba4f94f7a2b0fb17726,
+        type: 3}
+      propertyPath: m_Name
+      value: NeuronClampInstantiator
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 170c7fd960f71ba4f94f7a2b0fb17726, type: 3}
