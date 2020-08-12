@@ -29,7 +29,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6764255400395155544}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 5, y: 0, z: 0}
+  m_LocalPosition: {x: 1, y: 0, z: 0}
   m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
   m_Children: []
   m_Father: {fileID: 6764255401087786747}
@@ -252,5 +252,6 @@ MonoBehaviour:
   scaleTarget: {fileID: 0}
   handleA: {fileID: 6764255401028640401}
   handleB: {fileID: 6764255400395155545}
+  initSize: 1
   rulerCol: {r: 1, g: 1, b: 1, a: 1}
   rulerWidth: 0.05
