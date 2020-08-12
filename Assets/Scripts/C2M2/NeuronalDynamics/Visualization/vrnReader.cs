@@ -14,36 +14,43 @@ namespace C2M2.NeuronalDynamics.Visualization
     {
         public sealed class vrnReader : MonoBehaviour
         {
-            /// GEOMETRY
-            /// <summary>
-            /// Stores 1D and 2D geometries
-            /// </summary>
-            private sealed class Geometry
-            {
-                /// GEOM1D
+        
+                 /// GEOM1D
                 /// <summary>
                 /// Stores the 1D geometries by name and refinement 
                 /// </summary>
-                public sealed class Geom1d
+                            [Serializable]
+                public struct Geom1d
                 {
-                    public string name { get; set; }
-                    public string refinement { get; set; }
+                    public string name;
+                    public string refinement;
                 }
 
                 /// GEOM2D
                 /// <summary>
                 /// Stores the 2d geometries by name and inflation
                 /// </summary>
-                public sealed class Geom2d
+                            [Serializable]
+                public struct Geom2d
                 {
-                    public string name { get; set; }
-                    public string inflation { get; set; }
-                }
+		  public string inflation;
+                   public string name;
+                 }
+                 
+            /// GEOMETRY
+            /// <summary>
+            /// Stores 1D and 2D geometries
+            /// </summary>
+            [Serializable]
+            public class Geometry
+            {
+	
+                
 
                 /// All 1D geometries
-                public List<Geom1d> geom1d { get; set; }
+                public Geom1d[] geom1d;
                 /// All 2D geometries
-                public List<Geom2d> geom2d { get; set; }
+                public Geom2d[] geom2d;
             }
 
             private string fileName;
@@ -64,6 +71,7 @@ namespace C2M2.NeuronalDynamics.Visualization
                     _ = file ?? throw new ArgumentNullException(nameof(file));
                     geometry = JsonUtility.FromJson<Geometry>(new StreamReader(file.Open()).ReadToEnd().ToString());
                     loaded = true;
+              
                 }
             }
 
@@ -91,9 +99,10 @@ namespace C2M2.NeuronalDynamics.Visualization
             public string retrieve_1d_mesh(int refinement = 0)
             {
                 if (!loaded) load();
-                int index = geometry.geom1d.FindIndex
+                int index = geometry.geom1d.ToList().FindIndex
                 (geom => Int16.Parse(geom.refinement) == refinement);
                 return geometry.geom1d[index != -1 ? index : 0].name;
+            
             }
 
             /// RETRIEVE_2D_MESH
@@ -105,7 +114,7 @@ namespace C2M2.NeuronalDynamics.Visualization
             public string retrieve_2d_mesh(double inflation = 1.0)
             {
                 if (!loaded) load();
-                int index = geometry.geom2d.FindIndex
+		int index = geometry.geom2d.ToList().FindIndex
                 (geom => Double.Parse(geom.inflation) == inflation);
                 return geometry.geom2d[index != -1 ? index : 0].name;
             }
@@ -130,7 +139,7 @@ namespace C2M2.NeuronalDynamics.Visualization
                     UnityEngine.Debug.Log(reader.retrieve_1d_mesh(0));
                          
                     /// Get inflated 2d mesh by a factor of 2.5
-                    Console.WriteLine(reader.retrieve_2d_mesh(2.5));
+                    ///Console.WriteLine(reader.retrieve_2d_mesh(2.5));
                 }
                 catch (Exception ex) when (ex is System.IO.FileNotFoundException || ex is System.ArgumentNullException)
                 {
