@@ -70,8 +70,7 @@ namespace C2M2.NeuronalDynamics.UGX
 	
 	public static void Read2DUGX(in string archive, in double inflation, ref Grid grid) {
 		  vrnReader reader = new vrnReader(archive);
-		  reader.retrieve_2d_mesh(inflation)
-		  string meshName = reader.retrieve_1d_mesh(refinement);
+		  string meshName = reader.retrieve_2d_mesh(inflation);
 		  using (ZipArchive archive = ZipFile.Open(archive, ZipArchiveMode.Read))
                   {
                     var file = archive.GetEntry(meshName);
