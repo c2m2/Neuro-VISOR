@@ -18,7 +18,7 @@ namespace C2M2.Visualization.VR
 
         public float speed = 0.1f;
         public float slowSpeed = 0.025f;
-        private MovementController controller;
+        private MovementController controller = null;
         private bool SlowMoving
         {
             get
@@ -76,6 +76,16 @@ namespace C2M2.Visualization.VR
             keys.AddRange(activateKeys);
             keys.AddRange(pitchKeys);
             controlUI.GetComponent<ControlOverlay>().SetActivationKeys(keys.ToArray());
+        }
+        private void OnEnable()
+        {
+            if(controller != null)
+                controller.enabled = true;
+        }
+        private void OnDisable()
+        {
+            if (controller != null)
+                controller.enabled = false;
         }
     }
 }
