@@ -11,69 +11,45 @@ namespace C2M2.Visualization.VR
     ///
     /// <remarks>   Jacob Wells, 4/30/2020. </remarks>
     ////////////////////////////////////////////////////////////////////////////////////////////////////
+    [RequireComponent(typeof(MovementController))]
     public class MovingOVRHeadsetEmulator : OVRHeadsetEmulator
     {
         public KeyCode[] slowMoveKeys = new KeyCode[] { KeyCode.LeftShift, KeyCode.RightShift };
 
-        public float moveSpeed = 0.5f;
-        public float slowMoveSpeed = 0.05f;
-        public float rotationSensitivity = 1.5f;
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary> Finds out if the user is pressing any of the slow movement activation keys </summary>
-        /// <value> True if this is moving slow, false if not. </value>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        private bool IsMovingSlow
+        public float speed = 0.1f;
+        public float slowSpeed = 0.025f;
+        private MovementController controller;
+        private bool SlowMoving
         {
             get
             {
+                bool slowMoving = false;
                 foreach (KeyCode key in slowMoveKeys)
                 {
-                    if (Input.GetKey(key)) return true;
+                    if (Input.GetKey(key))
+                        slowMoving = true;
                 }
-                return false;
+                return slowMoving;
             }
         }
 
         private void Awake()
         {
-
+            controller = GetComponent<MovementController>() ?? gameObject.AddComponent<MovementController>();
+            controller.speed = speed;
         }
+
         private void Start()
         {
             DisableAvatar();
-            StartCoroutine(ResolveMovement());
             InitUI();
+            StartCoroutine(CheckSpeed());
         }
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   
-        ///     Coroutine to apply normal or slow movement speed to the obejct this script is attached to.
-        /// </summary>
-        ///
-        /// <returns>  
-        ///     yield return null makes this coroutine run once per game frame. 
-        /// </returns>
-        /// 
-        /// <remarks>  
-        ///     See https://docs.unity3d.com/Manual/ExecutionOrder.html for information about
-        ///     order of execution for event functions in Unity.  
-        /// </remarks>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        public IEnumerator ResolveMovement()
+        private IEnumerator CheckSpeed()
         {
-            // Original controls result in inversion
             while (true)
             {
-                // Get frame movement speed
-                float speed = IsMovingSlow ? slowMoveSpeed : moveSpeed;
-
-                // Get user movement key input, apply speed and move player
-                transform.Translate(
-                    new Vector3(Input.GetAxis("Horizontal") * speed, 0.0f, Input.GetAxis("Vertical") * moveSpeed),
-                    Camera.main.transform);
-
-                // Wait until next frame
+                controller.speed = SlowMoving ? slowSpeed : speed;
                 yield return null;
             }
         }
