@@ -181,4 +181,4 @@ namespace C2M2.NeuronalDynamics.Visualization
             }
         }
     }
-}s
+}
