@@ -128,7 +128,7 @@ namespace C2M2.NeuronalDynamics.Interaction
                 if (simulation != null)
                 {
                     ReportSimulation(simulation, transform.position);
-
+                    GetComponent<Rigidbody>().isKinematic = true;
                 }
             }
         }

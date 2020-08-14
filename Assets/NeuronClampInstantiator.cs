@@ -18,24 +18,29 @@ namespace C2M2.NeuronalDynamics.Interaction
         [Header("Input")]
         private bool inputOn = true;
         public bool InputOn { get; set; }
-        public OVRInput.Button createDestroyButton = OVRInput.Button.Two;
+        public OVRInput.Button createDestroyButton = OVRInput.Button.One;
         private KeyCode createDestroyKey = KeyCode.N;
         public bool CreateDestroyRequested
         {
             get
-            {
-                return (OVRInput.GetDown(createDestroyButton) || Input.GetKeyDown(createDestroyKey));
+            { 
+                // In VR, only allow controls if the handle is grabbed
+                return ((grabbable.isGrabbed && OVRInput.GetDown(createDestroyButton)) 
+                    || Input.GetKeyDown(createDestroyKey));
             }
         }
-        public OVRInput.Button toggleClampsButton = OVRInput.Button.Three;
+        public OVRInput.Button toggleClampsButton = OVRInput.Button.Two;
         private KeyCode toggleKey = KeyCode.Space;
         public bool ToggleRequested
         {
             get
             {
-                return OVRInput.GetDown(toggleClampsButton) || Input.GetKeyDown(toggleKey);
+                return (grabbable.isGrabbed && OVRInput.GetDown(toggleClampsButton)) 
+                    || Input.GetKeyDown(toggleKey);
             }
         }
+        private static Vector3 defaultLocalScale = new Vector3(2.5f, 0.25f, 2.5f);
+        private OVRGrabbable grabbable = null;
 
         private void Awake()
         {
@@ -45,6 +50,8 @@ namespace C2M2.NeuronalDynamics.Interaction
                 Destroy(this);
             }
             InstantiateClamp();
+            defaultLocalScale = curClamp.transform.localScale;
+            grabbable = GetComponent<OVRGrabbable>();
         }
 
         // Update is called once per frame
@@ -56,6 +63,14 @@ namespace C2M2.NeuronalDynamics.Interaction
                 if (curClamp.transform.parent == null || curClamp.transform.parent != clampAnchor)
                 {
                     curClamp = null;
+                }
+
+                if (curClamp != null && curClamp.transform.hasChanged)
+                {
+                    curClamp.transform.localPosition = Vector3.zero;
+                    curClamp.transform.localRotation = Quaternion.identity;
+                    curClamp.transform.localScale = defaultLocalScale;
+                    curClamp.transform.hasChanged = false;
                 }
             }
 
