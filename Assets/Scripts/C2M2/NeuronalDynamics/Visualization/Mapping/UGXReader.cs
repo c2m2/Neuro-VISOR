@@ -61,27 +61,31 @@ namespace C2M2.NeuronalDynamics.UGX
 
 	    public static void Read1DUGX(in string archive, in int refinement, ref Grid grid) {
           
-		      vrnReader reader = new vrnReader(archive);
-		      string meshName = reader.retrieve_1d_mesh(refinement);
+		    vrnReader reader = new vrnReader(archive);
+		    string meshName = reader.retrieve_1d_mesh(refinement);
             
-		      using (ZipArchive zipArchive = ZipFile.Open(archive, ZipArchiveMode.Read))
-                      {
-                        var file = zipArchive.GetEntry(meshName);
-                        _ = file ?? throw new ArgumentNullException(nameof(file));
-                         ReadUGX(file.Open(), grid);
-		      }
+		    using (ZipArchive zipArchive = ZipFile.Open(archive, ZipArchiveMode.Read))
+            {
+                var file = zipArchive.GetEntry(meshName);
+                _ = file ?? throw new ArgumentNullException(nameof(file));
+
+                Stream stream = file.Open();
+                ReadUGX(in stream, ref grid);
+		    }
 	    }
 	
 	    public static void Read2DUGX(in string archive, in double inflation, ref Grid grid)
         {
-		      vrnReader reader = new vrnReader(archive);
-		      string meshName = reader.retrieve_2d_mesh(inflation);
-		      using (ZipArchive zipArchive = ZipFile.Open(archive, ZipArchiveMode.Read))
-              {
-                        var file = zipArchive.GetEntry(meshName);
-                        _ = file ?? throw new ArgumentNullException(nameof(file));
-                        ReadUGX(file.Open(), grid);
-		      }
+		    vrnReader reader = new vrnReader(archive);
+		    string meshName = reader.retrieve_2d_mesh(inflation);
+		    using (ZipArchive zipArchive = ZipFile.Open(archive, ZipArchiveMode.Read))
+            {
+                var file = zipArchive.GetEntry(meshName);
+                _ = file ?? throw new ArgumentNullException(nameof(file));
+
+                Stream stream = file.Open();
+                ReadUGX(in stream, ref grid);
+            }
 	    }
 	
 	    public static void ReadUGX(in string filename, ref Grid grid)
