@@ -98,11 +98,6 @@ namespace C2M2.NeuronalDynamics.UGX
  	    /// <PARAM NAME="grid"> grid instance </param>
         public static void ReadUGX(in Stream filename, ref Grid grid)
         {
-            if (!UGX_EXTENSION.Equals(Path.GetExtension(filename), StringComparison.InvariantCultureIgnoreCase))
-            {
-                Debug.LogWarning("Supplied file does not have UGX extension >>{UGX_EXTENSION}<<");
-            }
-
             /// Check if diameter data was atttached
             if (!grid.HasVertexAttachment<DiameterAttachment>())
             {
