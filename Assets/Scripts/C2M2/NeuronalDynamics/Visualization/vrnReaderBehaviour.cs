@@ -164,20 +164,13 @@ namespace C2M2.NeuronalDynamics.Visualization
             /// 2.5 inflated 2d mesh is retrieved from the archive test.vrn
             public void Start()
             {
-                try
-                {
-                    /// Instantiate the VRN reader with the desired file name
-                    vrnReader reader = new vrnReader(Application.dataPath + Path.DirectorySeparatorChar + fileName);
-                    /// Get 1d mesh (0-th refinement aka coarse grid)
-                    UnityEngine.Debug.Log(reader.retrieve_1d_mesh(0));
-                    /// Get inflated 2d mesh by a factor of 2.5
-                    UnityEngine.Debug.Log(reader.retrieve_2d_mesh(2.5));
-                }
-                catch (Exception ex) when (ex is System.IO.FileNotFoundException || ex is System.ArgumentNullException)
-                {
-                    UnityEngine.Debug.LogError($"Archive or mesh file not found. Archive: {fileName}.");
-                    UnityEngine.Debug.LogError(ex);
-                }
+                string fullFileName = Application.dataPath + Path.DirectorySeparatorChar + fileName;
+                /// Instantiate the VRN reader with the desired file name
+                vrnReader reader = new vrnReader(fullFileName);
+                /// Get 1d mesh (0-th refinement aka coarse grid)
+                UnityEngine.Debug.Log(reader.retrieve_1d_mesh(0));
+                /// Get inflated 2d mesh by a factor of 2.5
+                UnityEngine.Debug.Log(reader.retrieve_2d_mesh(2.5));
             }
         }
     }
