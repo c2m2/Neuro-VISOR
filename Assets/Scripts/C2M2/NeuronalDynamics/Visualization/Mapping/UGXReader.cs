@@ -7,7 +7,9 @@ using System.Linq;
 using UnityEditor;
 using System.Xml.Schema;
 using System.Collections.Generic;
+using System.IO.Compression;
 using System.IO;
+using C2M2.NeuronalDynamics.Visualization.vrn;
 #endregion
 
 namespace C2M2.NeuronalDynamics.UGX
@@ -46,7 +48,7 @@ namespace C2M2.NeuronalDynamics.UGX
 
         /// ReadUGX
         /// <summary>
-	/// Helper method to test a static grid
+	    /// Helper method to test a static grid
         /// </summary>
         /// <param name="grid"></param>
         /// <returns></returns>
@@ -56,18 +58,50 @@ namespace C2M2.NeuronalDynamics.UGX
             ReadUGX(@"C:/Users/tug41634/Desktop/cube_3d.ugx", ref grid);
         }
 
+
+	    public static void Read1DUGX(in string archive, in int refinement, ref Grid grid) {
+          
+		    vrnReader reader = new vrnReader(archive);
+		    string meshName = reader.retrieve_1d_mesh(refinement);
+            
+		    using (ZipArchive zipArchive = ZipFile.Open(archive, ZipArchiveMode.Read))
+            {
+                var file = zipArchive.GetEntry(meshName);
+                _ = file ?? throw new ArgumentNullException(nameof(file));
+
+                Stream stream = file.Open();
+                ReadUGX(in stream, ref grid);
+		    }
+	    }
+	
+	    public static void Read2DUGX(in string archive, in double inflation, ref Grid grid)
+        {
+		    vrnReader reader = new vrnReader(archive);
+		    string meshName = reader.retrieve_2d_mesh(inflation);
+		    using (ZipArchive zipArchive = ZipFile.Open(archive, ZipArchiveMode.Read))
+            {
+                var file = zipArchive.GetEntry(meshName);
+                _ = file ?? throw new ArgumentNullException(nameof(file));
+
+                Stream stream = file.Open();
+                ReadUGX(in stream, ref grid);
+            }
+	    }
+	
+	    public static void ReadUGX(in string filename, ref Grid grid)
+        {
+            Stream stream = File.OpenRead(filename);
+		    ReadUGX(in stream, ref grid);
+	    }
+		
+		
         /// ReadUGX
         /// <summary>
         /// </summary>
         /// <param name="filename"> name of UGX file on disk </param>
- 	/// <PARAM NAME="grid"> grid instance </param>
-        public static void ReadUGX(in string filename, ref Grid grid)
+ 	    /// <PARAM NAME="grid"> grid instance </param>
+        public static void ReadUGX(in Stream filename, ref Grid grid)
         {
-            if (!UGX_EXTENSION.Equals(Path.GetExtension(filename), StringComparison.InvariantCultureIgnoreCase))
-            {
-                Debug.LogWarning("Supplied file does not have UGX extension >>{UGX_EXTENSION}<<");
-            }
-
             /// Check if diameter data was atttached
             if (!grid.HasVertexAttachment<DiameterAttachment>())
             {
@@ -311,7 +345,7 @@ namespace C2M2.NeuronalDynamics.UGX
                                         String subsetName = el.Attribute("name").Value;
                                         grid.Subsets[subsetName] = new Subset(subsetName, GetIndices(subsetName, el));
                                         if (subsetName.Equals("soma")) {
-					  UnityEngine.Debug.Log("soma indices: " + grid.Subsets["soma"]);
+					                        UnityEngine.Debug.Log("soma indices: " + grid.Subsets["soma"]);
                                         
                                         }
                                     }

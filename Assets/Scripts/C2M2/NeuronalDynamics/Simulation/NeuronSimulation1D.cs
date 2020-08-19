@@ -280,9 +280,6 @@ namespace C2M2.NeuronalDynamics.Simulation
                 colliderMesh = BuildMesh(meshColScale);
 
                 InitUI();
-
-                // Let neuron clamps lookup a triangle by its vertex
-                gameObject.AddComponent<TriLookup>();
             }
 
             return cellMesh;
