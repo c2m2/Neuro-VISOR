@@ -18,11 +18,14 @@ namespace C2M2.NeuronalDynamics.Interaction
         public Material inactiveMaterial = null;
 
         public NeuronSimulation1D activeTarget = null;
+        public Mesh cylMesh;
+        private Mesh origMesh;
 
 
         private Tuple<int, double>[] newValues = null;
 
         private Vector3 lastLocalPos;
+        private Vector3 origScale;
 
         private Vector3 simLastPos;
         private bool ClampMoved { get { return !lastLocalPos.Equals(transform.localPosition); } }
@@ -35,6 +38,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         private void Awake()
         {
             mr = GetComponent<MeshRenderer>();
+            origScale = transform.localScale;
         }
 
         private void FixedUpdate()
@@ -128,7 +132,7 @@ namespace C2M2.NeuronalDynamics.Interaction
                 if (simulation != null)
                 {
                     ReportSimulation(simulation, transform.position);
-                    GetComponent<Rigidbody>().isKinematic = true;
+                    //GetComponent<Rigidbody>().isKinematic = true;
                 }
             }
         }
@@ -143,9 +147,21 @@ namespace C2M2.NeuronalDynamics.Interaction
                 Tuple<int, double> newVal = new Tuple<int, double>(ind, clampPower);
                 newValues = new Tuple<int, double>[] { newVal };
 
+                origMesh = GetComponent<MeshFilter>().sharedMesh;
+                GetComponent<MeshFilter>().sharedMesh = cylMesh;
+                UpdateCylinder();
+
             }
 
             return activeTarget;
+        }
+        // Give cylinder the correct scaling and orientation
+        private void UpdateCylinder()
+        {
+            // Get adjacent 1D verts
+            // Resolve angle of orientation from those verts
+
+
         }
 
         private void OnTriggerExit(Collider other)
@@ -158,6 +174,9 @@ namespace C2M2.NeuronalDynamics.Interaction
                     // Only a clamp instantiator should be allowed to remove a NeuronClamp from a simulation
                     if (transform.parent == null || transform.parent.GetComponent<NeuronClampAnchor>() == null)
                         Destroy(this);
+
+                    GetComponent<MeshFilter>().sharedMesh = origMesh;
+                    transform.localScale = origScale;
                 }
             }
         }

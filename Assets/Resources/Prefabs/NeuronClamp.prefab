@@ -60,6 +60,7 @@ MonoBehaviour:
   activeMaterial: {fileID: 2100000, guid: 35c891bae7ccbb440a4193edaae59b1a, type: 2}
   inactiveMaterial: {fileID: 2100000, guid: b5682c8bb520e8a46bbeab52c1a74097, type: 2}
   activeTarget: {fileID: 0}
+  cylMesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!23 &897701459873006806
 MeshRenderer:
   m_ObjectHideFlags: 0
