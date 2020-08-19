@@ -11,6 +11,7 @@ using C2M2.Utils.MeshUtils;
 using C2M2.Interaction;
 using C2M2.Simulation;
 using Grid = C2M2.NeuronalDynamics.UGX.Grid;
+using C2M2.NeuronalDynamics.Visualization.vrn;
 
 namespace C2M2.NeuronalDynamics.Simulation
 {
@@ -277,7 +278,8 @@ namespace C2M2.NeuronalDynamics.Simulation
                 meshColController = gameObject.AddComponent<MeshColController>();
 
                 // Pass blownupMesh upwards to SurfaceSimulation
-                colliderMesh = BuildMesh(meshColScale);
+                //colliderMesh = BuildMesh(meshColScale);
+                colliderMesh = BuildMesh();
 
                 InitUI();
             }
@@ -330,7 +332,7 @@ namespace C2M2.NeuronalDynamics.Simulation
 
 
         // Returns whichever mesh is used for the mesh collider
-        private Mesh BuildMesh(MeshScaling meshScale)
+        /*private Mesh BuildMesh(MeshScaling meshScale)
         {
             if (scaledMeshes[(int)meshScale] == null)
             {
@@ -379,26 +381,54 @@ namespace C2M2.NeuronalDynamics.Simulation
             }
 
             return scaledMeshes[(int)meshScale];
+        }*/
+
+        private Mesh BuildMesh(double inflation = 1, int refinement = 0)
+        {
+            Mesh mesh = null;
+
+            // 1 <= inflation
+            inflation = Math.Max(inflation, 1);
+            // 0 <= refinement
+            refinement = Math.Max(refinement, 0);
+
+            vrnReader reader = new vrnReader("Assets\\test.vrn");
+            ;
+
+            mesh = MapUtils.BuildMap(reader.retrieve_2d_mesh(inflation),
+                reader.retrieve_1d_mesh(refinement),
+                false).SurfaceGeometry.Mesh;
+
+            mesh.RecalculateNormals();
+
+            mesh.name = mesh.name + "ref" + refinement.ToString() + "inf" + inflation.ToString();
+
+            return mesh;
         }
 
         public void SwitchColliderMesh(int scale)
         {    
             scale = Math.Clamp(scale, 0, 4);
 
-            if(scaledMeshes[scale] == null) BuildMesh((MeshScaling)scale);
+            //if(scaledMeshes[scale] == null) BuildMesh((MeshScaling)scale);
 
-            meshColController.Mesh = scaledMeshes[scale];
+
+
+            // meshColController.Mesh = scaledMeshes[scale];
+            meshColController.Mesh = BuildMesh(scale);
         }
 
         public void SwitchMesh(int scale)
         {
             scale = Math.Clamp(scale, 0, 4);
 
-            if (scaledMeshes[scale] == null) BuildMesh((MeshScaling)scale);
+            //if (scaledMeshes[scale] == null) BuildMesh((MeshScaling)scale);
+            
 
             MeshFilter mf = GetComponent<MeshFilter>();
 
-            if (mf != null) mf.sharedMesh = scaledMeshes[scale];
+            //if (mf != null) mf.sharedMesh = scaledMeshes[scale];
+            if (mf != null) mf.sharedMesh = BuildMesh(scale);
             else Debug.LogError("No MeshFilter found on " + name);
         }
 
