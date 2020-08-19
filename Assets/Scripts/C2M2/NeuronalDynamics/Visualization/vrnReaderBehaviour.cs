@@ -6,6 +6,8 @@ using System;
 using System.Linq;
 using UnityEngine;
 using UnityEditor;
+using C2M2.NeuronalDynamics.UGX;
+using Grid = C2M2.NeuronalDynamics.UGX.Grid;
 #endregion
 
 namespace C2M2.NeuronalDynamics.Visualization
@@ -78,7 +80,7 @@ namespace C2M2.NeuronalDynamics.Visualization
                     var file = archive.GetEntry (meshName);
                     _ = file ?? throw new ArgumentNullException (nameof (file));
                     using (var stream = file.Open ()) {
-                        UGXReader.ReadUGX(stream, grid);
+                        UGXReader.ReadUGX(stream, ref grid);
                     }
                 }
             }
@@ -177,7 +179,7 @@ namespace C2M2.NeuronalDynamics.Visualization
                 /// Name of mesh in archive (Here: 0-th refinement aka coarse grid)
                 string meshName = reader.retrieve_1d_mesh(0);
                 /// Read in the .ugx file into the grid (read_ugx uses UGXReader internally)
-                reader.read_ugx(meshName, ref grid);
+                //reader.read_ugx(meshName, ref grid);
             }
         }
     }

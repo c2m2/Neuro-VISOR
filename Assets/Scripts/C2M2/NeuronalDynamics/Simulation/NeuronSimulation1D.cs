@@ -278,8 +278,8 @@ namespace C2M2.NeuronalDynamics.Simulation
                 meshColController = gameObject.AddComponent<MeshColController>();
 
                 // Pass blownupMesh upwards to SurfaceSimulation
-                //colliderMesh = BuildMesh(meshColScale);
-                colliderMesh = BuildMesh();
+                colliderMesh = BuildMesh(meshColScale);
+                //colliderMesh = BuildMesh();
 
                 InitUI();
             }
@@ -332,7 +332,7 @@ namespace C2M2.NeuronalDynamics.Simulation
 
 
         // Returns whichever mesh is used for the mesh collider
-        /*private Mesh BuildMesh(MeshScaling meshScale)
+        private Mesh BuildMesh(MeshScaling meshScale)
         {
             if (scaledMeshes[(int)meshScale] == null)
             {
@@ -381,8 +381,8 @@ namespace C2M2.NeuronalDynamics.Simulation
             }
 
             return scaledMeshes[(int)meshScale];
-        }*/
-
+        }
+        /*
         private Mesh BuildMesh(double inflation = 1, int refinement = 0)
         {
             Mesh mesh = null;
@@ -404,31 +404,31 @@ namespace C2M2.NeuronalDynamics.Simulation
             mesh.name = mesh.name + "ref" + refinement.ToString() + "inf" + inflation.ToString();
 
             return mesh;
-        }
+        }*/
 
         public void SwitchColliderMesh(int scale)
         {    
             scale = Math.Clamp(scale, 0, 4);
 
-            //if(scaledMeshes[scale] == null) BuildMesh((MeshScaling)scale);
+            if(scaledMeshes[scale] == null) BuildMesh((MeshScaling)scale);
 
 
 
-            // meshColController.Mesh = scaledMeshes[scale];
-            meshColController.Mesh = BuildMesh(scale);
+            meshColController.Mesh = scaledMeshes[scale];
+            //meshColController.Mesh = BuildMesh(scale);
         }
 
         public void SwitchMesh(int scale)
         {
             scale = Math.Clamp(scale, 0, 4);
 
-            //if (scaledMeshes[scale] == null) BuildMesh((MeshScaling)scale);
+            if (scaledMeshes[scale] == null) BuildMesh((MeshScaling)scale);
             
 
             MeshFilter mf = GetComponent<MeshFilter>();
 
-            //if (mf != null) mf.sharedMesh = scaledMeshes[scale];
-            if (mf != null) mf.sharedMesh = BuildMesh(scale);
+            if (mf != null) mf.sharedMesh = scaledMeshes[scale];
+            //if (mf != null) mf.sharedMesh = BuildMesh(scale);
             else Debug.LogError("No MeshFilter found on " + name);
         }
 
