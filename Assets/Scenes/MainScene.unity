@@ -3495,11 +3495,11 @@ MonoBehaviour:
   globalMax: 120
   globalMin: -10
   refinementLevel: 1
-  cell1xPath: C:\Users\jacob\Desktop\C2M2\virtual-reality/Assets/StreamingAssets/NeuronalDynamics/ActiveCell/Cell2-0a/1xDiameter/Cell0-2a-1ref
-  cell2xPath: C:\Users\jacob\Desktop\C2M2\virtual-reality/Assets/StreamingAssets/NeuronalDynamics/ActiveCell/Cell2-0a/2xDiameter/Cell2-0a-1ref
-  cell3xPath: C:\Users\jacob\Desktop\C2M2\virtual-reality/Assets/StreamingAssets/NeuronalDynamics/ActiveCell/Cell2-0a/3xDiameter/Cell2-0a-1ref
-  cell4xPath: C:\Users\jacob\Desktop\C2M2\virtual-reality/Assets/StreamingAssets/NeuronalDynamics/ActiveCell/Cell2-0a/4xDiameter/Cell2-0a-1ref
-  cell5xPath: C:\Users\jacob\Desktop\C2M2\virtual-reality/Assets/StreamingAssets/NeuronalDynamics/ActiveCell/Cell2-0a/5xDiameter/Cell2-0a-1ref
+  cell1xPath: C:/Users/jacob/Desktop/C2M2/virtual-reality/Assets/StreamingAssets/NeuronalDynamics/ActiveCell/Cell2-0a/1xDiameter/Cell0-2a-0ref
+  cell2xPath: C:\Users\jacob/Desktop/C2M2\virtual-reality/Assets/StreamingAssets/NeuronalDynamics/ActiveCell/Cell2-0a/2xDiameter/Cell2-0a-1ref
+  cell3xPath: C:\Users\jacob/Desktop/C2M2\virtual-reality/Assets/StreamingAssets/NeuronalDynamics/ActiveCell/Cell2-0a/3xDiameter/Cell2-0a-1ref
+  cell4xPath: C:\Users\jacob/Desktop/C2M2\virtual-reality/Assets/StreamingAssets/NeuronalDynamics/ActiveCell/Cell2-0a/4xDiameter/Cell2-0a-1ref
+  cell5xPath: C:\Users\jacob/Desktop/C2M2\virtual-reality/Assets/StreamingAssets/NeuronalDynamics/ActiveCell/Cell2-0a/5xDiameter/Cell2-0a-1ref
   visualize1D: 0
   color1D:
     serializedVersion: 2
@@ -5275,6 +5275,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3135916970792637252, guid: 170c7fd960f71ba4f94f7a2b0fb17726,
+        type: 3}
+      propertyPath: createDestroyButton
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3135916970792637252, guid: 170c7fd960f71ba4f94f7a2b0fb17726,
+        type: 3}
+      propertyPath: toggleClampsButton
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 170c7fd960f71ba4f94f7a2b0fb17726, type: 3}

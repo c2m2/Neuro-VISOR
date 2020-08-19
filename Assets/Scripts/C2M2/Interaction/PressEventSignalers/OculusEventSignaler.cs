@@ -16,6 +16,7 @@ namespace C2M2.Interaction.Signaling
         public OVRInput.Button beginRaycastingButton = OVRInput.Button.One;
         [Tooltip("Button to invoke hit/hold events from a distance")]
         public OVRInput.Button triggerEventsButton = OVRInput.Button.PrimaryIndexTrigger;
+        public OVRGrabber grabber = null;
         [Tooltip("Line renderer for visually mimicking raycast vector")]
         public LineRenderer lineRend;
         [Tooltip("Line renderer default color")]
@@ -31,7 +32,10 @@ namespace C2M2.Interaction.Signaling
             lineRend = gameObject.GetComponentInChildren<LineRenderer>();
             if (lineRend == null) { Debug.LogWarning("Couldn't find line renderer in RaycastForward"); }
 
-
+            if(grabber == null)
+            {
+                grabber = GetComponentInParent<OVRGrabber>();
+            }
         }
         protected override void OnStart()
         {
@@ -41,8 +45,12 @@ namespace C2M2.Interaction.Signaling
             StartCoroutine(SearchForHand(100));
         }
         protected override bool BeginRaycastingCondition()
-        {
+        { 
             bool rURaycasting = OVRInput.Get(beginRaycastingButton, controller);
+
+            if (grabber != null && grabber.grabbedObject != null)
+                rURaycasting = false;
+
             StaticHandSetActive(rURaycasting);
             LineRendererSetActive(rURaycasting);
             return rURaycasting;
