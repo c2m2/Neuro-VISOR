@@ -67,6 +67,21 @@ namespace C2M2.NeuronalDynamics.Visualization
                     loaded = true;
                 }
             }
+            
+            
+            /// READ_UGX
+            /// <summary>
+            /// Read a file from the .vrn archive and creates a UGX grid
+            /// </summary>
+            public void read_ugx (in string meshName, ref Grid grid) {
+                using (ZipArchive archive = ZipFile.Open (this.fileName, ZipArchiveMode.Read)) {
+                    var file = archive.GetEntry (meshName);
+                    _ = file ?? throw new ArgumentNullException (nameof (file));
+                    using (var stream = file.Open ()) {
+                        UGXReader.ReadUGX(stream, grid);
+                    }
+                }
+            }
 
             /// READ
             /// <summary>
@@ -134,9 +149,9 @@ namespace C2M2.NeuronalDynamics.Visualization
                     {
                         /// Instantiate the VRN reader with the desired file name
                         vrnReader reader = new vrnReader(fileName);
-                        /// Get 1d mesh (0-th refinement aka coarse grid)
+                        /// Get the name of the 1d mesh (0-th refinement aka coarse grid)
                         Console.WriteLine(reader.retrieve_1d_mesh(0));
-                        /// Get inflated 2d mesh by a factor of 2.5
+                        /// Get the name of the inflated 2d mesh by a factor of 2.5
                         Console.WriteLine(reader.retrieve_2d_mesh(2.5));
                     }
                     catch (Exception ex) when (ex is System.IO.FileNotFoundException || ex is System.ArgumentNullException)
@@ -167,10 +182,17 @@ namespace C2M2.NeuronalDynamics.Visualization
                 string fullFileName = Application.dataPath + Path.DirectorySeparatorChar + fileName;
                 /// Instantiate the VRN reader with the desired file name
                 vrnReader reader = new vrnReader(fullFileName);
-                /// Get 1d mesh (0-th refinement aka coarse grid)
+                /// Get the name of the 1d mesh (0-th refinement aka coarse grid)
                 UnityEngine.Debug.Log(reader.retrieve_1d_mesh(0));
-                /// Get inflated 2d mesh by a factor of 2.5
+                /// Get the name of the inflated 2d mesh by a factor of 2.5
                 UnityEngine.Debug.Log(reader.retrieve_2d_mesh(2.5));
+                
+                /// Get a grid (UGX) from file
+                Grid grid;
+                /// Name of mesh in archive (Here: 0-th refinement aka coarse grid)
+                string meshName = reader.retrieve_1d_mesh(0);
+                /// Read in the .ugx file into the grid (read_ugx uses UGXReader internally)
+                reader.read_ugx(meshName, ref grid);
             }
         }
     }
