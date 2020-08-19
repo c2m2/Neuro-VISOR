@@ -67,25 +67,25 @@ namespace C2M2.NeuronalDynamics.Visualization
                     loaded = true;
                 }
             }
-
-            /// READ
+            
+            
+            /// READ_UGX
             /// <summary>
-            /// Read a file from the .vrn archive
+            /// Read a file from the .vrn archive and creates a UGX grid
             /// </summary>
-            private Stream read(in string meshName)
-            {
-                string name = Path.GetTempPath() + Path.GetRandomFileName();
-                using (ZipArchive archive = ZipFile.Open(this.fileName, ZipArchiveMode.Read))
-                {
-                    var file = archive.GetEntry(meshName);
-                    _ = file ?? throw new ArgumentNullException(nameof(file));
-                    return file.Open();
+            public void read_ugx (in string meshName, ref Grid grid) {
+                using (ZipArchive archive = ZipFile.Open (this.fileName, ZipArchiveMode.Read)) {
+                    var file = archive.GetEntry (meshName);
+                    _ = file ?? throw new ArgumentNullException (nameof (file));
+                    using (var stream = file.Open ()) {
+                        UGXReader.ReadUGX(stream, grid);
+                    }
                 }
             }
 
             /// RETRIEVE_1D_MESH
             /// <summary>
-            /// Retrieve the 1d mesh corresponding to the refinement number from the archive
+            /// Retrieve the 1d mesh name corresponding to the refinement number from the archive
             /// </summary>
             /// <param name="refinement"> Refinement number (Default: 0)</param>
             /// <returns> Filename of refined 1D mesh in archive </returns>
@@ -99,7 +99,7 @@ namespace C2M2.NeuronalDynamics.Visualization
 
             /// RETRIEVE_2D_MESH
             /// <summary>
-            /// Retrieve the 2D mesh corresponding to the inflation factor from the archive
+            /// Retrieve the 2D mesh name corresponding to the inflation factor from the archive
             /// </summary>
             /// <param name="inflation"> Inflation factor </param>
             /// <returns> Filename of inflated 2D mesh in archive </returns>
@@ -134,9 +134,9 @@ namespace C2M2.NeuronalDynamics.Visualization
                     {
                         /// Instantiate the VRN reader with the desired file name
                         vrnReader reader = new vrnReader(fileName);
-                        /// Get 1d mesh (0-th refinement aka coarse grid)
+                        /// Get the name of the 1d mesh (0-th refinement aka coarse grid)
                         Console.WriteLine(reader.retrieve_1d_mesh(0));
-                        /// Get inflated 2d mesh by a factor of 2.5
+                        /// Get the name of the inflated 2d mesh by a factor of 2.5
                         Console.WriteLine(reader.retrieve_2d_mesh(2.5));
                     }
                     catch (Exception ex) when (ex is System.IO.FileNotFoundException || ex is System.ArgumentNullException)
@@ -167,10 +167,17 @@ namespace C2M2.NeuronalDynamics.Visualization
                 string fullFileName = Application.dataPath + Path.DirectorySeparatorChar + fileName;
                 /// Instantiate the VRN reader with the desired file name
                 vrnReader reader = new vrnReader(fullFileName);
-                /// Get 1d mesh (0-th refinement aka coarse grid)
+                /// Get the name of the 1d mesh (0-th refinement aka coarse grid)
                 UnityEngine.Debug.Log(reader.retrieve_1d_mesh(0));
-                /// Get inflated 2d mesh by a factor of 2.5
+                /// Get the name of the inflated 2d mesh by a factor of 2.5
                 UnityEngine.Debug.Log(reader.retrieve_2d_mesh(2.5));
+                
+                /// Get a grid (UGX) from file
+                Grid grid;
+                /// Name of mesh in archive (Here: 0-th refinement aka coarse grid)
+                string meshName = reader.retrieve_1d_mesh(0);
+                /// Read in the .ugx file into the grid (read_ugx uses UGXReader internally)
+                reader.read_ugx(meshName, ref grid);
             }
         }
     }
