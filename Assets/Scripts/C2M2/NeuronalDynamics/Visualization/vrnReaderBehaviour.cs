@@ -83,24 +83,9 @@ namespace C2M2.NeuronalDynamics.Visualization
                 }
             }
 
-            /// READ
-            /// <summary>
-            /// Read a file from the .vrn archive
-            /// </summary>
-            private Stream read(in string meshName)
-            {
-                string name = Path.GetTempPath() + Path.GetRandomFileName();
-                using (ZipArchive archive = ZipFile.Open(this.fileName, ZipArchiveMode.Read))
-                {
-                    var file = archive.GetEntry(meshName);
-                    _ = file ?? throw new ArgumentNullException(nameof(file));
-                    return file.Open();
-                }
-            }
-
             /// RETRIEVE_1D_MESH
             /// <summary>
-            /// Retrieve the 1d mesh corresponding to the refinement number from the archive
+            /// Retrieve the 1d mesh name corresponding to the refinement number from the archive
             /// </summary>
             /// <param name="refinement"> Refinement number (Default: 0)</param>
             /// <returns> Filename of refined 1D mesh in archive </returns>
@@ -114,7 +99,7 @@ namespace C2M2.NeuronalDynamics.Visualization
 
             /// RETRIEVE_2D_MESH
             /// <summary>
-            /// Retrieve the 2D mesh corresponding to the inflation factor from the archive
+            /// Retrieve the 2D mesh name corresponding to the inflation factor from the archive
             /// </summary>
             /// <param name="inflation"> Inflation factor </param>
             /// <returns> Filename of inflated 2D mesh in archive </returns>
