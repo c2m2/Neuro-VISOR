@@ -57,15 +57,76 @@ namespace C2M2.NeuronalDynamics.UGX
     {
         /// BuildMap
         /// <summary>
-        /// Build the meshes of the model geometry and surface geometry as well as the 2d->1d mapping
+        /// Build the mapping from two grid objects
+        /// </summary>
+        /// This delegates to the (private) helper build method:
+        /// <see cref="MapUtils.build(in Grid, in Grid, in Grid)()"/>
+        /// <param name="grid1d"> 1D mesh </param>
+        /// <param name="grid2d"> 2D mesh </param>
+        /// <param name="grid2dvis"> 2D mesh for visualization (Default: null)</param>
+        /// <returns> mapping information as MappingInfo or null if grids not consistent </param>
+        public static MappingInfo? BuildMap(in Grid grid1d, in Grid grid2d, in Grid grid2dvis=null) {
+            /// 1d mesh needs a diameter
+            if (!grid1d.HasVertexAttachment<DiameterAttachment>()) {
+                UnityEngine.Debug.LogError("1d mesh needs a diameter attachment!");
+                return null;
+            }
 
+            /// 2d mesh needs a mapping
+            if (!grid2d.HasVertexAttachment<MappingAttachment>()) {
+                UnityEngine.Debug.LogError("2d mesh needs a mapping attachment");
+                return null;
+            }
+
+            /// otherwise can build map
+            return build(grid2d, grid1d, grid2dvis ?? grid2d);
+        }
+
+        /// Build
+        /// <summary>
+        /// Helper method to which other methods can delegate to
+        /// </summary>
+        /// <param name="grid2d"> 2D mesh </param>
+        /// <param name="grid1d"> 1D mesh </param>
+        /// <param name="grid2dvis"> 2D mesh for visualization </param>
+        /// <returns> mapping information as MappingInfo </returns>
+        private static MappingInfo build(in Grid grid2d, in Grid grid1d, in Grid grid2dvis) {
+            // Accessors for attachments and map
+            VertexAttachementAccessor<MappingData> accessor = new VertexAttachementAccessor<MappingData>(grid2d);
+            Dictionary<int, Tuple<int, int, double>> map2d1d = new Dictionary<int, Tuple<int, int, double>>();
+            int size1d = grid1d.Mesh.vertices.Length;
+            int size3d = grid2d.Mesh.vertices.Length;
+            Debug.Log("size1d: " + size1d + Environment.NewLine + "size3d: " + size3d);
+
+            Vector3[] vertices = grid1d.Mesh.vertices;
+
+            KdTree<float, int> tree = new KdTree<float, int>(3, new FloatMath());
+            for (int i = 0; i < size1d; i++)
+            {
+                tree.Add(new float[] { vertices[i].x, vertices[i].y, vertices[i].z }, i);
+            }
+
+            for (int i = 0; i < size3d; i++)
+            {
+                var node = tree.GetNearestNeighbours(new[] { accessor[i].Start[0], accessor[i].Start[1], accessor[i].Start[2] }, 1);
+                map2d1d[i] = new Tuple<int, int, double>(node[0].Value, node[0].Value, accessor[i].Lambda);
+            }
+
+            return new MappingInfo(grid1d, grid2dvis, map2d1d);
+        }
+
+        /// BuildMap
+        /// <summary>
+        /// Build the meshes of the model geometry and surface geometry as well as the 2d->1d mapping
         /// Thus the additional geom3dtris geometry will be discarded in the future. 
         /// </summary>
+        /// This delegates to the (private) helper build method:
+        /// <see cref="MapUtils.build(in Grid, in Grid, in Grid)()"/>
         /// <param name="geom1d"> Filename of 1d (model) geometry </param>
         /// <param name="geom2d"> Filename of 2d (surface) geometry with mapping data </param>
         /// <param name="geomTris"> Filename of 2d (surface) geometry for visualitation </param>
         /// <param name="validate"> Validate XML file (default is not to validate) </param>
-        /// <returns> The mapping information </returns>
+        /// <returns> The mapping information as MappingInfo </returns>
         /// <see cref="MappingInfo"> MappingInfo struct for details </see>
         /// Note: Mapping data could be encapsulated also in the triangulated mesh, thus eliminating the third mesh parameter
         public static MappingInfo
@@ -91,28 +152,8 @@ namespace C2M2.NeuronalDynamics.UGX
             UGXReader.ReadUGX(geom2d, ref grid2d);
             Debug.Log(grid2d);
 
-            // Accessors for attachments and map
-            VertexAttachementAccessor<MappingData> accessor = new VertexAttachementAccessor<MappingData>(grid2d);
-            Dictionary<int, Tuple<int, int, double>> map2d1d = new Dictionary<int, Tuple<int, int, double>>();
-            int size1d = grid1d.Mesh.vertices.Length;
-            int size3d = grid2d.Mesh.vertices.Length;
-            Debug.Log("size1d: " + size1d + "\nsize3d: " + size3d);
-
-            Vector3[] vertices = grid1d.Mesh.vertices;
-
-            KdTree<float, int> tree = new KdTree<float, int>(3, new FloatMath());
-            for (int i = 0; i < size1d; i++)
-            {
-                tree.Add(new float[] { vertices[i].x, vertices[i].y, vertices[i].z }, i);
-            }
-
-            for (int i = 0; i < size3d; i++)
-            {
-                var node = tree.GetNearestNeighbours(new[] { accessor[i].Start[0], accessor[i].Start[1], accessor[i].Start[2] }, 1);
-                map2d1d[i] = new Tuple<int, int, double>(node[0].Value, node[0].Value, accessor[i].Lambda);
-            }
-
-            return new MappingInfo(grid1d, grid2dvis, map2d1d);
+            /// build the mapping
+            return build(grid2d, grid1d, grid2dvis);
         }
 
         /// <summary>
