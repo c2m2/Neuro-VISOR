@@ -170,6 +170,32 @@ namespace C2M2
                 return array;
             }
             #endregion
+
+            #region Subset
+            /// <summary>
+            /// Returns a subset of this array from [from] (inclusive) to [to] (exclusive)
+            /// </summary>
+            /// <param name="from"> Beginning index (included in returned array) </param>
+            /// <param name="to"> Final index + 1 (not included in returned array) </param>
+            /// <returns></returns>
+            public static T[] Subset<T>(this T[] array, int to, int from = 0)
+            {
+                // 1 <= to <= array.Length
+                // 0 <= from < to
+                if (to < 1 || to > array.Length) throw new IndexOutOfRangeException("to out of bounds.");
+                if (from < 0 || from >= to) throw new IndexOutOfRangeException("from out of bounds.");
+
+                T[] subset = new T[to - from];
+                int s = 0;
+                for(int i = from; i < to; i++)
+                {
+                    subset[s] = array[i];
+                    s++;
+                }
+                return subset;
+            }
+            #endregion
+
             public static string ToStringFull(this double[] array)
             {
                 StringBuilder sb = new StringBuilder(array.Length * 10);
