@@ -227,7 +227,6 @@ namespace C2M2.NeuronalDynamics.UGX
                                             {
                                                 accessor[i] = new DiameterData(diameters[i]);
                                             }
-
                                         }
                                         else
                                         {
@@ -335,20 +334,33 @@ namespace C2M2.NeuronalDynamics.UGX
                                 Func<String, XElement, int[]> GetIndices = (String s, XElement el) =>
                                    Array.ConvertAll(el.Element("vertices").Value.Split(' '), int.Parse);
 
+                                Func<String, XElement, bool> IsEmpty = (String s, XElement el) =>
+                                        !el.Elements("vertices").Any();
+
                                 Func<String, XElement, Boolean> HasValue = (String s, XElement el) =>
                                !String.IsNullOrEmpty(el.Attribute(s).Value);
 
+
+                                UnityEngine.Debug.Log("here");
                                 if ("defSH".Equals(element.Attribute("name").Value))
                                 {
                                     foreach (XElement el in element.Elements().Where(el => HasValue("name", el)))
                                     {
                                         String subsetName = el.Attribute("name").Value;
+                                        /// We ignore subsets with name defSub and zero vertices. These should never be contained in a valid .ugx file.
+                                        if (subsetName.Equals("defSub") && IsEmpty(subsetName, el)) {
+                                            UnityEngine.Debug.Log(@"Subsets with name defSub (And 0 vertices) are ignored. 
+                                            Make sure your input geometry (.ugx) is consistent and does not contain empty subsets");
+                                            continue;
+                                        }
+
+                                        /// All other subsets are okay
                                         grid.Subsets[subsetName] = new Subset(subsetName, GetIndices(subsetName, el));
                                         if (subsetName.Equals("soma")) {
 					                        UnityEngine.Debug.Log("soma indices: " + grid.Subsets["soma"]);
-                                        
                                         }
                                     }
+                                       UnityEngine.Debug.Log("there");
                                 }
                                 else
                                 {
