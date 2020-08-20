@@ -340,8 +340,6 @@ namespace C2M2.NeuronalDynamics.UGX
                                 Func<String, XElement, Boolean> HasValue = (String s, XElement el) =>
                                !String.IsNullOrEmpty(el.Attribute(s).Value);
 
-
-                                UnityEngine.Debug.Log("here");
                                 if ("defSH".Equals(element.Attribute("name").Value))
                                 {
                                     foreach (XElement el in element.Elements().Where(el => HasValue("name", el)))
@@ -360,7 +358,6 @@ namespace C2M2.NeuronalDynamics.UGX
 					                        UnityEngine.Debug.Log("soma indices: " + grid.Subsets["soma"]);
                                         }
                                     }
-                                       UnityEngine.Debug.Log("there");
                                 }
                                 else
                                 {
