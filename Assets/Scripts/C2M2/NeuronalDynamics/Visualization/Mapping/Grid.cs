@@ -75,14 +75,15 @@ namespace C2M2.NeuronalDynamics.UGX
         {
             var sb = new StringBuilder();
             sb.Append($"Grid has name >>{Mesh.name}<< and #{Mesh.vertices.Length}");
-            sb.Append($" vertices and #{AttachmentInfo.Data.Count} attachments.");
+            sb.Append($" vertices and #{AttachmentInfo.Data.Count} attachments. ");
+            int counter = 1;
             foreach (var pair in AttachmentInfo.Data)
             {
-                sb.Append(pair.Key);
-                sb.Append(" has type ");
-                sb.Append(AttachmentInfo.Types[pair.Key]);
+                sb.Append($" Attachment #{counter} ({pair.Key}) has type ");
+                sb.Append(AttachmentInfo.Types[pair.Key].FullName);
+                counter++;
             }
-            sb.Append($"There are #{Edges.Count} edges contained in the grid");
+            sb.Append($" There are #{Edges.Count} edges contained in the grid");
             return sb.ToString();
         }
 
