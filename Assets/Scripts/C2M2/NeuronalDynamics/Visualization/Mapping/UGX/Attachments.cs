@@ -71,7 +71,6 @@ namespace C2M2.NeuronalDynamics.UGX
         public static void Distribute(in Grid grid)
         {
             UnityEngine.Debug.LogError("Currently not implemented");
-      
         }
 
         /// Attach

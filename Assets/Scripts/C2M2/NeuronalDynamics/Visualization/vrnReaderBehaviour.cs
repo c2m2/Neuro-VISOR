@@ -12,6 +12,7 @@ using Grid = C2M2.NeuronalDynamics.UGX.Grid;
 
 namespace C2M2.NeuronalDynamics.Visualization
 {
+    using DiameterAttachment = IAttachment<DiameterData>;
     namespace vrn
     {
         sealed class vrnReader
@@ -35,7 +36,8 @@ namespace C2M2.NeuronalDynamics.Visualization
             private struct Geom2d                                                                                                                                                                                                                                                 
             {                                                                                                                                                                                                                                                                     
                 public string inflation;                                                                                                                                                                                                                                          
-                public string name;                                                                                                                                                                                                                                               
+                public string name;    
+                public string description;                                                                                                                                                                                                                                           
             }                                                                                                                                                                                                                                                                     
                                                                                                                                                                                                                                                                                   
             /// GEOMETRY                                                                                                                                                                                                                                                          
@@ -66,6 +68,7 @@ namespace C2M2.NeuronalDynamics.Visualization
                     var file = archive.GetEntry("MetaInfo.json");
                     _ = file ?? throw new ArgumentNullException(nameof(file));
                     geometry = JsonUtility.FromJson<Geometry>(new StreamReader(file.Open()).ReadToEnd().ToString());
+                    UnityEngine.Debug.Log("Geometry: " + geometry.geom1d.Length);
                     loaded = true;
                 }
             }
@@ -79,8 +82,10 @@ namespace C2M2.NeuronalDynamics.Visualization
                 using (ZipArchive archive = ZipFile.Open (this.fileName, ZipArchiveMode.Read)) {
                     var file = archive.GetEntry (meshName);
                     _ = file ?? throw new ArgumentNullException (nameof (file));
-                    using (var stream = file.Open ()) {
+                    using (var stream = file.Open()) {
                         UGXReader.ReadUGX(stream, ref grid);
+                        UnityEngine.Debug.Log("Read in grid from archive {meshName}:");
+                        UnityEngine.Debug.Log(grid);
                     }
                 }
             }
@@ -94,6 +99,7 @@ namespace C2M2.NeuronalDynamics.Visualization
             public string retrieve_1d_mesh(int refinement = 0)
             {
                 if (!loaded) load();
+                UnityEngine.Debug.Log("Geometry: " + geometry.geom1d);
                 int index = geometry.geom1d.ToList().FindIndex
                             (geom => Int16.Parse(geom.refinement) == refinement);
                 return geometry.geom1d[index != -1 ? index : 0].name;
@@ -174,12 +180,19 @@ namespace C2M2.NeuronalDynamics.Visualization
                 /// Get the name of the inflated 2d mesh by a factor of 2.5
                 UnityEngine.Debug.Log(reader.retrieve_2d_mesh(2.5));
                 
-                /// Get a grid (UGX) from file
-                Grid grid;
-                /// Name of mesh in archive (Here: 0-th refinement aka coarse grid)
+                /// 1. Find a refinement in the .vrn archive (0 = 0th refinement = coarse grid, 1 = 1st refinement, 2 = 2nd refinement, ...)
+                /// or: Find a inflated mesh in the .vrn archive (1 = Inflated by factor 1, 2.5 = inflated by a factor 2.5, ...)
+                /// 2. Create empty Grid grid to store the mesh
+                /// 3. Read the file from the archive (.ugx filetype) into the Grid grid
+                /// NOTE: If the required refinement or inflation is not stored in the archive an error is thrown
+                /// Name of mesh in archive (Here: Name of the 0-th refinement aka coarse grid in the archive)
                 string meshName = reader.retrieve_1d_mesh(0);
+                /// Create empty grid with name of grid in archive
+                Grid grid = new Grid(new Mesh(), meshName);
+                grid.Attach(new DiameterAttachment());
                 /// Read in the .ugx file into the grid (read_ugx uses UGXReader internally)
-                //reader.read_ugx(meshName, ref grid);
+                UnityEngine.Debug.Log("Reading now mesh: " + meshName);
+                reader.read_ugx(meshName, ref grid);
             }
         }
     }
