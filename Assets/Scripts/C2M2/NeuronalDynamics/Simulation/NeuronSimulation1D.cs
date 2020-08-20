@@ -121,6 +121,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         public RefinementLevel refinementLevel = RefinementLevel.x1;
 
         // Need mesh options for each refinement, diameter level
+        public string vrnCellPath = "Assets\\test.vrn";
         public string cell1xPath;
         public string cell2xPath;
         public string cell3xPath;
@@ -237,8 +238,9 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// <param name="grid"></param>
         protected abstract void SetNeuronCell(Grid grid);
 
-        protected override void ReadData()
+        /*protected override void ReadData()
         {
+            vrnReader reader = new vrnReader(CellPath);
             CellPathPacket pathPacket = new CellPathPacket(cell1xPath, "1xDiameter");
 
             // Read in 1D & 3D data and build a map between them
@@ -246,10 +248,38 @@ namespace C2M2.NeuronalDynamics.Simulation
                 pathPacket.path3D,
                 false,
                 pathPacket.pathTris);
+
             //map = mapping.Data;
             // Convert dictionary to array for speed
             map = new Vert3D1DPair[mapping.Data.Count];
             foreach(KeyValuePair<int, Tuple<int, int, double>> entry in mapping.Data)
+            {
+                map[entry.Key] = new Vert3D1DPair(entry.Value.Item1, entry.Value.Item2, entry.Value.Item3);
+            }
+
+            scalars3D = new double[map.Length];
+
+            // Pass the cell to simulation code
+            SetNeuronCell(mapping.ModelGeometry);
+        }*/
+
+        vrnReader reader = null;
+        protected override void ReadData()
+        {
+            if(reader == null) reader = new vrnReader(vrnCellPath);
+
+            Debug.Log(reader.List());
+
+            // Read in 1D & 3D data and build a map between them
+            mapping = MapUtils.BuildMap(reader.retrieve_1d_mesh(0),
+                reader.retrieve_2d_mesh(1),
+                false,
+                reader.retrieve_2d_mesh(1));
+
+            //map = mapping.Data;
+            // Convert dictionary to array for speed
+            map = new Vert3D1DPair[mapping.Data.Count];
+            foreach (KeyValuePair<int, Tuple<int, int, double>> entry in mapping.Data)
             {
                 map[entry.Key] = new Vert3D1DPair(entry.Value.Item1, entry.Value.Item2, entry.Value.Item3);
             }
@@ -271,14 +301,14 @@ namespace C2M2.NeuronalDynamics.Simulation
             {
                 cellMesh = Clean3DCell(cellMesh);
 
-                scaledMeshes[(int)MeshScaling.x1] = cellMesh;
+                //scaledMeshes[(int)MeshScaling.x1] = cellMesh;
 
                 if (visualize1D) Render1DCell();
 
                 meshColController = gameObject.AddComponent<MeshColController>();
 
                 // Pass blownupMesh upwards to SurfaceSimulation
-                colliderMesh = BuildMesh(meshColScale);
+                colliderMesh = BuildMesh((int)meshColScale);
                 //colliderMesh = BuildMesh();
 
                 InitUI();
@@ -332,6 +362,7 @@ namespace C2M2.NeuronalDynamics.Simulation
 
 
         // Returns whichever mesh is used for the mesh collider
+        /*
         private Mesh BuildMesh(MeshScaling meshScale)
         {
             if (scaledMeshes[(int)meshScale] == null)
@@ -381,8 +412,8 @@ namespace C2M2.NeuronalDynamics.Simulation
             }
 
             return scaledMeshes[(int)meshScale];
-        }
-        /*
+        }*/
+        
         private Mesh BuildMesh(double inflation = 1, int refinement = 0)
         {
             Mesh mesh = null;
@@ -392,9 +423,7 @@ namespace C2M2.NeuronalDynamics.Simulation
             // 0 <= refinement
             refinement = Math.Max(refinement, 0);
 
-            vrnReader reader = new vrnReader("Assets\\test.vrn");
-            ;
-
+            if (reader == null) reader = new vrnReader(vrnCellPath);
             mesh = MapUtils.BuildMap(reader.retrieve_2d_mesh(inflation),
                 reader.retrieve_1d_mesh(refinement),
                 false).SurfaceGeometry.Mesh;
@@ -404,17 +433,39 @@ namespace C2M2.NeuronalDynamics.Simulation
             mesh.name = mesh.name + "ref" + refinement.ToString() + "inf" + inflation.ToString();
 
             return mesh;
-        }*/
+        }
+
+        /*        public void SwitchColliderMesh(int scale)
+                {    
+                    scale = Math.Clamp(scale, 0, 4);
+
+                    if(scaledMeshes[scale] == null) BuildMesh((MeshScaling)scale);
+
+
+
+                    meshColController.Mesh = scaledMeshes[scale];
+                    //meshColController.Mesh = BuildMesh(scale);
+                }
+
+                public void SwitchMesh(int scale)
+                {
+                    scale = Math.Clamp(scale, 0, 4);
+
+                    if (scaledMeshes[scale] == null) BuildMesh((MeshScaling)scale);
+
+
+                    MeshFilter mf = GetComponent<MeshFilter>();
+
+                    if (mf != null) mf.sharedMesh = scaledMeshes[scale];
+                    //if (mf != null) mf.sharedMesh = BuildMesh(scale);
+                    else Debug.LogError("No MeshFilter found on " + name);
+                }*/
 
         public void SwitchColliderMesh(int scale)
-        {    
+        {
             scale = Math.Clamp(scale, 0, 4);
 
-            if(scaledMeshes[scale] == null) BuildMesh((MeshScaling)scale);
-
-
-
-            meshColController.Mesh = scaledMeshes[scale];
+            meshColController.Mesh = BuildMesh(scale);
             //meshColController.Mesh = BuildMesh(scale);
         }
 
@@ -422,12 +473,10 @@ namespace C2M2.NeuronalDynamics.Simulation
         {
             scale = Math.Clamp(scale, 0, 4);
 
-            if (scaledMeshes[scale] == null) BuildMesh((MeshScaling)scale);
-            
 
             MeshFilter mf = GetComponent<MeshFilter>();
 
-            if (mf != null) mf.sharedMesh = scaledMeshes[scale];
+            if (mf != null) mf.sharedMesh = BuildMesh(scale);
             //if (mf != null) mf.sharedMesh = BuildMesh(scale);
             else Debug.LogError("No MeshFilter found on " + name);
         }

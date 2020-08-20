@@ -70,17 +70,18 @@ namespace C2M2.NeuronalDynamics.Visualization {
             /// <summary>
             /// Print out a list of 1D and 2D geometries contained in .vrn archive
             /// </summary>
-            public void list () {
+            public string List () {
                 if (!loaded) load ();
-                UnityEngine.Debug.Log ($"Geometries contained in supplied .vrn archive ({this.fileName}): ");
+                string s = $"Geometries contained in supplied .vrn archive ({this.fileName}): ";
                 /// 1D geometries
                 foreach (var geom in geometry.geom1d.Select ((x, i) => new { Value = x, Index = i })) {
-                    UnityEngine.Debug.Log ($"#{geom.Index+1} 1D geometry: {geom.Value.name} with refinement {geom.Value.refinement} ({geom.Value.description}).");
+                    s += $"\n#{geom.Index+1} 1D geometry: {geom.Value.name} with refinement {geom.Value.refinement} ({geom.Value.description}).";
                 }
                 /// 2D geometries
                 foreach (var geom in geometry.geom2d.Select ((x, i) => new { Value = x, Index = i })) {
-                    UnityEngine.Debug.Log ($"#{geom.Index+1} 2D geometry: {geom.Value.name} with inflation {geom.Value.inflation} ({geom.Value.description}).");
+                    s += $"\n#{geom.Index+1} 2D geometry: {geom.Value.name} with inflation {geom.Value.inflation} ({geom.Value.description}).";
                 }
+                return s;
             }
 
             /// READ_UGX
@@ -180,7 +181,7 @@ namespace C2M2.NeuronalDynamics.Visualization {
                     /// Instantiate the VRN reader with the desired file name (.vrn archive) to load from Assets
                     vrnReader reader = new vrnReader (fullFileName);
                     /// List all 1D and 2D geometries contained in given .vrn archive
-                    reader.list ();
+                    Debug.Log(reader.List ());
                     /// Get the name of the 1d mesh (0-th refinement aka coarse grid) in archive
                     UnityEngine.Debug.Log (reader.retrieve_1d_mesh (0));
                     /// Get the name of the inflated 2d mesh by a factor of 2.5 in archive
