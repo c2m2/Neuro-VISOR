@@ -206,13 +206,15 @@ namespace C2M2.NeuronalDynamics.Visualization {
                     /// or: Find a inflated mesh in the .vrn archive (1 = Inflated by factor 1, 2.5 = inflated by a factor 2.5, ...)
                     /// 2. Create empty Grid grid to store the mesh
                     /// 3. Read the file from the archive (.ugx filetype) into the Grid grid
-                    string meshName = reader.Retrieve1DMeshName ();
+                    string meshName = reader.Retrieve2DMeshName ();
                     /// Create empty grid with name of grid in archive
                     Grid grid = new Grid (new Mesh (), meshName);
                     grid.Attach (new DiameterAttachment ());
                     /// Read in the .ugx file into the grid (read_ugx uses UGXReader internally)
                     UnityEngine.Debug.Log ("Reading now mesh: " + meshName);
                     reader.ReadUGX (meshName, ref grid);
+
+                    GetComponent<MeshFilter>().sharedMesh = grid.Mesh;
                     ////////////////////////////////////////////////////////////////
                 } catch (Exception ex) when (ex is System.IO.FileNotFoundException || ex is System.ArgumentNullException) {
                     UnityEngine.Debug.LogError ($"Archive or mesh file not found. Archive: {fileName}.");
