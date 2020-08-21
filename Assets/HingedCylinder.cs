@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using C2M2.Utils;
+using C2M2.Utils.MeshUtils;
 namespace C2M2.NeuronalDynamics.Interaction {
     [RequireComponent(typeof(MeshFilter))]
     [RequireComponent(typeof(MeshRenderer))]
@@ -29,7 +30,7 @@ namespace C2M2.NeuronalDynamics.Interaction {
 
         private Mesh BuildMesh()
         {
-            List<Triangle> tris = new List<Triangle>();
+            List<Triangle> tris = new List<Triangle>(4*resolution);
             Vector3[] vertices = new Vector3[3 * resolution];
 
             float angleStep = 360 / resolution;
@@ -43,25 +44,27 @@ namespace C2M2.NeuronalDynamics.Interaction {
                 vertices[i + resolution] = new Vector3(vertices[i].x, halfLength, vertices[i].z);
                 vertices[i + 2*resolution] = new Vector3(vertices[i].x, -halfLength, vertices[i].z);
 
-                tris.Add(new Triangle(i, i + resolution, i + 1));
-                tris.Add(new Triangle(i, i + 2 * resolution + 1, i+2*resolution));
-                tris.Add(new Triangle(i + 1, i + resolution, i + resolution + 1));
-                tris.Add(new Triangle(i, i + 1, i + 2 * resolution + 1));
+                tris.Add(new Triangle(i+resolution, i+1, i));
+                tris.Add(new Triangle(i+1, i+resolution, i+resolution+1));
+                tris.Add(new Triangle(i, i+2*resolution+1, i+2*resolution));
+                tris.Add(new Triangle(i+2*resolution+1, i, i+1));
             }
 
             Triangle[] triangles = tris.ToArray();
 
             int j = resolution - 1;
-            triangles[triangles.Length - 4] = new Triangle(j, j + resolution, 0);
-            triangles[triangles.Length - 3] = new Triangle(j, 2 * resolution, j + 2 * resolution);
-            triangles[triangles.Length - 2] = new Triangle(0, j + resolution, resolution);
-            triangles[triangles.Length - 1] = new Triangle(j, 0, 2*resolution);
+            triangles[triangles.Length - 4] = new Triangle(j+resolution, 0, j);
+            triangles[triangles.Length - 3] = new Triangle(0, j+resolution, resolution);
+            triangles[triangles.Length - 2] = new Triangle(j, 2*resolution, j+2*resolution);
+            triangles[triangles.Length - 1] = new Triangle(2*resolution, j, 0);
 
             Mesh mesh = new Mesh();
             mesh.vertices = vertices;
             mesh.triangles = ToUnityArray(triangles);
             mesh.name = "CylinderRes" + resolution;
 
+            Debug.Log(MeshInfo.PrintVertices(mesh));
+            Debug.Log(MeshInfo.PrintTriangles(mesh));
             return mesh;    
         }
 
