@@ -58,48 +58,24 @@ namespace C2M2.NeuronalDynamics.UGX
             ReadUGX(@"C:/Users/tug41634/Desktop/cube_3d.ugx", ref grid);
         }
 
-
-	    public static void Read1DUGX(in string archive, in int refinement, ref Grid grid) {
-          
-		    vrnReader reader = new vrnReader(archive);
-		    string meshName = reader.retrieve_1d_mesh(refinement);
-            
-		    using (ZipArchive zipArchive = ZipFile.Open(archive, ZipArchiveMode.Read))
-            {
-                var file = zipArchive.GetEntry(meshName);
-                _ = file ?? throw new ArgumentNullException(nameof(file));
-
-                Stream stream = file.Open();
-                ReadUGX(in stream, ref grid);
-		    }
-	    }
-	
-	    public static void Read2DUGX(in string archive, in double inflation, ref Grid grid)
-        {
-		    vrnReader reader = new vrnReader(archive);
-		    string meshName = reader.retrieve_2d_mesh(inflation);
-		    using (ZipArchive zipArchive = ZipFile.Open(archive, ZipArchiveMode.Read))
-            {
-                var file = zipArchive.GetEntry(meshName);
-                _ = file ?? throw new ArgumentNullException(nameof(file));
-
-                Stream stream = file.Open();
-                ReadUGX(in stream, ref grid);
-            }
-	    }
-	
+        /// ReadUGX
+        /// <summary>
+        /// Read UGX from filename
+        /// </summary>
+        /// <param name="filename"> Name of mesh file on disk </param>
+        /// <param name="grid"> Grid to populate with UGX data </param>
 	    public static void ReadUGX(in string filename, ref Grid grid)
         {
             Stream stream = File.OpenRead(filename);
 		    ReadUGX(in stream, ref grid);
 	    }
 		
-		
         /// ReadUGX
         /// <summary>
+        /// Read a UGX file from a stream
         /// </summary>
         /// <param name="filename"> name of UGX file on disk </param>
- 	    /// <PARAM NAME="grid"> grid instance </param>
+ 	    /// <param name="grid"> grid instance </param>
         public static void ReadUGX(in Stream filename, ref Grid grid)
         {
             /// Check if diameter data was atttached

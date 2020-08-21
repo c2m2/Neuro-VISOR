@@ -48,21 +48,30 @@ namespace C2M2.NeuronalDynamics.Visualization {
                 public Geom2d[] geom2d;
             }
 
-            private string fileName;
+            private readonly string fileName;
             private Geometry geometry;
-            private Boolean loaded = false;
+            private Boolean loaded;
 
-            /// READ                                                                                                                                                                                                                                                              
+            /// LOAD
             /// <summary>
-            /// Loads the meta data stored in the JSON
+            /// Try to load the .vrn archive and deserialize JSON into appropriate data structures
             /// </summary>
-            private void load () {
-                using (ZipArchive archive = ZipFile.OpenRead (this.fileName)) {
-                    var file = archive.GetEntry ("MetaInfo.json");
-                    _ = file ??
-                        throw new ArgumentNullException (nameof (file));
-                    geometry = JsonUtility.FromJson<Geometry> (new StreamReader (file.Open ()).ReadToEnd ().ToString ());
-                    loaded = true;
+            /// Note the load is only done if the corresponding archive has not yet been loaded
+            /// <see cref="Geom1d"> 1D Geometries </see>
+            /// <see cref="Geom2d"> 2D Geoemtries </see>
+            private void Load () {
+                // Load if not already loaded
+                if (!loaded) { DoLoad (); }
+
+                // Helper function to do the actual loading
+                void DoLoad () {
+                    using (ZipArchive archive = ZipFile.OpenRead (this.fileName)) {
+                        var file = archive.GetEntry ("MetaInfo.json");
+                        _ = file ??
+                            throw new ArgumentNullException (nameof (file));
+                        geometry = JsonUtility.FromJson<Geometry> (new StreamReader (file.Open ()).ReadToEnd ());
+                        loaded = true;
+                    }
                 }
             }
 
@@ -71,15 +80,15 @@ namespace C2M2.NeuronalDynamics.Visualization {
             /// Print out a list of 1D and 2D geometries contained in .vrn archive
             /// </summary>
             public string List () {
-                if (!loaded) load ();
+                Load ();
                 string s = $"Geometries contained in supplied .vrn archive ({this.fileName}): ";
                 /// 1D geometries
                 foreach (var geom in geometry.geom1d.Select ((x, i) => new { Value = x, Index = i })) {
-                    s += $"\n#{geom.Index+1} 1D geometry: {geom.Value.name} with refinement {geom.Value.refinement} ({geom.Value.description}).";
+                    s += $"{Environment.NewLine}#{geom.Index+1} 1D geometry: {geom.Value.name} with refinement {geom.Value.refinement} ({geom.Value.description}).";
                 }
                 /// 2D geometries
                 foreach (var geom in geometry.geom2d.Select ((x, i) => new { Value = x, Index = i })) {
-                    s += $"\n#{geom.Index+1} 2D geometry: {geom.Value.name} with inflation {geom.Value.inflation} ({geom.Value.description}).";
+                    s += $"{Environment.NewLine}#{geom.Index+1} 2D geometry: {geom.Value.name} with inflation {geom.Value.inflation} ({geom.Value.description}).";
                 }
                 return s;
             }
@@ -90,7 +99,8 @@ namespace C2M2.NeuronalDynamics.Visualization {
             /// <param name="meshName"> Name of mesh in archive </param>
             /// <param name="grid"> Grid in which we store the UGX mesh from the file </param>
             /// </summary>
-            public void read_ugx (in string meshName, ref Grid grid) {
+            public void ReadUGX (in string meshName, ref Grid grid) {
+                Load ();
                 using (ZipArchive archive = ZipFile.Open (this.fileName, ZipArchiveMode.Read)) {
                     var file = archive.GetEntry (meshName);
                     _ = file ??
@@ -107,9 +117,8 @@ namespace C2M2.NeuronalDynamics.Visualization {
             /// </summary>
             /// <param name="refinement"> Refinement number (Default: 0 (coarse grid))</param>
             /// <returns> Filename of refined or unrefined 1D mesh in archive </returns>
-            public string retrieve_1d_mesh (int refinement = 0) {
-                if (!loaded) load ();
-                UnityEngine.Debug.Log ("Geometry: " + geometry.geom1d);
+            public string Retrieve1DMeshName (int refinement = 0) {
+                Load ();
                 int index = geometry.geom1d.ToList ().FindIndex (geom => Int16.Parse (geom.refinement) == refinement);
                 return geometry.geom1d[index != -1 ? index : 0].name;
             }
@@ -120,8 +129,8 @@ namespace C2M2.NeuronalDynamics.Visualization {
             /// </summary>
             /// <param name="inflation"> Inflation factor (default: 1.0 (no inflation)) </param>
             /// <returns> Filename of inflated 2D mesh in archive </returns>
-            public string retrieve_2d_mesh (double inflation = 1.0) {
-                if (!loaded) load ();
+            public string Retrieve2DMeshName (double inflation = 1.0) {
+                Load ();
                 int index = geometry.geom2d.ToList ().FindIndex (geom => Double.Parse (geom.inflation) == inflation);
                 return geometry.geom2d[index != -1 ? index : 0].name;
             }
@@ -140,16 +149,16 @@ namespace C2M2.NeuronalDynamics.Visualization {
             /// On start a test file (test.vrn) is read from the assets folder
             /// The coarse 1d mesh is retrieved as well as the by a factor of 
             /// 2.5 inflated 2d mesh is retrieved from the archive test.vrn
-            class Example {
+            static class Example {
                 static void Main (string[] args) {
                     string fileName = "test.vrn";
                     try {
                         /// Instantiate the VRN reader with the desired file name
                         vrnReader reader = new vrnReader (fileName);
                         /// Get the name of the 1d mesh (0-th refinement aka coarse grid)
-                        Console.WriteLine (reader.retrieve_1d_mesh (0));
+                        Console.WriteLine (reader.Retrieve1DMeshName ());
                         /// Get the name of the inflated 2d mesh by a factor of 2.5
-                        Console.WriteLine (reader.retrieve_2d_mesh (2.5));
+                        Console.WriteLine (reader.Retrieve2DMeshName (2.5));
                     } catch (Exception ex) when (ex is System.IO.FileNotFoundException || ex is System.ArgumentNullException) {
                         Console.Error.WriteLine ($"Archive or mesh file not found. Archive: {fileName}.");
                         Console.Error.WriteLine (ex);
@@ -181,13 +190,13 @@ namespace C2M2.NeuronalDynamics.Visualization {
                     /// Instantiate the VRN reader with the desired file name (.vrn archive) to load from Assets
                     vrnReader reader = new vrnReader (fullFileName);
                     /// List all 1D and 2D geometries contained in given .vrn archive
-                    Debug.Log(reader.List ());
+                    Debug.Log (reader.List ());
                     /// Get the name of the 1d mesh (0-th refinement aka coarse grid) in archive
-                    UnityEngine.Debug.Log (reader.retrieve_1d_mesh (0));
+                    UnityEngine.Debug.Log (reader.Retrieve1DMeshName ());
                     /// Get the name of the inflated 2d mesh by a factor of 2.5 in archive
-                    UnityEngine.Debug.Log (reader.retrieve_2d_mesh (2.5));
+                    UnityEngine.Debug.Log (reader.Retrieve2DMeshName (2.5));
                     ////////////////////////////////////////////////////////////////
-        
+
                     ////////////////////////////////////////////////////////////////
                     /// Example 2: Load a UGX file (mesh) from the .vrn archive and 
                     /// store it in a Grid object: Here the 1D coarse grid is loaded
@@ -197,17 +206,17 @@ namespace C2M2.NeuronalDynamics.Visualization {
                     /// or: Find a inflated mesh in the .vrn archive (1 = Inflated by factor 1, 2.5 = inflated by a factor 2.5, ...)
                     /// 2. Create empty Grid grid to store the mesh
                     /// 3. Read the file from the archive (.ugx filetype) into the Grid grid
-                    string meshName = reader.retrieve_1d_mesh (0);
+                    string meshName = reader.Retrieve1DMeshName ();
                     /// Create empty grid with name of grid in archive
                     Grid grid = new Grid (new Mesh (), meshName);
                     grid.Attach (new DiameterAttachment ());
                     /// Read in the .ugx file into the grid (read_ugx uses UGXReader internally)
                     UnityEngine.Debug.Log ("Reading now mesh: " + meshName);
-                    reader.read_ugx (meshName, ref grid);
+                    reader.ReadUGX (meshName, ref grid);
                     ////////////////////////////////////////////////////////////////
                 } catch (Exception ex) when (ex is System.IO.FileNotFoundException || ex is System.ArgumentNullException) {
-                    UnityEngine.Debug.LogError($"Archive or mesh file not found. Archive: {fileName}.");
-                    UnityEngine.Debug.LogError(ex);
+                    UnityEngine.Debug.LogError ($"Archive or mesh file not found. Archive: {fileName}.");
+                    UnityEngine.Debug.LogError (ex);
                 }
             }
         }

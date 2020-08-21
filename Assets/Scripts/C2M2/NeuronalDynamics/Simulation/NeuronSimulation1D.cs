@@ -121,7 +121,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         public RefinementLevel refinementLevel = RefinementLevel.x1;
 
         // Need mesh options for each refinement, diameter level
-        public string vrnCellPath = "Assets\\test.vrn";
+        public string vrnCellPath = "Assets" + Path.DirectorySeparatorChar + "test.vrn";
         public string cell1xPath;
         public string cell2xPath;
         public string cell3xPath;
@@ -271,10 +271,10 @@ namespace C2M2.NeuronalDynamics.Simulation
             Debug.Log(reader.List());
 
             // Read in 1D & 3D data and build a map between them
-            mapping = MapUtils.BuildMap(reader.retrieve_1d_mesh(0),
-                reader.retrieve_2d_mesh(1),
+            mapping = MapUtils.BuildMap(reader.Retrieve1DMeshName(0),
+                reader.Retrieve2DMeshName(1),
                 false,
-                reader.retrieve_2d_mesh(1));
+                reader.Retrieve2DMeshName(1));
 
             //map = mapping.Data;
             // Convert dictionary to array for speed
@@ -424,8 +424,8 @@ namespace C2M2.NeuronalDynamics.Simulation
             refinement = Math.Max(refinement, 0);
 
             if (reader == null) reader = new vrnReader(vrnCellPath);
-            mesh = MapUtils.BuildMap(reader.retrieve_2d_mesh(inflation),
-                reader.retrieve_1d_mesh(refinement),
+            mesh = MapUtils.BuildMap(reader.Retrieve2DMeshName(inflation),
+                reader.Retrieve1DMeshName(refinement),
                 false).SurfaceGeometry.Mesh;
 
             mesh.RecalculateNormals();
