@@ -5,6 +5,9 @@ using System.Collections.Generic;
 using System.IO;
 using System;
 using C2M2.NeuronalDynamics.UGX;
+using DiameterAttachment = C2M2.NeuronalDynamics.UGX.IAttachment<C2M2.NeuronalDynamics.UGX.DiameterData>;
+using MappingAttachment = C2M2.NeuronalDynamics.UGX.IAttachment<C2M2.NeuronalDynamics.UGX.MappingData>;
+
 using Math = C2M2.Utils.Math;
 using C2M2.Utils.DebugUtils;
 using C2M2.Utils.MeshUtils;
@@ -195,7 +198,6 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// </summary>
         public void SetValues(Tuple<int, double>[] newValues)
         {
-            string s = "Adding values: ";
             // Each 3D index will have TWO associated 1D vertices
             Tuple<int, double>[] new1DValues = new Tuple<int, double>[2 * newValues.Length];
             int j = 0;
@@ -270,11 +272,21 @@ namespace C2M2.NeuronalDynamics.Simulation
 
             Debug.Log(reader.List());
 
+            string meshName1D = reader.Retrieve1DMeshName();
+            /// Create empty grid with name of grid in archive
+            Grid grid1D = new Grid(new Mesh(), meshName1D);
+            grid1D.Attach(new DiameterAttachment());
+            reader.ReadUGX(meshName1D, ref grid1D);
+            string meshName2D = reader.Retrieve2DMeshName();
+            /// Create empty grid with name of grid in archive
+            Grid grid2D = new Grid(new Mesh(), meshName2D);
+            grid2D.Attach(new DiameterAttachment());
+            grid2D.Attach(new MappingAttachment());
+            reader.ReadUGX(meshName2D, ref grid2D);
+
+            //GetComponent<MeshFilter>().sharedMesh = grid.Mesh;
             // Read in 1D & 3D data and build a map between them
-            mapping = MapUtils.BuildMap(reader.Retrieve1DMeshName(0),
-                reader.Retrieve2DMeshName(1),
-                false,
-                reader.Retrieve2DMeshName(1));
+            mapping = (MappingInfo)MapUtils.BuildMap(grid1D, grid2D);
 
             //map = mapping.Data;
             // Convert dictionary to array for speed
@@ -299,7 +311,10 @@ namespace C2M2.NeuronalDynamics.Simulation
             Mesh cellMesh = new Mesh();
             if (!dryRun)
             {
-                cellMesh = Clean3DCell(cellMesh);
+                cellMesh = mapping.SurfaceGeometry.Mesh;
+                cellMesh.Rescale(transform, new Vector3(4, 4, 4));
+                cellMesh.RecalculateNormals();
+
 
                 //scaledMeshes[(int)MeshScaling.x1] = cellMesh;
 
@@ -339,14 +354,6 @@ namespace C2M2.NeuronalDynamics.Simulation
                 GameObject.Instantiate(ruler);
 
                 gameObject.AddComponent<ScaleLimiter>();
-            }
-
-            Mesh Clean3DCell(Mesh mesh)
-            {
-                mesh = mapping.SurfaceGeometry.Mesh;
-                mesh.Rescale(transform, new Vector3(4, 4, 4));
-                mesh.RecalculateNormals();
-                return mesh;
             }
 
         }
