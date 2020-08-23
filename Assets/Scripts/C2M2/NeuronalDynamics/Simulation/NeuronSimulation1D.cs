@@ -268,8 +268,9 @@ namespace C2M2.NeuronalDynamics.Simulation
         vrnReader reader = null;
         protected override void ReadData()
         {
-            if(reader == null) reader = new vrnReader(vrnCellPath);
-
+            /// FIXME: Specifiying vrnCellPath alone did not work for me (Assets/test.vrn), so I had to manually override it here
+            if(reader == null) reader = new vrnReader(Application.dataPath + Path.DirectorySeparatorChar + "test.vrn");
+            Debug.Log("Path: " + Application.dataPath + Path.DirectorySeparatorChar + "test.vrn");
             Debug.Log(reader.List());
 
             string meshName1D = reader.Retrieve1DMeshName();
