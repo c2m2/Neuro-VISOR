@@ -93,7 +93,6 @@ namespace C2M2.Simulation
             if (!dryRun)
             {
                 viz = BuildVisualization();
-
                 BuildInteraction();
             }
 
