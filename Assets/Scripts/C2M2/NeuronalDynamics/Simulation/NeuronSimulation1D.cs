@@ -292,15 +292,18 @@ namespace C2M2.NeuronalDynamics.Simulation
             Mesh cellMesh = new Mesh();
             if (!dryRun)
             {
-
                 //scaledMeshes[(int)MeshScaling.x1] = cellMesh;
-
                 string meshName2D = reader.Retrieve2DMeshName();
-                /// Create empty grid with name of grid in archive
+                string meshName1D = reader.Retrieve1DMeshName();
+                /// Empty 2D grid which stores geometry + mapping data
                 Grid grid2D = new Grid(new Mesh(), meshName2D);
-                grid2D.Attach(new DiameterAttachment());
                 grid2D.Attach(new MappingAttachment());
+                /// Empty 1D grid which stores geometry + diameter data
+                Grid grid1D = new Grid(new Mesh(), meshName2D);
+                grid1D.Attach(new DiameterAttachment());
+                /// Read the meshes with vrnReader directly from .vrn archive
                 reader.ReadUGX(meshName2D, ref grid2D);
+                reader.ReadUGX(meshName1D, ref grid1D);
 
                 //GetComponent<MeshFilter>().sharedMesh = grid.Mesh;
                 // Read in 1D & 3D data and build a map between them
