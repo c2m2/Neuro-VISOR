@@ -3635,7 +3635,6 @@ MonoBehaviour:
   globalMax: 120
   globalMin: -10
   refinementLevel: 1
-  vrnCellPath: "Assets/\x13test.vrn"
   cell1xPath: C:/Users/jacob/Desktop/C2M2/virtual-reality/Assets/StreamingAssets/NeuronalDynamics/ActiveCell/Cell2-0a/1xDiameter/Cell0-2a-0ref
   cell2xPath: C:\Users\jacob/Desktop/C2M2\virtual-reality/Assets/StreamingAssets/NeuronalDynamics/ActiveCell/Cell2-0a/2xDiameter/Cell2-0a-1ref
   cell3xPath: C:\Users\jacob/Desktop/C2M2\virtual-reality/Assets/StreamingAssets/NeuronalDynamics/ActiveCell/Cell2-0a/3xDiameter/Cell2-0a-1ref
