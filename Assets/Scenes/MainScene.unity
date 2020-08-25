@@ -3153,7 +3153,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1683661828
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3587,7 +3587,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1818162880
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3635,7 +3635,7 @@ MonoBehaviour:
   globalMax: 120
   globalMin: -10
   refinementLevel: 1
-  vrnCellPath: Assets\\test.vrn
+  vrnCellPath: "Assets/\x13test.vrn"
   cell1xPath: C:/Users/jacob/Desktop/C2M2/virtual-reality/Assets/StreamingAssets/NeuronalDynamics/ActiveCell/Cell2-0a/1xDiameter/Cell0-2a-0ref
   cell2xPath: C:\Users\jacob/Desktop/C2M2\virtual-reality/Assets/StreamingAssets/NeuronalDynamics/ActiveCell/Cell2-0a/2xDiameter/Cell2-0a-1ref
   cell3xPath: C:\Users\jacob/Desktop/C2M2\virtual-reality/Assets/StreamingAssets/NeuronalDynamics/ActiveCell/Cell2-0a/3xDiameter/Cell2-0a-1ref
