@@ -307,7 +307,7 @@ namespace C2M2.NeuronalDynamics.Simulation
                 grid1D.Attach(new DiameterAttachment());
                 /// Read the meshes with vrnReader directly from .vrn archive
                 reader.ReadUGX(meshName2D, ref grid2D);
-                //reader.ReadUGX(meshName1D, ref grid1D);
+                reader.ReadUGX(meshName1D, ref grid1D);
 
                 //GetComponent<MeshFilter>().sharedMesh = grid.Mesh;
                 // Read in 1D & 3D data and build a map between them
