@@ -15,6 +15,7 @@ using C2M2.Interaction;
 using C2M2.Simulation;
 using Grid = C2M2.NeuronalDynamics.UGX.Grid;
 using C2M2.NeuronalDynamics.Visualization.vrn;
+using System.Text;
 
 namespace C2M2.NeuronalDynamics.Simulation
 {
@@ -70,6 +71,10 @@ namespace C2M2.NeuronalDynamics.Simulation
             this.v1 = v1;
             this.v2 = v2;
             this.lambda = lambda;
+        }
+        public override string ToString()
+        {
+            return "v1: " + v1 + "\nv2: " + v2 + "\nlambda: " + lambda;
         }
     }
 
@@ -130,14 +135,6 @@ namespace C2M2.NeuronalDynamics.Simulation
         public string cell3xPath;
         public string cell4xPath;
         public string cell5xPath;
-
-        /*
-        public string cell1DPath = "NULL";
-        public string cell3DPath = "NULL";
-        public string cellTrianglesPath = "NULL";
-        public string cell3DColliderPath = "NULL";
-        public string cellTrianglesColliderPath = "NULL";
-        */
     
 
         [Header("1D Visualization")]
@@ -169,7 +166,8 @@ namespace C2M2.NeuronalDynamics.Simulation
             double[] scalars1D = Get1DValues();
 
             if (scalars1D == null) { return null; }
-
+            string format = "{0}:\t{1}\n";
+            StringBuilder sb = new StringBuilder(scalars3D.Length);
             //double[] scalars3D = new double[map.Length];
             for (int i = 0; i < map.Length; i++)
             { // for each 3D point,
@@ -179,8 +177,9 @@ namespace C2M2.NeuronalDynamics.Simulation
                 double newVal = map[i].lambda * (scalars1D[map[i].v2] - scalars1D[map[i].v1]) + scalars1D[map[i].v1];
 
                 scalars3D[i] = newVal;
+                sb.AppendFormat(format, i, newVal);
             }
-
+           // Debug.Log(sb.ToString());
             return scalars3D;
         }
         /// <summary>
@@ -201,6 +200,8 @@ namespace C2M2.NeuronalDynamics.Simulation
             // Each 3D index will have TWO associated 1D vertices
             Tuple<int, double>[] new1DValues = new Tuple<int, double>[2 * newValues.Length];
             int j = 0;
+            string s = "";
+            string format = "Adding [{0}] to vert [{1}]\n";
             for (int i = 0; i < newValues.Length; i++)
             {
                 // Get 3D vertex index
@@ -210,13 +211,16 @@ namespace C2M2.NeuronalDynamics.Simulation
                 // Translate into two 1D vert indices and a lambda weight
                 double val1D = (1 - map[vert3D].lambda) * val3D;
                 new1DValues[j] = new Tuple<int, double>(map[vert3D].v1, val1D);
+                s += String.Format(format, map[vert3D].v1, val1D);
 
                 // Weight newVal by (lambda) for second 1D vert                    
                 val1D = map[vert3D].lambda * val3D;
                 new1DValues[j + 1] = new Tuple<int, double>(map[vert3D].v2, val1D);
+                s += String.Format(format, map[vert3D].v1, val1D);
                 // Move up two spots in 1D array
                 j += 2;
             }
+            Debug.Log(s);
 
             // Send 1D-translated scalars to simulation
             Set1DValues(new1DValues);
@@ -275,7 +279,7 @@ namespace C2M2.NeuronalDynamics.Simulation
 
             string meshName1D = reader.Retrieve1DMeshName();
             /// Create empty grid with name of grid in archive
-            Grid grid1D = new Grid(new Mesh(), meshName1D);
+            grid1D = new Grid(new Mesh(), meshName1D);
             grid1D.Attach(new DiameterAttachment());
             reader.ReadUGX(meshName1D, ref grid1D);
 
@@ -299,23 +303,27 @@ namespace C2M2.NeuronalDynamics.Simulation
                 Grid grid2D = new Grid(new Mesh(), meshName2D);
                 grid2D.Attach(new MappingAttachment());
                 /// Empty 1D grid which stores geometry + diameter data
-                Grid grid1D = new Grid(new Mesh(), meshName2D);
+                Grid grid1D = new Grid(new Mesh(), meshName1D);
                 grid1D.Attach(new DiameterAttachment());
                 /// Read the meshes with vrnReader directly from .vrn archive
                 reader.ReadUGX(meshName2D, ref grid2D);
-                reader.ReadUGX(meshName1D, ref grid1D);
+                //reader.ReadUGX(meshName1D, ref grid1D);
 
                 //GetComponent<MeshFilter>().sharedMesh = grid.Mesh;
                 // Read in 1D & 3D data and build a map between them
                 mapping = (MappingInfo)MapUtils.BuildMap(grid1D, grid2D);
 
-                // Convert dictionary to array for speed
+                // Convert dictionary to array for speed              
                 map = new Vert3D1DPair[mapping.Data.Count];
+                string format = "3D vert {0} between 1Ds {1}, {2}, lambda: {3}\n";
+                StringBuilder sb = new StringBuilder(map.Length * format.Length);
+                sb.AppendLine("MAP:");
                 foreach (KeyValuePair<int, Tuple<int, int, double>> entry in mapping.Data)
                 {
                     map[entry.Key] = new Vert3D1DPair(entry.Value.Item1, entry.Value.Item2, entry.Value.Item3);
+                    sb.AppendFormat(format, entry.Key, entry.Value.Item1, entry.Value.Item2, entry.Value.Item3);
                 }
-
+                Debug.Log(sb.ToString());
                 scalars3D = new double[map.Length];
 
                 if (visualize1D) Render1DCell();
