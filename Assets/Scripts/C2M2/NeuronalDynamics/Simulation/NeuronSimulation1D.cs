@@ -299,7 +299,7 @@ namespace C2M2.NeuronalDynamics.Simulation
                 Grid grid2D = new Grid(new Mesh(), meshName2D);
                 grid2D.Attach(new MappingAttachment());
                 /// Empty 1D grid which stores geometry + diameter data
-                Grid grid1D = new Grid(new Mesh(), meshName2D);
+                Grid grid1D = new Grid(new Mesh(), meshName1D);
                 grid1D.Attach(new DiameterAttachment());
                 /// Read the meshes with vrnReader directly from .vrn archive
                 reader.ReadUGX(meshName2D, ref grid2D);
