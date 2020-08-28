@@ -1,6 +1,7 @@
 #region includes
 using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -22,6 +23,7 @@ namespace C2M2.NeuronalDynamics.Visualization {
             public CouldNotReadMeshFromVRNArchive () : base () { }
             public CouldNotReadMeshFromVRNArchive (string message) : base (message) { }
             public CouldNotReadMeshFromVRNArchive (string message, Exception inner) : base (message, inner) { }
+            protected CouldNotReadMeshFromVRNArchive (SerializationInfo info, StreamingContext ctxt) : base (info, ctxt) { }
         }
 
         sealed class vrnReader {

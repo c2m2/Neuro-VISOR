@@ -1,6 +1,7 @@
 ﻿#region using
 using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using KdTree;
 using KdTree.Math;
 using UnityEditor;
@@ -185,5 +186,6 @@ namespace C2M2.NeuronalDynamics.UGX {
         public MapNotBuildException () : base () { }
         public MapNotBuildException (string message) : base (message) { }
         public MapNotBuildException (string message, Exception inner) : base (message, inner) { }
+        protected MapNotBuildException (SerializationInfo info, StreamingContext ctxt) : base (info, ctxt) { }
     }
 }
