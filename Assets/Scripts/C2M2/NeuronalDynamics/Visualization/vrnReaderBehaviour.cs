@@ -13,6 +13,17 @@ using Grid = C2M2.NeuronalDynamics.UGX.Grid;
 namespace C2M2.NeuronalDynamics.Visualization {
     using DiameterAttachment = IAttachment<DiameterData>;
     namespace vrn {
+        /// <summary>
+        /// Custom exception thrown if file could not be found in VRN archive
+        /// </summary>
+        /// <see cref="Exception"> Exception base class </see>
+        [Serializable]
+        public class CouldNotReadMeshFromVRNArchive : Exception {
+            public CouldNotReadMeshFromVRNArchive () : base () { }
+            public CouldNotReadMeshFromVRNArchive (string message) : base (message) { }
+            public CouldNotReadMeshFromVRNArchive (string message, Exception inner) : base (message, inner) { }
+        }
+
         sealed class vrnReader {
             /// GEOM1D                                                                                                                                                                                                                                                            
             /// <summary>                                                                                                                                                                                                                                                         
@@ -68,7 +79,7 @@ namespace C2M2.NeuronalDynamics.Visualization {
                     using (ZipArchive archive = ZipFile.OpenRead (this.fileName)) {
                         var file = archive.GetEntry ("MetaInfo.json");
                         _ = file ??
-                            throw new ArgumentNullException (nameof (file));
+                            throw new CouldNotReadMeshFromVRNArchive (nameof (file));
                         geometry = JsonUtility.FromJson<Geometry> (new StreamReader (file.Open ()).ReadToEnd ());
                         loaded = true;
                     }
@@ -104,7 +115,7 @@ namespace C2M2.NeuronalDynamics.Visualization {
                 using (ZipArchive archive = ZipFile.Open (this.fileName, ZipArchiveMode.Read)) {
                     var file = archive.GetEntry (meshName);
                     _ = file ??
-                        throw new ArgumentNullException (nameof (file));
+                        throw new CouldNotReadMeshFromVRNArchive (nameof (file));
                     using (var stream = file.Open ()) {
                         UGXReader.ReadUGX (stream, ref grid);
                     }
@@ -160,7 +171,10 @@ namespace C2M2.NeuronalDynamics.Visualization {
                         /// Get the name of the inflated 2d mesh by a factor of 2.5
                         Console.WriteLine (reader.Retrieve2DMeshName (2.5));
                     } catch (Exception ex) when (ex is System.IO.FileNotFoundException || ex is System.ArgumentNullException) {
-                        Console.Error.WriteLine ($"Archive or mesh file not found. Archive: {fileName}.");
+                        Console.Error.WriteLine ($"Archive not found or unable to open the .vrn archive: {fileName}.");
+                        Console.Error.WriteLine (ex);
+                    } catch (Exception ex) when (ex is CouldNotReadMeshFromVRNArchive) {
+                        Console.Error.WriteLine ($"Requested mesh not contained in MetaInfo.json or given .vrn archive {fileName}.");
                         Console.Error.WriteLine (ex);
                     }
                 }
@@ -197,13 +211,13 @@ namespace C2M2.NeuronalDynamics.Visualization {
                     UnityEngine.Debug.Log (reader.Retrieve2DMeshName (2.5));
                     ////////////////////////////////////////////////////////////////
 
-                    string meshName1D = reader.Retrieve1DMeshName();
+                    string meshName1D = reader.Retrieve1DMeshName ();
                     /// Create empty grid with name of grid in archive
-                    Grid grid1D = new Grid(new Mesh(), meshName1D);
-                    grid1D.Attach(new DiameterAttachment());
+                    Grid grid1D = new Grid (new Mesh (), meshName1D);
+                    grid1D.Attach (new DiameterAttachment ());
                     /// Read in the .ugx file into the grid (read_ugx uses UGXReader internally)
-                    UnityEngine.Debug.Log("Reading now mesh: " + meshName1D);
-                    reader.ReadUGX(meshName1D, ref grid1D);
+                    UnityEngine.Debug.Log ("Reading now mesh: " + meshName1D);
+                    reader.ReadUGX (meshName1D, ref grid1D);
                     ////////////////////////////////////////////////////////////////
                     /// Example 2: Load a UGX file (mesh) from the .vrn archive and 
                     /// store it in a Grid object: Here the 1D coarse grid is loaded
@@ -221,10 +235,14 @@ namespace C2M2.NeuronalDynamics.Visualization {
                     UnityEngine.Debug.Log ("Reading now mesh: " + meshName2D);
                     reader.ReadUGX (meshName2D, ref grid2D);
 
-                    GetComponent<MeshFilter>().sharedMesh = grid2D.Mesh;
+                    GetComponent<MeshFilter> ().sharedMesh = grid2D.Mesh;
                     ////////////////////////////////////////////////////////////////
                 } catch (Exception ex) when (ex is System.IO.FileNotFoundException || ex is System.ArgumentNullException) {
-                    UnityEngine.Debug.LogError ($"Archive or mesh file not found. Archive: {fileName}.");
+                    UnityEngine.Debug.LogError ($"Archive not found or unable to open the .vrn archive: {fileName}.");
+                    UnityEngine.Debug.LogError (ex);
+
+                } catch (Exception ex) when (ex is CouldNotReadMeshFromVRNArchive) {
+                    UnityEngine.Debug.LogError ($"Requested mesh not contained in MetaInfo.json or given .vrn archive {fileName}.");
                     UnityEngine.Debug.LogError (ex);
                 }
             }
