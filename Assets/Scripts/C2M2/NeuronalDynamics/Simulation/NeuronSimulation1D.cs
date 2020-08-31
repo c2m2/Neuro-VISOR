@@ -115,11 +115,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
 
         // Need mesh options for each refinement, diameter level
         public string vrnPath = Application.streamingAssetsPath + Path.DirectorySeparatorChar + "test.vrn";
-        public string cell1xPath;
-        public string cell2xPath;
-        public string cell3xPath;
-        public string cell4xPath;
-        public string cell5xPath;
 
         [Header ("1D Visualization")]
         public bool visualize1D = false;
@@ -148,8 +143,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
             double[] scalars1D = Get1DValues ();
 
             if (scalars1D == null) { return null; }
-            string format = "{0}:\t{1}\n";
-            StringBuilder sb = new StringBuilder (scalars3D.Length);
             //double[] scalars3D = new double[map.Length];
             for (int i = 0; i < map.Length; i++) { // for each 3D point,
 
@@ -158,7 +151,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 double newVal = map[i].lambda * (scalars1D[map[i].v2] - scalars1D[map[i].v1]) + scalars1D[map[i].v1];
 
                 scalars3D[i] = newVal;
-                sb.AppendFormat (format, i, newVal);
             }
             // Debug.Log(sb.ToString());
             return scalars3D;
@@ -179,8 +171,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
             // Each 3D index will have TWO associated 1D vertices
             Tuple<int, double>[] new1DValues = new Tuple<int, double>[2 * newValues.Length];
             int j = 0;
-            string s = "";
-            string format = "Adding [{0}] to vert [{1}]\n";
             for (int i = 0; i < newValues.Length; i++) {
                 // Get 3D vertex index
                 int vert3D = newValues[i].Item1;
@@ -189,16 +179,13 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 // Translate into two 1D vert indices and a lambda weight
                 double val1D = (1 - map[vert3D].lambda) * val3D;
                 new1DValues[j] = new Tuple<int, double> (map[vert3D].v1, val1D);
-                s += String.Format (format, map[vert3D].v1, val1D);
 
                 // Weight newVal by (lambda) for second 1D vert                    
                 val1D = map[vert3D].lambda * val3D;
                 new1DValues[j + 1] = new Tuple<int, double> (map[vert3D].v2, val1D);
-                s += String.Format (format, map[vert3D].v1, val1D);
                 // Move up two spots in 1D array
                 j += 2;
             }
-            Debug.Log (s);
 
             // Send 1D-translated scalars to simulation
             Set1DValues (new1DValues);
@@ -221,31 +208,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
         /// </summary>
         /// <param name="grid"></param>
         protected abstract void SetNeuronCell (Grid grid);
-
-        /*protected override void ReadData()
-        {
-            vrnReader reader = new vrnReader(CellPath);
-            CellPathPacket pathPacket = new CellPathPacket(cell1xPath, "1xDiameter");
-
-            // Read in 1D & 3D data and build a map between them
-            mapping = MapUtils.BuildMap(pathPacket.path1D,
-                pathPacket.path3D,
-                false,
-                pathPacket.pathTris);
-
-            //map = mapping.Data;
-            // Convert dictionary to array for speed
-            map = new Vert3D1DPair[mapping.Data.Count];
-            foreach(KeyValuePair<int, Tuple<int, int, double>> entry in mapping.Data)
-            {
-                map[entry.Key] = new Vert3D1DPair(entry.Value.Item1, entry.Value.Item2, entry.Value.Item3);
-            }
-
-            scalars3D = new double[map.Length];
-
-            // Pass the cell to simulation code
-            SetNeuronCell(mapping.ModelGeometry);
-        }*/
 
         vrnReader reader = null;
         protected override void ReadData () {
@@ -359,59 +321,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
             }
         }
 
-        // Returns whichever mesh is used for the mesh collider
-        /*
-        private Mesh BuildMesh(MeshScaling meshScale)
-        {
-            if (scaledMeshes[(int)meshScale] == null)
-            {
-                Mesh mesh = null;
-
-                // Build blownup mesh name
-                CellPathPacket cellPathPacket = new CellPathPacket();
-                string scale = "";
-                switch (meshScale)
-                {
-                    case (MeshScaling.x1):
-                        cellPathPacket = new CellPathPacket(cell1xPath);
-                        scale = "x1";
-                        break;
-                    case (MeshScaling.x2):
-                        cellPathPacket = new CellPathPacket(cell2xPath);
-                        scale = "x2";
-                        break;
-                    case (MeshScaling.x3):
-                        cellPathPacket = new CellPathPacket(cell3xPath);
-                        scale = "x3";
-                        break;
-                    case (MeshScaling.x4):
-                        cellPathPacket = new CellPathPacket(cell4xPath);
-                        scale = "x4";
-                        break;
-                    case (MeshScaling.x5):
-                        cellPathPacket = new CellPathPacket(cell5xPath);
-                        scale = "x5";
-                        break;
-                    default:
-                        Debug.LogError("Cannot resolve mesh scale");
-                        break;
-                }
-
-                mesh = MapUtils.BuildMap(cellPathPacket.path3D,
-                    cellPathPacket.path1D,
-                    false,
-                    cellPathPacket.pathTris).SurfaceGeometry.Mesh;
-
-                mesh.RecalculateNormals();
-
-                mesh.name = mesh.name + scale;
-                
-                scaledMeshes[(int)meshScale] = mesh;
-            }
-
-            return scaledMeshes[(int)meshScale];
-        }*/
-
         private Mesh BuildMesh (double inflation = 1, int refinement = 0) {
             Mesh mesh = null;
 
@@ -431,32 +340,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
 
             return mesh;
         }
-
-        /*        public void SwitchColliderMesh(int scale)
-                {    
-                    scale = Math.Clamp(scale, 0, 4);
-
-                    if(scaledMeshes[scale] == null) BuildMesh((MeshScaling)scale);
-
-
-
-                    meshColController.Mesh = scaledMeshes[scale];
-                    //meshColController.Mesh = BuildMesh(scale);
-                }
-
-                public void SwitchMesh(int scale)
-                {
-                    scale = Math.Clamp(scale, 0, 4);
-
-                    if (scaledMeshes[scale] == null) BuildMesh((MeshScaling)scale);
-
-
-                    MeshFilter mf = GetComponent<MeshFilter>();
-
-                    if (mf != null) mf.sharedMesh = scaledMeshes[scale];
-                    //if (mf != null) mf.sharedMesh = BuildMesh(scale);
-                    else Debug.LogError("No MeshFilter found on " + name);
-                }*/
 
         public void SwitchColliderMesh (int scale) {
             scale = Math.Clamp (scale, 0, 4);

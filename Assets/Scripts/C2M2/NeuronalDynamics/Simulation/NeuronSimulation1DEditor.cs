@@ -10,11 +10,6 @@ namespace C2M2.NeuronalDynamics.Simulation
     [CustomEditor(typeof(NeuronSimulation1D), true)]
     public class NeuronSimulation1DEditor : Editor
     {
-        private int _cellIndex = 0;
-        private int prevIndex = -1;
-        private NeuronSimulation1D.MeshScaling prevScale = NeuronSimulation1D.MeshScaling.x1;
-        private NeuronSimulation1D.RefinementLevel prevRef = NeuronSimulation1D.RefinementLevel.x1;
-
         private string lastPath = "";
         NeuronSimulation1D neuronSimulation;
 
@@ -27,19 +22,11 @@ namespace C2M2.NeuronalDynamics.Simulation
         {
             if (!Application.isPlaying)
             { 
-                DrawTextField(ref neuronSimulation.cell1xPath, "Cell Path Diameter 1x");
-                DrawTextField(ref neuronSimulation.cell2xPath, "Cell Path Diameter 2x");
-                DrawTextField(ref neuronSimulation.cell3xPath, "Cell Path Diameter 3x");
-                DrawTextField(ref neuronSimulation.cell4xPath, "Cell Path Diameter 4x");
-                DrawTextField(ref neuronSimulation.cell5xPath, "Cell Path Diameter 5x");
+                DrawTextField(ref neuronSimulation.vrnPath, "VRN Cell Path");
             }
             else
             {
-                DrawTextArea(ref neuronSimulation.cell1xPath, "Cell Path Diameter 1x");
-                DrawTextArea(ref neuronSimulation.cell2xPath, "Cell Path Diameter 2x");
-                DrawTextArea(ref neuronSimulation.cell3xPath, "Cell Path Diameter 3x");
-                DrawTextArea(ref neuronSimulation.cell4xPath, "Cell Path Diameter 4x");
-                DrawTextArea(ref neuronSimulation.cell5xPath, "Cell Path Diameter 5x");
+                DrawTextArea(ref neuronSimulation.vrnPath, "VRN Cell Path");
             }
 
             // Draw the default inspector
