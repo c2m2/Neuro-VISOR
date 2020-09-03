@@ -69,7 +69,6 @@ namespace C2M2.Simulation
                 
                 VRRaycastableMesh raycastable = gameObject.AddComponent<VRRaycastableMesh>();
 
-                Debug.Log(colliderMesh.name);
                 if (colliderMesh != null) raycastable.SetSource(colliderMesh);
                 else raycastable.SetSource(viz);
 

@@ -104,14 +104,78 @@ namespace C2M2.NeuronalDynamics.Simulation {
     /// 1D Neuron surface simulations should derive from this class.
     /// </remarks>
     public abstract class NeuronSimulation1D : MeshSimulation {
-        public enum MeshScaling { x1 = 0, x2 = 1, x3 = 2, x4 = 3, x5 = 4 }
+        private int refinementLevel = 1;
+        public int RefinementLevel
+        {
+            get { return refinementLevel; }
+            set
+            {
+                refinementLevel = value;
+            }
+        }
 
-        [Header ("3D Visualization")]
-        [Tooltip ("Which mesh scale to use for the mesh collider used for raycasting. Larger meshes will be easier to interact with, but less accurate")]
-        private MeshScaling meshScale = MeshScaling.x1;
-        private MeshScaling meshColScale = MeshScaling.x1;
-        public enum RefinementLevel { x0, x1, x2, x3, x4 }
-        public RefinementLevel refinementLevel = RefinementLevel.x1;
+        private double meshInflation = 1;
+        public double VisualInflation
+        {
+            get { return meshInflation; }
+            set
+            {
+                meshInflation = value;
+                if (ColliderInflation > meshInflation) ColliderInflation = meshInflation;
+                VisualMesh = CheckMeshCache(colliderInflation);
+            }
+        }
+
+        private double colliderInflation = 1;
+        public double ColliderInflation
+        {
+            get { return colliderInflation; }
+            set
+            {
+                if (value > meshInflation) return;
+                colliderInflation = value;
+                ColliderMesh = CheckMeshCache(colliderInflation);
+            }
+        }
+        private Mesh visualMesh = null;
+        public Mesh VisualMesh
+        {
+            get
+            {
+                return visualMesh;
+            }
+            private set
+            {
+                if (value == null) return;
+                visualMesh = value;
+
+                var mf = GetComponent<MeshFilter>();
+                if(mf == null) gameObject.AddComponent<MeshFilter>();
+                if (GetComponent<MeshRenderer>() == null)
+                    gameObject.AddComponent<MeshRenderer>().sharedMaterial = GameManager.instance.vertexColorationMaterial;
+                mf.sharedMesh = visualMesh;
+            }
+        }
+        private new Mesh colMesh = null;
+        public Mesh ColliderMesh
+        {
+            get
+            {
+                return colMesh;
+            }
+            private set
+            {
+                if (value == null) return;
+                colMesh = value;
+
+                var con = GetComponent<MeshColController>();
+                if (con == null) con = gameObject.AddComponent<MeshColController>();
+                con.Mesh = colMesh;
+                base.colliderMesh = colMesh;
+            }
+        }
+
+        private Dictionary<double, Mesh> meshCache = new Dictionary<double, Mesh>();
 
         // Need mesh options for each refinement, diameter level
         public string vrnPath = Application.streamingAssetsPath + Path.DirectorySeparatorChar + "test.vrn";
@@ -121,17 +185,13 @@ namespace C2M2.NeuronalDynamics.Simulation {
         public Color32 color1D = Color.yellow;
         public float lineWidth1D = 0.005f;
 
-        public Vector3[] Verts1D { get { return mapping.ModelGeometry.Mesh.vertices; } }
-
         protected Grid grid1D;
+        public Vector3[] Verts1D { get { return grid1D.Mesh.vertices; } }
 
         ///<summary> Lookup a 3D vert and get back two 1D indices and a lambda value for them </summary>
         //private Dictionary<int, Tuple<int, int, double>> map;
         private Vert3D1DPair[] map;
         private MappingInfo mapping;
-
-        private MeshColController meshColController = null;
-        private Mesh[] scaledMeshes = new Mesh[5];
 
         private double[] scalars3D = new double[0];
 
@@ -263,14 +323,9 @@ namespace C2M2.NeuronalDynamics.Simulation {
 
                 // Convert dictionary to array for speed              
                 map = new Vert3D1DPair[mapping.Data.Count];
-                string format = "3D vert {0} between 1Ds {1}, {2}, lambda: {3}\n";
-                StringBuilder sb = new StringBuilder (map.Length * format.Length);
-                sb.AppendLine ("MAP:");
                 foreach (KeyValuePair<int, Tuple<int, int, double>> entry in mapping.Data) {
                     map[entry.Key] = new Vert3D1DPair (entry.Value.Item1, entry.Value.Item2, entry.Value.Item3);
-                    sb.AppendFormat (format, entry.Key, entry.Value.Item1, entry.Value.Item2, entry.Value.Item3);
                 }
-                Debug.Log (sb.ToString ());
                 scalars3D = new double[map.Length];
 
                 if (visualize1D) Render1DCell ();
@@ -279,11 +334,11 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 cellMesh.Rescale (transform, new Vector3 (4, 4, 4));
                 cellMesh.RecalculateNormals ();
 
-                meshColController = gameObject.AddComponent<MeshColController> ();
+                //var meshColController = gameObject.AddComponent<MeshColController> ();
 
                 // Pass blownupMesh upwards to SurfaceSimulation
                 //colliderMesh = BuildMesh((int)meshColScale);
-                colliderMesh = grid2D.Mesh;
+                colMesh = grid2D.Mesh;
 
                 InitUI ();
             }
@@ -320,42 +375,59 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 mf.sharedMesh.Rescale (transform, newSize);
             }
         }
+        
 
-        private Mesh BuildMesh (double inflation = 1, int refinement = 0) {
+        private Mesh BuildMesh (double inflation = 1) {
             Mesh mesh = null;
 
             // 1 <= inflation
             inflation = Math.Max (inflation, 1);
             // 0 <= refinement
-            refinement = Math.Max (refinement, 0);
 
             if (reader == null) reader = new vrnReader (vrnPath);
             mesh = MapUtils.BuildMap (reader.Retrieve2DMeshName (inflation),
-                reader.Retrieve1DMeshName (refinement),
+                reader.Retrieve1DMeshName (0),
                 false).SurfaceGeometry.Mesh;
 
             mesh.RecalculateNormals ();
 
-            mesh.name = mesh.name + "ref" + refinement.ToString () + "inf" + inflation.ToString ();
+          //  mesh.name = mesh.name + "ref" + refinement.ToString () + "inf" + inflation.ToString ();
 
             return mesh;
         }
-
-        public void SwitchColliderMesh (int scale) {
-            scale = Math.Clamp (scale, 0, 4);
-
-            meshColController.Mesh = BuildMesh (scale);
-            //meshColController.Mesh = BuildMesh(scale);
+        private Mesh CheckMeshCache(double inflation)
+        {
+            if (meshCache[inflation] == null)
+            {
+                if (reader == null) reader = new vrnReader(vrnPath);
+                string meshName = reader.Retrieve2DMeshName(colliderInflation);
+                Grid grid = new Grid(new Mesh(), meshName);
+                reader.ReadUGX(meshName, ref grid);
+                meshCache[inflation] = grid.Mesh;
+            }
+            return meshCache[inflation];
         }
 
-        public void SwitchMesh (int scale) {
-            scale = Math.Clamp (scale, 0, 4);
+        public void SwitchColliderMesh (double inflation) {
+            inflation = Math.Clamp (inflation, 0, 4);
 
+            //var meshColController = GetComponent<MeshColController>();
+            //if (meshColController == null) meshColController = gameObject.AddComponent<MeshColController>();
+            //meshColController.Mesh = BuildMesh (inflation);
+            ColliderInflation = inflation;
+        }
+
+        public void SwitchMesh (double inflation) {
+            inflation = Math.Clamp (inflation, 0, 4);
+
+            /*
             MeshFilter mf = GetComponent<MeshFilter> ();
 
-            if (mf != null) mf.sharedMesh = BuildMesh (scale);
+            if (mf != null) mf.sharedMesh = BuildMesh (inflation);
             //if (mf != null) mf.sharedMesh = BuildMesh(scale);
             else Debug.LogError ("No MeshFilter found on " + name);
+            */
+            VisualInflation = inflation;
         }
 
         /// <summary>
@@ -363,11 +435,9 @@ namespace C2M2.NeuronalDynamics.Simulation {
         /// </summary>
         /// <param name="mesh"></param>
         private void SwitchColliderMesh (Mesh mesh) {
-            if (meshColController != null) {
-                if (mesh != null) {
-                    meshColController.Mesh = mesh;
-                } else Debug.LogError ("Mesh given for collider is invalid.");
-            } else Debug.LogError ("No MeshColController found.");
+            var meshColController = GetComponent<MeshColController>();
+            if (meshColController == null) meshColController = gameObject.AddComponent<MeshColController>();
+            meshColController.Mesh = mesh;
         }
     }
 }

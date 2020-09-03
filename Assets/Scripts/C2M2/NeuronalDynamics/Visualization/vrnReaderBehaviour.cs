@@ -14,17 +14,6 @@ using Grid = C2M2.NeuronalDynamics.UGX.Grid;
 namespace C2M2.NeuronalDynamics.Visualization {
     using DiameterAttachment = IAttachment<DiameterData>;
     namespace vrn {
-        /// <summary>
-        /// Custom exception thrown if file could not be found in VRN archive
-        /// </summary>
-        /// <see cref="Exception"> Exception base class </see>
-        [Serializable]
-        public class CouldNotReadMeshFromVRNArchive : Exception {
-            public CouldNotReadMeshFromVRNArchive () : base () { }
-            public CouldNotReadMeshFromVRNArchive (string message) : base (message) { }
-            public CouldNotReadMeshFromVRNArchive (string message, Exception inner) : base (message, inner) { }
-            protected CouldNotReadMeshFromVRNArchive (SerializationInfo info, StreamingContext ctxt) : base (info, ctxt) { }
-        }
 
         sealed class vrnReader {
             /// GEOM1D                                                                                                                                                                                                                                                            
@@ -248,6 +237,19 @@ namespace C2M2.NeuronalDynamics.Visualization {
                     UnityEngine.Debug.LogError (ex);
                 }
             }
+        }
+
+        /// <summary>
+        /// Custom exception thrown if file could not be found in VRN archive
+        /// </summary>
+        /// <see cref="Exception"> Exception base class </see>
+        [Serializable]
+        public class CouldNotReadMeshFromVRNArchive : Exception
+        {
+            public CouldNotReadMeshFromVRNArchive() : base() { }
+            public CouldNotReadMeshFromVRNArchive(string message) : base(message) { }
+            public CouldNotReadMeshFromVRNArchive(string message, Exception inner) : base(message, inner) { }
+            protected CouldNotReadMeshFromVRNArchive(SerializationInfo info, StreamingContext ctxt) : base(info, ctxt) { }
         }
     }
 }
