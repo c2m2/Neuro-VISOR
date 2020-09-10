@@ -207,7 +207,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
             for (int i = 0; i < map.Length; i++) { // for each 3D point,
 
                 // Take an weighted average using lambda
-                // Equivalent to [lambda * val1Db + (1 - lambda) * val1Da]        
+                // Equivalent to [lambda * val1Db + (1 - lambda) * val1Da]
                 double newVal = map[i].lambda * (scalars1D[map[i].v2] - scalars1D[map[i].v1]) + scalars1D[map[i].v1];
 
                 scalars3D[i] = newVal;
@@ -240,7 +240,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 double val1D = (1 - map[vert3D].lambda) * val3D;
                 new1DValues[j] = new Tuple<int, double> (map[vert3D].v1, val1D);
 
-                // Weight newVal by (lambda) for second 1D vert                    
+                // Weight newVal by (lambda) for second 1D vert
                 val1D = map[vert3D].lambda * val3D;
                 new1DValues[j + 1] = new Tuple<int, double> (map[vert3D].v2, val1D);
                 // Move up two spots in 1D array
@@ -275,7 +275,12 @@ namespace C2M2.NeuronalDynamics.Simulation {
             if (reader == null) reader = new vrnReader (vrnPath);
             Debug.Log ("Path: " + vrnPath);
             Debug.Log (reader.List ());
-
+            // Convert dictionary to array for speed
+            map = new Vert3D1DPair[mapping.Data.Count];
+            foreach(KeyValuePair<int, Tuple<int, int, double>> entry in mapping.Data)
+            {
+                map[entry.Key] = new Vert3D1DPair(entry.Value.Item1, entry.Value.Item2, entry.Value.Item3);
+            }
             string meshName1D = reader.Retrieve1DMeshName ();
             /// Create empty grid with name of grid in archive
             grid1D = new Grid (new Mesh (), meshName1D);
@@ -321,7 +326,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
                     UnityEngine.Debug.LogError (ex);
                 }
 
-                // Convert dictionary to array for speed              
+                // Convert dictionary to array for speed
                 map = new Vert3D1DPair[mapping.Data.Count];
                 foreach (KeyValuePair<int, Tuple<int, int, double>> entry in mapping.Data) {
                     map[entry.Key] = new Vert3D1DPair (entry.Value.Item1, entry.Value.Item2, entry.Value.Item3);
@@ -375,7 +380,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 mf.sharedMesh.Rescale (transform, newSize);
             }
         }
-        
+
 
         private Mesh BuildMesh (double inflation = 1) {
             Mesh mesh = null;
