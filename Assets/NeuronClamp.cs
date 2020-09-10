@@ -100,6 +100,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         public void ActivateClamp()
         {
             clampLive = true;
+
             if (activeMaterial != null)
             {
                 mr.material = activeMaterial;

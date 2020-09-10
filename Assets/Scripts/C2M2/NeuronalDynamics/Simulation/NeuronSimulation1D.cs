@@ -242,6 +242,7 @@ namespace C2M2.NeuronalDynamics.Simulation
             CellPathPacket pathPacket = new CellPathPacket(cell1xPath, "1xDiameter");
 
             // Read in 1D & 3D data and build a map between them
+            Debug.Log("cell1xPath: " + cell1xPath + "\npathPacket.path1D: " + pathPacket.path1D + "\npathPacket.path3D: " + pathPacket.path3D + "\npathPacket.pathTris: " + pathPacket.pathTris);
             mapping = MapUtils.BuildMap(pathPacket.path1D,
                 pathPacket.path3D,
                 false,

@@ -42,6 +42,8 @@ namespace C2M2.NeuronalDynamics.Interaction
         private static Vector3 defaultLocalScale = new Vector3(2.5f, 0.25f, 2.5f);
         private OVRGrabbable grabbable = null;
 
+        private bool clampsActivated = false;
+
         private void Awake()
         {
             if (ClampPrefab == null || clampAnchor == null)
@@ -98,13 +100,28 @@ namespace C2M2.NeuronalDynamics.Interaction
             // Toggle clamps if requested
             if (allClamps.Count > 0 && ToggleRequested)
             {
-                foreach (NeuronClamp clamp in allClamps)
+                // If "all clamps" state is on, deactivate all clamps
+                if (clampsActivated)
                 {
-                    if (clamp != null)
+                    foreach (NeuronClamp clamp in allClamps)
                     {
-                        clamp.ToggleClamp();
+                        if (clamp != null)
+                        {
+                            clamp.DeactivateClamp();
+                        }
                     }
                 }
+                else
+                {
+                    foreach (NeuronClamp clamp in allClamps)
+                    {
+                        if (clamp != null)
+                        {
+                            clamp.ActivateClamp();
+                        }
+                    }
+                }
+                clampsActivated = !clampsActivated;
             }
         }
 
