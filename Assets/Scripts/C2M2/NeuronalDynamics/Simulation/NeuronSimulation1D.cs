@@ -275,12 +275,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
             if (reader == null) reader = new vrnReader (vrnPath);
             Debug.Log ("Path: " + vrnPath);
             Debug.Log (reader.List ());
-            // Convert dictionary to array for speed
-            map = new Vert3D1DPair[mapping.Data.Count];
-            foreach(KeyValuePair<int, Tuple<int, int, double>> entry in mapping.Data)
-            {
-                map[entry.Key] = new Vert3D1DPair(entry.Value.Item1, entry.Value.Item2, entry.Value.Item3);
-            }
+
             string meshName1D = reader.Retrieve1DMeshName ();
             /// Create empty grid with name of grid in archive
             grid1D = new Grid (new Mesh (), meshName1D);
