@@ -31,11 +31,20 @@ namespace C2M2.NeuronalDynamics.Interaction
         private MeshRenderer mr;
         private Bounds bounds;
         private Vector3 LocalExtents { get { return transform.localScale / 2; } }
+        private Vector3 posFocus = Vector3.zero;
 
         private void Awake()
         {
             mr = GetComponent<MeshRenderer>();
-            origScale = transform.localScale;
+            origScale = transform.parent.localScale;
+        }
+
+        private void Update()
+        {
+            if (activeTarget != null)
+            {
+                transform.parent.localPosition = posFocus;
+            }
         }
 
         private void FixedUpdate()
@@ -57,8 +66,6 @@ namespace C2M2.NeuronalDynamics.Interaction
             {
                 mr.material = activeMaterial;
             }
-          
-            //mr.material.color = activeCol;
         }
         public void DeactivateClamp()
         {
@@ -67,7 +74,6 @@ namespace C2M2.NeuronalDynamics.Interaction
             {
                 mr.material = inactiveMaterial;
             }
-            //mr.material.color = inactiveCol;
         }
 
         public void ToggleClamp()
@@ -84,7 +90,7 @@ namespace C2M2.NeuronalDynamics.Interaction
                 NeuronSimulation1D simulation = other.GetComponentInParent<NeuronSimulation1D>() ?? other.GetComponent<NeuronSimulation1D>();
                 if (simulation != null)
                 {
-                    ReportSimulation(simulation, transform.position);
+                    ReportSimulation(simulation, transform.parent.position);
                     //GetComponent<Rigidbody>().isKinematic = true;
                 }
             }
@@ -95,7 +101,9 @@ namespace C2M2.NeuronalDynamics.Interaction
             if (activeTarget == null)
             {
                 activeTarget = simulation;
-                transform.parent = simulation.transform;
+                //Vector3 pos = transform.parent.position;
+                transform.parent.parent = simulation.transform;
+                //transform.parent.position = pos;
 
 
                 int ind = GetNearestPoint(activeTarget, contactPoint);
@@ -153,9 +161,9 @@ namespace C2M2.NeuronalDynamics.Interaction
                 + "\nworldPoint: " + worldPoint.ToString("F5")
                 + "\nverts.Length: " + verts.Length);
 
-            transform.localPosition = nearestPos;
+            posFocus = nearestPos;
 
-            this.name = "AttachedNeuronClamp" + nearestVertInd;
+            transform.parent.name = "AttachedNeuronClamp" + nearestVertInd;
             return nearestVertInd;
         }
 
@@ -196,11 +204,9 @@ namespace C2M2.NeuronalDynamics.Interaction
                 if (activeTarget == other.GetComponentInParent<NeuronSimulation1D>() || activeTarget == other.GetComponent<NeuronSimulation1D>())
                 {
                     activeTarget = null;
-                    // Only a clamp instantiator should be allowed to remove a NeuronClamp from a simulation
-                    if (transform.parent == null || transform.parent.GetComponent<NeuronClampAnchor>() == null)
-                        Destroy(this);
 
-                    transform.localScale = origScale;
+                    transform.parent.localScale = origScale;
+                    posFocus = Vector3.zero;
                 }
             }
         }
