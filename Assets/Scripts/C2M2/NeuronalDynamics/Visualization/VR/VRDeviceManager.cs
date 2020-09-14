@@ -20,7 +20,7 @@ namespace C2M2.Visualization.VR
         public GameObject fpsOverlay = null;
         public GameObject fpsTVScreen = null;
         private MovingOVRHeadsetEmulator emulator;
-        private MouseEventSignaler signaler;
+        private MouseEventSignaler mouseSignaler;
         private OVRPlayerController playerController;
         private MovementController emulatorMove;
 
@@ -30,15 +30,22 @@ namespace C2M2.Visualization.VR
 
             emulator = GetComponent<MovingOVRHeadsetEmulator>();
             emulatorMove = GetComponent<MovementController>();
-            signaler = GetComponent<MouseEventSignaler>();
+            mouseSignaler = GetComponent<MouseEventSignaler>();
             playerController = GetComponent<OVRPlayerController>();
             
 
             emulator.enabled = !playerController.enabled;
-            signaler.enabled = emulator.enabled;
+            mouseSignaler.enabled = emulator.enabled;
             emulatorMove.enabled = emulator.enabled;
             if (fpsOverlay != null) fpsOverlay.SetActive(emulator.enabled);
             if (fpsTVScreen != null) fpsTVScreen.SetActive(playerController.enabled);
+
+            // only enable oculus signalers if player controller is enabled
+            OculusEventSignaler[] oculusSignalers = GetComponentsInChildren<OculusEventSignaler>();
+            foreach(OculusEventSignaler o in oculusSignalers)
+            {
+                o.enabled = playerController.enabled;
+            }
         }
     }
 }
