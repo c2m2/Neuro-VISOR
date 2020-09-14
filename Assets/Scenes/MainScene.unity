@@ -4039,28 +4039,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1950825764}
   m_CullTransparentMesh: 0
---- !u!1 &2001918704 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 7952641023667870623, guid: 170c7fd960f71ba4f94f7a2b0fb17726,
-    type: 3}
-  m_PrefabInstance: {fileID: 7952641023480349039}
-  m_PrefabAsset: {fileID: 0}
---- !u!54 &2001918705
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2001918704}
-  serializedVersion: 2
-  m_Mass: 1
-  m_Drag: Infinity
-  m_AngularDrag: Infinity
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
 --- !u!1001 &2058848668
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4078,10 +4056,15 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 9043822889724945539, guid: 170c7fd960f71ba4f94f7a2b0fb17726,
+        type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 1272943665652909156, guid: 170c7fd960f71ba4f94f7a2b0fb17726,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.303
+      value: -0.723
       objectReference: {fileID: 0}
     - target: {fileID: 1272943665652909156, guid: 170c7fd960f71ba4f94f7a2b0fb17726,
         type: 3}
@@ -4091,7 +4074,7 @@ PrefabInstance:
     - target: {fileID: 1272943665652909156, guid: 170c7fd960f71ba4f94f7a2b0fb17726,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.643
+      value: -0.886
       objectReference: {fileID: 0}
     - target: {fileID: 1272943665652909156, guid: 170c7fd960f71ba4f94f7a2b0fb17726,
         type: 3}
@@ -4133,6 +4116,21 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1272943665652909156, guid: 170c7fd960f71ba4f94f7a2b0fb17726,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1272943665652909156, guid: 170c7fd960f71ba4f94f7a2b0fb17726,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1272943665652909156, guid: 170c7fd960f71ba4f94f7a2b0fb17726,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3135916970792637252, guid: 170c7fd960f71ba4f94f7a2b0fb17726,
         type: 3}
       propertyPath: createDestroyButton
@@ -4142,6 +4140,11 @@ PrefabInstance:
         type: 3}
       propertyPath: toggleClampsButton
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3135916970792637252, guid: 170c7fd960f71ba4f94f7a2b0fb17726,
+        type: 3}
+      propertyPath: clampAnchor
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 5711705084138329172, guid: 170c7fd960f71ba4f94f7a2b0fb17726,
         type: 3}
@@ -4159,12 +4162,6 @@ PrefabInstance:
 --- !u!1 &2058848669 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 9043822889724945539, guid: 170c7fd960f71ba4f94f7a2b0fb17726,
-    type: 3}
-  m_PrefabInstance: {fileID: 2058848668}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &2058848670 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 7952641023667870623, guid: 170c7fd960f71ba4f94f7a2b0fb17726,
     type: 3}
   m_PrefabInstance: {fileID: 2058848668}
   m_PrefabAsset: {fileID: 0}
@@ -4186,22 +4183,19 @@ MonoBehaviour:
   m_snapOffset: {fileID: 0}
   m_grabPoints:
   - {fileID: 0}
---- !u!54 &2058848672
-Rigidbody:
+--- !u!135 &2058848673
+SphereCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2058848670}
+  m_GameObject: {fileID: 2058848669}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
   serializedVersion: 2
-  m_Mass: 1
-  m_Drag: Infinity
-  m_AngularDrag: Infinity
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
+  m_Radius: 0.1
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &2128362492
 GameObject:
   m_ObjectHideFlags: 0

@@ -7,7 +7,6 @@ namespace C2M2.NeuronalDynamics.Interaction
     /// <summary>
     /// Instantiates NeuronClamps, keeps track of them, 
     /// </summary>
-    [RequireComponent(typeof(OVRGrabbable))]
     public class NeuronClampInstantiator : MonoBehaviour
     {
         public GameObject ClampPrefab = null;
@@ -46,7 +45,7 @@ namespace C2M2.NeuronalDynamics.Interaction
 
         private void Awake()
         {
-            if (ClampPrefab == null || clampAnchor == null)
+            if (ClampPrefab == null)
             {
                 Debug.LogError("No clamp prefab given.");
                 Destroy(this);
@@ -56,16 +55,28 @@ namespace C2M2.NeuronalDynamics.Interaction
             grabbable = GetComponent<OVRGrabbable>();
         }
 
+        private void OnTriggerExit(Collider other)
+        {
+            if(other.tag == "NeuronClamp")
+            {
+                NeuronClamp clamp = other.GetComponent<NeuronClamp>();
+                if (clamp != null)
+                {
+                    allClamps.Add(clamp);
+                    clamp.name = "UncampedNeuronClamp";
+                    curClamp = null;
+                    InstantiateClamp();
+                }
+            }
+        }
+
         // Update is called once per frame
         void Update()
         {
+            /*
             // If our clamp has latched onto a simulation, add another clamp
             if (curClamp != null)
             {
-                if (curClamp.transform.parent == null || curClamp.transform.parent != clampAnchor)
-                {
-                    curClamp = null;
-                }
 
                 if (curClamp != null && curClamp.transform.hasChanged)
                 {
@@ -74,27 +85,15 @@ namespace C2M2.NeuronalDynamics.Interaction
                     curClamp.transform.localScale = defaultLocalScale;
                     curClamp.transform.hasChanged = false;
                 }
-            }
+            }*/
 
             // Instantiate a new clamp if requested
             if (InputOn)
             {
-                ListenForClampCreation();
                 ListenForClampToggle();
             }
         }
 
-        private void ListenForClampCreation()
-        {
-            if (CreateDestroyRequested)
-            {
-                if (curClamp == null) InstantiateClamp();
-                else
-                {
-                    DestroyClamp(curClamp);
-                }
-            }
-        }
         private void ListenForClampToggle()
         {
             // Toggle clamps if requested
@@ -129,10 +128,9 @@ namespace C2M2.NeuronalDynamics.Interaction
         {
             if (curClamp == null)
             {
-                curClamp = Instantiate(ClampPrefab, clampAnchor ?? transform).GetComponent<NeuronClamp>();
+                curClamp = Instantiate(ClampPrefab, transform).GetComponent<NeuronClamp>();
                 curClamp.transform.localPosition = Vector3.zero;
-                curClamp.name = "UnattachedNeuronClamp";
-                allClamps.Add(curClamp);
+                curClamp.name = "CampedNeuronClamp";
             }
         }
         public void DestroyClamp(NeuronClamp clamp)

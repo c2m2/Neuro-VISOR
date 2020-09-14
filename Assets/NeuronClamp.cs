@@ -203,7 +203,6 @@ namespace C2M2.NeuronalDynamics.Interaction
                     if (transform.parent == null || transform.parent.GetComponent<NeuronClampAnchor>() == null)
                         Destroy(this);
 
-                    GetComponent<MeshFilter>().sharedMesh = origMesh;
                     transform.localScale = origScale;
                 }
             }
