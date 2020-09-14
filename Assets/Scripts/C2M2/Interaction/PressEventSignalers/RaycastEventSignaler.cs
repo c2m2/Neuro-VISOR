@@ -6,7 +6,7 @@ namespace C2M2.Interaction.Signaling
     public abstract class RaycastEventSignaler : PressEventSignaler
     {
         public bool rightHand = true;
-        private LayerMask layerMask;
+        public LayerMask layerMask;
         public float maxRaycastDistance = 10f;
         private RaycastEventManager activeEvent = null;
         private RaycastHit lastHit;
@@ -14,7 +14,11 @@ namespace C2M2.Interaction.Signaling
         protected abstract void OnAwake();
         protected void Awake()
         {
-            layerMask = LayerMask.GetMask(new string[]{ "Raycast" });
+            if (layerMask == default(LayerMask) 
+                || layerMask.Equals(LayerMask.GetMask(new string[] { "Nothing" })))
+            {
+                layerMask = LayerMask.GetMask(new string[] { "Raycast", "RaycastCollider" });
+            }
             OnAwake();
         }
         protected abstract void OnStart();

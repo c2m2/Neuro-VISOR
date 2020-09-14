@@ -18,9 +18,6 @@ namespace C2M2.NeuronalDynamics.Interaction
         public Material inactiveMaterial = null;
 
         public NeuronSimulation1D activeTarget = null;
-        public Mesh cylMesh;
-        private Mesh origMesh;
-
 
         private Tuple<int, double>[] newValues = null;
 

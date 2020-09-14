@@ -34,7 +34,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         {
             get
             {
-                return (grabbable.isGrabbed && OVRInput.GetDown(toggleClampsButton)) 
+                return (grabbable.isGrabbed && OVRInput.GetDown(toggleClampsButton))
                     || Input.GetKeyDown(toggleKey);
             }
         }
@@ -96,31 +96,36 @@ namespace C2M2.NeuronalDynamics.Interaction
 
         private void ListenForClampToggle()
         {
-            // Toggle clamps if requested
-            if (allClamps.Count > 0 && ToggleRequested)
+            if (ToggleRequested)
             {
-                // If "all clamps" state is on, deactivate all clamps
-                if (clampsActivated)
+                Debug.Log("Toggle Requested");
+                // Toggle clamps if requested
+                if (allClamps.Count > 0)
                 {
-                    foreach (NeuronClamp clamp in allClamps)
+                    Debug.Log("allClamps.Count > 0");
+                    // If "all clamps" state is on, deactivate all clamps
+                    if (clampsActivated)
                     {
-                        if (clamp != null)
+                        foreach (NeuronClamp clamp in allClamps)
                         {
-                            clamp.DeactivateClamp();
+                            if (clamp != null)
+                            {
+                                clamp.DeactivateClamp();
+                            }
                         }
                     }
-                }
-                else
-                {
-                    foreach (NeuronClamp clamp in allClamps)
+                    else
                     {
-                        if (clamp != null)
+                        foreach (NeuronClamp clamp in allClamps)
                         {
-                            clamp.ActivateClamp();
+                            if (clamp != null)
+                            {
+                                clamp.ActivateClamp();
+                            }
                         }
                     }
+                    clampsActivated = !clampsActivated;
                 }
-                clampsActivated = !clampsActivated;
             }
         }
 
@@ -128,7 +133,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         {
             if (curClamp == null)
             {
-                curClamp = Instantiate(ClampPrefab, transform).GetComponent<NeuronClamp>();
+                curClamp = Instantiate(ClampPrefab, transform).GetComponentInChildren<NeuronClamp>();
                 curClamp.transform.localPosition = Vector3.zero;
                 curClamp.name = "CampedNeuronClamp";
             }
