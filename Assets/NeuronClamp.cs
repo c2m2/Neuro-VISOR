@@ -37,6 +37,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         {
             mr = GetComponent<MeshRenderer>();
             origScale = transform.parent.localScale;
+            grabbable = GetComponentInParent<OVRGrabbable>();
         }
 
         private void Update()
@@ -165,6 +166,26 @@ namespace C2M2.NeuronalDynamics.Interaction
 
             transform.parent.name = "AttachedNeuronClamp" + nearestVertInd;
             return nearestVertInd;
+        }
+
+        [Tooltip("Hold down a raycast for this many frames in order to destroy a clamp")]
+        public int destroyCount = 50;
+        int holdCount = 0;
+        /// <summary>
+        /// If the user holds a raycast down for X seconds on a clamp, it should destroy the clamp
+        /// </summary>
+        public void ListenForDestroy()
+        {
+            holdCount++;
+            if(holdCount == destroyCount)
+            {
+                Debug.Log("Destroying " + transform.parent.name);
+                Destroy(transform.parent.gameObject);
+            }
+        }
+        public void ResetHoldCount()
+        {
+            holdCount = 0;
         }
 
         private void UpdateScale(NeuronSimulation1D simulation, int nearestPoint)

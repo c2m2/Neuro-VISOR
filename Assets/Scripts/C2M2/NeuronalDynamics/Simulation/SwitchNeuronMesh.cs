@@ -6,7 +6,7 @@ namespace C2M2.NeuronalDynamics.Simulation
 {
     public class SwitchNeuronMesh : MonoBehaviour
     {
-        public NeuronSimulation1D neuronSimulation1D;
+        public NeuronSimulation1D neuronSimulation1D = null;
         [Tooltip("If true, changes the visual Mesh. Otherwise changes MeshCollider")]
         public bool changeViz = true;
         public double inflation = 1;
