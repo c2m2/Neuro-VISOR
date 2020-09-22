@@ -604,7 +604,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   neuronSimulation1D: {fileID: 0}
   changeViz: 1
-  meshScale: 4
+  inflation: 5
 --- !u!1 &7110071881256472604
 GameObject:
   m_ObjectHideFlags: 0
@@ -1075,7 +1075,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   neuronSimulation1D: {fileID: 0}
   changeViz: 0
-  meshScale: 3
+  inflation: 4
 --- !u!1 &7110071881301761584
 GameObject:
   m_ObjectHideFlags: 0
@@ -1635,7 +1635,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   neuronSimulation1D: {fileID: 0}
   changeViz: 1
-  meshScale: 1
+  inflation: 2
 --- !u!1 &7110071881458632824
 GameObject:
   m_ObjectHideFlags: 0
@@ -2604,7 +2604,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: -1.69, y: 1.383}
+  m_AnchoredPosition: {x: -1.6900024, y: 1.3829956}
   m_SizeDelta: {x: 3138.9653, y: 2092.446}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &7110071881850089398
@@ -3226,7 +3226,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   neuronSimulation1D: {fileID: 0}
   changeViz: 1
-  meshScale: 0
+  inflation: 1
 --- !u!1 &7110071882057527617
 GameObject:
   m_ObjectHideFlags: 0
@@ -4198,7 +4198,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   neuronSimulation1D: {fileID: 0}
   changeViz: 0
-  meshScale: 4
+  inflation: 5
 --- !u!1 &7110071882295032033
 GameObject:
   m_ObjectHideFlags: 0
@@ -4819,7 +4819,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   neuronSimulation1D: {fileID: 0}
   changeViz: 0
-  meshScale: 2
+  inflation: 3
 --- !u!1 &7110071882526040852
 GameObject:
   m_ObjectHideFlags: 0
@@ -5517,7 +5517,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   neuronSimulation1D: {fileID: 0}
   changeViz: 1
-  meshScale: 2
+  inflation: 3
 --- !u!1 &7110071882876333030
 GameObject:
   m_ObjectHideFlags: 0
@@ -6063,7 +6063,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   neuronSimulation1D: {fileID: 0}
   changeViz: 0
-  meshScale: 0
+  inflation: 1
 --- !u!1 &7110071883000282487
 GameObject:
   m_ObjectHideFlags: 0
@@ -6220,7 +6220,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   neuronSimulation1D: {fileID: 0}
   changeViz: 0
-  meshScale: 1
+  inflation: 2
 --- !u!1 &7110071883066972770
 GameObject:
   m_ObjectHideFlags: 0
@@ -6534,7 +6534,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   neuronSimulation1D: {fileID: 0}
   changeViz: 1
-  meshScale: 3
+  inflation: 4
 --- !u!1 &7110071883202751911
 GameObject:
   m_ObjectHideFlags: 0
