@@ -121,7 +121,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
             set
             {
                 visualInflation = value;
-                if (ColliderInflation > visualInflation) ColliderInflation = visualInflation;
+                if (ColliderInflation < visualInflation) ColliderInflation = visualInflation;
                 VisualMesh = CheckMeshCache(visualInflation);
             }
         }
@@ -132,7 +132,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
             get { return colliderInflation; }
             set
             {
-                if (value > visualInflation) return;
+                if (value < visualInflation) return;
                 colliderInflation = value;
                 ColliderMesh = CheckMeshCache(colliderInflation);
             }
@@ -154,7 +154,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 if (GetComponent<MeshRenderer>() == null)
                     gameObject.AddComponent<MeshRenderer>().sharedMaterial = GameManager.instance.vertexColorationMaterial;
                 mf.sharedMesh = visualMesh;
-                Debug.Log("mesh set to " + visualMesh.name);
             }
         }
         private Mesh colMesh = null;
@@ -163,17 +162,15 @@ namespace C2M2.NeuronalDynamics.Simulation {
             get { return colMesh; }
             private set
             {
-                if (value == null) return;
+                //if (value == null) return;
                 colMesh = value;
 
                 var cont = GetComponent<MeshColController>() ?? GetComponentInChildren<MeshColController>();
                 if (cont == null)
                 {
-                    Debug.Log("No mesh controller found");
                     cont = gameObject.AddComponent<MeshColController>();
                 }
                 cont.Mesh = colMesh;
-                Debug.Log("ColliderMesh: " + colMesh);
                 base.colliderMesh = colMesh;
             }
         }
