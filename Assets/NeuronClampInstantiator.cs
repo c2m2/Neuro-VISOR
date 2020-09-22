@@ -63,7 +63,7 @@ namespace C2M2.NeuronalDynamics.Interaction
                 if (clamp != null)
                 {
                     allClamps.Add(clamp);
-                    clamp.name = "UncampedNeuronClamp";
+                    clamp.transform.parent.name = "UncampedNeuronClamp";
                     curClamp = null;
                     InstantiateClamp();
                 }
@@ -135,7 +135,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             {
                 curClamp = Instantiate(ClampPrefab, transform).GetComponentInChildren<NeuronClamp>();
                 curClamp.transform.localPosition = Vector3.zero;
-                curClamp.name = "CampedNeuronClamp";
+                curClamp.transform.parent.name = "CampedNeuronClamp";
             }
         }
         public void DestroyClamp(NeuronClamp clamp)

@@ -218,6 +218,7 @@ namespace C2M2.NeuronalDynamics.Interaction
 
         }
 
+        /*
         private void OnTriggerExit(Collider other)
         {
             if (activeTarget != null)
@@ -230,6 +231,6 @@ namespace C2M2.NeuronalDynamics.Interaction
                     posFocus = Vector3.zero;
                 }
             }
-        }
+        }*/
     }
 }
