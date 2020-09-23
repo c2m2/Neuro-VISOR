@@ -17,6 +17,7 @@ using C2M2.Utils.MeshUtils;
 using Grid = C2M2.NeuronalDynamics.UGX.Grid;
 using System.Text;
 using C2M2.NeuronalDynamics.Visualization.vrn;
+using C2M2.NeuronalDynamics.Interaction;
 
 namespace C2M2.NeuronalDynamics.Simulation {
     public struct CellPathPacket {
@@ -186,6 +187,11 @@ namespace C2M2.NeuronalDynamics.Simulation {
         public float lineWidth1D = 0.005f;
 
         protected Grid grid1D;
+
+        public Grid getGrid1D()
+        {
+            return grid1D;
+        }
         public Vector3[] Verts1D { get { return grid1D.Mesh.vertices; } }
 
         ///<summary> Lookup a 3D vert and get back two 1D indices and a lambda value for them </summary>
@@ -416,6 +422,10 @@ namespace C2M2.NeuronalDynamics.Simulation {
         public void SwitchMesh (double inflation) {
             inflation = Math.Clamp (inflation, 1, 5);
             VisualInflation = inflation;
+            foreach(NeuronClamp clamp in FindObjectsOfType(typeof(NeuronClamp)))
+            {
+                clamp.UpdateScale((float)inflation);
+            }
         }
 
         /// <summary>
