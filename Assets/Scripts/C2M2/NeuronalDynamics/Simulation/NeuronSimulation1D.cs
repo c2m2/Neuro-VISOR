@@ -280,6 +280,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
             /// Create empty grid with name of grid in archive
             grid1D = new Grid (new Mesh (), meshName1D);
             grid1D.Attach (new DiameterAttachment ());
+            
             reader.ReadUGX (meshName1D, ref grid1D);
 
             // Pass the cell to simulation code
