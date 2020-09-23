@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using C2M2.NeuronalDynamics.Simulation;
 using C2M2.Utils.MeshUtils;
+using Grid = C2M2.NeuronalDynamics.UGX.Grid;
+using C2M2.NeuronalDynamics.UGX;
 
 namespace C2M2.NeuronalDynamics.Interaction
 {
@@ -32,6 +34,8 @@ namespace C2M2.NeuronalDynamics.Interaction
         private Bounds bounds;
         private Vector3 LocalExtents { get { return transform.localScale / 2; } }
         private Vector3 posFocus = Vector3.zero;
+
+        float currentVisualizationScale = 1;
 
         private void Awake()
         {
@@ -115,7 +119,7 @@ namespace C2M2.NeuronalDynamics.Interaction
                 //GetComponent<MeshFilter>().sharedMesh = cylMesh;
 
                 // Set scale here
-                UpdateScale(activeTarget, ind);
+                SetScale(activeTarget, ind);
             }
 
             return activeTarget;
@@ -188,34 +192,31 @@ namespace C2M2.NeuronalDynamics.Interaction
             holdCount = 0;
         }
 
-        private void UpdateScale(NeuronSimulation1D simulation, int nearestPoint)
+        private void SetScale(NeuronSimulation1D simulation, int nearestPoint)
         {
-            Vector3[] verts = simulation.Verts1D;
+            //Gets the neighbors of the vertex
+            //List<UGX.Vertex> neighbors = simulation.getGrid1D().Vertices[nearestPoint].Neighbors;
 
-            // Approach 1: Resize relative to geometry bounds
-            /*
-            float scaler = 1 / 45;
-            // If the geometry is 90 units long, make the clamp 2 units in radius
-            float minX = -1, minY = -1, minZ = -1;
-            float maxX = -1, maxY = -1, maxZ = -1;
-            Vector3 localExtents = new Vector3(maxX - minX, maxY - minY, maxZ - minZ);
-            transform.localScale = localExtents * scaler;
-            */
+            //Gets the visual inflation
+            currentVisualizationScale = (float) simulation.VisualInflation;
 
+            float scalarSize = 20f; //Needs to be tested to find right number
+                                   //Could also adjusted so that it can be edited in Unity Editor
 
-            // Approach 2: Get position of neighboring 1D points, fit between neighbors
-            /*
-            Vector3 ourPos = verts[nearestPoint]; // = however we get this info
-            Vector3 nPosA = new Vector3(); 
-            Vector3 nPosB = new Vector3();
+            NeuronCell testCell = new NeuronCell(simulation.getGrid1D());
+            double dendriteWidth = testCell.nodeData[nearestPoint].nodeRadius;
+            //can also get neighbors for nodeData
+            Debug.Log("Nearest Point Radius: " + dendriteWidth);
 
-            float halfwayA = Vector3.Distance(ourPos, nPosA);
-            float halfwayB = Vector3.Distance(ourPos, nPosB);
-            float avg = (halfwayA + halfwayB) / 2;
+            float scalingVal = (float)(scalarSize * dendriteWidth * currentVisualizationScale);
+            transform.parent.localScale = new Vector3(scalingVal, scalingVal, scalingVal);
+        }
 
-            transform.localScale = new Vector3(avg, avg, avg);
-            */
-
+        public void UpdateScale(float newScale)
+        {
+            float modifiedScale = newScale/currentVisualizationScale;
+            transform.parent.localScale *= modifiedScale;
+            currentVisualizationScale = newScale;
         }
 
         /*
