@@ -37,6 +37,11 @@ namespace C2M2.NeuronalDynamics.Interaction
 
         float currentVisualizationScale = 1;
 
+        private void VariableChangeHandler(double newVal)
+        {
+            UpdateScale((float)newVal);
+        }
+
         private void Awake()
         {
             mr = GetComponent<MeshRenderer>();
@@ -120,6 +125,8 @@ namespace C2M2.NeuronalDynamics.Interaction
 
                 // Set scale here
                 SetScale(activeTarget, ind);
+
+                simulation.OnVariableChange += VariableChangeHandler;
             }
 
             return activeTarget;

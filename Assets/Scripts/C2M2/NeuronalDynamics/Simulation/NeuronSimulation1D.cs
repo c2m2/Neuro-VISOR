@@ -124,8 +124,12 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 visualInflation = value;
                 if (ColliderInflation < visualInflation) ColliderInflation = visualInflation;
                 VisualMesh = CheckMeshCache(visualInflation);
+                OnVariableChange?.Invoke(visualInflation);
             }
         }
+
+        public delegate void OnVariableChangeDelegate(double newVal);
+        public event OnVariableChangeDelegate OnVariableChange;
 
         private double colliderInflation = 1;
         public double ColliderInflation
@@ -422,10 +426,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
         public void SwitchMesh (double inflation) {
             inflation = Math.Clamp (inflation, 1, 5);
             VisualInflation = inflation;
-            foreach(NeuronClamp clamp in FindObjectsOfType(typeof(NeuronClamp)))
-            {
-                clamp.UpdateScale((float)inflation);
-            }
         }
 
         /// <summary>
