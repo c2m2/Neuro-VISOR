@@ -6,15 +6,19 @@ namespace C2M2
 {
     using Interaction;
     using Interaction.UI;
+    using NeuronalDynamics.Interaction;
     /// <summary>
     /// Stores many global variables, handles pregame initializations
     /// </summary>
+    [RequireComponent(typeof(ClampSimpleInstantiator))]
     public class GameManager : MonoBehaviour
     {
         public static GameManager instance = null;
-
+        
         public int mainThreadId { get; private set; } = -1;
         public string assetsPath { get; private set; } = null;
+
+        public ClampSimpleInstantiator clampInstantiator = null;
 
         [Header("Materials")]
         public Material defaultMaterial;
@@ -53,6 +57,8 @@ namespace C2M2
             DontDestroyOnLoad(gameObject);
             if (instance == null) { instance = this; }
             else if (instance != this) { Destroy(this); }
+
+            clampInstantiator = GetComponent<ClampSimpleInstantiator>();
             // Initialize keyboard
             //raycastKeyboardPrefab = Instantiate(raycastKeyboardPrefab, new Vector3(50, 50, 50), Quaternion.identity);
             //raycastKeyboard = raycastKeyboardPrefab.GetComponent<RaycastKeyboard>();

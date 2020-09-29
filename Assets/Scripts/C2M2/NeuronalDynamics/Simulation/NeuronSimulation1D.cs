@@ -20,39 +20,7 @@ using C2M2.NeuronalDynamics.Visualization.vrn;
 using C2M2.NeuronalDynamics.Interaction;
 
 namespace C2M2.NeuronalDynamics.Simulation {
-    public struct CellPathPacket {
-        public string name { get; private set; }
-        public string path1D { get; private set; }
-        public string path3D { get; private set; }
-        public string pathTris { get; private set; }
 
-        public CellPathPacket (string path1D, string path3D, string pathTris, string name = "") {
-            this.name = name;
-            this.path1D = path1D;
-            this.path3D = path3D;
-            this.pathTris = pathTris;
-        }
-        /// <summary>
-        /// Provide the absolute path to a directory containing all of the files
-        /// </summary>
-        public CellPathPacket (string sourceDir, string name = "") {
-            this.name = name;
-            // Default values
-            this.path1D = "NULL";
-            this.path3D = "NULL";
-            this.pathTris = "NULL";
-
-            string[] files = Directory.GetFiles (sourceDir);
-            foreach (string file in files) {
-                // If this isn't a non-metadata ugx file,
-                if (!file.EndsWith (".meta") && file.EndsWith (".ugx")) {
-                    if (file.EndsWith ("_1d.ugx")) path1D = file; // 1D cell
-                    else if (file.EndsWith ("_tris.ugx")) pathTris = file; // Triangles
-                    else if (file.EndsWith (".ugx")) path3D = file; // If it isn't specified as 1D or triangles, it's most likely 3D
-                }
-            }
-        }
-    }
     /// <summary>
     /// Stores two 1D indices and a lambda value for a 3D vertex
     /// </summary>
@@ -71,33 +39,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
         }
     }
 
-    public struct CellInfo {
-        public string name { get; private set; }
-        public string filePath { get; private set; }
-        public MappingInfo data { get; private set; }
-
-        public Mesh mesh {
-            get {
-                return data.SurfaceGeometry.Mesh;
-            }
-        }
-        public CellInfo (string filePath, string name = "") {
-            this.name = name;
-            this.filePath = filePath;
-            CellPathPacket paths = new CellPathPacket (filePath);
-
-            if (paths.path3D != "NULL" && paths.path1D != "NULL" && paths.pathTris != "NULL") {
-                data = MapUtils.BuildMap (paths.path3D, paths.path1D, false, paths.pathTris);
-            } else {
-                string s = "";
-                if (paths.path3D == "NULL") s += " [3D Cell] ";
-                if (paths.path1D == "NULL") s += " [1D Cell] ";
-                if (paths.pathTris == "NULL") s += " [Cell Triangles] ";
-                throw new NullReferenceException ("Null paths found for " + s);
-            }
-
-        }
-    }
     /// <summary>
     /// Provide an interface for 1D neuron-surface simulations to be visualized and interacted with
     /// </summary>
@@ -105,15 +46,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
     /// 1D Neuron surface simulations should derive from this class.
     /// </remarks>
     public abstract class NeuronSimulation1D : MeshSimulation {
-        private int refinementLevel = 1;
-        public int RefinementLevel
-        {
-            get { return refinementLevel; }
-            set
-            {
-                refinementLevel = value;
-            }
-        }
 
         private double visualInflation = 1;
         public double VisualInflation
@@ -185,6 +117,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
         // Need mesh options for each refinement, diameter level
         public string vrnPath = Application.streamingAssetsPath + Path.DirectorySeparatorChar + "test.vrn";
 
+        public bool clampMode = true;
         [Header ("1D Visualization")]
         public bool visualize1D = false;
         public Color32 color1D = Color.yellow;
@@ -279,6 +212,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
         /// <param name="grid"></param>
         protected abstract void SetNeuronCell (Grid grid);
 
+        
         vrnReader reader = null;
         protected override void ReadData () {
             /// This goes to StreamingAssets
@@ -297,6 +231,16 @@ namespace C2M2.NeuronalDynamics.Simulation {
             SetNeuronCell (grid1D);
         }
 
+        protected override void OnUpdate()
+        {
+            RaycastEventManager eventManager = GetComponent<RaycastEventManager>();
+            RaycastPressEvents newEvents = clampMode ? 
+                GameManager.instance.gameObject.GetComponent<RaycastPressEvents>()
+                : GetComponentInChildren<RaycastPressEvents>();
+            eventManager.leftTrigger = newEvents;
+            eventManager.rightTrigger = newEvents;
+
+        }
         /// <summary>
         /// Read in the cell and initialize 3D/1D visualization/interaction infrastructure
         /// </summary>

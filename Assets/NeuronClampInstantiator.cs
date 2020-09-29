@@ -73,19 +73,6 @@ namespace C2M2.NeuronalDynamics.Interaction
         // Update is called once per frame
         void Update()
         {
-            /*
-            // If our clamp has latched onto a simulation, add another clamp
-            if (curClamp != null)
-            {
-
-                if (curClamp != null && curClamp.transform.hasChanged)
-                {
-                    curClamp.transform.localPosition = Vector3.zero;
-                    curClamp.transform.localRotation = Quaternion.identity;
-                    curClamp.transform.localScale = defaultLocalScale;
-                    curClamp.transform.hasChanged = false;
-                }
-            }*/
 
             // Instantiate a new clamp if requested
             if (InputOn)
