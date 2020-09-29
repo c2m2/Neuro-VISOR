@@ -118,6 +118,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
         public string vrnPath = Application.streamingAssetsPath + Path.DirectorySeparatorChar + "test.vrn";
 
         public bool clampMode = true;
+        private bool clampModePrev = false;
         [Header ("1D Visualization")]
         public bool visualize1D = false;
         public Color32 color1D = Color.yellow;
@@ -135,6 +136,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
         //private Dictionary<int, Tuple<int, int, double>> map;
         private Vert3D1DPair[] map;
         private MappingInfo mapping;
+        private RaycastEventManager raycastManager = null;
 
         private double[] scalars3D = new double[0];
 
@@ -230,16 +232,23 @@ namespace C2M2.NeuronalDynamics.Simulation {
             // Pass the cell to simulation code
             SetNeuronCell (grid1D);
         }
-
+        protected override void OnStart()
+        {
+            base.OnStart();
+            raycastManager = GetComponent<RaycastEventManager>();
+        }
         protected override void OnUpdate()
         {
-            RaycastEventManager eventManager = GetComponent<RaycastEventManager>();
-            RaycastPressEvents newEvents = clampMode ? 
-                GameManager.instance.gameObject.GetComponent<RaycastPressEvents>()
-                : GetComponentInChildren<RaycastPressEvents>();
-            eventManager.leftTrigger = newEvents;
-            eventManager.rightTrigger = newEvents;
+            if (clampMode != clampModePrev)
+            {
+                RaycastPressEvents newEvents = clampMode ?
+                    GameManager.instance.gameObject.GetComponent<RaycastPressEvents>()
+                    : GetComponentInChildren<RaycastPressEvents>();
+                raycastManager.leftTrigger = newEvents;
+                raycastManager.rightTrigger = newEvents;
+            }
 
+            clampModePrev = clampMode;
         }
         /// <summary>
         /// Read in the cell and initialize 3D/1D visualization/interaction infrastructure
