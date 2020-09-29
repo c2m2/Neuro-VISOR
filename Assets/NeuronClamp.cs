@@ -5,6 +5,7 @@ using C2M2.NeuronalDynamics.Simulation;
 using C2M2.Utils.MeshUtils;
 using Grid = C2M2.NeuronalDynamics.UGX.Grid;
 using C2M2.NeuronalDynamics.UGX;
+using System.Collections;
 
 namespace C2M2.NeuronalDynamics.Interaction
 {
@@ -37,9 +38,9 @@ namespace C2M2.NeuronalDynamics.Interaction
 
         float currentVisualizationScale = 1;
 
-        private void VariableChangeHandler(double newVal)
+        private void VisualInflationChangeHandler(double newInflation)
         {
-            UpdateScale((float)newVal);
+            UpdateScale((float)newInflation);
         }
 
         private void Awake()
@@ -116,17 +117,18 @@ namespace C2M2.NeuronalDynamics.Interaction
                 //transform.parent.position = pos;
 
 
-                int ind = GetNearestPoint(activeTarget, contactPoint);
-                Tuple<int, double> newVal = new Tuple<int, double>(ind, clampPower);
+                int clampIndex = GetNearestPoint(activeTarget, contactPoint);
+                Tuple<int, double> newVal = new Tuple<int, double>(clampIndex, clampPower);
                 newValues = new Tuple<int, double>[] { newVal };
 
                 //origMesh = GetComponent<MeshFilter>().sharedMesh;
                 //GetComponent<MeshFilter>().sharedMesh = cylMesh;
 
-                // Set scale here
-                SetScale(activeTarget, ind);
+                NeuronCell.NodeData clampCellNodeData = new NeuronCell(simulation.getGrid1D()).nodeData[clampIndex];
+                SetScale(activeTarget, clampCellNodeData);
+                SetRotation(activeTarget, clampCellNodeData);
 
-                simulation.OnVariableChange += VariableChangeHandler;
+                simulation.OnVisualInflationChange += VisualInflationChangeHandler;
             }
 
             return activeTarget;
@@ -199,31 +201,44 @@ namespace C2M2.NeuronalDynamics.Interaction
             holdCount = 0;
         }
 
-        private void SetScale(NeuronSimulation1D simulation, int nearestPoint)
+        private void SetScale(NeuronSimulation1D simulation, NeuronCell.NodeData cellNodeData)
         {
-            //Gets the neighbors of the vertex
-            //List<UGX.Vertex> neighbors = simulation.getGrid1D().Vertices[nearestPoint].Neighbors;
-
-            //Gets the visual inflation
             currentVisualizationScale = (float) simulation.VisualInflation;
 
-            float scalarSize = 20f; //Needs to be tested to find right number
-                                   //Could also adjusted so that it can be edited in Unity Editor
+            float scalarRatio = 25f;
+            
+            double dendriteWidth = cellNodeData.nodeRadius;
 
-            NeuronCell testCell = new NeuronCell(simulation.getGrid1D());
-            double dendriteWidth = testCell.nodeData[nearestPoint].nodeRadius;
-            //can also get neighbors for nodeData
-            Debug.Log("Nearest Point Radius: " + dendriteWidth);
-
-            float scalingVal = (float)(scalarSize * dendriteWidth * currentVisualizationScale);
-            transform.parent.localScale = new Vector3(scalingVal, scalingVal, scalingVal);
+            float scalingValue = (float)(scalarRatio * dendriteWidth * currentVisualizationScale);
+            transform.parent.localScale = new Vector3(scalingValue, scalingValue, transform.parent.localScale.z);
         }
 
         public void UpdateScale(float newScale)
         {
             float modifiedScale = newScale/currentVisualizationScale;
-            transform.parent.localScale *= modifiedScale;
+            Vector3 tempVector = transform.parent.localScale;
+            tempVector.x *= modifiedScale;
+            tempVector.y *= modifiedScale;
+            transform.parent.localScale = tempVector;
             currentVisualizationScale = newScale;
+        }
+
+        public void SetRotation(NeuronSimulation1D simulation, NeuronCell.NodeData cellNodeData)
+        {
+            List<int> neighbors = cellNodeData.neighborIDs;
+            List<Vector3> neighborVectors = new List<Vector3>();
+            foreach (int neighbor in neighbors)
+            {
+                neighborVectors.Add(simulation.Verts1D[neighbor]);
+            }
+            if (neighborVectors.Count == 1)
+            {
+                transform.parent.rotation = Quaternion.LookRotation(neighborVectors[0] - transform.parent.position);
+            }
+            else if (neighborVectors.Count > 1)
+            {
+                transform.parent.rotation = Quaternion.LookRotation(neighborVectors[0] - neighborVectors[1]);
+            }
         }
 
         /*

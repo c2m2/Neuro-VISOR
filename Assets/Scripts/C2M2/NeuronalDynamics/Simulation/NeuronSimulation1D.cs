@@ -56,12 +56,12 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 visualInflation = value;
                 if (ColliderInflation < visualInflation) ColliderInflation = visualInflation;
                 VisualMesh = CheckMeshCache(visualInflation);
-                OnVariableChange?.Invoke(visualInflation);
+                OnVisualInflationChange?.Invoke(visualInflation);
             }
         }
 
-        public delegate void OnVariableChangeDelegate(double newVal);
-        public event OnVariableChangeDelegate OnVariableChange;
+        public delegate void OnVisualInflationChangeDelegate(double newInflation);
+        public event OnVisualInflationChangeDelegate OnVisualInflationChange;
 
         private double colliderInflation = 1;
         public double ColliderInflation
