@@ -40,5 +40,23 @@ namespace C2M2.NeuronalDynamics.Interaction
             }
             allActive = !allActive;
         }
+
+        public int holdCount = 50;
+        public int curCount = 0;
+        public void MonitorDestroy(RaycastHit hit)
+        {
+            curCount++;
+            if(curCount == holdCount)
+            {
+                foreach(NeuronClamp clamp in clamps)
+                {
+                    Destroy(clamp.transform.parent.gameObject);
+                }
+            }
+        }
+        public void EndDestroyMonitor(RaycastHit hit)
+        {
+            curCount = 0;
+        }
     }
 }

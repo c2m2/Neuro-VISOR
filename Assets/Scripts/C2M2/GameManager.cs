@@ -19,6 +19,7 @@ namespace C2M2
         public string assetsPath { get; private set; } = null;
 
         public ClampSimpleInstantiator clampInstantiator = null;
+        public GameObject[] clampControllers = new GameObject[0];
 
         [Header("Materials")]
         public Material defaultMaterial;

@@ -640,15 +640,15 @@ GameObject:
   - component: {fileID: 320645342}
   - component: {fileID: 320645341}
   - component: {fileID: 320645340}
+  - component: {fileID: 320645343}
   - component: {fileID: 320645338}
-  - component: {fileID: 320645339}
   m_Layer: 8
-  m_Name: ClampInstantiator
+  m_Name: ClampController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &320645337
 Transform:
   m_ObjectHideFlags: 0
@@ -693,29 +693,36 @@ MonoBehaviour:
       Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
   onHoldPress:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 3671467347388522959}
+        m_MethodName: MonitorDestroy
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: C2M2.Interaction.RaycastPressEvents+RaycastHitEvent, Assembly-CSharp,
       Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
   onEndPress:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 3671467347388522959}
+        m_MethodName: EndDestroyMonitor
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: C2M2.Interaction.RaycastPressEvents+RaycastHitEvent, Assembly-CSharp,
       Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
---- !u!114 &320645339
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 320645336}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bbc8be6eb56076a499c6617efcbc6be4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  parent: {fileID: 1246904545894575466}
-  monosToDisable: []
-  colsToDisable: []
 --- !u!65 &320645340
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -774,6 +781,20 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 320645336}
   m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &320645343
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 320645336}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6dee7b5c4ddc78f44b1b1919d3ea115d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rightTrigger: {fileID: 320645338}
+  leftTrigger: {fileID: 320645338}
 --- !u!1 &322851902
 GameObject:
   m_ObjectHideFlags: 0
@@ -2463,15 +2484,15 @@ GameObject:
   - component: {fileID: 835806277}
   - component: {fileID: 835806276}
   - component: {fileID: 835806275}
-  - component: {fileID: 835806278}
+  - component: {fileID: 835806279}
   - component: {fileID: 835806274}
   m_Layer: 8
-  m_Name: ClampInstantiator
+  m_Name: ClampController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &835806273
 Transform:
   m_ObjectHideFlags: 0
@@ -2516,12 +2537,34 @@ MonoBehaviour:
       Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
   onHoldPress:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 3671467347388522959}
+        m_MethodName: MonitorDestroy
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: C2M2.Interaction.RaycastPressEvents+RaycastHitEvent, Assembly-CSharp,
       Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
   onEndPress:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 3671467347388522959}
+        m_MethodName: EndDestroyMonitor
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: C2M2.Interaction.RaycastPressEvents+RaycastHitEvent, Assembly-CSharp,
       Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
 --- !u!65 &835806275
@@ -2582,7 +2625,7 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 835806272}
   m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &835806278
+--- !u!114 &835806279
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2591,13 +2634,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 835806272}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bbc8be6eb56076a499c6617efcbc6be4, type: 3}
+  m_Script: {fileID: 11500000, guid: 6dee7b5c4ddc78f44b1b1919d3ea115d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  parent: {fileID: 1246904545894575467}
-  monosToDisable: []
-  colsToDisable:
-  - {fileID: 835806275}
+  rightTrigger: {fileID: 835806274}
+  leftTrigger: {fileID: 835806274}
 --- !u!1 &836224700
 GameObject:
   m_ObjectHideFlags: 0
@@ -3956,6 +3997,8 @@ MonoBehaviour:
     type: 3}
   allActive: 0
   clamps: []
+  holdCount: 50
+  curCount: 0
 --- !u!1 &1830012931
 GameObject:
   m_ObjectHideFlags: 0
@@ -4362,6 +4405,27 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1950825764}
   m_CullTransparentMesh: 0
+--- !u!1 &2012984921 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1246904545416573985, guid: 3cd62f4122818be4585249f5083a977d,
+    type: 3}
+  m_PrefabInstance: {fileID: 1246904545894575464}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2012984923
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2012984921}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbc8be6eb56076a499c6617efcbc6be4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  parent: {fileID: 1246904545894575467}
+  children:
+  - {fileID: 835806272}
 --- !u!1001 &2058848668
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4377,7 +4441,7 @@ PrefabInstance:
     - target: {fileID: 9043822889724945539, guid: 170c7fd960f71ba4f94f7a2b0fb17726,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9043822889724945539, guid: 170c7fd960f71ba4f94f7a2b0fb17726,
         type: 3}
@@ -4509,6 +4573,8 @@ MonoBehaviour:
     type: 3}
   allActive: 0
   clamps: []
+  holdCount: 50
+  curCount: 0
 --- !u!135 &2058848673
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -4522,6 +4588,27 @@ SphereCollider:
   serializedVersion: 2
   m_Radius: 0.1
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &2071456537 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1246904545522868941, guid: 3cd62f4122818be4585249f5083a977d,
+    type: 3}
+  m_PrefabInstance: {fileID: 1246904545894575464}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2071456539
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2071456537}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbc8be6eb56076a499c6617efcbc6be4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  parent: {fileID: 1246904545894575466}
+  children:
+  - {fileID: 320645336}
 --- !u!1 &2128362492
 GameObject:
   m_ObjectHideFlags: 0
@@ -4964,6 +5051,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3671467348768610598, guid: f49e57d0c1b71c4418326894ace9a9b5,
         type: 3}
+      propertyPath: clampControllers.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3671467348768610598, guid: f49e57d0c1b71c4418326894ace9a9b5,
+        type: 3}
       propertyPath: rightRaycaster
       value: 
       objectReference: {fileID: 0}
@@ -5067,6 +5159,16 @@ PrefabInstance:
       propertyPath: objScaleMin.z
       value: 0.2
       objectReference: {fileID: 0}
+    - target: {fileID: 3671467348768610598, guid: f49e57d0c1b71c4418326894ace9a9b5,
+        type: 3}
+      propertyPath: clampControllers.Array.data[0]
+      value: 
+      objectReference: {fileID: 835806272}
+    - target: {fileID: 3671467348768610598, guid: f49e57d0c1b71c4418326894ace9a9b5,
+        type: 3}
+      propertyPath: clampControllers.Array.data[1]
+      value: 
+      objectReference: {fileID: 320645336}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f49e57d0c1b71c4418326894ace9a9b5, type: 3}
 --- !u!1 &3671467347388522958 stripped
@@ -5091,6 +5193,8 @@ MonoBehaviour:
     type: 3}
   allActive: 0
   clamps: []
+  holdCount: 50
+  curCount: 0
 --- !u!114 &3671467347388522960
 MonoBehaviour:
   m_ObjectHideFlags: 0

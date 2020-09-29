@@ -246,6 +246,11 @@ namespace C2M2.NeuronalDynamics.Simulation {
                     : GetComponentInChildren<RaycastPressEvents>();
                 raycastManager.leftTrigger = newEvents;
                 raycastManager.rightTrigger = newEvents;
+                
+            }
+            foreach (GameObject clamp in GameManager.instance.clampControllers)
+            {
+                clamp.SetActive(clampMode);
             }
 
             clampModePrev = clampMode;

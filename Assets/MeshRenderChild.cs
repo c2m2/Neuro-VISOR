@@ -16,31 +16,34 @@ namespace C2M2.Utils
     public class MeshRenderChild : MonoBehaviour
     {
         public MeshRenderer parent = null;
-        public MonoBehaviour[] monosToDisable = null;
-        public Collider[] colsToDisable = null;
+        public GameObject[] children = new GameObject[0];
 
         private void Awake()
         {
             if(parent == null)
             {
-                Debug.LogError("No MeshRenderer given to MeshRenderChild");
-            }
-            if(monosToDisable.Length == 0)
-            {
-                Debug.LogWarning("No components given to MeshRenderChild to disable/enable");
+                parent = GetComponent<MeshRenderer>();
+                if(parent == null)
+                    Debug.LogError("No MeshRenderer given to MeshRenderChild");
             }
         }
 
         // Update is called once per frame
         void Update()
         {
-            if (parent.enabled) Toggle(false);
-            else Toggle(true);
+            if (parent.enabled) Toggle(true);
+            else Toggle(false);
         }
 
         private void Toggle(bool toggleTo)
         {
-            foreach (MonoBehaviour comp in monosToDisable) comp.enabled = toggleTo;
+            if (children.Length > 0)
+            {
+                foreach (GameObject child in children) child.SetActive(toggleTo);
+            }else if (Application.isPlaying)
+            {
+                Destroy(this);
+            }
 
         }
     }
