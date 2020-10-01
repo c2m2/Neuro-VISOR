@@ -205,21 +205,20 @@ namespace C2M2.NeuronalDynamics.Interaction
         {
             currentVisualizationScale = (float) simulation.VisualInflation;
 
-            float scalarRatio = 25f;
-            
-            double dendriteWidth = cellNodeData.nodeRadius;
+            float radiuScalarRatio = 1.3f;
+            float heightScalarRatio = .25f;
 
-            float scalingValue = (float)(scalarRatio * dendriteWidth * currentVisualizationScale);
-            transform.parent.localScale = new Vector3(scalingValue, scalingValue, transform.parent.localScale.z);
+            double dendriteDiameter = cellNodeData.nodeRadius * 2;
+
+            float radiusScalingValue = (float)(radiuScalarRatio * dendriteDiameter * currentVisualizationScale);
+            float heightScalingValue = (float)(heightScalarRatio * dendriteDiameter * currentVisualizationScale);
+            transform.parent.localScale = new Vector3(radiusScalingValue, radiusScalingValue, heightScalingValue);
         }
 
         public void UpdateScale(float newScale)
         {
             float modifiedScale = newScale/currentVisualizationScale;
-            Vector3 tempVector = transform.parent.localScale;
-            tempVector.x *= modifiedScale;
-            tempVector.y *= modifiedScale;
-            transform.parent.localScale = tempVector;
+            transform.parent.localScale *= modifiedScale;
             currentVisualizationScale = newScale;
         }
 
