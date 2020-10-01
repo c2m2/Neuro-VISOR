@@ -19,7 +19,7 @@ namespace C2M2.NeuronalDynamics.Interaction
 
             var clamp = Instantiate(clampPrefab, sim.transform);
             clamp.transform.position = hit.point;
-            clamps.Add(clampPrefab.GetComponent<NeuronClamp>());
+            clamps.Add(clamp.GetComponent<NeuronClamp>());
         }
 
         public void ToggleClamps(RaycastHit hit)
