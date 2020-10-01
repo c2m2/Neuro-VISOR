@@ -24,21 +24,24 @@ namespace C2M2.NeuronalDynamics.Interaction
 
         public void ToggleClamps(RaycastHit hit)
         {
-            if (allActive)
+            if (clamps.Count > 0)
             {
-                foreach(NeuronClamp clamp in clamps)
+                if (allActive)
                 {
-                    clamp.DeactivateClamp();
+                    foreach (NeuronClamp clamp in clamps)
+                    {
+                        clamp.DeactivateClamp();
+                    }
                 }
-            }
-            else
-            {
-                foreach (NeuronClamp clamp in clamps)
+                else
                 {
-                    clamp.ActivateClamp();
+                    foreach (NeuronClamp clamp in clamps)
+                    {
+                        clamp.ActivateClamp();
+                    }
                 }
+                allActive = !allActive;
             }
-            allActive = !allActive;
         }
 
         public int holdCount = 50;
