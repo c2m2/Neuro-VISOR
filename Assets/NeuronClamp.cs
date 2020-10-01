@@ -132,6 +132,7 @@ namespace C2M2.NeuronalDynamics.Interaction
 
                 // Change object layer to Raycast so the clamp does not continue to interact physically with the simulation
                 gameObject.layer = LayerMask.GetMask(new string[] { "Raycast" });
+                GetComponent<Collider>().isTrigger = false;
             }
 
             return activeTarget;

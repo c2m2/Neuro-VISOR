@@ -26,6 +26,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         {
             if (clamps.Count > 0)
             {
+                Debug.Log("Toggling clamps...");
                 if (allActive)
                 {
                     foreach (NeuronClamp clamp in clamps)
@@ -54,6 +55,7 @@ namespace C2M2.NeuronalDynamics.Interaction
                 foreach(NeuronClamp clamp in clamps)
                 {
                     Destroy(clamp.transform.parent.gameObject);
+                    clamps.Remove(clamp);
                 }
             }
         }
