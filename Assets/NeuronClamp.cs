@@ -129,6 +129,9 @@ namespace C2M2.NeuronalDynamics.Interaction
                 SetRotation(activeTarget, clampCellNodeData);
 
                 simulation.OnVisualInflationChange += VisualInflationChangeHandler;
+
+                // Change object layer to Raycast so the clamp does not continue to interact physically with the simulation
+                gameObject.layer = LayerMask.GetMask(new string[] { "Raycast" });
             }
 
             return activeTarget;
