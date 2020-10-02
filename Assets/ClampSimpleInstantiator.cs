@@ -19,7 +19,7 @@ namespace C2M2.NeuronalDynamics.Interaction
 
             var clamp = Instantiate(clampPrefab, sim.transform);
             clamp.transform.position = hit.point;
-            clamps.Add(clamp.GetComponent<NeuronClamp>());
+            clamps.Add(clamp.GetComponentInChildren<NeuronClamp>());
         }
 
         public void ToggleClamps(RaycastHit hit)
@@ -55,8 +55,8 @@ namespace C2M2.NeuronalDynamics.Interaction
                 foreach(NeuronClamp clamp in clamps)
                 {
                     Destroy(clamp.transform.parent.gameObject);
-                    clamps.Remove(clamp);
                 }
+                clamps.Clear();
             }
         }
         public void EndDestroyMonitor(RaycastHit hit)

@@ -15,7 +15,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         [Range(0, 1)]
         public double clampPower = 0.1;
 
-        public bool use1DVerts = true;
+        public int nearestVert = -1;
 
         public Material activeMaterial = null;
         public Material inactiveMaterial = null;
@@ -29,7 +29,7 @@ namespace C2M2.NeuronalDynamics.Interaction
 
         private Vector3 simLastPos;
         private bool ClampMoved { get { return !lastLocalPos.Equals(transform.localPosition); } }
-
+        private bool use1DVerts = true;
         private OVRGrabbable grabbable;
         private MeshRenderer mr;
         private Bounds bounds;
@@ -54,7 +54,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         {
             if (activeTarget != null)
             {
-                transform.parent.localPosition = posFocus;
+            //    transform.parent.localPosition = posFocus;
             }
         }
 
@@ -131,7 +131,7 @@ namespace C2M2.NeuronalDynamics.Interaction
                 simulation.OnVisualInflationChange += VisualInflationChangeHandler;
 
                 // Change object layer to Raycast so the clamp does not continue to interact physically with the simulation
-                gameObject.layer = LayerMask.GetMask(new string[] { "Raycast" });
+                gameObject.layer = LayerMask.NameToLayer("Raycast");
                 Destroy(gameObject.GetComponent<Rigidbody>());
             }
 
@@ -172,12 +172,7 @@ namespace C2M2.NeuronalDynamics.Interaction
                 }
             }
 
-            Debug.Log("Nearest index: " + nearestVertInd
-                + "\nPosition: " + nearestPos.ToString("F5")
-                + "\nDistance: " + nearestDist
-                + "\nlocalPoint: " + localPoint.ToString("F5")
-                + "\nworldPoint: " + worldPoint.ToString("F5")
-                + "\nverts.Length: " + verts.Length);
+            nearestVert = nearestVertInd;
 
             posFocus = nearestPos;
 
@@ -244,20 +239,5 @@ namespace C2M2.NeuronalDynamics.Interaction
                 transform.parent.rotation = Quaternion.LookRotation(neighborVectors[0] - neighborVectors[1]);
             }
         }
-
-        /*
-        private void OnTriggerExit(Collider other)
-        {
-            if (activeTarget != null)
-            {
-                if (activeTarget == other.GetComponentInParent<NeuronSimulation1D>() || activeTarget == other.GetComponent<NeuronSimulation1D>())
-                {
-                    activeTarget = null;
-
-                    transform.parent.localScale = origScale;
-                    posFocus = Vector3.zero;
-                }
-            }
-        }*/
     }
 }
