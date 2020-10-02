@@ -205,7 +205,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             currentVisualizationScale = (float) simulation.VisualInflation;
 
             float scalarRatio = 25f;
-            
+
             double dendriteWidth = cellNodeData.nodeRadius;
 
             float scalingValue = (float)(scalarRatio * dendriteWidth * currentVisualizationScale);
