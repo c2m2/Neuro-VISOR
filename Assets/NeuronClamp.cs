@@ -189,6 +189,8 @@ namespace C2M2.NeuronalDynamics.Interaction
 
             posFocus = nearestPos;
 
+            transform.parent.localPosition = posFocus;
+
             transform.parent.name = "AttachedNeuronClamp" + nearestVertInd;
             return nearestVertInd;
         }
