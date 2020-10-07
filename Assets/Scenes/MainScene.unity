@@ -3836,7 +3836,6 @@ GameObject:
   - component: {fileID: 1818162882}
   - component: {fileID: 1818162881}
   - component: {fileID: 1818162880}
-  - component: {fileID: 1818162884}
   m_Layer: 0
   m_Name: HHSolver
   m_TagString: Untagged
@@ -3981,24 +3980,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1818162884
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1818162879}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 44d31676bc1b53d4eabd97dda90e808e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  clampPrefab: {fileID: 7051469727396962550, guid: 4565241fccd266147a078e252b27d27f,
-    type: 3}
-  allActive: 0
-  clamps: []
-  holdCount: 50
-  curCount: 0
 --- !u!1 &1830012931
 GameObject:
   m_ObjectHideFlags: 0

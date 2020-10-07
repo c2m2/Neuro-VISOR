@@ -119,13 +119,13 @@ namespace C2M2.NeuronalDynamics.Simulation {
 
         public bool clampMode = true;
         private bool clampModePrev = false;
+
         [Header ("1D Visualization")]
         public bool visualize1D = false;
         public Color32 color1D = Color.yellow;
         public float lineWidth1D = 0.005f;
 
         protected Grid grid1D;
-
         public Grid getGrid1D()
         {
             return grid1D;
@@ -219,7 +219,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
         protected override void ReadData () {
             /// This goes to StreamingAssets
             if (reader == null) reader = new vrnReader (vrnPath);
-            Debug.Log ("Path: " + vrnPath);
+
             Debug.Log (reader.List ());
 
             string meshName1D = reader.Retrieve1DMeshName ();

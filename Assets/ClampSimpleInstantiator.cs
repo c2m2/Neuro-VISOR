@@ -31,14 +31,28 @@ namespace C2M2.NeuronalDynamics.Interaction
                 {
                     foreach (NeuronClamp clamp in clamps)
                     {
-                        clamp.DeactivateClamp();
+                        if (clamp != null)
+                        {
+                            clamp.DeactivateClamp();
+                        }
+                        else
+                        {
+                            clamps.Remove(clamp);
+                        }
                     }
                 }
                 else
                 {
                     foreach (NeuronClamp clamp in clamps)
                     {
-                        clamp.ActivateClamp();
+                        if (clamp != null)
+                        {
+                            clamp.ActivateClamp();
+                        }
+                        else
+                        {
+                            clamps.Remove(clamp);
+                        }
                     }
                 }
                 allActive = !allActive;
@@ -54,7 +68,10 @@ namespace C2M2.NeuronalDynamics.Interaction
             {
                 foreach(NeuronClamp clamp in clamps)
                 {
-                    Destroy(clamp.transform.parent.gameObject);
+                    if (clamp != null)
+                    {
+                        Destroy(clamp.transform.parent.gameObject);
+                    }
                 }
                 clamps.Clear();
             }

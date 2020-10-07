@@ -52,15 +52,15 @@ namespace C2M2.Visualization
         public Color32[] gradientLUT { get; private set; } = null;
 
         /// <summary> Given the extrema method, color an entire array of scalers using the LUT </summary>
-        public Color32[] Evaluate(in float[] scalars)
+        public Color32[] Evaluate(in float[] times)
         {
-            if (scalars == null || scalars.Length == 0) return null;
+            if (times == null || times.Length == 0) return null;
 
             // If we haven't built the LUT yet, and we have a gradient, build the LUT
             if (gradientLUT == null && gradient != null) gradientLUT = BuildLUT(gradient, lutRes);
 
             // Store a local pointer so we can manipulate scalers
-            float[] scalarsScaled = scalars;
+            float[] scalarsScaled = times;
             // Rescale array based on extrema values
             scalarsScaled = RescaleArray(scalarsScaled, extremaMethod);
 

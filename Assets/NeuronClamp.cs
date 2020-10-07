@@ -5,6 +5,7 @@ using C2M2.NeuronalDynamics.Simulation;
 using C2M2.Utils.MeshUtils;
 using Grid = C2M2.NeuronalDynamics.UGX.Grid;
 using C2M2.NeuronalDynamics.UGX;
+using C2M2.Visualization;
 using System.Collections;
 
 namespace C2M2.NeuronalDynamics.Interaction
@@ -32,6 +33,8 @@ namespace C2M2.NeuronalDynamics.Interaction
         private bool use1DVerts = true;
         private OVRGrabbable grabbable;
         private MeshRenderer mr;
+        private MeshFilter mf;
+        private Color32[] cols;
         private Bounds bounds;
         private Vector3 LocalExtents { get { return transform.localScale / 2; } }
         private Vector3 posFocus = Vector3.zero;
@@ -46,6 +49,11 @@ namespace C2M2.NeuronalDynamics.Interaction
         private void Awake()
         {
             mr = GetComponent<MeshRenderer>();
+            mf = GetComponent<MeshFilter>();
+
+            cols = mf.mesh.colors32;
+            if(cols.Length == 0) { cols = new Color32[mf.mesh.vertexCount]; }
+
             origScale = transform.parent.localScale;
             grabbable = GetComponentInParent<OVRGrabbable>();
         }
@@ -54,7 +62,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         {
             if (activeTarget != null)
             {
-            //    transform.parent.localPosition = posFocus;
+                transform.parent.localPosition = posFocus;
             }
         }
 
@@ -93,6 +101,16 @@ namespace C2M2.NeuronalDynamics.Interaction
             else ActivateClamp();
         }
 
+        private IEnumerator FollowCol(LUTGradient colLut)
+        {
+            
+            while (true)
+            {
+                
+                yield return null;
+            }
+        }
+
         // Scan new targets for ND simulations
         private void OnTriggerEnter(Collider other)
         {
@@ -112,17 +130,12 @@ namespace C2M2.NeuronalDynamics.Interaction
             if (activeTarget == null)
             {
                 activeTarget = simulation;
-                //Vector3 pos = transform.parent.position;
-                transform.parent.parent = simulation.transform;
-                //transform.parent.position = pos;
 
+                transform.parent.parent = simulation.transform;
 
                 int clampIndex = GetNearestPoint(activeTarget, contactPoint);
                 Tuple<int, double> newVal = new Tuple<int, double>(clampIndex, clampPower);
                 newValues = new Tuple<int, double>[] { newVal };
-
-                //origMesh = GetComponent<MeshFilter>().sharedMesh;
-                //GetComponent<MeshFilter>().sharedMesh = cylMesh;
 
                 NeuronCell.NodeData clampCellNodeData = new NeuronCell(simulation.getGrid1D()).nodeData[clampIndex];
                 SetScale(activeTarget, clampCellNodeData);
