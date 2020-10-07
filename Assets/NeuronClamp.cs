@@ -103,10 +103,10 @@ namespace C2M2.NeuronalDynamics.Interaction
 
         private IEnumerator FollowCol(LUTGradient colLut)
         {
-            
+
             while (true)
             {
-                
+
                 yield return null;
             }
         }
@@ -220,24 +220,26 @@ namespace C2M2.NeuronalDynamics.Interaction
         {
             currentVisualizationScale = (float) simulation.VisualInflation;
 
-            float scalarRatio = 2.35f;
+            float radiuScalarRatio = 1.3f;
 
-            double dendriteWidth = 2 * cellNodeData.nodeRadius;
-            Debug.Log("denrtie width: " + dendriteWidth);
-            Debug.Log("currentVizScale: " + currentVisualizationScale);
+            double dendriteDiameter = cellNodeData.nodeRadius * 2;
 
-            float scalingValue = (float)(scalarRatio * dendriteWidth * currentVisualizationScale);
-            transform.parent.localScale = new Vector3(scalingValue, scalingValue, transform.parent.localScale.z);
+            float radiusScalingValue = (float)(radiuScalarRatio * dendriteDiameter * currentVisualizationScale);
+            transform.parent.localScale = new Vector3(radiusScalingValue, radiusScalingValue, 1f);
         }
 
         public void UpdateScale(float newScale)
         {
-            float modifiedScale = newScale/currentVisualizationScale;
-            Vector3 tempVector = transform.parent.localScale;
-            tempVector.x *= modifiedScale;
-            tempVector.y *= modifiedScale;
-            transform.parent.localScale = tempVector;
-            currentVisualizationScale = newScale;
+            if (this != null)
+            {
+                float modifiedScale = newScale/currentVisualizationScale;
+                Vector3 tempVector = transform.parent.localScale;
+                tempVector.x *= modifiedScale;
+                tempVector.y *= modifiedScale;
+                transform.parent.localScale = tempVector;
+                currentVisualizationScale = newScale;
+            }
+
         }
 
         public void SetRotation(NeuronSimulation1D simulation, NeuronCell.NodeData cellNodeData)
@@ -248,13 +250,13 @@ namespace C2M2.NeuronalDynamics.Interaction
             {
                 neighborVectors.Add(simulation.Verts1D[neighbor]);
             }
-            if (neighborVectors.Count == 1)
-            {
-                transform.parent.rotation = Quaternion.LookRotation(neighborVectors[0] - transform.parent.position);
-            }
-            else if (neighborVectors.Count > 1)
+            if (neighborVectors.Count == 2)
             {
                 transform.parent.rotation = Quaternion.LookRotation(neighborVectors[0] - neighborVectors[1]);
+            }
+            else if (neighborVectors.Count > 0)
+            {
+                transform.parent.rotation = Quaternion.LookRotation(simulation.Verts1D[cellNodeData.pid] - transform.parent.position);
             }
         }
     }
