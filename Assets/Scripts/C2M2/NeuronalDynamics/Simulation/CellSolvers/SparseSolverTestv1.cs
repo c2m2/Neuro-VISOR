@@ -132,8 +132,9 @@ namespace C2M2.NeuronalDynamics.Simulation
                 foreach (Tuple<int, double> newVal in newValues)
                 {
                     int j = newVal.Item1;
-                    double val = newVal.Item2 * 0.75;
+                    double val = newVal.Item2;
                     U[j] += val;
+                    GameManager.instance.DebugLogSafe("Added [" + val + "] to index " + j);
                 }
                 mutex.ReleaseMutex();
             }

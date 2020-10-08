@@ -15,7 +15,7 @@ namespace C2M2.NeuronalDynamics.Interaction
     {
         public bool clampLive { get; private set; } = false;
  
-        public double clampPower = 0.1;
+        public double clampPower = 55;
 
         public int nearestVert = -1;
 
@@ -35,10 +35,20 @@ namespace C2M2.NeuronalDynamics.Interaction
         private OVRGrabbable grabbable;
         private MeshRenderer mr;
         private MeshFilter mf;
-        private Color32[] cols;
         private Bounds bounds;
         private Vector3 LocalExtents { get { return transform.localScale / 2; } }
         private Vector3 posFocus = Vector3.zero;
+        private Color32 clampCol = Color.black;
+        public Color32 ClampCol
+        {
+            get { return clampCol; }
+            private set
+            {
+                clampCol = value;
+                mr.material.SetColor("_Color", clampCol);
+            }
+        }
+        private LUTGradient gradientLUT = null;
 
         float currentVisualizationScale = 1;
 
@@ -52,21 +62,8 @@ namespace C2M2.NeuronalDynamics.Interaction
             mr = GetComponent<MeshRenderer>();
             mf = GetComponent<MeshFilter>();
 
-            cols = mf.mesh.colors32;
-            if(cols.Length == 0) { cols = new Color32[mf.mesh.vertexCount]; }
-
             origScale = transform.parent.localScale;
             grabbable = GetComponentInParent<OVRGrabbable>();
-        }
-
-        private void Update()
-        {
-            /*
-            if (activeTarget != null)
-            {
-                transform.parent.localPosition = posFocus;
-            }
-            */
         }
 
         private void FixedUpdate()
@@ -76,6 +73,8 @@ namespace C2M2.NeuronalDynamics.Interaction
                 if (clampLive)
                 {
                     activeTarget.Set1DValues(newValues);
+                  
+                    ClampCol = gradientLUT.EvaluateUnscaled((float)clampPower);
                 }
             }
         }
@@ -104,15 +103,6 @@ namespace C2M2.NeuronalDynamics.Interaction
             else ActivateClamp();
         }
 
-        private IEnumerator FollowCol(LUTGradient colLut)
-        { 
-            while (true)
-            {
-
-                yield return null;
-            }
-        }
-
         // Scan new targets for ND simulations
         private void OnTriggerEnter(Collider other)
         {
@@ -136,6 +126,7 @@ namespace C2M2.NeuronalDynamics.Interaction
                 transform.parent.parent = simulation.transform;
 
                 int clampIndex = GetNearestPoint(activeTarget, contactPoint);
+
                 Tuple<int, double> newVal = new Tuple<int, double>(clampIndex, clampPower);
                 newValues = new Tuple<int, double>[] { newVal };
 
@@ -148,6 +139,8 @@ namespace C2M2.NeuronalDynamics.Interaction
                 // Change object layer to Raycast so the clamp does not continue to interact physically with the simulation
                 gameObject.layer = LayerMask.NameToLayer("Raycast");
                 Destroy(gameObject.GetComponent<Rigidbody>());
+
+                gradientLUT = activeTarget.GetComponent<LUTGradient>();
             }
 
             return activeTarget;
@@ -227,7 +220,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             double dendriteDiameter = cellNodeData.nodeRadius * 2;
 
             float radiusScalingValue = (float)(radiuScalarRatio * dendriteDiameter * currentVisualizationScale);
-            transform.parent.localScale = new Vector3(radiusScalingValue, radiusScalingValue, 1f);
+            transform.parent.localScale = new Vector3(radiusScalingValue, radiusScalingValue, 10f);
         }
 
         public void UpdateScale(float newScale)

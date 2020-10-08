@@ -3890,7 +3890,7 @@ MonoBehaviour:
   globalMax: 120
   globalMin: -10
   vrnPath: C:/Users/jacob/Desktop/C2M2/virtual-reality/Assets/StreamingAssets\test.vrn
-  clampMode: 0
+  clampMode: 1
   visualize1D: 0
   color1D:
     serializedVersion: 2
