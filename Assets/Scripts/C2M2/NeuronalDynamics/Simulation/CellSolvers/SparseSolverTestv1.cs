@@ -132,7 +132,7 @@ namespace C2M2.NeuronalDynamics.Simulation
                 foreach (Tuple<int, double> newVal in newValues)
                 {
                     int j = newVal.Item1;
-                    double val = newVal.Item2 * vstart * 0.75;
+                    double val = newVal.Item2 * 0.75;
                     U[j] += val;
                 }
                 mutex.ReleaseMutex();
@@ -141,6 +141,8 @@ namespace C2M2.NeuronalDynamics.Simulation
             {
                 GameManager.instance.DebugLogSafe(e);
             }
+
+
         }
 
         protected override void Solve()

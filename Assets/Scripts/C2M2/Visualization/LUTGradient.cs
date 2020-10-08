@@ -23,6 +23,8 @@ namespace C2M2.Visualization
         public ExtremaMethod extremaMethod = ExtremaMethod.RollingExtrema;
         public float globalMax = Mathf.NegativeInfinity;
         public float globalMin = Mathf.Infinity;
+        public float curMax { get; private set; } = -1;
+        public float curMix { get; private set; } = -1;
 
         /// <summary>
         /// Resolution of the lookup table. Increase for finer-grained color evaluations
@@ -77,6 +79,21 @@ namespace C2M2.Visualization
         /// </summary>
         public Color32 Evaluate(float time) => gradientLUT[Clamp((int)time, 0, (lutRes - 1))];
 
+        /// <summary>
+        /// Calculate color at a given UNSCALED time. Assumes min and max have already been calculated
+        /// </summary>
+        public Color32 EvaluateUnscaled(float unscaledTime)
+        {
+            float[] scalars = new float[] { oldMin, unscaledTime, oldMax };
+
+            // Rescale based on extrema
+            scalars.RescaleArray(0f, (lutRes - 1), oldMin, oldMax);
+
+            float scaledTime = scalars[1];
+
+            return gradientLUT[Clamp((int)scaledTime, 0, (lutRes - 1))];
+        }
+
         private Color32[] BuildLUT(Gradient gradient, int lutRes)
         {
             Color32[] gradientLUT = new Color32[lutRes];
@@ -91,10 +108,21 @@ namespace C2M2.Visualization
 
             return gradientLUT;
         }
+
+        public float oldMin { get; private set; } = 0;
+        public float oldMax { get; private set; } = 0;
         private float[] RescaleArray(float[] scalars, ExtremaMethod extremaMethod)
         {
-            float oldMin = 0;
-            float oldMax = 0;
+            oldMin = 0;
+            oldMax = 0;
+            GetMinMax(scalars, extremaMethod);
+            // Rescale based on extrema
+            scalars.RescaleArray(0f, (lutRes - 1), oldMin, oldMax);
+            return scalars;
+        }
+
+        public void GetMinMax(float[] scalars, ExtremaMethod extremaMethod)
+        {
             switch (extremaMethod)
             {
                 case (ExtremaMethod.LocalExtrema):
@@ -121,9 +149,6 @@ namespace C2M2.Visualization
                     oldMax = globalMax;
                     break;
             }
-            // Rescale based on extrema
-            scalars.RescaleArray(0f, (lutRes - 1), oldMin, oldMax);
-            return scalars;
         }
     }
     public class Gradient32LUTNotFoundException : Exception

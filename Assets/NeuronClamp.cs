@@ -7,13 +7,14 @@ using Grid = C2M2.NeuronalDynamics.UGX.Grid;
 using C2M2.NeuronalDynamics.UGX;
 using C2M2.Visualization;
 using System.Collections;
+using C2M2.Utils;
 
 namespace C2M2.NeuronalDynamics.Interaction
 {
     public class NeuronClamp : MonoBehaviour
     {
         public bool clampLive { get; private set; } = false;
-        [Range(0, 1)]
+ 
         public double clampPower = 0.1;
 
         public int nearestVert = -1;
@@ -60,10 +61,12 @@ namespace C2M2.NeuronalDynamics.Interaction
 
         private void Update()
         {
+            /*
             if (activeTarget != null)
             {
                 transform.parent.localPosition = posFocus;
             }
+            */
         }
 
         private void FixedUpdate()
@@ -102,8 +105,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         }
 
         private IEnumerator FollowCol(LUTGradient colLut)
-        {
-
+        { 
             while (true)
             {
 

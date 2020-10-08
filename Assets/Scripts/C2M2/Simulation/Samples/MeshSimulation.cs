@@ -18,7 +18,7 @@ namespace C2M2.Simulation.Samples
         public override double[] GetValues() => scalars;
         public override void SetValues(RaycastHit hit)
         {
-            Tuple<int, double>[] newValues = RaycastSimHeaterDiscrete.HitToTriangles(hit);
+            Tuple<int, double>[] newValues = ((RaycastSimHeaterDiscrete)Heater).HitToTriangles(hit);
 
             foreach (Tuple<int, double> newVal in newValues)
             {

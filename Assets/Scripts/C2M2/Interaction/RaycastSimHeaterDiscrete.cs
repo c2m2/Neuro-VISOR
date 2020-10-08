@@ -5,6 +5,7 @@ namespace C2M2.Interaction
 {
     public class RaycastSimHeaterDiscrete : RaycastHeater
     {
+        public double value = 55;
         private MeshFilter mf;
         protected override void OnAwake()
         {
@@ -23,14 +24,14 @@ namespace C2M2.Interaction
             int v3 = mf.mesh.triangles[triInd + 2];
 
             // Attach new values to new vertices
-            newValues[0] = new Tuple<int, double>(v1, 1);
-            newValues[1] = new Tuple<int, double>(v2, 1);
-            newValues[2] = new Tuple<int, double>(v3, 1);
+            newValues[0] = new Tuple<int, double>(v1, value);
+            newValues[1] = new Tuple<int, double>(v2, value);
+            newValues[2] = new Tuple<int, double>(v3, value);
 
             return newValues;
         }
 
-        public static Tuple<int, double>[] HitToTriangles(RaycastHit hit)
+        public Tuple<int, double>[] HitToTriangles(RaycastHit hit)
         {
             // We will have 3 new index/value pairings
             Tuple<int, double>[] newValues = new Tuple<int, double>[3];
@@ -44,9 +45,9 @@ namespace C2M2.Interaction
             int v3 = mf.mesh.triangles[triInd + 2];
 
             // Attach new values to new vertices
-            newValues[0] = new Tuple<int, double>(v1, 1);
-            newValues[1] = new Tuple<int, double>(v2, 1);
-            newValues[2] = new Tuple<int, double>(v3, 1);
+            newValues[0] = new Tuple<int, double>(v1, value);
+            newValues[1] = new Tuple<int, double>(v2, value);
+            newValues[2] = new Tuple<int, double>(v3, value);
 
             return newValues;
         }

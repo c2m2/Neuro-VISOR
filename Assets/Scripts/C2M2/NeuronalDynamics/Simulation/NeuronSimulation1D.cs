@@ -22,24 +22,6 @@ using C2M2.NeuronalDynamics.Interaction;
 namespace C2M2.NeuronalDynamics.Simulation {
 
     /// <summary>
-    /// Stores two 1D indices and a lambda value for a 3D vertex
-    /// </summary>
-    public struct Vert3D1DPair {
-        public int v1 { get; private set; }
-        public int v2 { get; private set; }
-        public double lambda { get; private set; }
-
-        public Vert3D1DPair (int v1, int v2, double lambda) {
-            this.v1 = v1;
-            this.v2 = v2;
-            this.lambda = lambda;
-        }
-        public override string ToString () {
-            return "v1: " + v1 + "\nv2: " + v2 + "\nlambda: " + lambda;
-        }
-    }
-
-    /// <summary>
     /// Provide an interface for 1D neuron-surface simulations to be visualized and interacted with
     /// </summary>
     /// <remarks>
@@ -164,7 +146,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
         /// Translate 3D vertex values to 1D values, and pass them downwards for interaction
         /// </summary>
         public sealed override void SetValues (RaycastHit hit) {
-            Tuple<int, double>[] newValues = RaycastSimHeaterDiscrete.HitToTriangles (hit);
+            Tuple<int, double>[] newValues = ((RaycastSimHeaterDiscrete)Heater).HitToTriangles (hit);
 
             SetValues (newValues);
         }
@@ -172,6 +154,9 @@ namespace C2M2.NeuronalDynamics.Simulation {
         /// <summary>
         /// Translate 3D vertex values to 1D values, and pass them downwards for interaction
         /// </summary>
+        /// <returns>
+        /// Either the same set of values given, or values translated
+        /// </returns>
         public void SetValues (Tuple<int, double>[] newValues) {
             // Each 3D index will have TWO associated 1D vertices
             Tuple<int, double>[] new1DValues = new Tuple<int, double>[2 * newValues.Length];
@@ -199,8 +184,8 @@ namespace C2M2.NeuronalDynamics.Simulation {
         /// <summary>
         /// Requires deived classes to know how to receive one value to add onto each 1D vert index
         /// </summary>
-        /// <param name="newValuess"> List of 1D vert indices and values to add onto that index. </param>
-        public abstract void Set1DValues (Tuple<int, double>[] newValuess);
+        /// <param name="newValues"> List of 1D vert indices and values to add onto that index. </param>
+        public abstract void Set1DValues (Tuple<int, double>[] newValues);
 
         /// <summary>
         /// Requires derived classes to know how to make available one value for each 1D vertex
@@ -394,6 +379,27 @@ namespace C2M2.NeuronalDynamics.Simulation {
             var meshColController = GetComponent<MeshColController>();
             if (meshColController == null) meshColController = gameObject.AddComponent<MeshColController>();
             meshColController.Mesh = mesh;
+        }
+    }
+
+    /// <summary>
+    /// Stores two 1D indices and a lambda value for a 3D vertex
+    /// </summary>
+    public struct Vert3D1DPair
+    {
+        public int v1 { get; private set; }
+        public int v2 { get; private set; }
+        public double lambda { get; private set; }
+
+        public Vert3D1DPair(int v1, int v2, double lambda)
+        {
+            this.v1 = v1;
+            this.v2 = v2;
+            this.lambda = lambda;
+        }
+        public override string ToString()
+        {
+            return "v1: " + v1 + "\nv2: " + v2 + "\nlambda: " + lambda;
         }
     }
 }
