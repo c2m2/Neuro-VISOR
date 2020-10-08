@@ -216,10 +216,12 @@ namespace C2M2.NeuronalDynamics.Interaction
 
             float radiuScalarRatio = 1.5f;
 
+            float heightScalarRatio = 7.5f;
+
             double dendriteDiameter = cellNodeData.nodeRadius * 2;
 
             float radiusScalingValue = (float)(radiuScalarRatio * dendriteDiameter * currentVisualizationScale);
-            transform.parent.localScale = new Vector3(radiusScalingValue, radiusScalingValue, 7.5f); //todo fix
+            transform.parent.localScale = new Vector3(radiusScalingValue, radiusScalingValue, heightScalarRatio);
         }
 
         public void UpdateScale(float newScale)
