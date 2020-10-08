@@ -210,17 +210,18 @@ namespace C2M2.NeuronalDynamics.Interaction
             holdCount = 0;
         }
 
-        // Todo: clamps don't scale with neighbor distance
         private void SetScale(NeuronSimulation1D simulation, NeuronCell.NodeData cellNodeData)
         {
             currentVisualizationScale = (float) simulation.VisualInflation;
 
-            float radiuScalarRatio = 1.3f;
+            float radiuScalarRatio = 1.5f;
+
+            float heightScalarRatio = 7.5f;
 
             double dendriteDiameter = cellNodeData.nodeRadius * 2;
 
             float radiusScalingValue = (float)(radiuScalarRatio * dendriteDiameter * currentVisualizationScale);
-            transform.parent.localScale = new Vector3(radiusScalingValue, radiusScalingValue, 10f);
+            transform.parent.localScale = new Vector3(radiusScalingValue, radiusScalingValue, heightScalarRatio);
         }
 
         public void UpdateScale(float newScale)
@@ -247,11 +248,11 @@ namespace C2M2.NeuronalDynamics.Interaction
             }
             if (neighborVectors.Count == 2)
             {
-                transform.parent.rotation = Quaternion.LookRotation(neighborVectors[0] - neighborVectors[1]);
+                transform.parent.localRotation = Quaternion.LookRotation(neighborVectors[0] - neighborVectors[1]);
             }
             else if (neighborVectors.Count > 0)
             {
-                transform.parent.rotation = Quaternion.LookRotation(simulation.Verts1D[cellNodeData.pid] - transform.parent.position);
+                transform.parent.localRotation = Quaternion.LookRotation(simulation.Verts1D[cellNodeData.pid] - transform.parent.localPosition);
             }
         }
     }
