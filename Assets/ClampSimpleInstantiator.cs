@@ -18,9 +18,9 @@ namespace C2M2.NeuronalDynamics.Interaction
                 if (clamps.Count > 0) {
                     foreach (NeuronClamp clamp in clamps)
                     {
-                        if(clamp != null && clamp.nearestVert != -1)
+                        if(clamp != null && clamp.focusVert != -1)
                         {
-                            inds.Add(clamp.nearestVert);
+                            inds.Add(clamp.focusVert);
                         }
                     }
                 }
@@ -57,7 +57,7 @@ namespace C2M2.NeuronalDynamics.Interaction
                 {
                     foreach (NeuronClamp clamp in clamps)
                     {
-                        if (clamp != null && clamp.nearestVert != -1) clamp.DeactivateClamp();
+                        if (clamp != null && clamp.focusVert != -1) clamp.DeactivateClamp();
                         else clampGarbage.Add(clamp);
                     }
                     s += "Deactivated ";
@@ -66,7 +66,7 @@ namespace C2M2.NeuronalDynamics.Interaction
                 {
                     foreach (NeuronClamp clamp in clamps)
                     {
-                        if (clamp != null && clamp.nearestVert != -1) clamp.ActivateClamp();
+                        if (clamp != null && clamp.focusVert != -1) clamp.ActivateClamp();
                         else clampGarbage.Add(clamp);
                     }
                     s += "Activated ";
@@ -86,7 +86,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             {
                 foreach(NeuronClamp clamp in clamps)
                 {
-                    if (clamp != null && clamp.nearestVert != -1)
+                    if (clamp != null && clamp.focusVert != -1)
                     {
                         Destroy(clamp.transform.parent.gameObject);
                     }
@@ -110,7 +110,7 @@ namespace C2M2.NeuronalDynamics.Interaction
                     
                     foreach (NeuronClamp clamp in clamps)
                     {
-                        if (takenVerts.Contains(clamp.nearestVert))
+                        if (takenVerts.Contains(clamp.focusVert))
                         {
                             clampGarbage.Add(clamp);
                             Destroy(clamp.transform.parent);

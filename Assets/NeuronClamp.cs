@@ -17,7 +17,7 @@ namespace C2M2.NeuronalDynamics.Interaction
  
         public double clampPower = 55;
 
-        public int nearestVert { get; private set; } = -1;
+        public int focusVert { get; private set; } = -1;
 
         public Material activeMaterial = null;
         public Material inactiveMaterial = null;
@@ -135,7 +135,7 @@ namespace C2M2.NeuronalDynamics.Interaction
                     Destroy(transform.parent.gameObject);
                 }
 
-                nearestVert = clampIndex;
+                focusVert = clampIndex;
 
                 SetScale(activeTarget, clampCellNodeData);
                 SetRotation(activeTarget, clampCellNodeData);
@@ -206,7 +206,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             // If there is a clamp on that 1D vertex, the spot is not open
             if (takenSpots.Contains(clampIndex))
             {
-                Debug.LogWarning("Clamp already exists on target vert [" + clampIndex + "]");
+                Debug.LogWarning("Clamp already exists on focus vert [" + clampIndex + "]");
                 spotOpen = false;
             }
             // If there is a clamp on any of its immediate neighbors, the spot is not open
@@ -214,7 +214,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             {
                 if (takenSpots.Contains(n))
                 {
-                    Debug.LogWarning("Clamp already exists on neighbor [" + n + "] of target vert [" + clampIndex + "]");
+                    Debug.LogWarning("Clamp already exists on neighbor [" + n + "] of focus vert [" + clampIndex + "].");
                     spotOpen = false;
                 }
             }
@@ -272,11 +272,14 @@ namespace C2M2.NeuronalDynamics.Interaction
         public void SetRotation(NeuronSimulation1D simulation, NeuronCell.NodeData cellNodeData)
         {
             List<int> neighbors = cellNodeData.neighborIDs;
+
+            // Get each neighbor's Vector3 value
             List<Vector3> neighborVectors = new List<Vector3>();
             foreach (int neighbor in neighbors)
             {
                 neighborVectors.Add(simulation.Verts1D[neighbor]);
             }
+
             if (neighborVectors.Count == 2)
             {
                 transform.parent.localRotation = Quaternion.LookRotation(neighborVectors[0] - neighborVectors[1]);
