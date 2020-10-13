@@ -17,7 +17,7 @@ namespace C2M2.NeuronalDynamics.Interaction
  
         public double clampPower = 55;
 
-        public int nearestVert = -1;
+        public int nearestVert { get; private set; } = -1;
 
         public Material activeMaterial = null;
         public Material inactiveMaterial = null;
@@ -112,7 +112,6 @@ namespace C2M2.NeuronalDynamics.Interaction
                 if (simulation != null)
                 {
                     ReportSimulation(simulation, transform.parent.position);
-                    //GetComponent<Rigidbody>().isKinematic = true;
                 }
             }
         }
@@ -127,10 +126,17 @@ namespace C2M2.NeuronalDynamics.Interaction
 
                 int clampIndex = GetNearestPoint(activeTarget, contactPoint);
 
-                Tuple<int, double> newVal = new Tuple<int, double>(clampIndex, clampPower);
-                newValues = new Tuple<int, double>[] { newVal };
+                // TODO: We shouldn't rebuild the whole cell every time here
+                NeuronCell.NodeData clampCellNodeData = new NeuronCell(simulation.Grid1D()).nodeData[clampIndex];
 
-                NeuronCell.NodeData clampCellNodeData = new NeuronCell(simulation.getGrid1D()).nodeData[clampIndex];
+                // Check for duplicates
+                if(!VertIsAvailable(clampIndex, clampCellNodeData))
+                {
+                    Destroy(transform.parent.gameObject);
+                }
+
+                nearestVert = clampIndex;
+
                 SetScale(activeTarget, clampCellNodeData);
                 SetRotation(activeTarget, clampCellNodeData);
 
@@ -141,6 +147,9 @@ namespace C2M2.NeuronalDynamics.Interaction
                 Destroy(gameObject.GetComponent<Rigidbody>());
 
                 gradientLUT = activeTarget.GetComponent<LUTGradient>();
+
+                Tuple<int, double> newVal = new Tuple<int, double>(clampIndex, clampPower);
+                newValues = new Tuple<int, double>[] { newVal };
             }
 
             return activeTarget;
@@ -180,14 +189,36 @@ namespace C2M2.NeuronalDynamics.Interaction
                 }
             }
 
-            nearestVert = nearestVertInd;
-
             posFocus = nearestPos;
 
             transform.parent.localPosition = posFocus;
 
             transform.parent.name = "AttachedNeuronClamp" + nearestVertInd;
             return nearestVertInd;
+        }
+
+        // Returns true if the that 1D index is available, otherwise returns false
+        private bool VertIsAvailable(int clampIndex, NeuronCell.NodeData cellNodeData)
+        {
+            List<int> takenSpots = GameManager.instance.clampInstantiator.ClampInds;
+            bool spotOpen = true;
+
+            // If there is a clamp on that 1D vertex, the spot is not open
+            if (takenSpots.Contains(clampIndex))
+            {
+                Debug.LogWarning("Clamp already exists on target vert [" + clampIndex + "]");
+                spotOpen = false;
+            }
+            // If there is a clamp on any of its immediate neighbors, the spot is not open
+            foreach(int n in cellNodeData.neighborIDs)
+            {
+                if (takenSpots.Contains(n))
+                {
+                    Debug.LogWarning("Clamp already exists on neighbor [" + n + "] of target vert [" + clampIndex + "]");
+                    spotOpen = false;
+                }
+            }
+            return spotOpen;
         }
 
         [Tooltip("Hold down a raycast for this many frames in order to destroy a clamp")]

@@ -134,7 +134,6 @@ namespace C2M2.NeuronalDynamics.Simulation
                     int j = newVal.Item1;
                     double val = newVal.Item2;
                     U[j] += val;
-                    GameManager.instance.DebugLogSafe("Added [" + val + "] to index " + j);
                 }
                 mutex.ReleaseMutex();
             }

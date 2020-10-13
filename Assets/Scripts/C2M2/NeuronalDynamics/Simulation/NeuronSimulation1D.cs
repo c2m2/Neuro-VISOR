@@ -108,7 +108,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
         public float lineWidth1D = 0.005f;
 
         protected Grid grid1D;
-        public Grid getGrid1D()
+        public Grid Grid1D()
         {
             return grid1D;
         }
