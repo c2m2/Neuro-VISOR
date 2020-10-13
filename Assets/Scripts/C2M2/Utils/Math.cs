@@ -411,6 +411,10 @@ namespace C2M2
             #endregion
             #endregion
 
+            public static Vector3 Dot(this Vector3 a, Vector3 b)
+            {
+                return new Vector3(a.x * b.x, a.y * b.y, a.z * b.z);
+            }
             /// <summary>
             /// Run each function in this class and compare the performance to System.Linq's matching methods
             /// </summary>
