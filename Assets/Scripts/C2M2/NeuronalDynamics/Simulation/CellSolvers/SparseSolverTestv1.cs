@@ -141,8 +141,6 @@ namespace C2M2.NeuronalDynamics.Simulation
             {
                 GameManager.instance.DebugLogSafe(e);
             }
-
-
         }
 
         protected override void Solve()
