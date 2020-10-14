@@ -280,14 +280,23 @@ namespace C2M2.NeuronalDynamics.Interaction
                 neighborVectors.Add(simulation.Verts1D[neighbor]);
             }
 
+            Vector3 rotationVector;
             if (neighborVectors.Count == 2)
             {
-                transform.parent.localRotation = Quaternion.LookRotation(neighborVectors[0] - neighborVectors[1]);
+                Vector3 clampToFirstNeighborVector = neighborVectors[0] - simulation.Verts1D[cellNodeData.id];
+                Vector3 clampToSecondNeighborVector = neighborVectors[1] - simulation.Verts1D[cellNodeData.id];
+
+                rotationVector = clampToFirstNeighborVector.normalized - clampToSecondNeighborVector.normalized;
             }
             else if (neighborVectors.Count > 0)
             {
-                transform.parent.localRotation = Quaternion.LookRotation(simulation.Verts1D[cellNodeData.pid] - transform.parent.localPosition);
+                rotationVector = simulation.Verts1D[cellNodeData.pid].normalized - transform.parent.localPosition.normalized;
             }
+            else
+            {
+                rotationVector = Vector3.up; //if a clamp has no neighbors it will use a default orientation of facing up
+            }
+            transform.parent.localRotation = Quaternion.LookRotation(rotationVector);
         }
     }
 }
