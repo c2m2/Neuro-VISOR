@@ -10,6 +10,7 @@ namespace C2M2.Interaction.UI
         public Image defaultImg = null;
         public Image highlightImg = null;
         public float highlightSeconds = 0.3f;
+        private bool highlighted = false;
 
         private void Awake()
         {
@@ -23,12 +24,21 @@ namespace C2M2.Interaction.UI
         {
             defaultImg.gameObject.SetActive(false);
             highlightImg.gameObject.SetActive(true);
+            highlighted = true;
         }
 
         public void Unhighlight()
         {
             highlightImg.gameObject.SetActive(false);
             defaultImg.gameObject.SetActive(true);
+            highlighted = false;
+        }
+
+        public void Toggle()
+        {
+            if (highlighted) Unhighlight();
+            else Highlight();
+
         }
 
         public void TimedHighlight()

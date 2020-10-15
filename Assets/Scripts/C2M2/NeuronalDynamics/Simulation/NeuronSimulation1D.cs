@@ -190,6 +190,8 @@ namespace C2M2.NeuronalDynamics.Simulation {
         /// <param name="newValues"> List of 1D vert indices and values to add onto that index. </param>
         public abstract void Set1DValues (Tuple<int, double>[] newValues);
 
+
+
         /// <summary>
         /// Requires derived classes to know how to make available one value for each 1D vertex
         /// </summary>
@@ -273,7 +275,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 /// Build the 1D/2D mapping
                 try {
                     mapping = (MappingInfo) MapUtils.BuildMap (grid1D, grid2D);
-                    UnityEngine.Debug.Log("Mapping build succesfully.");
                 } catch (MapNotBuildException ex) {
                     UnityEngine.Debug.LogError (ex);
                 }
@@ -306,10 +307,10 @@ namespace C2M2.NeuronalDynamics.Simulation {
             }
             void InitUI () {
                 // Instantiate neuron diameter control panel, announce active simulation to each button
-                GameObject diameterControlPanel = Resources.Load ("Prefabs/NeuronDiameterControls") as GameObject;
-                SwitchNeuronMesh[] buttons = diameterControlPanel.GetComponentsInChildren<SwitchNeuronMesh> ();
-                foreach (SwitchNeuronMesh button in buttons) {
-                    button.neuronSimulation1D = this;
+                GameObject diameterControlPanel = Resources.Load ("Prefabs/NDControls") as GameObject;
+                NDControlButton[] buttons = diameterControlPanel.GetComponentsInChildren<NDControlButton> ();
+                foreach (NDControlButton button in buttons) {
+                    button.ndSimulation = this;
                 }
 
                 GameObject.Instantiate (diameterControlPanel, GameManager.instance.whiteboard);
