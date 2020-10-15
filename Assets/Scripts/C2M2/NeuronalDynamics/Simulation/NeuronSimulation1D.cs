@@ -253,8 +253,8 @@ namespace C2M2.NeuronalDynamics.Simulation {
             Mesh cellMesh = new Mesh ();
             if (!dryRun) {
                 /// Retrieve mesh names from archive
-                string meshName2D = reader.Retrieve2DMeshName ();
-                string meshName1D = reader.Retrieve1DMeshName ();
+                string meshName2D = reader.Retrieve2DMeshName (visualInflation);
+                string meshName1D = reader.Retrieve1DMeshName (refinementLevel);
 
                 /// Empty 2D grid which stores geometry + mapping data
                 Grid grid2D = new Grid (new Mesh (), meshName2D);

@@ -4924,7 +4924,7 @@ MonoBehaviour:
   extremaMethod: 1
   globalMax: 120
   globalMin: -10
-  refinementLevel: 1
+  refinementLevel: 2
   vrnPath: C:/Users/jacob/Desktop/C2M2/virtual-reality/Assets/StreamingAssets\test.vrn
   clampMode: 1
   visualize1D: 0
