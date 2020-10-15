@@ -2449,9 +2449,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0994573edd12e27498ed53a92025b8a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  radius: 0.2
-  resolution: 8
-  length: 1
 --- !u!33 &691635484
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -4927,6 +4924,7 @@ MonoBehaviour:
   extremaMethod: 1
   globalMax: 120
   globalMin: -10
+  refinementLevel: 1
   vrnPath: C:/Users/jacob/Desktop/C2M2/virtual-reality/Assets/StreamingAssets\test.vrn
   clampMode: 1
   visualize1D: 0

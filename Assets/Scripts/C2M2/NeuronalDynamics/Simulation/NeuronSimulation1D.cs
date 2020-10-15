@@ -56,6 +56,9 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 ColliderMesh = CheckMeshCache(colliderInflation);
             }
         }
+
+        public int refinementLevel = 0;
+
         private Mesh visualMesh = null;
         public Mesh VisualMesh
         {
@@ -207,7 +210,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
 
             Debug.Log (reader.List ());
 
-            string meshName1D = reader.Retrieve1DMeshName ();
+            string meshName1D = reader.Retrieve1DMeshName (refinementLevel);
             /// Create empty grid with name of grid in archive
             grid1D = new Grid (new Mesh (), meshName1D);
             grid1D.Attach (new DiameterAttachment ());
