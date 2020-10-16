@@ -16,7 +16,7 @@ namespace C2M2.Interaction.UI
             if(buttons == null)
                 buttons = GetComponentsInChildren<ButtonHighlight>();
 
-            if(buttons == null)
+            if(buttons == null || buttons.Length == 0)
             {
                 Debug.LogError("No buttons given to button manager on " + name);
                 Destroy(this);

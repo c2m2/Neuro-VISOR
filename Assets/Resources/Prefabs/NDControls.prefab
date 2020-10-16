@@ -358,9 +358,7 @@ MonoBehaviour:
   buttons:
   - {fileID: 7110071881982469176}
   - {fileID: 7110071881436151908}
-  - {fileID: 0}
   - {fileID: 7110071883179799173}
-  - {fileID: 0}
 --- !u!1 &7110071881256472604
 GameObject:
   m_ObjectHideFlags: 0
@@ -1118,9 +1116,7 @@ MonoBehaviour:
   buttons:
   - {fileID: 7110071882984304761}
   - {fileID: 7110071883000282480}
-  - {fileID: 0}
   - {fileID: 7110071881294650773}
-  - {fileID: 0}
 --- !u!1 &7110071881425919903
 GameObject:
   m_ObjectHideFlags: 0
