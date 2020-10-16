@@ -128,7 +128,7 @@ namespace C2M2.NeuronalDynamics.Interaction
                 int clampIndex = GetNearestPoint(activeTarget, contactPoint);
 
                 // TODO: We shouldn't rebuild the whole cell every time here
-                NeuronCell.NodeData clampCellNodeData = new NeuronCell(simulation.Grid1D()).nodeData[clampIndex];
+                NeuronCell.NodeData clampCellNodeData = new NeuronCell(simulation.Grid1D).nodeData[clampIndex];
 
                 // Check for duplicates
                 if(!VertIsAvailable(clampIndex, clampCellNodeData))

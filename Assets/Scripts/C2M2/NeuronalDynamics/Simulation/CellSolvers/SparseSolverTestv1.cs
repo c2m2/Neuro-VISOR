@@ -280,7 +280,6 @@ namespace C2M2.NeuronalDynamics.Simulation
                             }
                         }
 
-
                         if (printVolt_time)
                         {
                             for (int j = 0; j < myCell.vertCount; j++)

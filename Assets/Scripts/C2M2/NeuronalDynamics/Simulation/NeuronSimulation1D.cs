@@ -110,12 +110,51 @@ namespace C2M2.NeuronalDynamics.Simulation {
         public Color32 color1D = Color.yellow;
         public float lineWidth1D = 0.005f;
 
-        protected Grid grid1D;
-        public Grid Grid1D()
+        private vrnReader vrnReader = null;
+        private vrnReader VrnReader
         {
-            return grid1D;
+            get
+            {
+                if(vrnReader == null)
+                    vrnReader = new vrnReader(vrnPath);
+                return vrnReader;
+            }
+        }
+        protected Grid grid1D = null;
+        public Grid Grid1D
+        {
+            get {
+                if (grid1D == null)
+                {
+                    string meshName1D = vrnReader.Retrieve1DMeshName(refinementLevel);
+                    /// Create empty grid with name of grid in archive
+                    grid1D = new Grid(new Mesh(), meshName1D);
+                    grid1D.Attach(new DiameterAttachment());
+
+                    vrnReader.ReadUGX(meshName1D, ref grid1D);
+                }
+                return grid1D;
+            }
         }
         public Vector3[] Verts1D { get { return grid1D.Mesh.vertices; } }
+        protected Grid grid2D = null;
+        public Grid Grid2D
+        {
+            get
+            {
+                if (grid2D == null)
+                {
+                    /// Retrieve mesh names from archive
+                    string meshName2D = vrnReader.Retrieve2DMeshName(visualInflation);
+
+                    /// Empty 2D grid which stores geometry + mapping data
+                    grid2D = new Grid(new Mesh(), meshName2D);
+                    grid2D.Attach(new MappingAttachment());
+                    vrnReader.ReadUGX(meshName2D, ref grid2D);
+                }
+                return grid2D;
+            }
+        }
 
         ///<summary> Lookup a 3D vert and get back two 1D indices and a lambda value for them </summary>
         //private Dictionary<int, Tuple<int, int, double>> map;
@@ -206,24 +245,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
         /// <param name="grid"></param>
         protected abstract void SetNeuronCell (Grid grid);
 
-        
-        vrnReader reader = null;
-        protected override void ReadData () {
-            /// This goes to StreamingAssets
-            if (reader == null) reader = new vrnReader (vrnPath);
-
-            Debug.Log (reader.List ());
-
-            string meshName1D = reader.Retrieve1DMeshName (refinementLevel);
-            /// Create empty grid with name of grid in archive
-            grid1D = new Grid (new Mesh (), meshName1D);
-            grid1D.Attach (new DiameterAttachment ());
-            
-            reader.ReadUGX (meshName1D, ref grid1D);
-
-            // Pass the cell to simulation code
-            SetNeuronCell (grid1D);
-        }
         protected override void OnStart()
         {
             base.OnStart();
@@ -247,6 +268,14 @@ namespace C2M2.NeuronalDynamics.Simulation {
 
             clampModePrev = clampMode;
         }
+
+        protected override void ReadData()
+        {
+            Debug.Log(VrnReader.List());
+
+            // Pass the cell to simulation code
+            SetNeuronCell(Grid1D);
+        }
         /// <summary>
         /// Read in the cell and initialize 3D/1D visualization/interaction infrastructure
         /// </summary>
@@ -254,32 +283,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
         protected override Mesh BuildVisualization () {
             Mesh cellMesh = new Mesh ();
             if (!dryRun) {
-                /// Retrieve mesh names from archive
-                string meshName2D = reader.Retrieve2DMeshName (visualInflation);
-                string meshName1D = reader.Retrieve1DMeshName (refinementLevel);
-
-                /// Empty 2D grid which stores geometry + mapping data
-                Grid grid2D = new Grid (new Mesh (), meshName2D);
-                grid2D.Attach (new MappingAttachment ());
-
-                /// Empty 1D grid which stores geometry + diameter data
-                Grid grid1D = new Grid (new Mesh (), meshName1D);
-                grid1D.Attach (new DiameterAttachment ());
-
-                /// Read the meshes with vrnReader directly from .vrn archive
-                try {
-                    reader.ReadUGX (meshName2D, ref grid2D);
-                    reader.ReadUGX (meshName1D, ref grid1D);
-                } catch (CouldNotReadMeshFromVRNArchive ex) {
-                    UnityEngine.Debug.LogError (ex);
-                }
-
-                /// Build the 1D/2D mapping
-                try {
-                    mapping = (MappingInfo) MapUtils.BuildMap (grid1D, grid2D);
-                } catch (MapNotBuildException ex) {
-                    UnityEngine.Debug.LogError (ex);
-                }
+                mapping = (MappingInfo) MapUtils.BuildMap (Grid1D, Grid2D);
 
                 // Convert dictionary to array for speed
                 map = new Vert3D1DPair[mapping.Data.Count];
@@ -290,13 +294,13 @@ namespace C2M2.NeuronalDynamics.Simulation {
 
                 if (visualize1D) Render1DCell ();
 
-                VisualMesh = grid2D.Mesh;
+                VisualMesh = Grid2D.Mesh;
                 VisualMesh.Rescale (transform, new Vector3 (4, 4, 4));
                 VisualMesh.RecalculateNormals ();
                 cellMesh = VisualMesh;
 
                 // Pass blownupMesh upwards to SurfaceSimulation
-                colMesh = grid2D.Mesh;
+                colMesh = Grid2D.Mesh;
 
                 InitUI ();
             }
@@ -341,9 +345,8 @@ namespace C2M2.NeuronalDynamics.Simulation {
             inflation = Math.Max (inflation, 1);
             // 0 <= refinement
 
-            if (reader == null) reader = new vrnReader (vrnPath);
-            mesh = MapUtils.BuildMap (reader.Retrieve2DMeshName (inflation),
-                reader.Retrieve1DMeshName (0),
+            mesh = MapUtils.BuildMap (VrnReader.Retrieve2DMeshName (inflation),
+                VrnReader.Retrieve1DMeshName (refinementLevel),
                 false).SurfaceGeometry.Mesh;
 
             mesh.RecalculateNormals ();
@@ -356,11 +359,10 @@ namespace C2M2.NeuronalDynamics.Simulation {
         {
             if (!meshCache.ContainsKey(inflation) || meshCache[inflation] == null)
             {
-                if (reader == null) reader = new vrnReader(vrnPath);
-                string meshName = reader.Retrieve2DMeshName(inflation);
-                Debug.Log("meshName: " + meshName + "\ninflation: " + inflation);
+                string meshName = VrnReader.Retrieve2DMeshName(inflation);
+
                 Grid grid = new Grid(new Mesh(), meshName);
-                reader.ReadUGX(meshName, ref grid);
+                VrnReader.ReadUGX(meshName, ref grid);
                 meshCache[inflation] = grid.Mesh;
             }
             return meshCache[inflation];
