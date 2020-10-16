@@ -125,6 +125,8 @@ namespace C2M2.NeuronalDynamics.Simulation {
 
         private double[] scalars3D = new double[0];
 
+        public List<NeuronClamp> clampValues = new List<NeuronClamp>();
+
         /// <summary>
         /// Translate 1D vertex values to 3D values and pass them upwards for visualization
         /// </summary>
@@ -322,7 +324,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
 
                 gameObject.AddComponent<ScaleLimiter> ();
             }
-
         }
 
         public void RescaleMesh (Vector3 newSize) {

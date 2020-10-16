@@ -6,6 +6,7 @@ using System.IO;
 using System;
 using System.Diagnostics;
 using UnityEngine;
+using C2M2.NeuronalDynamics.Interaction;
 
 // These are the MathNet Numerics Libraries needed
 // They need to dragged and dropped into the Unity assets plugins folder!
@@ -266,6 +267,19 @@ namespace C2M2.NeuronalDynamics.Simulation
                         //Always reset to IC conditions and boundary conditions (for now)
                         U.SetSubVector(0, myCell.vertCount, boundaryConditions(U, myCell.boundaryID));
                         if (SomaOn) { U.SetSubVector(0, myCell.vertCount, setSoma(U, myCell.somaID, vstart)); }
+
+                        // Apply clamp voltages
+                        if (clampValues.Count > 0)
+                        {
+                            foreach (NeuronClamp clamp in clampValues)
+                            {
+                                if (clamp.focusVert != -1 && clamp.clampLive)
+                                {
+                                    U[clamp.focusVert] = clamp.clampPower;
+                                }
+                            }
+                        }
+
 
                         if (printVolt_time)
                         {

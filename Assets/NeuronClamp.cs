@@ -66,13 +66,14 @@ namespace C2M2.NeuronalDynamics.Interaction
             grabbable = GetComponentInParent<OVRGrabbable>();
         }
 
+        
         private void FixedUpdate()
         {
             if(activeTarget != null)
             {
                 if (clampLive)
                 {
-                    activeTarget.Set1DValues(newValues);
+                    //activeTarget.Set1DValues(newValues);
                   
                     ClampCol = gradientLUT.EvaluateUnscaled((float)clampPower);
                 }
@@ -150,9 +151,16 @@ namespace C2M2.NeuronalDynamics.Interaction
 
                 Tuple<int, double> newVal = new Tuple<int, double>(clampIndex, clampPower);
                 newValues = new Tuple<int, double>[] { newVal };
+
+                activeTarget.clampValues.Add(this);
             }
 
             return activeTarget;
+        }
+
+        private void OnDestroy()
+        {
+            activeTarget.clampValues.Remove(this);
         }
 
         private int GetNearestPoint(NeuronSimulation1D simulation, Vector3 worldPoint)
