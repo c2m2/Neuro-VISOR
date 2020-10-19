@@ -6106,6 +6106,11 @@ PrefabInstance:
       propertyPath: clampInstantiator
       value: 
       objectReference: {fileID: 3671467347388522959}
+    - target: {fileID: 3671467348768610598, guid: f49e57d0c1b71c4418326894ace9a9b5,
+        type: 3}
+      propertyPath: vrDeviceManager
+      value: 
+      objectReference: {fileID: 475776574}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f49e57d0c1b71c4418326894ace9a9b5, type: 3}
 --- !u!1 &3671467347388522958 stripped

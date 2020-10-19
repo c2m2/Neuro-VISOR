@@ -128,7 +128,6 @@ namespace C2M2.NeuronalDynamics.Simulation
 
         protected override void Solve()
         {
-            InitializeNeuronCell();
 
             for (int kSim = 0; kSim <= numRuns; kSim++)
             {
@@ -148,17 +147,17 @@ namespace C2M2.NeuronalDynamics.Simulation
                 }
 
                 // setup up paths for writing output
-                string strPath = Environment.GetFolderPath(System.Environment.SpecialFolder.DesktopDirectory);
-                string subPath = strPath + @"\VR_Simulations";
-                bool exists = System.IO.Directory.Exists(subPath);
+                //string strPath = Environment.GetFolderPath(System.Environment.SpecialFolder.DesktopDirectory);
+                //string subPath = strPath + @"\VR_Simulations";
+                //bool exists = System.IO.Directory.Exists(subPath);
 
                 // check if directory exists
-                if (!exists) { System.IO.Directory.CreateDirectory(subPath); }
+                //if (!exists) { System.IO.Directory.CreateDirectory(subPath); }
 
                 // set the path for writing
-                strPath = subPath;
-                DirectoryInfo di = Directory.CreateDirectory(strPath + @"\SimulationRun" + "_" + kSim);
-                strPath = strPath + @"\SimulationRun" + "_" + kSim;
+                //strPath = subPath;
+                //DirectoryInfo di = Directory.CreateDirectory(strPath + @"\SimulationRun" + "_" + kSim);
+                //strPath = strPath + @"\SimulationRun" + "_" + kSim;
 
                 // Number of time steps
                 nT = (int)System.Math.Floor(endTime / k);
@@ -197,23 +196,23 @@ namespace C2M2.NeuronalDynamics.Simulation
                 //var order = ColumnOrdering.MinimumDegreeAtPlusA;
 
                 // Create Cholesky factorization setup
-                Timer timer = new Timer();
-                timer.StartTimer();
+               // Timer timer = new Timer();
+                //timer.StartTimer();
                 var chl = SparseCholesky.Create(l_csc, p);
                 //var chl = SparseCholesky.Create(l_csc, order);
-                timer.StopTimer("Matrix Setup");
-                timer.ExportCSV_path(strPath + @"\chlSetup_" + kSim);
+                //timer.StopTimer("Matrix Setup");
+                //timer.ExportCSV_path(strPath + @"\chlSetup_" + kSim);
 
                 // Write permutation, rhsM, lhsM, and choleskyR matrix to file
-                if (printMatrices) { printMatrix(Id_csc, r_csc, l_csc, chl.L, strPath, kSim); }
+                //if (printMatrices) { printMatrix(Id_csc, r_csc, l_csc, chl.L, strPath, kSim); }
                 // Print cell info to a text file
-                if (printCellInfo) { printCell(NeuronCell, h, k, nT, endTime, cfl, strPath, kSim); }
+                //if (printCellInfo) { printCell(NeuronCell, h, k, nT, endTime, cfl, strPath, kSim); }
 
                 // For printing voltage data and time steps
-                var sw = new StreamWriter(strPath + @"\outputVoltage_" + kSim + ".txt", true);
-                var tw = new StreamWriter(strPath + @"\timesteps_" + kSim + ".txt", true);
+                //var sw = new StreamWriter(strPath + @"\outputVoltage_" + kSim + ".txt", true);
+                //var tw = new StreamWriter(strPath + @"\timesteps_" + kSim + ".txt", true);
 
-                timer = new Timer(nT);
+                //timer = new Timer(nT);
                 try
                 {
                     for (i = 0; i < nT; i++)
@@ -223,9 +222,9 @@ namespace C2M2.NeuronalDynamics.Simulation
 
                         r_csc.Multiply(U.ToArray(), b);         // Peform b = rhs * U_curr 
                         // Diffusion solver
-                        timer.StartTimer();
+                  //      timer.StartTimer();
                         chl.Solve(b, b);
-                        timer.StopTimer(i.ToString());
+                    //    timer.StopTimer(i.ToString());
 
                         // Set U_next = b
                         U.SetSubVector(0, NeuronCell.vertCount, Vector.Build.DenseOfArray(b));
@@ -268,16 +267,16 @@ namespace C2M2.NeuronalDynamics.Simulation
                         {
                             for (int j = 0; j < NeuronCell.vertCount; j++)
                             {
-                                sw.Write(U[j] + " ");
+                      //          sw.Write(U[j] + " ");
                             }
-                            sw.Write("\n");
-                            tw.Write((k * (double)i) + " ");
-                            tw.Write("\n");
+                         //   sw.Write("\n");
+                          //  tw.Write((k * (double)i) + " ");
+                           // tw.Write("\n");
                         }
                         mutex.ReleaseMutex();
                     }
-                    sw.Close();
-                    tw.Close();
+                  //  sw.Close();
+                   // tw.Close();
                 }
                 catch (Exception e)
                 {
@@ -285,9 +284,9 @@ namespace C2M2.NeuronalDynamics.Simulation
                 }
                 finally
                 {
-                    timer.ExportCSV_path(strPath + @"\diffusionTimes_" + kSim);
-                    sw.Close();
-                    tw.Close();
+                  //  timer.ExportCSV_path(strPath + @"\diffusionTimes_" + kSim);
+                   // sw.Close();
+                //    tw.Close();
                 }
                 GameManager.instance.DebugLogSafe("Simulation Over.");
             }

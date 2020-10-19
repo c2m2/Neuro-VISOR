@@ -21,6 +21,13 @@ namespace C2M2.NeuronalDynamics.UGX {
     public readonly struct MappingInfo {
         public Grid ModelGeometry { get; }
         public Grid SurfaceGeometry { get; }
+        /// <summary>
+        /// Look up a 3D vertex, get back its two corresponding 1D vertices and a lambda value representing 
+        /// </summary>
+        /// <remarks>
+        /// Lambda is a value between 0 and 1. If a 3D vertex is given a value of 100, and it's lambda is 0.7,
+        /// then the 1D vert stored at Data[vert3D].Entry1 should get a value of 30, and Data[vert3D].Entry2 should get a value of 70.
+        /// </remarks>
         public Dictionary<int, Tuple<int, int, double>> Data { get; }
 
         /// <summary>

@@ -6,6 +6,7 @@ namespace C2M2
 {
     using Interaction;
     using Interaction.UI;
+    using Interaction.VR;
     using NeuronalDynamics.Interaction;
     /// <summary>
     /// Stores many global variables, handles pregame initializations
@@ -17,6 +18,15 @@ namespace C2M2
         
         public int mainThreadId { get; private set; } = -1;
         public string assetsPath { get; private set; } = null;
+
+        public VRDeviceManager vrDeviceManager = null;
+        public bool vrIsActive {
+            get
+            {
+                if (vrDeviceManager == null) Debug.LogError("No VR Device Manager Found!");
+                return vrDeviceManager.vrIsActive;
+            }
+        }
 
         public ClampSimpleInstantiator clampInstantiator = null;
         public GameObject[] clampControllers = new GameObject[0];

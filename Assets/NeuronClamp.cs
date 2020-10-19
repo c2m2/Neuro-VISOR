@@ -13,6 +13,8 @@ namespace C2M2.NeuronalDynamics.Interaction
 {
     public class NeuronClamp : MonoBehaviour
     {
+
+
         public bool clampLive { get; private set; } = false;
  
         public double clampPower = 55;
@@ -213,26 +215,6 @@ namespace C2M2.NeuronalDynamics.Interaction
             return spotOpen;
         }
 
-        [Tooltip("Hold down a raycast for this many frames in order to destroy a clamp")]
-        public int destroyCount = 50;
-        int holdCount = 0;
-        /// <summary>
-        /// If the user holds a raycast down for X seconds on a clamp, it should destroy the clamp
-        /// </summary>
-        public void ListenForDestroy()
-        {
-            holdCount++;
-            if(holdCount == destroyCount)
-            {
-                Debug.Log("Destroying " + transform.parent.name);
-                Destroy(transform.parent.gameObject);
-            }
-        }
-        public void ResetHoldCount()
-        {
-            holdCount = 0;
-        }
-
         private void SetScale(NeuronSimulation1D simulation, NeuronCell.NodeData cellNodeData)
         {
             currentVisualizationScale = (float) simulation.VisualInflation;
@@ -290,5 +272,83 @@ namespace C2M2.NeuronalDynamics.Interaction
             }
             transform.parent.localRotation = Quaternion.LookRotation(rotationVector);
         }
+
+        #region Input
+        [Tooltip("Hold down a raycast for this many frames in order to destroy a clamp")]
+        public int destroyCount = 50;
+        int holdCount = 0;
+        float thumbstickScaler = 5;
+        /// <summary>
+        /// Pressing this button toggles clamps on/off. Holding this button down for long enough destroys the clamp
+        /// </summary>
+        public OVRInput.Button toggleDestroyOVR = OVRInput.Button.Two;
+        public KeyCode toggleDestroyKey = KeyCode.Q;
+        private bool ToggleDestroy
+        {
+            get
+            {
+                if (GameManager.instance.vrIsActive)
+                {
+                    return OVRInput.Get(toggleDestroyOVR);
+                }
+                else
+                {
+                    bool pressed = Input.GetKey(toggleDestroyKey);
+                    Debug.Log("Key is pressed: " + pressed);
+                    return pressed;
+                }
+            }
+        }
+        public KeyCode powerModifierPlusKey = KeyCode.P;
+        public KeyCode powerModifierMinusKey = KeyCode.M;
+        private float PowerModifier
+        {
+            get
+            {
+                if (GameManager.instance.vrIsActive)
+                {
+                    return thumbstickScaler * OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick).y;
+                }
+                else
+                {
+                    if (Input.GetKey(powerModifierPlusKey)) return thumbstickScaler;
+                    if (Input.GetKey(powerModifierMinusKey)) return -thumbstickScaler;
+                    else return 0;
+                }
+            }
+        }
+        /// <summary>
+        /// If the user holds a raycast down for X seconds on a clamp, it should destroy the clamp
+        /// </summary>
+        public void MonitorInput()
+        {
+            if (ToggleDestroy)
+            {
+                // This is never called, even when button is pressed
+                holdCount++;
+            }
+            else
+            {
+                if (holdCount >= destroyCount)
+                {
+                    Debug.Log("Destroying " + transform.parent.name);
+                    Destroy(transform.parent.gameObject);
+                }
+                // if the toggle-destroy button was simply pressed, toggle the clamp
+                else if (holdCount > 0 && holdCount < destroyCount) ToggleClamp();
+
+                // If the button has been released, reset hold count
+                holdCount = 0;
+            }
+
+            float power = PowerModifier;
+
+            clampPower += power;
+        }
+        public void ResetHoldCount()
+        {
+            holdCount = 0;
+        }
+        #endregion
     }
 }
