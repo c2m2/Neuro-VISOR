@@ -1,10 +1,10 @@
 #region includes
 using System;
 using System.Collections.Generic;
-using System.Runtime.Serialization;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Runtime.Serialization;
 using C2M2.NeuronalDynamics.UGX;
 using UnityEditor;
 using UnityEngine;
@@ -18,18 +18,20 @@ namespace C2M2.NeuronalDynamics.Visualization {
         sealed class vrnReader {
             /// GEOM1D                                                                                                                                                                                                                                                            
             /// <summary>                                                                                                                                                                                                                                                         
-            /// Stores the 1D geometries by name and refinement                                                                                                                                                                                                                   
+            /// Stores the 1D geometries by name, refinement and a description
+            /// Inflations are attached to the 1D geometries as a list of Geom2ds
             /// </summary>                                                                                                                                                                                                                                                        
             [Serializable]
             private struct Geom1d {
                 public string name;
                 public string refinement;
                 public string description;
+                public Geom2d[] inflations;
             }
 
             /// GEOM2D                                                                                                                                                                                                                                                            
             /// <summary>                                                                                                                                                                                                                                                         
-            /// Stores the 2d geometries by name and inflation                                                                                                                                                                                                                    
+            /// Stores the 2d geometries by name, inflation (factor), and description
             /// </summary>                                                                                                                                                                                                                                                        
             [Serializable]
             private struct Geom2d {
@@ -40,14 +42,12 @@ namespace C2M2.NeuronalDynamics.Visualization {
 
             /// GEOMETRY                                                                                                                                                                                                                                                          
             /// <summary>                                                                                                                                                                                                                                                         
-            /// Stores 1D and 2D geometries                                                                                                                                                                                                                                       
+            /// Stores 1D and associated 2D geometries in the member geom1d
             /// </summary>                                                                                                                                                                                                                                                        
             [Serializable]
             private class Geometry {
                 /// All 1D geometries                                                                                                                                                                                                                                             
                 public Geom1d[] geom1d;
-                /// All 2D geometries                                                                                                                                                                                                                                             
-                public Geom2d[] geom2d;
             }
 
             private readonly string fileName;
@@ -67,7 +67,7 @@ namespace C2M2.NeuronalDynamics.Visualization {
 
                 // Helper function to do the actual loading
                 void DoLoad () {
-                    using (ZipArchive archive = ZipFile.OpenRead (this.fileName)) {
+                    using (ZipArchive archive = ZipFile.OpenRead ("/home/stephan/testNew.vrn")) {
                         var file = archive.GetEntry ("MetaInfo.json");
                         _ = file ??
                             throw new CouldNotReadMeshFromVRNArchive (nameof (file));
@@ -84,13 +84,8 @@ namespace C2M2.NeuronalDynamics.Visualization {
             public string List () {
                 Load ();
                 string s = $"Geometries contained in supplied .vrn archive ({this.fileName}): ";
-                /// 1D geometries
                 foreach (var geom in geometry.geom1d.Select ((x, i) => new { Value = x, Index = i })) {
                     s += $"{Environment.NewLine}#{geom.Index+1} 1D geometry: {geom.Value.name} with refinement {geom.Value.refinement} ({geom.Value.description}).";
-                }
-                /// 2D geometries
-                foreach (var geom in geometry.geom2d.Select ((x, i) => new { Value = x, Index = i })) {
-                    s += $"{Environment.NewLine}#{geom.Index+1} 2D geometry: {geom.Value.name} with inflation {geom.Value.inflation} ({geom.Value.description}).";
                 }
                 return s;
             }
@@ -115,7 +110,7 @@ namespace C2M2.NeuronalDynamics.Visualization {
 
             /// RETRIEVE_1D_MESH
             /// <summary>
-            /// Retrieve the name of the 1d mesh corresponding to the refinement number from the .vrn archive
+            /// Retrieve the name of the 1D mesh corresponding to the 0th refinement and no inflation variant
             /// </summary>
             /// <param name="refinement"> Refinement number (Default: 0 (coarse grid))</param>
             /// <returns> Filename of refined or unrefined 1D mesh in archive </returns>
@@ -127,14 +122,16 @@ namespace C2M2.NeuronalDynamics.Visualization {
 
             /// RETRIEVE_2D_MESH
             /// <summary>
-            /// Retrieve the name of the 2D mesh corresponding to the inflation factor from the .vrn archive
+            /// Retrieve the name of the 2D mesh corresponding to the inflation and refinement factor from the .vrn archive
             /// </summary>
             /// <param name="inflation"> Inflation factor (default: 1.0 (no inflation)) </param>
+            /// <param name="refinement"> Refinement level (default: 0 (no refinement)) </param>
             /// <returns> Filename of inflated 2D mesh in archive </returns>
-            public string Retrieve2DMeshName (double inflation = 1.0) {
+            public string Retrieve2DMeshName (double inflation = 1.0, int refinement = 0) {
                 Load ();
-                int index = geometry.geom2d.ToList ().FindIndex (geom => Double.Parse (geom.inflation) == inflation);
-                return geometry.geom2d[index != -1 ? index : 0].name;
+                int index = geometry.geom1d.ToList ().FindIndex (geom => Int16.Parse (geom.refinement) == refinement);
+                int index2 = geometry.geom1d[index].inflations.ToList ().FindIndex (geom => Double.Parse (geom.inflation) == inflation);
+                return geometry.geom1d[index].inflations[index2 != -1 ? index2 : 0].name;
             }
 
             /// VRNREADER
@@ -153,7 +150,7 @@ namespace C2M2.NeuronalDynamics.Visualization {
             /// 2.5 inflated 2d mesh is retrieved from the archive test.vrn
             static class Example {
                 static void Main (string[] args) {
-                    string fileName = "test.vrn";
+                    string fileName = "testNew.vrn";
                     try {
                         /// Instantiate the VRN reader with the desired file name
                         vrnReader reader = new vrnReader (fileName);
@@ -178,7 +175,7 @@ namespace C2M2.NeuronalDynamics.Visualization {
         /// </summary>
         public class vrnReaderBehaviour : MonoBehaviour {
             /// the test archive file test.vrn
-            public string fileName = "test.vrn";
+            public string fileName = "testNew.vrn";
 
             /// <summary>
             /// On start a test file (test.vrn) is read from the assets folder
@@ -196,6 +193,7 @@ namespace C2M2.NeuronalDynamics.Visualization {
                     vrnReader reader = new vrnReader (fullFileName);
                     /// List all 1D and 2D geometries contained in given .vrn archive
                     Debug.Log (reader.List ());
+
                     /// Get the name of the 1d mesh (0-th refinement aka coarse grid) in archive
                     UnityEngine.Debug.Log (reader.Retrieve1DMeshName ());
                     /// Get the name of the inflated 2d mesh by a factor of 2.5 in archive
@@ -244,12 +242,11 @@ namespace C2M2.NeuronalDynamics.Visualization {
         /// </summary>
         /// <see cref="Exception"> Exception base class </see>
         [Serializable]
-        public class CouldNotReadMeshFromVRNArchive : Exception
-        {
-            public CouldNotReadMeshFromVRNArchive() : base() { }
-            public CouldNotReadMeshFromVRNArchive(string message) : base(message) { }
-            public CouldNotReadMeshFromVRNArchive(string message, Exception inner) : base(message, inner) { }
-            protected CouldNotReadMeshFromVRNArchive(SerializationInfo info, StreamingContext ctxt) : base(info, ctxt) { }
+        public class CouldNotReadMeshFromVRNArchive : Exception {
+            public CouldNotReadMeshFromVRNArchive () : base () { }
+            public CouldNotReadMeshFromVRNArchive (string message) : base (message) { }
+            public CouldNotReadMeshFromVRNArchive (string message, Exception inner) : base (message, inner) { }
+            protected CouldNotReadMeshFromVRNArchive (SerializationInfo info, StreamingContext ctxt) : base (info, ctxt) { }
         }
     }
 }

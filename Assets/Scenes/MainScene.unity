@@ -2778,6 +2778,7 @@ GameObject:
   - component: {fileID: 735852102}
   - component: {fileID: 735852105}
   - component: {fileID: 735852106}
+  - component: {fileID: 735852107}
   m_Layer: 0
   m_Name: Debugging
   m_TagString: Untagged
@@ -2885,6 +2886,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 83aa7e3bcec33704894df6d7d06cc56c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &735852107
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 735852099}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58c4687d10d3cc440b3b6fe3219b675d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fileName: "testNew.vrn\x13"
 --- !u!1 &747183905
 GameObject:
   m_ObjectHideFlags: 0
@@ -4161,7 +4175,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1468803172
 Transform:
   m_ObjectHideFlags: 0
@@ -4877,7 +4891,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1818162880
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5613,6 +5627,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: OVRPlayerController
       objectReference: {fileID: 0}
+    - target: {fileID: 1246904545451624249, guid: 3cd62f4122818be4585249f5083a977d,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1246904544822792155, guid: 3cd62f4122818be4585249f5083a977d,
         type: 3}
       propertyPath: Mode
@@ -5925,6 +5944,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: GameManager
+      objectReference: {fileID: 0}
+    - target: {fileID: 3671467348768610599, guid: f49e57d0c1b71c4418326894ace9a9b5,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3671467348768610593, guid: f49e57d0c1b71c4418326894ace9a9b5,
         type: 3}
