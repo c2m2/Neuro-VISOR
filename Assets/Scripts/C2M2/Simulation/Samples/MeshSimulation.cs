@@ -39,10 +39,7 @@ namespace C2M2.Simulation.Samples
                 }
             }
         }
-        protected override void ReadData()
-        {
-            
-        }
+
         protected override Mesh BuildVisualization()
         {
             MeshFilter meshf = GetComponent<MeshFilter>() ?? throw new MeshFilterNotFoundException();

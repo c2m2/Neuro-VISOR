@@ -47,31 +47,6 @@ namespace C2M2.NeuronalDynamics.Simulation
         // Keep track of i locally so that we know which simulation frame to send to other scripts
         private int i = -1;
 
-        private NeuronCell myCell;
-
-        // NeuronCellSimulation handles reading the UGX file
-        protected override void SetNeuronCell(Grid grid)
-        {
-            myCell = new NeuronCell(grid);
-
-            //Initialize vector with all zeros
-            U = Vector.Build.Dense(myCell.vertCount);
-            M = Vector.Build.Dense(myCell.vertCount);
-            N = Vector.Build.Dense(myCell.vertCount);
-            H = Vector.Build.Dense(myCell.vertCount);
-
-            //Set all initial state probabilities
-            //M.Add(mi, M);
-            //N.Add(ni, N);
-            //H.Add(hi, H);
-            M[0] = mi;
-            N[0] = ni;
-            H[0] = hi;
-
-            //Set the initial conditions of the solution
-            U.SetSubVector(0, myCell.vertCount, initialConditions(U, myCell.boundaryID));
-        }
-
         // Secnd simulation 1D values 
         public override double[] Get1DValues()
         {
@@ -79,7 +54,7 @@ namespace C2M2.NeuronalDynamics.Simulation
             double[] curVals = null;
             if (i > -1)
             {
-                Vector curTimeSlice = U.SubVector(0, myCell.vertCount);
+                Vector curTimeSlice = U.SubVector(0, NeuronCell.vertCount);
                 curTimeSlice.Multiply(1, curTimeSlice);
 
                 curVals = curTimeSlice.ToArray();
@@ -107,6 +82,8 @@ namespace C2M2.NeuronalDynamics.Simulation
         {
             Timer timer = new Timer(nT + 1);
             timer.StartTimer();
+
+            InitializeNeuronCell();
             // Computer simulation stepping parameters
             double k = endTime / ((double)nT * 0.3); //Time step size min is 0.27
                                                      //double h = myCell.edgeLengths.Average();
@@ -125,14 +102,14 @@ namespace C2M2.NeuronalDynamics.Simulation
             //Matrix rhsM = Matrix.Build.Dense(myCell.vertCount, myCell.vertCount);
             //Matrix lhsM = Matrix.Build.Dense(myCell.vertCount, myCell.vertCount);
 
-            double[,] rhsMarray = new double[myCell.vertCount, myCell.vertCount];
-            double[,] lhsMarray = new double[myCell.vertCount, myCell.vertCount];
+            double[,] rhsMarray = new double[NeuronCell.vertCount, NeuronCell.vertCount];
+            double[,] lhsMarray = new double[NeuronCell.vertCount, NeuronCell.vertCount];
 
             // reaction vector
-            Vector R = Vector.Build.Dense(myCell.vertCount);
+            Vector R = Vector.Build.Dense(NeuronCell.vertCount);
 
             // temporary voltage vector
-            Vector tempV = Vector.Build.Dense(myCell.vertCount);
+            Vector tempV = Vector.Build.Dense(NeuronCell.vertCount);
 
             int nghbrCount;
             int nghbrInd;
@@ -144,14 +121,14 @@ namespace C2M2.NeuronalDynamics.Simulation
             //rhsMarray[0, 0] = 1; //Set Soma coefficient to 1
             //lhsMarray[0, 0] = 1;
 
-            rhsMarray[myCell.vertCount - 1, myCell.vertCount - 1] = 1;
-            lhsMarray[myCell.vertCount - 1, myCell.vertCount - 1] = 1;
+            rhsMarray[NeuronCell.vertCount - 1, NeuronCell.vertCount - 1] = 1;
+            lhsMarray[NeuronCell.vertCount - 1, NeuronCell.vertCount - 1] = 1;
 
             //for (int p = 1; p < myCell.vertCount - 1; p++)
-            for (int p = 0; p < myCell.vertCount - 1; p++)
+            for (int p = 0; p < NeuronCell.vertCount - 1; p++)
             {
-                nghbrCount = myCell.nodeData[p].neighborIDs.Count;
-                vRad = myCell.nodeData[p].nodeRadius;
+                nghbrCount = NeuronCell.nodeData[p].neighborIDs.Count;
+                vRad = NeuronCell.nodeData[p].nodeRadius;
                 if (nghbrCount == 1)
                 {
                     rhsMarray[p, p] = 1;
@@ -163,7 +140,7 @@ namespace C2M2.NeuronalDynamics.Simulation
                     lhsMarray[p, p] = 1 + ((double)nghbrCount) * vRad * cfl / (2 * h);
                     for (int q = 0; q < nghbrCount; q++)
                     {
-                        nghbrInd = myCell.nodeData[p].neighborIDs[q];
+                        nghbrInd = NeuronCell.nodeData[p].neighborIDs[q];
                         rhsMarray[p, nghbrInd] = vRad * cfl / (2 * h);
                         lhsMarray[p, nghbrInd] = -vRad * cfl / (2 * h);
                     }
@@ -196,10 +173,10 @@ namespace C2M2.NeuronalDynamics.Simulation
                     invlshM.Multiply(U, U);
 
                     // Save voltage from diffusion step for state probabilities
-                    tempV.SetSubVector(0, myCell.vertCount, U);
+                    tempV.SetSubVector(0, NeuronCell.vertCount, U);
 
                     // Reaction
-                    R.SetSubVector(0, myCell.vertCount, reactF(U, N, M, H, myCell.boundaryID));
+                    R.SetSubVector(0, NeuronCell.vertCount, reactF(U, N, M, H, NeuronCell.boundaryID));
                     R.Multiply(k / cap, R);
 
                     // This is the solution for the voltage after the reaction is included!
@@ -215,7 +192,7 @@ namespace C2M2.NeuronalDynamics.Simulation
                     //U.SetSubVector(0, myCell.vertCount, setBC(U, i, k, myCell.boundaryID));
 
                     //Always reset to IC conditions and boundary conditions (for now)
-                    U.SetSubVector(0, myCell.vertCount, boundaryConditions(U, myCell.boundaryID));
+                    U.SetSubVector(0, NeuronCell.vertCount, boundaryConditions(U, NeuronCell.boundaryID));
                     tCount++;
 
                     mutex.ReleaseMutex();
@@ -232,7 +209,25 @@ namespace C2M2.NeuronalDynamics.Simulation
         }
 
         #region Local Functions
+        private void InitializeNeuronCell()
+        {
+            //Initialize vector with all zeros
+            U = Vector.Build.Dense(NeuronCell.vertCount);
+            M = Vector.Build.Dense(NeuronCell.vertCount);
+            N = Vector.Build.Dense(NeuronCell.vertCount);
+            H = Vector.Build.Dense(NeuronCell.vertCount);
 
+            //Set all initial state probabilities
+            //M.Add(mi, M);
+            //N.Add(ni, N);
+            //H.Add(hi, H);
+            M[0] = mi;
+            N[0] = ni;
+            H[0] = hi;
+
+            //Set the initial conditions of the solution
+            U.SetSubVector(0, NeuronCell.vertCount, initialConditions(U, NeuronCell.boundaryID));
+        }
         //Function for initialize voltage on cell
         public static Vector initialConditions(Vector V, List<int> bcIndices)
         {

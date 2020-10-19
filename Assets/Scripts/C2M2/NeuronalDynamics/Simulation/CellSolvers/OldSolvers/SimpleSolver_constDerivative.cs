@@ -35,16 +35,8 @@ namespace C2M2.NeuronalDynamics.Simulation
         public const double vstart = 55;
 
         private Vector U;
-        // NeuronCellSimulation handles reading the UGX file
-        private NeuronCell myCell;
-        protected override void SetNeuronCell(Grid grid)
-        {
-            myCell = new NeuronCell(grid);
-            U = Vector.Build.Dense(myCell.vertCount);
 
-            U.SetSubVector(0, myCell.vertCount, ic(myCell.vertCount));
-            //U = Vector.Build.Dense(myCell.vertCount);
-        }
+
         // Keep track of i locally so that we know which simulation frame to send to other scripts
         private int i = -1;
 
@@ -54,7 +46,7 @@ namespace C2M2.NeuronalDynamics.Simulation
             Debug.Log("Here is state: " + U.ToString());
             //i = i + 1;
 
-            return (U != null) ? U.SubVector(0, myCell.vertCount).ToArray() : null;
+            return (U != null) ? U.SubVector(0, NeuronCell.vertCount).ToArray() : null;
         }
         // Receive new simulation 1D index/value pairings
         public override void Set1DValues(Tuple<int, double>[] newValues)
@@ -69,7 +61,8 @@ namespace C2M2.NeuronalDynamics.Simulation
 
         protected override void Solve()
         {
-            int numVert = myCell.vertCount;
+            InitNeuronCell();
+            int numVert = NeuronCell.vertCount;
 
             int nT = 9000;
             double endTime = 25;
@@ -91,6 +84,13 @@ namespace C2M2.NeuronalDynamics.Simulation
             //}
         }
         #region Local Functions
+        private void InitNeuronCell()
+        {
+            U = Vector.Build.Dense(NeuronCell.vertCount);
+
+            U.SetSubVector(0, NeuronCell.vertCount, ic(NeuronCell.vertCount));
+            //U = Vector.Build.Dense(myCell.vertCount);
+        }
         private static Vector ic(int size)
         {
             double[] outV = new double[size];

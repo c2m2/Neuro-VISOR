@@ -54,30 +54,6 @@ namespace C2M2.NeuronalDynamics.Simulation
 
         internal OrderType orderType = OrderType.Identity;
 
-        // NeuronCellSimulation handles reading the UGX file
-        protected override void SetNeuronCell(Grid grid)
-        {
-            grid.Type = orderType;
-            myCell = new NeuronCell(grid);
-
-            //Initialize vector with all zeros
-            U = Vector.Build.Dense(myCell.vertCount);
-            M = Vector.Build.Dense(myCell.vertCount);
-            N = Vector.Build.Dense(myCell.vertCount);
-            H = Vector.Build.Dense(myCell.vertCount);
-
-            //Set all initial state probabilities
-            //M.Add(mi, M);
-            //N.Add(ni, N);
-            //H.Add(hi, H);
-            M[0] = mi;
-            N[0] = ni;
-            H[0] = hi;
-
-            //Set the initial conditions of the solution
-            U.SetSubVector(0, myCell.vertCount, initialConditions(U, myCell.boundaryID));
-        }
-
         // Secnd simulation 1D values 
         public override double[] Get1DValues()
         {
@@ -112,6 +88,8 @@ namespace C2M2.NeuronalDynamics.Simulation
         {
             int nT;      // Number of Time steps
             double endTime = 10;  // End time value
+
+            InitializeNeuronCell();
 
             double k;
 
@@ -274,7 +252,26 @@ namespace C2M2.NeuronalDynamics.Simulation
 
         }
         #region Local Functions
+        private void InitializeNeuronCell()
+        {
+            Grid1D.Type = orderType;
+            //Initialize vector with all zeros
+            U = Vector.Build.Dense(myCell.vertCount);
+            M = Vector.Build.Dense(myCell.vertCount);
+            N = Vector.Build.Dense(myCell.vertCount);
+            H = Vector.Build.Dense(myCell.vertCount);
 
+            //Set all initial state probabilities
+            //M.Add(mi, M);
+            //N.Add(ni, N);
+            //H.Add(hi, H);
+            M[0] = mi;
+            N[0] = ni;
+            H[0] = hi;
+
+            //Set the initial conditions of the solution
+            U.SetSubVector(0, myCell.vertCount, initialConditions(U, myCell.boundaryID));
+        }
         //Function for initialize voltage on cell
         public static Vector initialConditions(Vector V, List<int> bcIndices)
         {

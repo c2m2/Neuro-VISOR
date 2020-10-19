@@ -39,21 +39,14 @@ namespace C2M2.NeuronalDynamics.Simulation
         // Keep track of i locally so that we know which simulation frame to send to other scripts
         private int i = -1;
 
-        private NeuronCell myCell;
-        // NeuronCellSimulation handles reading the UGX file
-        protected override void SetNeuronCell(Grid grid)
-        {
-            myCell = new NeuronCell(grid);
-            U = Vector.Build.Dense(myCell.vertCount);
-            U.SetSubVector(0, myCell.vertCount, initialConditions(myCell.vertCount));
-        }
+        private NeuronCell NeuronCell;
 
         public override double[] Get1DValues()
         {
             double[] curVals = null;
             if (i > -1)
             {
-                Vector curTimeSlice = U.SubVector(0, myCell.vertCount);
+                Vector curTimeSlice = U.SubVector(0, NeuronCell.vertCount);
                 curVals = curTimeSlice.ToArray();
             }
             return curVals;
@@ -91,7 +84,7 @@ namespace C2M2.NeuronalDynamics.Simulation
             for (i = 0; i < nT; i++)
             {
                 Debug.Log("U[0]:" + U[0]
-                    + "\n\tU[" + (myCell.vertCount - 1) + "]:" + U[myCell.vertCount - 1]);
+                    + "\n\tU[" + (NeuronCell.vertCount - 1) + "]:" + U[NeuronCell.vertCount - 1]);
 
                 U.Add(k, U);
             }

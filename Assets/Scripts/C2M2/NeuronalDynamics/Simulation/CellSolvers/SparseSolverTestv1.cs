@@ -76,29 +76,6 @@ namespace C2M2.NeuronalDynamics.Simulation
         // Keep track of i locally so that we know which simulation frame to send to other scripts
         private int i = -1;
 
-        private NeuronCell myCell;
-
-        // NeuronCellSimulation handles reading the UGX file
-        protected override void SetNeuronCell(Grid grid)
-        {
-            myCell = new NeuronCell(grid);
-
-            //Initialize vector with all zeros
-            U = Vector.Build.Dense(myCell.vertCount,0);
-            M = Vector.Build.Dense(myCell.vertCount, mi);
-            N = Vector.Build.Dense(myCell.vertCount, ni);
-            H = Vector.Build.Dense(myCell.vertCount, hi);
-
-            //Set all initial state probabilities
-            M[0] = mi;
-            N[0] = ni;
-            H[0] = hi;
-
-            //Set the initial conditions of the solution
-            U.SetSubVector(0, myCell.vertCount, initialConditions(U, myCell.boundaryID));
-            if (SomaOn) { U.SetSubVector(0, myCell.vertCount, setSoma(U, myCell.somaID, vstart)); }
-        }
-
         // Send simulation 1D values 
         public override double[] Get1DValues()
         {
@@ -109,7 +86,7 @@ namespace C2M2.NeuronalDynamics.Simulation
 
                 if (i > -1)
                 {
-                    Vector curTimeSlice = U.SubVector(0, myCell.vertCount);
+                    Vector curTimeSlice = U.SubVector(0, NeuronCell.vertCount);
                     curTimeSlice.Multiply(1, curTimeSlice);
                     //curTimeSlice = curTimeSlice - 70;
                     curVals = curTimeSlice.ToArray();
@@ -144,8 +121,15 @@ namespace C2M2.NeuronalDynamics.Simulation
             }
         }
 
+        protected override void PreSolve()
+        {
+            InitializeNeuronCell();
+        }
+
         protected override void Solve()
         {
+            InitializeNeuronCell();
+
             for (int kSim = 0; kSim <= numRuns; kSim++)
             {
                 int nT;                                                             // Number of Time steps
@@ -154,7 +138,7 @@ namespace C2M2.NeuronalDynamics.Simulation
                 // TODO: NEED TO DO THIS BETTER
                 if (HK_auto)
                 {
-                    h = 0.1 * myCell.edgeLengths.Average();
+                    h = 0.1 * NeuronCell.edgeLengths.Average();
                     if (h <= 1) { k = h / 130; }                // 0 refine       
                     if (h <= 0.5) { k = h / 65; }               // 1 refine
                     if (h <= 0.25) { k = h / 32.5; }            // 2 refine
@@ -184,30 +168,30 @@ namespace C2M2.NeuronalDynamics.Simulation
                 double cfl = diffConst * k / h;
 
                 // reaction vector
-                Vector R = Vector.Build.Dense(myCell.vertCount);
+                Vector R = Vector.Build.Dense(NeuronCell.vertCount);
                 List<double> reactConst = new List<double> { gk, gna, gl, ek, ena, el };
 
                 // temporary voltage vector
-                Vector tempV = Vector.Build.Dense(myCell.vertCount);
+                Vector tempV = Vector.Build.Dense(NeuronCell.vertCount);
 
                 // Construct sparse RHS and LHS in coordinate storage format, no zeros are stored
-                List<CoordinateStorage<double>> sparse_stencils = makeSparseStencils(myCell, h, k, diffConst);
+                List<CoordinateStorage<double>> sparse_stencils = makeSparseStencils(NeuronCell, h, k, diffConst);
 
                 // Compress the sparse matrices
                 CompressedColumnStorage<double> r_csc = CompressedColumnStorage<double>.OfIndexed(sparse_stencils[0]); //null;
                 CompressedColumnStorage<double> l_csc = CompressedColumnStorage<double>.OfIndexed(sparse_stencils[1]); //null;
 
                 // Permutation matrix----------------------------------------------------------------------//
-                int[] p = new int[myCell.vertCount];
-                if (randomPermute) { p = Permutation.Create(myCell.vertCount, 1); }
-                else { p = Permutation.Create(myCell.vertCount, 0); }
+                int[] p = new int[NeuronCell.vertCount];
+                if (randomPermute) { p = Permutation.Create(NeuronCell.vertCount, 1); }
+                else { p = Permutation.Create(NeuronCell.vertCount, 0); }
 
-                CompressedColumnStorage<double> Id_csc = CompressedColumnStorage<double>.CreateDiagonal(myCell.vertCount, 1);
+                CompressedColumnStorage<double> Id_csc = CompressedColumnStorage<double>.CreateDiagonal(NeuronCell.vertCount, 1);
                 Id_csc.PermuteRows(p);
                 //--------------------------------------------------------------------------------------------//
 
                 // for solving Ax = b problem
-                double[] b = new double[myCell.vertCount];
+                double[] b = new double[NeuronCell.vertCount];
 
                 // Apply column ordering to A to reduce fill-in.
                 //var order = ColumnOrdering.MinimumDegreeAtPlusA;
@@ -223,7 +207,7 @@ namespace C2M2.NeuronalDynamics.Simulation
                 // Write permutation, rhsM, lhsM, and choleskyR matrix to file
                 if (printMatrices) { printMatrix(Id_csc, r_csc, l_csc, chl.L, strPath, kSim); }
                 // Print cell info to a text file
-                if (printCellInfo) { printCell(myCell, h, k, nT, endTime, cfl, strPath, kSim); }
+                if (printCellInfo) { printCell(NeuronCell, h, k, nT, endTime, cfl, strPath, kSim); }
 
                 // For printing voltage data and time steps
                 var sw = new StreamWriter(strPath + @"\outputVoltage_" + kSim + ".txt", true);
@@ -234,7 +218,7 @@ namespace C2M2.NeuronalDynamics.Simulation
                 {
                     for (i = 0; i < nT; i++)
                     {
-                        if (SomaOn) { U.SetSubVector(0, myCell.vertCount, setSoma(U, myCell.somaID, vstart)); }
+                        if (SomaOn) { U.SetSubVector(0, NeuronCell.vertCount, setSoma(U, NeuronCell.somaID, vstart)); }
                         mutex.WaitOne();
 
                         r_csc.Multiply(U.ToArray(), b);         // Peform b = rhs * U_curr 
@@ -244,16 +228,16 @@ namespace C2M2.NeuronalDynamics.Simulation
                         timer.StopTimer(i.ToString());
 
                         // Set U_next = b
-                        U.SetSubVector(0, myCell.vertCount, Vector.Build.DenseOfArray(b));
+                        U.SetSubVector(0, NeuronCell.vertCount, Vector.Build.DenseOfArray(b));
 
                         // Save voltage from diffusion step for state probabilities
-                        tempV.SetSubVector(0, myCell.vertCount, U);
+                        tempV.SetSubVector(0, NeuronCell.vertCount, U);
 
                         // Reaction
                         channels[0] = na_ONOFF;
                         channels[1] = k_ONOFF;
                         channels[2] = leak_ONOFF;
-                        R.SetSubVector(0, myCell.vertCount, reactF(reactConst, U, N, M, H, channels, myCell.boundaryID));
+                        R.SetSubVector(0, NeuronCell.vertCount, reactF(reactConst, U, N, M, H, channels, NeuronCell.boundaryID));
                         R.Multiply(k / cap, R);
 
                         // This is the solution for the voltage after the reaction is included!
@@ -265,8 +249,8 @@ namespace C2M2.NeuronalDynamics.Simulation
                         H.Add(fH(tempV, H).Multiply(k), H);
 
                         //Always reset to IC conditions and boundary conditions (for now)
-                        U.SetSubVector(0, myCell.vertCount, boundaryConditions(U, myCell.boundaryID));
-                        if (SomaOn) { U.SetSubVector(0, myCell.vertCount, setSoma(U, myCell.somaID, vstart)); }
+                        U.SetSubVector(0, NeuronCell.vertCount, boundaryConditions(U, NeuronCell.boundaryID));
+                        if (SomaOn) { U.SetSubVector(0, NeuronCell.vertCount, setSoma(U, NeuronCell.somaID, vstart)); }
 
                         // Apply clamp voltages
                         if (clampValues.Count > 0)
@@ -282,7 +266,7 @@ namespace C2M2.NeuronalDynamics.Simulation
 
                         if (printVolt_time)
                         {
-                            for (int j = 0; j < myCell.vertCount; j++)
+                            for (int j = 0; j < NeuronCell.vertCount; j++)
                             {
                                 sw.Write(U[j] + " ");
                             }
@@ -310,6 +294,24 @@ namespace C2M2.NeuronalDynamics.Simulation
         }
 
         #region Local Functions
+
+        private void InitializeNeuronCell()
+        {
+            //Initialize vector with all zeros
+            U = Vector.Build.Dense(NeuronCell.vertCount, 0);
+            M = Vector.Build.Dense(NeuronCell.vertCount, mi);
+            N = Vector.Build.Dense(NeuronCell.vertCount, ni);
+            H = Vector.Build.Dense(NeuronCell.vertCount, hi);
+
+            //Set all initial state probabilities
+            M[0] = mi;
+            N[0] = ni;
+            H[0] = hi;
+
+            //Set the initial conditions of the solution
+            U.SetSubVector(0, NeuronCell.vertCount, initialConditions(U, NeuronCell.boundaryID));
+            if (SomaOn) { U.SetSubVector(0, NeuronCell.vertCount, setSoma(U, NeuronCell.somaID, vstart)); }
+        }
 
         // This is the thomas_algorithm
         // Input: D = diagonal of LHS
@@ -406,9 +408,9 @@ namespace C2M2.NeuronalDynamics.Simulation
             var permId = new StreamWriter(strPath + @"\permIdMatrix_" + kSim + ".txt", true);
             var chlMatrix = new StreamWriter(strPath + @"\chlLmat_" + kSim + ".txt", true);
 
-            for (int q = 0; q < myCell.vertCount; q++)
+            for (int q = 0; q < NeuronCell.vertCount; q++)
             {
-                for (int j = 0; j < myCell.vertCount; j++)
+                for (int j = 0; j < NeuronCell.vertCount; j++)
                 {
                     rhsMatrix.Write(rhsMarray.At(q, j) + " ");
                     lhsMatrix.Write(lhsMarray.At(q, j) + " ");

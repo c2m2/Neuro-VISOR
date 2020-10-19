@@ -90,26 +90,6 @@ namespace C2M2.NeuronalDynamics.Simulation
 
         private Timer timer = new Timer();
 
-        // NeuronCellSimulation handles reading the UGX file
-        protected override void SetNeuronCell(Grid grid)
-        {
-            myCell = new NeuronCell(grid);
-
-            //Initialize vector with all zeros
-            U = Vector.Build.Dense(myCell.vertCount);
-            M = Vector.Build.Dense(myCell.vertCount);
-            N = Vector.Build.Dense(myCell.vertCount);
-            H = Vector.Build.Dense(myCell.vertCount);
-
-            //Set all initial state probabilities
-            M[0] = mi;
-            N[0] = ni;
-            H[0] = hi;
-
-            //Set the initial conditions of the solution
-            U.SetSubVector(0, myCell.vertCount, initialConditions(U, myCell.boundaryID));
-            if (SomaOn) { U.SetSubVector(0, myCell.vertCount, setSoma(U, myCell.somaID, vstart)); }
-        }
 
         // Send simulation 1D values 
         public override double[] Get1DValues()
@@ -161,6 +141,7 @@ namespace C2M2.NeuronalDynamics.Simulation
 
         protected override void Solve()
         {
+            InitNeuronCell();
             int nT;                 // Number of Time steps
             List<bool> channels = new List<bool>();
 
@@ -333,7 +314,24 @@ namespace C2M2.NeuronalDynamics.Simulation
         }
 
         #region Local Functions
+        private void InitNeuronCell()
+        {
 
+            //Initialize vector with all zeros
+            U = Vector.Build.Dense(myCell.vertCount);
+            M = Vector.Build.Dense(myCell.vertCount);
+            N = Vector.Build.Dense(myCell.vertCount);
+            H = Vector.Build.Dense(myCell.vertCount);
+
+            //Set all initial state probabilities
+            M[0] = mi;
+            N[0] = ni;
+            H[0] = hi;
+
+            //Set the initial conditions of the solution
+            U.SetSubVector(0, myCell.vertCount, initialConditions(U, myCell.boundaryID));
+            if (SomaOn) { U.SetSubVector(0, myCell.vertCount, setSoma(U, myCell.somaID, vstart)); }
+        }
         public static double[] maxCheck(double[] b)
         {
             for (int i = 0; i < b.Length; i++)

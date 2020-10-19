@@ -24,18 +24,9 @@ namespace C2M2.NeuronalDynamics.Interaction
 
         public NeuronSimulation1D activeTarget = null;
 
-        private Tuple<int, double>[] newValues = null;
-
-        private Vector3 lastLocalPos;
-        private Vector3 origScale;
-
-        private Vector3 simLastPos;
-        private bool ClampMoved { get { return !lastLocalPos.Equals(transform.localPosition); } }
         private bool use1DVerts = true;
-        private OVRGrabbable grabbable;
+
         private MeshRenderer mr;
-        private MeshFilter mf;
-        private Bounds bounds;
         private Vector3 LocalExtents { get { return transform.localScale / 2; } }
         private Vector3 posFocus = Vector3.zero;
         private Color32 clampCol = Color.black;
@@ -60,10 +51,6 @@ namespace C2M2.NeuronalDynamics.Interaction
         private void Awake()
         {
             mr = GetComponent<MeshRenderer>();
-            mf = GetComponent<MeshFilter>();
-
-            origScale = transform.parent.localScale;
-            grabbable = GetComponentInParent<OVRGrabbable>();
         }
 
         
@@ -148,9 +135,6 @@ namespace C2M2.NeuronalDynamics.Interaction
                 Destroy(gameObject.GetComponent<Rigidbody>());
 
                 gradientLUT = activeTarget.GetComponent<LUTGradient>();
-
-                Tuple<int, double> newVal = new Tuple<int, double>(clampIndex, clampPower);
-                newValues = new Tuple<int, double>[] { newVal };
 
                 activeTarget.clampValues.Add(this);
             }

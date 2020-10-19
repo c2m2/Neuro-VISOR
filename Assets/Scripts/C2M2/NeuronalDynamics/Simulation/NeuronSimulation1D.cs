@@ -126,12 +126,12 @@ namespace C2M2.NeuronalDynamics.Simulation {
             get {
                 if (grid1D == null)
                 {
-                    string meshName1D = vrnReader.Retrieve1DMeshName(refinementLevel);
+                    string meshName1D = VrnReader.Retrieve1DMeshName(refinementLevel);
                     /// Create empty grid with name of grid in archive
                     grid1D = new Grid(new Mesh(), meshName1D);
                     grid1D.Attach(new DiameterAttachment());
 
-                    vrnReader.ReadUGX(meshName1D, ref grid1D);
+                    VrnReader.ReadUGX(meshName1D, ref grid1D);
                 }
                 return grid1D;
             }
@@ -145,14 +145,26 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 if (grid2D == null)
                 {
                     /// Retrieve mesh names from archive
-                    string meshName2D = vrnReader.Retrieve2DMeshName(visualInflation);
+                    string meshName2D = VrnReader.Retrieve2DMeshName(visualInflation);
 
                     /// Empty 2D grid which stores geometry + mapping data
                     grid2D = new Grid(new Mesh(), meshName2D);
                     grid2D.Attach(new MappingAttachment());
-                    vrnReader.ReadUGX(meshName2D, ref grid2D);
+                    VrnReader.ReadUGX(meshName2D, ref grid2D);
                 }
                 return grid2D;
+            }
+        }
+        private NeuronCell neuronCell = null;
+        public NeuronCell NeuronCell
+        {
+            get
+            {
+                if(neuronCell == null)
+                {
+                    neuronCell = new NeuronCell(Grid1D);
+                }
+                return neuronCell;
             }
         }
 
@@ -231,19 +243,11 @@ namespace C2M2.NeuronalDynamics.Simulation {
         /// <param name="newValues"> List of 1D vert indices and values to add onto that index. </param>
         public abstract void Set1DValues (Tuple<int, double>[] newValues);
 
-
-
         /// <summary>
         /// Requires derived classes to know how to make available one value for each 1D vertex
         /// </summary>
         /// <returns></returns>
         public abstract double[] Get1DValues ();
-
-        /// <summary>
-        /// Pass the UGX 1D and 3D cells to simulation code
-        /// </summary>
-        /// <param name="grid"></param>
-        protected abstract void SetNeuronCell (Grid grid);
 
         protected override void OnStart()
         {
@@ -267,14 +271,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
             }
 
             clampModePrev = clampMode;
-        }
-
-        protected override void ReadData()
-        {
-            Debug.Log(VrnReader.List());
-
-            // Pass the cell to simulation code
-            SetNeuronCell(Grid1D);
         }
         /// <summary>
         /// Read in the cell and initialize 3D/1D visualization/interaction infrastructure
