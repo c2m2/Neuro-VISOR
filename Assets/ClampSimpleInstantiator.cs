@@ -184,34 +184,40 @@ namespace C2M2.NeuronalDynamics.Interaction
         }
         private void ToggleAll()
         {
-            if (allActive)
+            if (clamps.Count > 0)
             {
-                foreach (NeuronClamp clamp in clamps)
+                if (allActive)
                 {
-                    if (clamp != null && clamp.focusVert != -1) clamp.DeactivateClamp();
-                    else if (!clampGarbage.Contains(clamp)) clampGarbage.Add(clamp);                    
+                    foreach (NeuronClamp clamp in clamps)
+                    {
+                        if (clamp != null && clamp.focusVert != -1) clamp.DeactivateClamp();
+                        else if (!clampGarbage.Contains(clamp)) clampGarbage.Add(clamp);
+                    }
                 }
-            }
-            else
-            {
-                foreach (NeuronClamp clamp in clamps)
+                else
                 {
-                    if (clamp != null && clamp.focusVert != -1) clamp.ActivateClamp();
-                    else if (!clampGarbage.Contains(clamp)) clampGarbage.Add(clamp);
+                    foreach (NeuronClamp clamp in clamps)
+                    {
+                        if (clamp != null && clamp.focusVert != -1) clamp.ActivateClamp();
+                        else if (!clampGarbage.Contains(clamp)) clampGarbage.Add(clamp);
+                    }
                 }
+                allActive = !allActive;
             }
-            allActive = !allActive;
         }
         private void DestroyAll()
         {
-            foreach (NeuronClamp clamp in clamps)
+            if (clamps.Count > 0)
             {
-                if (clamp != null && clamp.focusVert != -1)
-                    Destroy(clamp.transform.parent.gameObject);
+                foreach (NeuronClamp clamp in clamps)
+                {
+                    if (clamp != null && clamp.focusVert != -1)
+                        Destroy(clamp.transform.parent.gameObject);
 
-                if (!clampGarbage.Contains(clamp)) clampGarbage.Add(clamp);
+                    if (!clampGarbage.Contains(clamp)) clampGarbage.Add(clamp);
+                }
+                clamps.Clear();
             }
-            clamps.Clear();
         }
 
         private IEnumerator CheckForDuplicates(float waitTime)
