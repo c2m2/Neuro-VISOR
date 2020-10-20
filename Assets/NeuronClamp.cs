@@ -277,30 +277,23 @@ namespace C2M2.NeuronalDynamics.Interaction
         [Tooltip("Hold down a raycast for this many frames in order to destroy a clamp")]
         public int destroyCount = 50;
         int holdCount = 0;
-        float thumbstickScaler = 5;
+        float thumbstickScaler = 1;
+
         /// <summary>
         /// Pressing this button toggles clamps on/off. Holding this button down for long enough destroys the clamp
         /// </summary>
         public OVRInput.Button toggleDestroyOVR = OVRInput.Button.Two;
-        public KeyCode toggleDestroyKey = KeyCode.Q;
-        private bool ToggleDestroy
+        private bool PressedToggleDestroy
         {
             get
             {
                 if (GameManager.instance.vrIsActive)
-                {
                     return OVRInput.Get(toggleDestroyOVR);
-                }
-                else
-                {
-                    bool pressed = Input.GetKey(toggleDestroyKey);
-                    Debug.Log("Key is pressed: " + pressed);
-                    return pressed;
-                }
+                else return true;
             }
         }
-        public KeyCode powerModifierPlusKey = KeyCode.P;
-        public KeyCode powerModifierMinusKey = KeyCode.M;
+        public KeyCode powerModifierPlusKey = KeyCode.UpArrow;
+        public KeyCode powerModifierMinusKey = KeyCode.DownArrow;
         private float PowerModifier
         {
             get
@@ -317,38 +310,42 @@ namespace C2M2.NeuronalDynamics.Interaction
                 }
             }
         }
+        private bool powerClick = false;
         /// <summary>
         /// If the user holds a raycast down for X seconds on a clamp, it should destroy the clamp
         /// </summary>
         public void MonitorInput()
         {
-            if (ToggleDestroy)
-            {
-                // This is never called, even when button is pressed
+            if (PressedToggleDestroy)
                 holdCount++;
-            }
             else
-            {
-                if (holdCount >= destroyCount)
-                {
-                    Debug.Log("Destroying " + transform.parent.name);
-                    Destroy(transform.parent.gameObject);
-                }
-                // if the toggle-destroy button was simply pressed, toggle the clamp
-                else if (holdCount > 0 && holdCount < destroyCount) ToggleClamp();
-
-                // If the button has been released, reset hold count
-                holdCount = 0;
-            }
+                CheckInput(holdCount);
 
             float power = PowerModifier;
+            // If clamp power is modified while the user holds a click, don't let the click also toggle/destroy the clamp
+            if (power != 0 && !powerClick) powerClick = true;
 
             clampPower += power;
         }
+
         public void ResetHoldCount()
         {
-            holdCount = 0;
+            CheckInput(holdCount);
         }
+
+        private void CheckInput(int holdCount)
+        {
+            if (powerClick) return;
+
+            if (holdCount >= destroyCount)
+            {
+                Destroy(transform.parent.gameObject);
+            } else if (holdCount > 0) ToggleClamp();
+
+            holdCount = 0;
+            powerClick = false;
+        }
+
         #endregion
     }
 }

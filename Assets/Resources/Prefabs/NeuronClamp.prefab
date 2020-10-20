@@ -195,9 +195,8 @@ MonoBehaviour:
   activeTarget: {fileID: 0}
   destroyCount: 50
   toggleDestroyOVR: 2
-  toggleDestroyKey: 113
-  powerModifierPlusKey: 112
-  powerModifierMinusKey: 109
+  powerModifierPlusKey: 273
+  powerModifierMinusKey: 274
 --- !u!114 &1525391653058632939
 MonoBehaviour:
   m_ObjectHideFlags: 0

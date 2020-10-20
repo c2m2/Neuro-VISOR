@@ -1346,6 +1346,18 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 1246904545894575464}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &396515146 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1246904545536113186, guid: 3cd62f4122818be4585249f5083a977d,
+    type: 3}
+  m_PrefabInstance: {fileID: 1246904545894575464}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 396515144}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd425c2d06f39bf4899d07c05d0f10eb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &425781080 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5843646974205992161, guid: 70469a93359ee8b4e98c4c445b157af9,
@@ -2671,6 +2683,18 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 1246904545894575464}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &726520549 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1246904545201651597, guid: 3cd62f4122818be4585249f5083a977d,
+    type: 3}
+  m_PrefabInstance: {fileID: 1246904545894575464}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 726520547}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd425c2d06f39bf4899d07c05d0f10eb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &731384458
 GameObject:
   m_ObjectHideFlags: 0
@@ -5863,6 +5887,11 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1246904544304391328, guid: 3cd62f4122818be4585249f5083a977d,
+        type: 3}
+      propertyPath: grabber
+      value: 
+      objectReference: {fileID: 396515146}
     - target: {fileID: 1246904544797454429, guid: 3cd62f4122818be4585249f5083a977d,
         type: 3}
       propertyPath: localAvatar
@@ -5878,6 +5907,11 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1246904544797454429, guid: 3cd62f4122818be4585249f5083a977d,
+        type: 3}
+      propertyPath: grabber
+      value: 
+      objectReference: {fileID: 726520549}
     - target: {fileID: 1246904545451624255, guid: 3cd62f4122818be4585249f5083a977d,
         type: 3}
       propertyPath: m_Enabled

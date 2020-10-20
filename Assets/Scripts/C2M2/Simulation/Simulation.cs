@@ -14,7 +14,7 @@ namespace C2M2.Simulation
     {
         [Tooltip("Run simulation code without visualization or interaction features")]
         /// <summary>
-        /// Run simulation without visualization or interaction
+        /// Run solve code without visualization or interaction
         /// </summary>
         public bool dryRun = false;
 
