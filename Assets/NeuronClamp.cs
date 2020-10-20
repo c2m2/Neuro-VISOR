@@ -8,6 +8,7 @@ using C2M2.NeuronalDynamics.UGX;
 using C2M2.Visualization;
 using System.Collections;
 using C2M2.Utils;
+using Math = C2M2.Utils.Math;
 
 namespace C2M2.NeuronalDynamics.Interaction
 {
@@ -305,11 +306,12 @@ namespace C2M2.NeuronalDynamics.Interaction
             {
                 if (GameManager.instance.vrIsActive)
                 {
-                    Vector2 t1, t2;
-                    t1 = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick);
-                    t2 = OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick);
-                    Debug.Log("t1: " + t1.ToString("F5") + "\nt2: " + t2.ToString("F5"));
-                    return thumbstickScaler * t1.y;
+                    // Use the value of whichever joystick is held up furthest
+                    float y1 = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick).y;
+                    float y2 = OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick).y;
+                    float scaler = (y1 + y2);
+
+                    return thumbstickScaler * scaler;
                 }
                 else
                 {
