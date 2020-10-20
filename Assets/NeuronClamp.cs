@@ -305,7 +305,11 @@ namespace C2M2.NeuronalDynamics.Interaction
             {
                 if (GameManager.instance.vrIsActive)
                 {
-                    return thumbstickScaler * OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick).y;
+                    Vector2 t1, t2;
+                    t1 = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick);
+                    t2 = OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick);
+                    Debug.Log("t1: " + t1.ToString("F5") + "\nt2: " + t2.ToString("F5"));
+                    return thumbstickScaler * t1.y;
                 }
                 else
                 {
