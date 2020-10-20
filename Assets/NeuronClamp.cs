@@ -289,12 +289,13 @@ namespace C2M2.NeuronalDynamics.Interaction
         /// Pressing this button toggles clamps on/off. Holding this button down for long enough destroys the clamp
         /// </summary>
         public OVRInput.Button toggleDestroyOVR = OVRInput.Button.Two;
+        public OVRInput.Button toggleDestroyOVRS = OVRInput.Button.Four;
         private bool PressedToggleDestroy
         {
             get
             {
                 if (GameManager.instance.vrIsActive)
-                    return OVRInput.Get(toggleDestroyOVR, OVRInput.Controller.RTouch) || OVRInput.Get(toggleDestroyOVR, OVRInput.Controller.RTouch);
+                    return (OVRInput.Get(toggleDestroyOVR) || OVRInput.Get(toggleDestroyOVRS));
                 else return true;
             }
         }
