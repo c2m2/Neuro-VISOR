@@ -873,7 +873,7 @@ GameObject:
   - component: {fileID: 320645343}
   - component: {fileID: 320645338}
   m_Layer: 8
-  m_Name: ClampController
+  m_Name: ClampControllerR
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3102,7 +3102,7 @@ GameObject:
   - component: {fileID: 835806279}
   - component: {fileID: 835806274}
   m_Layer: 8
-  m_Name: ClampController
+  m_Name: ClampControllerL
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
