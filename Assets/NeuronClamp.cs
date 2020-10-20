@@ -324,7 +324,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             if (PressedToggleDestroy)
                 holdCount++;
             else
-                CheckInput(holdCount);
+                CheckInput();
 
             float power = PowerModifier;
             // If clamp power is modified while the user holds a click, don't let the click also toggle/destroy the clamp
@@ -335,10 +335,10 @@ namespace C2M2.NeuronalDynamics.Interaction
 
         public void ResetHoldCount()
         {
-            CheckInput(holdCount);
+            CheckInput();
         }
 
-        private void CheckInput(int holdCount)
+        private void CheckInput()
         {
             if (powerClick) return;
 
