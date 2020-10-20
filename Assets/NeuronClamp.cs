@@ -330,8 +330,6 @@ namespace C2M2.NeuronalDynamics.Interaction
             else
             {
                 CheckInput();
-                holdCount = 0;
-                powerClick = false;
             }
 
             float power = PowerModifier;
@@ -344,18 +342,21 @@ namespace C2M2.NeuronalDynamics.Interaction
         public void ResetHoldCount()
         {
             CheckInput();
-            holdCount = 0;
-            powerClick = false;
         }
 
         private void CheckInput()
         {
-            if (powerClick) return;
-
-            if (holdCount >= destroyCount)
+            if (!powerClick)
             {
-                Destroy(transform.parent.gameObject);
-            } else if (holdCount > 0) ToggleClamp();
+                if (holdCount >= destroyCount)
+                {
+                    Destroy(transform.parent.gameObject);
+                }
+                else if (holdCount > 0) ToggleClamp();
+            }
+
+            holdCount = 0;
+            powerClick = false;
         }
 
         #endregion
