@@ -294,7 +294,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             get
             {
                 if (GameManager.instance.vrIsActive)
-                    return OVRInput.Get(toggleDestroyOVR);
+                    return OVRInput.Get(toggleDestroyOVR, OVRInput.Controller.All);
                 else return true;
             }
         }
