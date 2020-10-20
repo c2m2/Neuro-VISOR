@@ -200,6 +200,7 @@ namespace C2M2.NeuronalDynamics.Interaction
                     else if (!clampGarbage.Contains(clamp)) clampGarbage.Add(clamp);
                 }
             }
+            allActive = !allActive;
         }
         private void DestroyAll()
         {
