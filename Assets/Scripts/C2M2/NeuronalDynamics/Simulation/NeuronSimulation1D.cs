@@ -171,6 +171,23 @@ namespace C2M2.NeuronalDynamics.Simulation {
             }
         }
 
+        // Storing the information from mapping in an array of structs greatly improves time performance
+        private Vert3D1DPair[] map = null;
+        private Vert3D1DPair[] Map
+        {
+            get
+            {
+                if(map == null)
+                {
+                    map = new Vert3D1DPair[Mapping.Data.Count];
+                    for(int i = 0; i < Mapping.Data.Count; i++)
+                    {
+                        map[i] = new Vert3D1DPair(Mapping.Data[i].Item1, Mapping.Data[i].Item2, Mapping.Data[i].Item3);
+                    }
+                }
+                return map;
+            }
+        }
         private MappingInfo mapping = default;
         private MappingInfo Mapping
         {
@@ -213,11 +230,11 @@ namespace C2M2.NeuronalDynamics.Simulation {
 
             if (scalars1D == null) { return null; }
             //double[] scalars3D = new double[map.Length];
-            for (int i = 0; i < Mapping.Data.Count; i++) { // for each 3D point,
+            for (int i = 0; i < Map.Length; i++) { // for each 3D point,
 
                 // Take an weighted average using lambda
                 // Equivalent to [lambda * v2 + (1 - lambda) * v1]
-                double newVal = Mapping.Data[i].Item3 * (scalars1D[Mapping.Data[i].Item2] - scalars1D[Mapping.Data[i].Item1]) + scalars1D[Mapping.Data[i].Item1];
+                double newVal = map[i].lambda * (scalars1D[map[i].v2] - scalars1D[map[i].v1]) + scalars1D[map[i].v1];
 
                 Scalars3D[i] = newVal;
             }
@@ -239,7 +256,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
         /// <returns>
         /// Either the same set of values given, or values translated
         /// </returns>
-        public void SetValues (Tuple<int, double>[] newValues) {
+        public void SetValues (Tuple<int, double>[] newValues) {        
             // Each 3D index will have TWO associated 1D vertices
             Tuple<int, double>[] new1DValues = new Tuple<int, double>[2 * newValues.Length];
             int j = 0;
@@ -250,12 +267,12 @@ namespace C2M2.NeuronalDynamics.Simulation {
 
                 // TODO: What if a 1D vert belongs to multiple 3D verts in this list?
                 // Translate into two 1D vert indices and a lambda weight
-                double val1D = (1 - Mapping.Data[vert3D].Item3) * val3D;
-                new1DValues[j] = new Tuple<int, double> (Mapping.Data[vert3D].Item1, val1D);
+                double val1D = (1 - Map[vert3D].lambda) * val3D;
+                new1DValues[j] = new Tuple<int, double> (map[vert3D].v1, val1D);
 
                 // Weight newVal by (lambda) for second 1D vert
-                val1D = Mapping.Data[vert3D].Item3 * val3D;
-                new1DValues[j + 1] = new Tuple<int, double> (Mapping.Data[vert3D].Item2, val1D);
+                val1D = map[vert3D].lambda * val3D;
+                new1DValues[j + 1] = new Tuple<int, double> (map[vert3D].v2, val1D);
                 // Move up two spots in 1D array
                 j += 2;
             }
