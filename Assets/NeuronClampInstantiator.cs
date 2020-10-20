@@ -5,7 +5,7 @@ using C2M2.NeuronalDynamics.Simulation;
 
 namespace C2M2.NeuronalDynamics.Interaction
 {
-    public class ClampSimpleInstantiator : MonoBehaviour
+    public class NeuronClampInstantiator : MonoBehaviour
     {
         public GameObject clampPrefab = null;
         public bool allActive = false;

@@ -11,7 +11,7 @@ namespace C2M2
     /// <summary>
     /// Stores many global variables, handles pregame initializations
     /// </summary>
-    [RequireComponent(typeof(ClampSimpleInstantiator))]
+    [RequireComponent(typeof(NeuronClampInstantiator))]
     public class GameManager : MonoBehaviour
     {
         public static GameManager instance = null;
@@ -28,7 +28,7 @@ namespace C2M2
             }
         }
 
-        public ClampSimpleInstantiator clampInstantiator = null;
+        public NeuronClampInstantiator clampInstantiator = null;
         public GameObject[] clampControllers = new GameObject[0];
 
         [Header("Materials")]
@@ -69,7 +69,7 @@ namespace C2M2
             if (instance == null) { instance = this; }
             else if (instance != this) { Destroy(this); }
 
-            clampInstantiator = GetComponent<ClampSimpleInstantiator>();
+            clampInstantiator = GetComponent<NeuronClampInstantiator>();
             // Initialize keyboard
             //raycastKeyboardPrefab = Instantiate(raycastKeyboardPrefab, new Vector3(50, 50, 50), Quaternion.identity);
             //raycastKeyboard = raycastKeyboardPrefab.GetComponent<RaycastKeyboard>();
