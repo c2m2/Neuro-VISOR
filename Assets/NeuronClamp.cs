@@ -342,7 +342,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             clampPower += power;
         }
 
-        public void ResetHoldCount()
+        public void ResetInput()
         {
             CheckInput();
         }

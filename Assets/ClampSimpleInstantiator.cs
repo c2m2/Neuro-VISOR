@@ -48,6 +48,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             clamps.Add(clamp.GetComponentInChildren<NeuronClamp>());
         }
 
+        /*
         public void ToggleClamps(RaycastHit hit)
         {
             if (clamps.Count > 0)
@@ -98,6 +99,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             curCount = 0;
         }
 
+        */
 
         private int destroyCount = 50;
         private int holdCount = 0;
@@ -162,7 +164,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             
         }
 
-        public void ResetHoldCount()
+        public void ResetInput()
         {
             CheckInput();
         }
