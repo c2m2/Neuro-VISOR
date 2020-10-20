@@ -55,9 +55,14 @@ namespace C2M2.NeuronalDynamics.Interaction
             mr = GetComponent<MeshRenderer>();
         }
 
-        
+        private void Update()
+        {
+            OVRInput.Update();
+        }
         private void FixedUpdate()
         {
+            OVRInput.FixedUpdate();
+
             if(activeTarget != null)
             {
                 if (clampLive)
