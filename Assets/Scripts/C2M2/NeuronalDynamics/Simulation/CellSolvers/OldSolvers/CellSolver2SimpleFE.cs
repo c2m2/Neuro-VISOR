@@ -42,19 +42,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         // Keep track of i locally so that we know which simulation frame to send to other scripts
         private int i = -1;
 
-        private NeuronCell myCell;
-
-        // NeuronCellSimulation handles reading the UGX file
-        protected override void SetNeuronCell(Grid grid)
-        {
-            myCell = new NeuronCell(grid);
-
-            //Initialize vector with all zeros
-            U = Vector.Build.Dense(myCell.vertCount);
-
-            //Set the initial conditions of the solution
-            U.SetSubVector(0, myCell.vertCount, initialConditions(myCell.vertCount));
-        }
+        private NeuronCell NeuronCell;
 
         // Secnd simulation 1D values 
         public override double[] Get1DValues()
@@ -63,7 +51,7 @@ namespace C2M2.NeuronalDynamics.Simulation
             double[] curVals = null;
             if (i > -1)
             {
-                Vector curTimeSlice = U.SubVector(0, myCell.vertCount);
+                Vector curTimeSlice = U.SubVector(0, NeuronCell.vertCount);
                 curVals = curTimeSlice.ToArray();
             }
             mutex.ReleaseMutex();
@@ -85,7 +73,7 @@ namespace C2M2.NeuronalDynamics.Simulation
 
         protected override void Solve()
         {
-
+            InitializeNeuronCell();
             // Computer simulation stepping parameters
             double k = endTime / (double)nT; //Time step size
                                              //double h = 0.008; // spatial step size
@@ -101,7 +89,7 @@ namespace C2M2.NeuronalDynamics.Simulation
                 mutex.WaitOne();
                 //Debug.Log("Time step number = " + i);
                 //Debug.Log("Elapsed Time = " + ((double)i) * k);
-                Debug.Log("U[0]:" + U[0].ToString() + "\n\tU[" + (myCell.vertCount - 1) + "]:" + U[myCell.vertCount - 1].ToString());
+                Debug.Log("U[0]:" + U[0].ToString() + "\n\tU[" + (NeuronCell.vertCount - 1) + "]:" + U[NeuronCell.vertCount - 1].ToString());
 
                 //This is the solver Vnxt = Vcur + k*f(Vcur)
                 //Where f(Vcur)=2.5
@@ -113,7 +101,14 @@ namespace C2M2.NeuronalDynamics.Simulation
         }
 
         #region Local Functions
+        private void InitializeNeuronCell()
+        {
+            //Initialize vector with all zeros
+            U = Vector.Build.Dense(NeuronCell.vertCount);
 
+            //Set the initial conditions of the solution
+            U.SetSubVector(0, NeuronCell.vertCount, initialConditions(NeuronCell.vertCount));
+        }
         //Function for initialize voltage on cell
         public static Vector initialConditions(int size)
         {

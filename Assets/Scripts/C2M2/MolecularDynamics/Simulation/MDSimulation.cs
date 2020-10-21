@@ -115,13 +115,13 @@ namespace C2M2.MolecularDynamics.Simulation
         private BondRenderer[] bondRenderers;
         private Shader shader;
 
-        protected override void ReadData()
+        private void ReadData()
         {
             PSFFile psfFile = PSFReader.ReadFile(path + psfPath);
             mass = psfFile.mass;
             bonds = psfFile.bonds;
             angles = psfFile.angles;
-            types = psfFile.types;       
+            types = psfFile.types;
 
             // Convert bonds and angles to 0 base
             for (int i = 0; i < bonds.Length; i++) bonds[i] = bonds[i] - 1;
@@ -139,7 +139,7 @@ namespace C2M2.MolecularDynamics.Simulation
 
             // Initialize pbc flags to zero
             pbcFlag = new Vector3Int[coord.Length];
-            for(int i = 0; i < pbcFlag.Length; i++)
+            for (int i = 0; i < pbcFlag.Length; i++)
             {
                 pbcFlag[i] = Vector3Int.zero;
             }
@@ -152,6 +152,8 @@ namespace C2M2.MolecularDynamics.Simulation
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         protected override Transform[] BuildVisualization()
         {
+            ReadData();
+
             Transform[] transforms = RenderSpheres(coord, types, radius);
 
             bond_topo = BuildBondTopology(bonds);

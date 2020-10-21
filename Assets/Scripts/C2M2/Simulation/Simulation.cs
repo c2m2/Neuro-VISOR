@@ -14,7 +14,7 @@ namespace C2M2.Simulation
     {
         [Tooltip("Run simulation code without visualization or interaction features")]
         /// <summary>
-        /// Run simulation without visualization or interaction
+        /// Run solve code without visualization or interaction
         /// </summary>
         public bool dryRun = false;
 
@@ -49,11 +49,6 @@ namespace C2M2.Simulation
         public VizType viz { get; protected set; }
 
         /// <summary>
-        /// Read/initialize data here. ReadData is called before BuildVisualization
-        /// </summary>
-        protected abstract void ReadData();
-
-        /// <summary>
         /// Update the visualization. This will be called once per Update() call
         /// </summary>
         /// <remarks>
@@ -67,6 +62,8 @@ namespace C2M2.Simulation
         public void StartSimulation()
         {
             StopSimulation();
+            Debug.Log("Running PreSolve...");
+            PreSolve();
             solveThread = new Thread(Solve);
             solveThread.Start();
             Debug.Log("Solve() launched on thread " + solveThread.ManagedThreadId);
@@ -85,10 +82,18 @@ namespace C2M2.Simulation
         /// </remarks>
         protected abstract void Solve();
 
+        /// <summary>
+        /// Called on the main thread before the Solve thread is launched
+        /// </summary>
+        /// <remarks>
+        /// This is useful if you need to initialize anything that makes use of Unity calls,
+        /// which are not available to be called from secondary threads.
+        /// </remarks>
+        protected virtual void PreSolve() { }
+
         #region Unity Methods
         public void Awake()
         {
-            ReadData();
 
             if (!dryRun)
             {

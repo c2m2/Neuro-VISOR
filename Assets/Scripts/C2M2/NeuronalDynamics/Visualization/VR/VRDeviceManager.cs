@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR;
 using C2M2.Interaction;
-namespace C2M2.Visualization.VR
+namespace C2M2.Interaction.VR
 {
     using Interaction.Signaling;
+    using Visualization.VR;
     /// <summary>
     /// Make sure that a VR device is loaded before using OVRPlayerController.
     /// If none is loaded, add VR emulation tools
@@ -17,34 +18,46 @@ namespace C2M2.Visualization.VR
     [ExecuteInEditMode]
     public class VRDeviceManager : MonoBehaviour
     {
+        public bool vrIsActive { get { return playerController.enabled; } }
         public GameObject fpsOverlay = null;
         public GameObject fpsTVScreen = null;
         private MovingOVRHeadsetEmulator emulator;
         private MouseEventSignaler mouseSignaler;
         private OVRPlayerController playerController;
         private MovementController emulatorMove;
+        private bool prev;
 
-        private void Update()
+        private void Awake()
         {
-            if (Application.isPlaying) Destroy(this);
-
             emulator = GetComponent<MovingOVRHeadsetEmulator>();
             emulatorMove = GetComponent<MovementController>();
             mouseSignaler = GetComponent<MouseEventSignaler>();
             playerController = GetComponent<OVRPlayerController>();
-            
-
-            emulator.enabled = !playerController.enabled;
-            mouseSignaler.enabled = emulator.enabled;
-            emulatorMove.enabled = emulator.enabled;
-            if (fpsOverlay != null) fpsOverlay.SetActive(emulator.enabled);
-            if (fpsTVScreen != null) fpsTVScreen.SetActive(playerController.enabled);
-
-            // only enable oculus signalers if player controller is enabled
-            OculusEventSignaler[] oculusSignalers = GetComponentsInChildren<OculusEventSignaler>();
-            foreach(OculusEventSignaler o in oculusSignalers)
+            prev = vrIsActive;
+            if (Application.isPlaying)
             {
-                o.enabled = playerController.enabled;
+                if (vrIsActive) { Debug.Log("Running in VR mode."); }
+                else Debug.Log("Running in emulator mode.");
+            }
+        }
+        private void Update()
+        {
+            if (prev != vrIsActive && !Application.isPlaying)
+            {
+                emulator.enabled = !vrIsActive;
+                mouseSignaler.enabled = !vrIsActive;
+                emulatorMove.enabled = !vrIsActive;
+                if (fpsOverlay != null) fpsOverlay.SetActive(!vrIsActive);
+
+                if (fpsTVScreen != null) fpsTVScreen.SetActive(vrIsActive);
+
+                // only enable oculus signalers if player controller is enabled
+                OculusEventSignaler[] oculusSignalers = GetComponentsInChildren<OculusEventSignaler>();
+                foreach (OculusEventSignaler o in oculusSignalers)
+                {
+                    o.enabled = vrIsActive;
+                }
+                prev = vrIsActive;
             }
         }
     }

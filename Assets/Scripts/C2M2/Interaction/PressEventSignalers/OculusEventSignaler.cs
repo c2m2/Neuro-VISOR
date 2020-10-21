@@ -14,6 +14,8 @@ namespace C2M2.Interaction.Signaling
         public OVRInput.Controller controller = OVRInput.Controller.RTouch;
         [Tooltip("Button to activate raycasting mode")]
         public OVRInput.Button beginRaycastingButton = OVRInput.Button.One;
+        [Tooltip("If Toggle Mode is enabled, pressing Begin Raycasting Button will toggle raycasting mode on. Otherwise Begin Raycasting Button needs to be held down to enter raycasting mode.")]
+        public bool toggleMode = true;
         [Tooltip("Button to invoke hit/hold events from a distance")]
         public OVRInput.Button triggerEventsButton = OVRInput.Button.PrimaryIndexTrigger;
         public OVRGrabber grabber = null;
@@ -26,6 +28,20 @@ namespace C2M2.Interaction.Signaling
 
         public Transform localAvatar;
         public bool isLeftHand = false;
+
+        private bool toggled = false;
+        private bool Toggled
+        {
+            get
+            {
+                // If the raycasting button was pressed for the first time this frame, enable/disable raycasting
+                if (OVRInput.GetDown(beginRaycastingButton, controller))
+                {
+                    toggled = !toggled;
+                }
+                return toggled;
+            }
+        }
 
         protected override void OnAwake()
         {
@@ -45,14 +61,18 @@ namespace C2M2.Interaction.Signaling
             StartCoroutine(SearchForHand(100));
         }
         protected override bool BeginRaycastingCondition()
-        { 
-            bool rURaycasting = OVRInput.Get(beginRaycastingButton, controller);
+        {
+            // If we are in toggle mode, is raycasting mode toggled on?
+            // Otherwise, is the Begin Raycasting Button currently being pressed down?
+            bool rURaycasting = toggleMode ? Toggled : OVRInput.Get(beginRaycastingButton, controller);
 
+            // If an object is being actively grabbed, don't raycast
             if (grabber != null && grabber.grabbedObject != null)
                 rURaycasting = false;
 
             StaticHandSetActive(rURaycasting);
             LineRendererSetActive(rURaycasting);
+
             return rURaycasting;
         }
         private bool distancePressed = false;

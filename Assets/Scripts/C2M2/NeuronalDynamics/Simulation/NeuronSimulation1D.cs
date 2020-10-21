@@ -11,6 +11,7 @@ using MappingAttachment = C2M2.NeuronalDynamics.UGX.IAttachment<C2M2.NeuronalDyn
 using Math = C2M2.Utils.Math;
 using C2M2.Interaction;
 using C2M2.Simulation;
+using C2M2.Utils;
 using C2M2.Utils.DebugUtils;
 using C2M2.Utils.Exceptions;
 using C2M2.Utils.MeshUtils;
@@ -120,24 +121,26 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 return vrnReader;
             }
         }
-        protected Grid grid1D = null;
+
+        private Grid grid1D = null;
         public Grid Grid1D
         {
             get {
                 if (grid1D == null)
                 {
-                    string meshName1D = vrnReader.Retrieve1DMeshName(refinementLevel);
+                    string meshName1D = VrnReader.Retrieve1DMeshName(refinementLevel);
                     /// Create empty grid with name of grid in archive
                     grid1D = new Grid(new Mesh(), meshName1D);
                     grid1D.Attach(new DiameterAttachment());
 
-                    vrnReader.ReadUGX(meshName1D, ref grid1D);
+                    VrnReader.ReadUGX(meshName1D, ref grid1D);
                 }
                 return grid1D;
             }
         }
         public Vector3[] Verts1D { get { return grid1D.Mesh.vertices; } }
-        protected Grid grid2D = null;
+
+        private Grid grid2D = null;
         public Grid Grid2D
         {
             get
@@ -145,24 +148,77 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 if (grid2D == null)
                 {
                     /// Retrieve mesh names from archive
-                    string meshName2D = vrnReader.Retrieve2DMeshName(visualInflation);
+                    string meshName2D = VrnReader.Retrieve2DMeshName(visualInflation);
 
                     /// Empty 2D grid which stores geometry + mapping data
                     grid2D = new Grid(new Mesh(), meshName2D);
                     grid2D.Attach(new MappingAttachment());
-                    vrnReader.ReadUGX(meshName2D, ref grid2D);
+                    VrnReader.ReadUGX(meshName2D, ref grid2D);
                 }
                 return grid2D;
             }
         }
 
-        ///<summary> Lookup a 3D vert and get back two 1D indices and a lambda value for them </summary>
-        //private Dictionary<int, Tuple<int, int, double>> map;
-        private Vert3D1DPair[] map;
-        private MappingInfo mapping;
+        private NeuronCell neuronCell = null;
+        public NeuronCell NeuronCell
+        {
+            get
+            {
+                if(neuronCell == null)
+                {
+                    neuronCell = new NeuronCell(Grid1D);
+                }
+                return neuronCell;
+            }
+        }
+
+        // Storing the information from mapping in an array of structs greatly improves time performance
+        private Vert3D1DPair[] map = null;
+        private Vert3D1DPair[] Map
+        {
+            get
+            {
+                if(map == null)
+                {
+                    map = new Vert3D1DPair[Mapping.Data.Count];
+                    for(int i = 0; i < Mapping.Data.Count; i++)
+                    {
+                        map[i] = new Vert3D1DPair(Mapping.Data[i].Item1, Mapping.Data[i].Item2, Mapping.Data[i].Item3);
+                    }
+                }
+                return map;
+            }
+        }
+        private MappingInfo mapping = default;
+        private MappingInfo Mapping
+        {
+            get
+            {
+                if(mapping.Equals(default(MappingInfo)))
+                {
+                    mapping = (MappingInfo)MapUtils.BuildMap(Grid1D, Grid2D);
+                }
+                return mapping;
+            }
+            set
+            {
+                mapping = (MappingInfo)MapUtils.BuildMap(Grid1D, Grid2D);
+            }
+        }
         private RaycastEventManager raycastManager = null;
 
         private double[] scalars3D = new double[0];
+        private double[] Scalars3D
+        {
+            get
+            {
+                if(scalars3D.Length == 0)
+                {
+                    scalars3D = new double[Mapping.Data.Count];
+                }
+                return scalars3D;
+            }
+        }
 
         public List<NeuronClamp> clampValues = new List<NeuronClamp>();
 
@@ -175,16 +231,16 @@ namespace C2M2.NeuronalDynamics.Simulation {
 
             if (scalars1D == null) { return null; }
             //double[] scalars3D = new double[map.Length];
-            for (int i = 0; i < map.Length; i++) { // for each 3D point,
+            for (int i = 0; i < Map.Length; i++) { // for each 3D point,
 
                 // Take an weighted average using lambda
-                // Equivalent to [lambda * val1Db + (1 - lambda) * val1Da]
+                // Equivalent to [lambda * v2 + (1 - lambda) * v1]
                 double newVal = map[i].lambda * (scalars1D[map[i].v2] - scalars1D[map[i].v1]) + scalars1D[map[i].v1];
 
-                scalars3D[i] = newVal;
+                Scalars3D[i] = newVal;
             }
             // Debug.Log(sb.ToString());
-            return scalars3D;
+            return Scalars3D;
         }
         /// <summary>
         /// Translate 3D vertex values to 1D values, and pass them downwards for interaction
@@ -201,7 +257,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
         /// <returns>
         /// Either the same set of values given, or values translated
         /// </returns>
-        public void SetValues (Tuple<int, double>[] newValues) {
+        public void SetValues (Tuple<int, double>[] newValues) {        
             // Each 3D index will have TWO associated 1D vertices
             Tuple<int, double>[] new1DValues = new Tuple<int, double>[2 * newValues.Length];
             int j = 0;
@@ -210,8 +266,9 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 int vert3D = newValues[i].Item1;
                 double val3D = newValues[i].Item2;
 
+                // TODO: What if a 1D vert belongs to multiple 3D verts in this list?
                 // Translate into two 1D vert indices and a lambda weight
-                double val1D = (1 - map[vert3D].lambda) * val3D;
+                double val1D = (1 - Map[vert3D].lambda) * val3D;
                 new1DValues[j] = new Tuple<int, double> (map[vert3D].v1, val1D);
 
                 // Weight newVal by (lambda) for second 1D vert
@@ -231,19 +288,11 @@ namespace C2M2.NeuronalDynamics.Simulation {
         /// <param name="newValues"> List of 1D vert indices and values to add onto that index. </param>
         public abstract void Set1DValues (Tuple<int, double>[] newValues);
 
-
-
         /// <summary>
         /// Requires derived classes to know how to make available one value for each 1D vertex
         /// </summary>
         /// <returns></returns>
         public abstract double[] Get1DValues ();
-
-        /// <summary>
-        /// Pass the UGX 1D and 3D cells to simulation code
-        /// </summary>
-        /// <param name="grid"></param>
-        protected abstract void SetNeuronCell (Grid grid);
 
         protected override void OnStart()
         {
@@ -257,24 +306,19 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 RaycastPressEvents newEvents = clampMode ?
                     GameManager.instance.gameObject.GetComponent<RaycastPressEvents>()
                     : GetComponentInChildren<RaycastPressEvents>();
+                if (newEvents == null) return;
                 raycastManager.leftTrigger = newEvents;
                 raycastManager.rightTrigger = newEvents;
                 
             }
             foreach (GameObject clamp in GameManager.instance.clampControllers)
             {
+                MeshRenderChild renderControls = clamp.GetComponentInParent<MeshRenderChild>();
+                if (renderControls != null) renderControls.enabled = clampMode;
                 clamp.SetActive(clampMode);
             }
 
             clampModePrev = clampMode;
-        }
-
-        protected override void ReadData()
-        {
-            Debug.Log(VrnReader.List());
-
-            // Pass the cell to simulation code
-            SetNeuronCell(Grid1D);
         }
         /// <summary>
         /// Read in the cell and initialize 3D/1D visualization/interaction infrastructure
@@ -283,14 +327,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
         protected override Mesh BuildVisualization () {
             Mesh cellMesh = new Mesh ();
             if (!dryRun) {
-                mapping = (MappingInfo) MapUtils.BuildMap (Grid1D, Grid2D);
-
-                // Convert dictionary to array for speed
-                map = new Vert3D1DPair[mapping.Data.Count];
-                foreach (KeyValuePair<int, Tuple<int, int, double>> entry in mapping.Data) {
-                    map[entry.Key] = new Vert3D1DPair (entry.Value.Item1, entry.Value.Item2, entry.Value.Item3);
-                }
-                scalars3D = new double[map.Length];
 
                 if (visualize1D) Render1DCell ();
 
@@ -308,7 +344,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
             return cellMesh;
 
             void Render1DCell () {
-                Grid geom1D = mapping.ModelGeometry;
+                Grid geom1D = Mapping.ModelGeometry;
                 GameObject lines1D = gameObject.AddComponent<LinesRenderer> ().Constr (geom1D, color1D, lineWidth1D);
             }
             void InitUI () {
@@ -330,31 +366,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
             }
         }
 
-        public void RescaleMesh (Vector3 newSize) {
-            MeshFilter mf = GetComponent<MeshFilter> ();
-            if (mf != null && mf.sharedMesh != null) {
-                mf.sharedMesh.Rescale (transform, newSize);
-            }
-        }
-
-
-        private Mesh BuildMesh (double inflation = 1) {
-            Mesh mesh = null;
-
-            // 1 <= inflation
-            inflation = Math.Max (inflation, 1);
-            // 0 <= refinement
-
-            mesh = MapUtils.BuildMap (VrnReader.Retrieve2DMeshName (inflation),
-                VrnReader.Retrieve1DMeshName (refinementLevel),
-                false).SurfaceGeometry.Mesh;
-
-            mesh.RecalculateNormals ();
-
-          //  mesh.name = mesh.name + "ref" + refinement.ToString () + "inf" + inflation.ToString ();
-
-            return mesh;
-        }
         private Mesh CheckMeshCache(double inflation)
         {
             if (!meshCache.ContainsKey(inflation) || meshCache[inflation] == null)
@@ -376,16 +387,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
         public void SwitchMesh (double inflation) {
             inflation = Math.Clamp (inflation, 1, 5);
             VisualInflation = inflation;
-        }
-
-        /// <summary>
-        /// Switch the visualization or collider mesh
-        /// </summary>
-        /// <param name="mesh"></param>
-        private void SwitchColliderMesh (Mesh mesh) {
-            var meshColController = GetComponent<MeshColController>();
-            if (meshColController == null) meshColController = gameObject.AddComponent<MeshColController>();
-            meshColController.Mesh = mesh;
         }
     }
 

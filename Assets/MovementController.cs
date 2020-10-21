@@ -4,16 +4,18 @@ using UnityEngine;
 
 public class MovementController : MonoBehaviour
 {
-    public KeyCode forward = KeyCode.UpArrow;
-    public KeyCode backward = KeyCode.DownArrow;
-    public KeyCode left = KeyCode.LeftArrow;
-    public KeyCode right = KeyCode.RightArrow;
-    public KeyCode upDown = KeyCode.LeftAlt;
+    public KeyCode forward = KeyCode.W;
+    public KeyCode backward = KeyCode.S;
+    public KeyCode left = KeyCode.A;
+    public KeyCode right = KeyCode.D;
+    public KeyCode upDown = KeyCode.LeftControl;
+
     private bool ForwardPress { get { return Input.GetKey(forward); } }
     private bool BackwardPress { get { return Input.GetKey(backward); } }
     private bool LeftPress { get { return Input.GetKey(left); } }
     private bool RightPress { get { return Input.GetKey(right); } }
     private bool UpDownPress { get { return Input.GetKey(upDown); } }
+
     private Coroutine moveRoutine = null;
     public bool isMoving { get; private set; } = false;
     public float speed = 0.01f;

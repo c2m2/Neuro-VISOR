@@ -34,12 +34,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         public const double vstart = 55;
 
         private Matrix U;
-        // NeuronCellSimulation handles reading the UGX file
-        private NeuronCell myCell;
-        protected override void SetNeuronCell(Grid grid)
-        {
-            myCell = new NeuronCell(grid);
-        }
+
         // Keep track of i locally so that we know which simulation frame to send to other scripts
         private int i = -1;
 
@@ -68,22 +63,22 @@ namespace C2M2.NeuronalDynamics.Simulation
             int nT = 9000; //9000;  //16000;          // Number of Time steps
             double k = endTime / (double)nT; //Time step size
                                              //double h = 0.008; //myCell.edgeLengths.Average()*1e4; //Spatial Step Size
-            double h = myCell.edgeLengths.Average() * 1e4;
+            double h = NeuronCell.edgeLengths.Average() * 1e4;
 
             Debug.Log("h = " + h);
-            Debug.Log("Ave Edge Length = " + myCell.edgeLengths.Average());
+            Debug.Log("Ave Edge Length = " + NeuronCell.edgeLengths.Average());
 
             //This is where I begin using MathNumerics Library
             //Make grid function as a matrix for now! and then I initialize the voltage at one
             //location. Note: the row index will correspond to the vertex number! (hopefully)
-            U = Matrix.Build.Dense(myCell.vertCount, nT);
+            U = Matrix.Build.Dense(NeuronCell.vertCount, nT);
 
             //State variable grid functions
-            Matrix NN = Matrix.Build.Dense(myCell.vertCount, nT);
-            Matrix MM = Matrix.Build.Dense(myCell.vertCount, nT);
-            Matrix HH = Matrix.Build.Dense(myCell.vertCount, nT);
+            Matrix NN = Matrix.Build.Dense(NeuronCell.vertCount, nT);
+            Matrix MM = Matrix.Build.Dense(NeuronCell.vertCount, nT);
+            Matrix HH = Matrix.Build.Dense(NeuronCell.vertCount, nT);
 
-            U.SetSubMatrix(0, 0, SetBoundaryConditions(U.SubMatrix(0, myCell.vertCount, 0, 1), myCell.boundaryID));
+            U.SetSubMatrix(0, 0, SetBoundaryConditions(U.SubMatrix(0, NeuronCell.vertCount, 0, 1), NeuronCell.boundaryID));
 
             //Initialize state variables
             NN[0, 0] = ni;
@@ -93,20 +88,20 @@ namespace C2M2.NeuronalDynamics.Simulation
             alglib.sparsematrix rhsM;
             alglib.sparsematrix lhsM;
 
-            alglib.sparsecreate(myCell.vertCount, myCell.vertCount, out rhsM);
-            alglib.sparsecreate(myCell.vertCount, myCell.vertCount, out lhsM);
+            alglib.sparsecreate(NeuronCell.vertCount, NeuronCell.vertCount, out rhsM);
+            alglib.sparsecreate(NeuronCell.vertCount, NeuronCell.vertCount, out lhsM);
 
             //Internal variables for CN coefficients
             double sig;
             double rad;
             int nghbr;
 
-            for (int p = 0; p < myCell.vertCount; p++)
+            for (int p = 0; p < NeuronCell.vertCount; p++)
             {
-                rad = myCell.nodeData[p].nodeRadius;
+                rad = NeuronCell.nodeData[p].nodeRadius;
                 //rad = 1e-3;
 
-                if (myCell.nodeData[p].neighborIDs.Count == 1)
+                if (NeuronCell.nodeData[p].neighborIDs.Count == 1)
                 {
                     alglib.sparseset(rhsM, p, p, 1);
                     alglib.sparseset(lhsM, p, p, 1);
@@ -119,9 +114,9 @@ namespace C2M2.NeuronalDynamics.Simulation
                     alglib.sparseset(lhsM, p, p, 1 + 2 * sig);
 
 
-                    for (int j = 0; j < myCell.nodeData[p].neighborIDs.Count; j++)
+                    for (int j = 0; j < NeuronCell.nodeData[p].neighborIDs.Count; j++)
                     {
-                        nghbr = myCell.nodeData[p].neighborIDs[j];
+                        nghbr = NeuronCell.nodeData[p].neighborIDs[j];
                         alglib.sparseset(rhsM, p, nghbr, sig);
                         alglib.sparseset(lhsM, p, nghbr, -sig);
 
@@ -134,12 +129,12 @@ namespace C2M2.NeuronalDynamics.Simulation
 
             //This is the solving loop
             //Using operator splitting
-            Matrix temp1 = Matrix.Build.Dense(myCell.vertCount, 1);
-            Matrix temp2 = Matrix.Build.Dense(myCell.vertCount, 1);
-            Matrix probTemp = Matrix.Build.Dense(myCell.vertCount, 1);
-            Matrix react = Matrix.Build.Dense(myCell.vertCount, 1);
+            Matrix temp1 = Matrix.Build.Dense(NeuronCell.vertCount, 1);
+            Matrix temp2 = Matrix.Build.Dense(NeuronCell.vertCount, 1);
+            Matrix probTemp = Matrix.Build.Dense(NeuronCell.vertCount, 1);
+            Matrix react = Matrix.Build.Dense(NeuronCell.vertCount, 1);
 
-            double[] tempa = new double[myCell.vertCount];
+            double[] tempa = new double[NeuronCell.vertCount];
 
             alglib.sparsesolverreport rep;
 
@@ -155,40 +150,40 @@ namespace C2M2.NeuronalDynamics.Simulation
             {
                 t1 = DateTime.Now;
                 //Crank Nicolson: First multiply rhsM*b, then solve lhsM*x = rhsM*b
-                alglib.sparsemv(rhsM, GetColumn(U, i, myCell.vertCount), ref tempa);
-                alglib.sparsesolve(lhsM, myCell.vertCount, tempa, out tempa, out rep);
+                alglib.sparsemv(rhsM, GetColumn(U, i, NeuronCell.vertCount), ref tempa);
+                alglib.sparsesolve(lhsM, NeuronCell.vertCount, tempa, out tempa, out rep);
 
                 temp1.SetColumn(0, tempa);
 
                 //Reaction Calculation Step
                 //Use solution from diffusion solve (temp1) as input
-                react = ReactF(temp1, NN.SubMatrix(0, myCell.vertCount, i, 1),
-                MM.SubMatrix(0, myCell.vertCount, i, 1), HH.SubMatrix(0, myCell.vertCount, i, 1));
+                react = ReactF(temp1, NN.SubMatrix(0, NeuronCell.vertCount, i, 1),
+                MM.SubMatrix(0, NeuronCell.vertCount, i, 1), HH.SubMatrix(0, NeuronCell.vertCount, i, 1));
 
                 //This is the solution from the reaction FE solve
                 temp2 = temp1 + k / cap * react;  //FE step
 
                 //set B.C of cell 
-                temp2.SetSubMatrix(0, 0, SetBoundaryConditions(temp2, myCell.boundaryID));
+                temp2.SetSubMatrix(0, 0, SetBoundaryConditions(temp2, NeuronCell.boundaryID));
 
                 U.SetSubMatrix(0, i + 1, temp2); //Set to next grid function step for Voltage
                 osTimes.Add((DateTime.Now - t1).TotalSeconds);
 
                 t1 = DateTime.Now;
                 //Do FE steps on state prob below using the intermediate solution temp1 from diffusion solve
-                probTemp = NN.SubMatrix(0, myCell.vertCount, i, 1) +
-                        k * (an(temp1).PointwiseMultiply(1 - NN.SubMatrix(0, myCell.vertCount, i, 1)) -
-                        bn(temp1).PointwiseMultiply(NN.SubMatrix(0, myCell.vertCount, i, 1)));
+                probTemp = NN.SubMatrix(0, NeuronCell.vertCount, i, 1) +
+                        k * (an(temp1).PointwiseMultiply(1 - NN.SubMatrix(0, NeuronCell.vertCount, i, 1)) -
+                        bn(temp1).PointwiseMultiply(NN.SubMatrix(0, NeuronCell.vertCount, i, 1)));
                 NN.SetSubMatrix(0, i + 1, probTemp);
 
-                probTemp = MM.SubMatrix(0, myCell.vertCount, i, 1) +
-                        k * (am(temp1).PointwiseMultiply(1 - MM.SubMatrix(0, myCell.vertCount, i, 1)) -
-                        bm(temp1).PointwiseMultiply(MM.SubMatrix(0, myCell.vertCount, i, 1)));
+                probTemp = MM.SubMatrix(0, NeuronCell.vertCount, i, 1) +
+                        k * (am(temp1).PointwiseMultiply(1 - MM.SubMatrix(0, NeuronCell.vertCount, i, 1)) -
+                        bm(temp1).PointwiseMultiply(MM.SubMatrix(0, NeuronCell.vertCount, i, 1)));
                 MM.SetSubMatrix(0, i + 1, probTemp);
 
-                probTemp = HH.SubMatrix(0, myCell.vertCount, i, 1) +
-                        k * (ah(temp1).PointwiseMultiply(1 - HH.SubMatrix(0, myCell.vertCount, i, 1)) -
-                        bh(temp1).PointwiseMultiply(HH.SubMatrix(0, myCell.vertCount, i, 1)));
+                probTemp = HH.SubMatrix(0, NeuronCell.vertCount, i, 1) +
+                        k * (ah(temp1).PointwiseMultiply(1 - HH.SubMatrix(0, NeuronCell.vertCount, i, 1)) -
+                        bh(temp1).PointwiseMultiply(HH.SubMatrix(0, NeuronCell.vertCount, i, 1)));
                 HH.SetSubMatrix(0, i + 1, probTemp);
 
                 feTimes.Add((DateTime.Now - t1).TotalSeconds);

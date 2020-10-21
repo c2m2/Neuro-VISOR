@@ -6,11 +6,12 @@ namespace C2M2
 {
     using Interaction;
     using Interaction.UI;
+    using Interaction.VR;
     using NeuronalDynamics.Interaction;
     /// <summary>
     /// Stores many global variables, handles pregame initializations
     /// </summary>
-    [RequireComponent(typeof(ClampSimpleInstantiator))]
+    [RequireComponent(typeof(NeuronClampInstantiator))]
     public class GameManager : MonoBehaviour
     {
         public static GameManager instance = null;
@@ -18,7 +19,16 @@ namespace C2M2
         public int mainThreadId { get; private set; } = -1;
         public string assetsPath { get; private set; } = null;
 
-        public ClampSimpleInstantiator clampInstantiator = null;
+        public VRDeviceManager vrDeviceManager = null;
+        public bool vrIsActive {
+            get
+            {
+                if (vrDeviceManager == null) Debug.LogError("No VR Device Manager Found!");
+                return vrDeviceManager.vrIsActive;
+            }
+        }
+
+        public NeuronClampInstantiator clampInstantiator = null;
         public GameObject[] clampControllers = new GameObject[0];
 
         [Header("Materials")]
@@ -59,7 +69,7 @@ namespace C2M2
             if (instance == null) { instance = this; }
             else if (instance != this) { Destroy(this); }
 
-            clampInstantiator = GetComponent<ClampSimpleInstantiator>();
+            clampInstantiator = GetComponent<NeuronClampInstantiator>();
             // Initialize keyboard
             //raycastKeyboardPrefab = Instantiate(raycastKeyboardPrefab, new Vector3(50, 50, 50), Quaternion.identity);
             //raycastKeyboard = raycastKeyboardPrefab.GetComponent<RaycastKeyboard>();

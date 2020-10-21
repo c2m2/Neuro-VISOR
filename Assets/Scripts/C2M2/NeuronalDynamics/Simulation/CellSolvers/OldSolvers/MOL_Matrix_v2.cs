@@ -71,7 +71,6 @@ namespace C2M2.NeuronalDynamics.Simulation
                 U[j, i] = val;
             }
         }
-        protected override void SetNeuronCell(Grid grid) { }
         protected override void Solve()
         {
             // Compute step sizes

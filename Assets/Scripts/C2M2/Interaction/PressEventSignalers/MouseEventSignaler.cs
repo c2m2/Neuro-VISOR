@@ -44,6 +44,7 @@ namespace C2M2.Interaction.Signaling
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             bool raycastHit = Physics.Raycast(ray, out hit, maxDistance, layerMask);
            
+            /*
             bool grabPressed = false;
             foreach(KeyCode key in grabKeys)
             {
@@ -60,6 +61,7 @@ namespace C2M2.Interaction.Signaling
                 return false;
             }
             else grabVolume.enabled = false;
+            */
 
             return raycastHit;
         }

@@ -194,6 +194,10 @@ MonoBehaviour:
   inactiveMaterial: {fileID: 2100000, guid: b5682c8bb520e8a46bbeab52c1a74097, type: 2}
   activeTarget: {fileID: 0}
   destroyCount: 50
+  toggleDestroyOVR: 2
+  toggleDestroyOVRS: 8
+  powerModifierPlusKey: 273
+  powerModifierMinusKey: 274
 --- !u!114 &1525391653058632939
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -222,25 +226,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   onPress:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 2030585019643067809}
-        m_MethodName: ToggleClamp
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
     m_TypeName: C2M2.Interaction.RaycastPressEvents+RaycastHitEvent, Assembly-CSharp,
       Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
   onHoldPress:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 2030585019643067809}
-        m_MethodName: ListenForDestroy
+        m_MethodName: MonitorInput
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -256,7 +249,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 2030585019643067809}
-        m_MethodName: ResetHoldCount
+        m_MethodName: ResetInput
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

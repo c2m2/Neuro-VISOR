@@ -8,11 +8,14 @@ using C2M2.NeuronalDynamics.UGX;
 using C2M2.Visualization;
 using System.Collections;
 using C2M2.Utils;
+using Math = C2M2.Utils.Math;
 
 namespace C2M2.NeuronalDynamics.Interaction
 {
     public class NeuronClamp : MonoBehaviour
     {
+
+
         public bool clampLive { get; private set; } = false;
  
         public double clampPower = 55;
@@ -24,18 +27,9 @@ namespace C2M2.NeuronalDynamics.Interaction
 
         public NeuronSimulation1D activeTarget = null;
 
-        private Tuple<int, double>[] newValues = null;
-
-        private Vector3 lastLocalPos;
-        private Vector3 origScale;
-
-        private Vector3 simLastPos;
-        private bool ClampMoved { get { return !lastLocalPos.Equals(transform.localPosition); } }
         private bool use1DVerts = true;
-        private OVRGrabbable grabbable;
+
         private MeshRenderer mr;
-        private MeshFilter mf;
-        private Bounds bounds;
         private Vector3 LocalExtents { get { return transform.localScale / 2; } }
         private Vector3 posFocus = Vector3.zero;
         private Color32 clampCol = Color.black;
@@ -60,15 +54,16 @@ namespace C2M2.NeuronalDynamics.Interaction
         private void Awake()
         {
             mr = GetComponent<MeshRenderer>();
-            mf = GetComponent<MeshFilter>();
-
-            origScale = transform.parent.localScale;
-            grabbable = GetComponentInParent<OVRGrabbable>();
         }
 
-        
+        private void Update()
+        {
+            OVRInput.Update();
+        }
         private void FixedUpdate()
         {
+            OVRInput.FixedUpdate();
+
             if(activeTarget != null)
             {
                 if (clampLive)
@@ -149,9 +144,6 @@ namespace C2M2.NeuronalDynamics.Interaction
 
                 gradientLUT = activeTarget.GetComponent<LUTGradient>();
 
-                Tuple<int, double> newVal = new Tuple<int, double>(clampIndex, clampPower);
-                newValues = new Tuple<int, double>[] { newVal };
-
                 activeTarget.clampValues.Add(this);
             }
 
@@ -229,26 +221,6 @@ namespace C2M2.NeuronalDynamics.Interaction
             return spotOpen;
         }
 
-        [Tooltip("Hold down a raycast for this many frames in order to destroy a clamp")]
-        public int destroyCount = 50;
-        int holdCount = 0;
-        /// <summary>
-        /// If the user holds a raycast down for X seconds on a clamp, it should destroy the clamp
-        /// </summary>
-        public void ListenForDestroy()
-        {
-            holdCount++;
-            if(holdCount == destroyCount)
-            {
-                Debug.Log("Destroying " + transform.parent.name);
-                Destroy(transform.parent.gameObject);
-            }
-        }
-        public void ResetHoldCount()
-        {
-            holdCount = 0;
-        }
-
         private void SetScale(NeuronSimulation1D simulation, NeuronCell.NodeData cellNodeData)
         {
             currentVisualizationScale = (float) simulation.VisualInflation;
@@ -306,5 +278,88 @@ namespace C2M2.NeuronalDynamics.Interaction
             }
             transform.parent.localRotation = Quaternion.LookRotation(rotationVector);
         }
+
+        #region Input
+        [Tooltip("Hold down a raycast for this many frames in order to destroy a clamp")]
+        public int destroyCount = 50;
+        int holdCount = 0;
+        float thumbstickScaler = 1;
+
+        /// <summary>
+        /// Pressing this button toggles clamps on/off. Holding this button down for long enough destroys the clamp
+        /// </summary>
+        public OVRInput.Button toggleDestroyOVR = OVRInput.Button.Two;
+        public OVRInput.Button toggleDestroyOVRS = OVRInput.Button.Four;
+        private bool PressedToggleDestroy
+        {
+            get
+            {
+                if (GameManager.instance.vrIsActive)
+                    return (OVRInput.Get(toggleDestroyOVR) || OVRInput.Get(toggleDestroyOVRS));
+                else return true;
+            }
+        }
+        public KeyCode powerModifierPlusKey = KeyCode.UpArrow;
+        public KeyCode powerModifierMinusKey = KeyCode.DownArrow;
+        private float PowerModifier
+        {
+            get
+            {
+                if (GameManager.instance.vrIsActive)
+                {
+                    // Use the value of whichever joystick is held up furthest
+                    float y1 = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick).y;
+                    float y2 = OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick).y;
+                    float scaler = (y1 + y2);
+
+                    return thumbstickScaler * scaler;
+                }
+                else
+                {
+                    if (Input.GetKey(powerModifierPlusKey)) return thumbstickScaler;
+                    if (Input.GetKey(powerModifierMinusKey)) return -thumbstickScaler;
+                    else return 0;
+                }
+            }
+        }
+        private bool powerClick = false;
+        /// <summary>
+        /// If the user holds a raycast down for X seconds on a clamp, it should destroy the clamp
+        /// </summary>
+        public void MonitorInput()
+        {
+            if (PressedToggleDestroy)
+                holdCount++;
+            else
+                CheckInput();
+
+            float power = PowerModifier;
+            // If clamp power is modified while the user holds a click, don't let the click also toggle/destroy the clamp
+            if (power != 0 && !powerClick) powerClick = true;
+
+            clampPower += power;
+        }
+
+        public void ResetInput()
+        {
+            CheckInput();
+        }
+
+        private void CheckInput()
+        {
+            if (!powerClick)
+            {
+                if (holdCount >= destroyCount)
+                {
+                    Destroy(transform.parent.gameObject);
+                }
+                else if (holdCount > 0) ToggleClamp();
+            }
+
+            holdCount = 0;
+            powerClick = false;
+        }
+
+        #endregion
     }
 }

@@ -873,7 +873,7 @@ GameObject:
   - component: {fileID: 320645343}
   - component: {fileID: 320645338}
   m_Layer: 8
-  m_Name: ClampController
+  m_Name: ClampControllerR
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -886,9 +886,9 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 320645336}
-  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0.0383, y: -0.0055, z: 0.0111}
-  m_LocalScale: {x: 0.05, y: 0.001, z: 0.05}
+  m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
+  m_LocalPosition: {x: 0.0375, y: -0.0055, z: 0.015}
+  m_LocalScale: {x: 0.035, y: 0.015, z: 0.035}
   m_Children: []
   m_Father: {fileID: 208289132}
   m_RootOrder: 1
@@ -907,26 +907,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   onPress:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 3671467347388522959}
-        m_MethodName: ToggleClamps
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
     m_TypeName: C2M2.Interaction.RaycastPressEvents+RaycastHitEvent, Assembly-CSharp,
       Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
   onHoldPress:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 3671467347388522959}
-        m_MethodName: MonitorDestroy
-        m_Mode: 0
+        m_MethodName: MonitorInput
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -941,8 +930,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 3671467347388522959}
-        m_MethodName: EndDestroyMonitor
-        m_Mode: 0
+        m_MethodName: ResetInput
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -964,8 +953,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1.0000002, y: 2.000001, z: 1.0000005}
-  m_Center: {x: -0.00000017881393, y: 8.131516e-20, z: -0.00000008940699}
+  m_Size: {x: 1.0000002, y: 2, z: 1.0000005}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!23 &320645341
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1346,6 +1335,18 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 1246904545894575464}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &396515146 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1246904545536113186, guid: 3cd62f4122818be4585249f5083a977d,
+    type: 3}
+  m_PrefabInstance: {fileID: 1246904545894575464}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 396515144}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd425c2d06f39bf4899d07c05d0f10eb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &425781080 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5843646974205992161, guid: 70469a93359ee8b4e98c4c445b157af9,
@@ -2671,6 +2672,18 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 1246904545894575464}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &726520549 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1246904545201651597, guid: 3cd62f4122818be4585249f5083a977d,
+    type: 3}
+  m_PrefabInstance: {fileID: 1246904545894575464}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 726520547}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd425c2d06f39bf4899d07c05d0f10eb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &731384458
 GameObject:
   m_ObjectHideFlags: 0
@@ -3103,7 +3116,7 @@ GameObject:
   - component: {fileID: 835806279}
   - component: {fileID: 835806274}
   m_Layer: 8
-  m_Name: ClampController
+  m_Name: ClampControllerL
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3117,8 +3130,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 835806272}
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: -0.0432, y: -0.0055, z: 0.0057}
-  m_LocalScale: {x: 0.050000057, y: 0.001000001, z: 0.050000038}
+  m_LocalPosition: {x: -0.0375, y: -0.0055, z: 0.015}
+  m_LocalScale: {x: 0.035, y: 0.015, z: 0.035}
   m_Children: []
   m_Father: {fileID: 833317828}
   m_RootOrder: 1
@@ -3137,26 +3150,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   onPress:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 3671467347388522959}
-        m_MethodName: ToggleClamps
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
     m_TypeName: C2M2.Interaction.RaycastPressEvents+RaycastHitEvent, Assembly-CSharp,
       Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
   onHoldPress:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 3671467347388522959}
-        m_MethodName: MonitorDestroy
-        m_Mode: 0
+        m_MethodName: MonitorInput
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -3171,8 +3173,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 3671467347388522959}
-        m_MethodName: EndDestroyMonitor
-        m_Mode: 0
+        m_MethodName: ResetInput
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -3194,8 +3196,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1.0000002, y: 2.000001, z: 1.0000005}
-  m_Center: {x: -0.00000017881393, y: 8.131516e-20, z: -0.00000008940699}
+  m_Size: {x: 1.0000002, y: 2, z: 1.0000005}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!23 &835806276
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -4940,7 +4942,7 @@ MonoBehaviour:
   globalMin: -10
   refinementLevel: 0
   vrnPath: C:/Users/jacob/Desktop/C2M2/virtual-reality/Assets/StreamingAssets\test.vrn
-  clampMode: 1
+  clampMode: 0
   visualize1D: 0
   color1D:
     serializedVersion: 2
@@ -5882,6 +5884,11 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1246904544304391328, guid: 3cd62f4122818be4585249f5083a977d,
+        type: 3}
+      propertyPath: grabber
+      value: 
+      objectReference: {fileID: 396515146}
     - target: {fileID: 1246904544797454429, guid: 3cd62f4122818be4585249f5083a977d,
         type: 3}
       propertyPath: localAvatar
@@ -5897,6 +5904,11 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1246904544797454429, guid: 3cd62f4122818be4585249f5083a977d,
+        type: 3}
+      propertyPath: grabber
+      value: 
+      objectReference: {fileID: 726520549}
     - target: {fileID: 1246904545451624255, guid: 3cd62f4122818be4585249f5083a977d,
         type: 3}
       propertyPath: m_Enabled
@@ -6130,6 +6142,11 @@ PrefabInstance:
       propertyPath: clampInstantiator
       value: 
       objectReference: {fileID: 3671467347388522959}
+    - target: {fileID: 3671467348768610598, guid: f49e57d0c1b71c4418326894ace9a9b5,
+        type: 3}
+      propertyPath: vrDeviceManager
+      value: 
+      objectReference: {fileID: 475776574}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f49e57d0c1b71c4418326894ace9a9b5, type: 3}
 --- !u!1 &3671467347388522958 stripped
@@ -6154,8 +6171,10 @@ MonoBehaviour:
     type: 3}
   allActive: 0
   clamps: []
-  holdCount: 50
-  curCount: 0
+  toggleDestroyOVR: 2
+  toggleDestroyOVRS: 8
+  powerModifierPlusKey: 273
+  powerModifierMinusKey: 274
 --- !u!114 &3671467347388522960
 MonoBehaviour:
   m_ObjectHideFlags: 0

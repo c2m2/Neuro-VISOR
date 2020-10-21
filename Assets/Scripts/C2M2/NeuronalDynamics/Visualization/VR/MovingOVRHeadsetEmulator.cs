@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using C2M2.Interaction.UI;
-namespace C2M2.Visualization.VR
+namespace C2M2.Interaction.VR
 {
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     /// <summary> Add movement functionality to Oculus HMD headset emulator,
