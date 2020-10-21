@@ -67,7 +67,10 @@ namespace C2M2.NeuronalDynamics.Visualization {
 
                 // Helper function to do the actual loading
                 void DoLoad () {
-                    using (ZipArchive archive = ZipFile.OpenRead ("/home/stephan/testNew.vrn")) {
+                    //using (ZipArchive archive = ZipFile.OpenRead ("/home/stephan/testNew.vrn")) {
+                    Debug.Log("fileName: " + this.fileName);
+                    using (ZipArchive archive = ZipFile.OpenRead($"{this.fileName}"))
+                    {
                         var file = archive.GetEntry ("MetaInfo.json");
                         _ = file ??
                             throw new CouldNotReadMeshFromVRNArchive (nameof (file));
@@ -129,6 +132,7 @@ namespace C2M2.NeuronalDynamics.Visualization {
             /// <returns> Filename of inflated 2D mesh in archive </returns>
             public string Retrieve2DMeshName (double inflation = 1.0, int refinement = 0) {
                 Load ();
+   
                 int index = geometry.geom1d.ToList ().FindIndex (geom => Int16.Parse (geom.refinement) == refinement);
                 int index2 = geometry.geom1d[index].inflations.ToList ().FindIndex (geom => Double.Parse (geom.inflation) == inflation);
                 return geometry.geom1d[index].inflations[index2 != -1 ? index2 : 0].name;
