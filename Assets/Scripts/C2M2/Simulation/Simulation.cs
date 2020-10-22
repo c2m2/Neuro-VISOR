@@ -57,24 +57,6 @@ namespace C2M2.Simulation
         protected abstract void UpdateVisualization(in ValueType newValues);
 
         /// <summary>
-        /// Launch Solve thread
-        /// </summary>
-        public void StartSimulation()
-        {
-            StopSimulation();
-            Debug.Log("Running PreSolve...");
-            PreSolve();
-            solveThread = new Thread(Solve);
-            solveThread.Start();
-            Debug.Log("Solve() launched on thread " + solveThread.ManagedThreadId);
-        }
-
-        /// <summary>
-        /// Stop current Solve thread
-        /// </summary>
-        public void StopSimulation() { if (solveThread != null) solveThread.Abort(); }
-
-        /// <summary>
         /// Method containing simulation code
         /// </summary>
         /// <remarks>
@@ -94,7 +76,6 @@ namespace C2M2.Simulation
         #region Unity Methods
         public void Awake()
         {
-
             if (!dryRun)
             {
                 viz = BuildVisualization();
@@ -104,13 +85,10 @@ namespace C2M2.Simulation
             // Run child awake methods first
             OnAwake(viz);
 
-            if (startOnAwake) StartSimulation();
-
             return;
 
             void BuildInteraction()
             {
-
                 switch (interactionType)
                 {
                     case (InteractionType.Discrete): Heater = gameObject.AddComponent<RaycastSimHeaterDiscrete>(); break;
@@ -123,12 +101,11 @@ namespace C2M2.Simulation
                 child.transform.position = Vector3.zero;
                 child.transform.eulerAngles = Vector3.zero;
 
-                // Create hit event
+                // Attach hit events to an event manager
+                RaycastEventManager eventManager = gameObject.AddComponent<RaycastEventManager>();
+                // Create hit events
                 RaycastPressEvents raycastEvents = child.AddComponent<RaycastPressEvents>();
                 raycastEvents.OnHoldPress.AddListener((hit) => Heater.Hit(hit));
-
-                // Attach event to an event manager
-                RaycastEventManager eventManager = gameObject.AddComponent<RaycastEventManager>();
                 eventManager.rightTrigger = raycastEvents;
                 eventManager.leftTrigger = raycastEvents;
 
@@ -136,10 +113,12 @@ namespace C2M2.Simulation
                 gameObject.AddComponent<Utils.DebugUtils.Actions.TransformResetter>();
             }
         }
+
         public void Start()
         {
             OnStart();
-            //gameObject.AddComponent<VRGrabbable>();
+
+            if (startOnAwake) StartSimulation();
         }
         public void Update()
         {
@@ -152,6 +131,7 @@ namespace C2M2.Simulation
                 if (simulationValues != null) UpdateVisualization(simulationValues);
             }
         }
+
         // Allow derived classes to run code in Awake/Start/Update if they choose
         protected virtual void OnAwake(VizType viz) { }
         protected virtual void OnStart() { }
@@ -167,6 +147,24 @@ namespace C2M2.Simulation
             if (solveThread != null) solveThread.Abort();
         }
         #endregion
+
+        /// <summary>
+        /// Launch Solve thread
+        /// </summary>
+        public void StartSimulation()
+        {
+            StopSimulation();
+            Debug.Log("Running PreSolve...");
+            PreSolve();
+            solveThread = new Thread(Solve);
+            solveThread.Start();
+            Debug.Log("Solve() launched on thread " + solveThread.ManagedThreadId);
+        }
+
+        /// <summary>
+        /// Stop current Solve thread
+        /// </summary>
+        public void StopSimulation() { if (solveThread != null) solveThread.Abort(); }
     }
     public class SimulationNotFoundException : Exception
     {

@@ -100,24 +100,43 @@ namespace C2M2.NeuronalDynamics.Simulation {
 
         private Dictionary<double, Mesh> meshCache = new Dictionary<double, Mesh>();
 
-        // Need mesh options for each refinement, diameter level
-        public string vrnPath = Application.streamingAssetsPath + Path.DirectorySeparatorChar + "test.vrn";
+        private bool clampMode = false;
+        public bool ClampMode
+        {
+            get { return clampMode; }
+            set
+            {
+                clampMode = value;
+                RaycastPressEvents newEvents = clampMode ?
+                    GameManager.instance.gameObject.GetComponent<RaycastPressEvents>()
+                    : GetComponentInChildren<RaycastPressEvents>();
+                if (newEvents == null) return;
+                raycastManager.leftTrigger = newEvents;
+                raycastManager.rightTrigger = newEvents;
 
-        public bool clampMode = true;
-        private bool clampModePrev = false;
+                foreach (GameObject clamp in GameManager.instance.clampControllers)
+                {
+                    MeshRenderChild renderControls = clamp.GetComponentInParent<MeshRenderChild>();
+                    if (renderControls != null) renderControls.enabled = clampMode;
+                    clamp.SetActive(clampMode);
+                }
+            }
+        }
 
         [Header ("1D Visualization")]
         public bool visualize1D = false;
         public Color32 color1D = Color.yellow;
         public float lineWidth1D = 0.005f;
 
+        // Need mesh options for each refinement, diameter level
+        public string vrnPath = "test.vrn";
         private vrnReader vrnReader = null;
         private vrnReader VrnReader
         {
             get
             {
                 if(vrnReader == null)
-                    vrnReader = new vrnReader(vrnPath);
+                    vrnReader = new vrnReader(Application.streamingAssetsPath + Path.DirectorySeparatorChar + vrnPath);
                 return vrnReader;
             }
         }
@@ -128,12 +147,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
             get {
                 if (grid1D == null)
                 {
-                    string meshName1D = VrnReader.Retrieve1DMeshName(refinementLevel);
-                    /// Create empty grid with name of grid in archive
-                    grid1D = new Grid(new Mesh(), meshName1D);
-                    grid1D.Attach(new DiameterAttachment());
-
-                    VrnReader.ReadUGX(meshName1D, ref grid1D);
+                    UpdateGrid1D();
                 }
                 return grid1D;
             }
@@ -147,13 +161,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
             {
                 if (grid2D == null)
                 {
-                    /// Retrieve mesh names from archive
-                    string meshName2D = VrnReader.Retrieve2DMeshName(visualInflation);
-
-                    /// Empty 2D grid which stores geometry + mapping data
-                    grid2D = new Grid(new Mesh(), meshName2D);
-                    grid2D.Attach(new MappingAttachment());
-                    VrnReader.ReadUGX(meshName2D, ref grid2D);
+                    UpdateGrid2D();
                 }
                 return grid2D;
             }
@@ -168,6 +176,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 {
                     neuronCell = new NeuronCell(Grid1D);
                 }
+                
                 return neuronCell;
             }
         }
@@ -205,6 +214,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 mapping = (MappingInfo)MapUtils.BuildMap(Grid1D, Grid2D);
             }
         }
+
         private RaycastEventManager raycastManager = null;
 
         private double[] scalars3D = new double[0];
@@ -298,34 +308,14 @@ namespace C2M2.NeuronalDynamics.Simulation {
         {
             base.OnStart();
             raycastManager = GetComponent<RaycastEventManager>();
-        }
-        protected override void OnUpdate()
-        {
-            if (clampMode != clampModePrev)
-            {
-                RaycastPressEvents newEvents = clampMode ?
-                    GameManager.instance.gameObject.GetComponent<RaycastPressEvents>()
-                    : GetComponentInChildren<RaycastPressEvents>();
-                if (newEvents == null) return;
-                raycastManager.leftTrigger = newEvents;
-                raycastManager.rightTrigger = newEvents;
-                
-            }
-            foreach (GameObject clamp in GameManager.instance.clampControllers)
-            {
-                MeshRenderChild renderControls = clamp.GetComponentInParent<MeshRenderChild>();
-                if (renderControls != null) renderControls.enabled = clampMode;
-                clamp.SetActive(clampMode);
-            }
 
-            clampModePrev = clampMode;
+            ClampMode = clampMode;
         }
         /// <summary>
         /// Read in the cell and initialize 3D/1D visualization/interaction infrastructure
         /// </summary>
         /// <returns> Unity Mesh visualization of the 3D geometry. </returns>
         protected override Mesh BuildVisualization () {
-            Mesh cellMesh = new Mesh ();
             if (!dryRun) {
 
                 if (visualize1D) Render1DCell ();
@@ -333,15 +323,14 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 VisualMesh = Grid2D.Mesh;
                 VisualMesh.Rescale (transform, new Vector3 (4, 4, 4));
                 VisualMesh.RecalculateNormals ();
-                cellMesh = VisualMesh;
 
                 // Pass blownupMesh upwards to SurfaceSimulation
-                colMesh = Grid2D.Mesh;
+                colMesh = VisualMesh;
 
                 InitUI ();
             }
 
-            return cellMesh;
+            return VisualMesh;
 
             void Render1DCell () {
                 Grid geom1D = Mapping.ModelGeometry;
@@ -387,6 +376,26 @@ namespace C2M2.NeuronalDynamics.Simulation {
         public void SwitchMesh (double inflation) {
             inflation = Math.Clamp (inflation, 1, 5);
             VisualInflation = inflation;
+        }
+
+        private void UpdateGrid1D()
+        {
+            string meshName1D = VrnReader.Retrieve1DMeshName(refinementLevel);
+            /// Create empty grid with name of grid in archive
+            grid1D = new Grid(new Mesh(), meshName1D);
+            grid1D.Attach(new DiameterAttachment());
+
+            VrnReader.ReadUGX(meshName1D, ref grid1D);
+        }
+        private void UpdateGrid2D()
+        {
+            /// Retrieve mesh names from archive
+            string meshName2D = VrnReader.Retrieve2DMeshName(visualInflation);
+
+            /// Empty 2D grid which stores geometry + mapping data
+            grid2D = new Grid(new Mesh(), meshName2D);
+            grid2D.Attach(new MappingAttachment());
+            VrnReader.ReadUGX(meshName2D, ref grid2D);
         }
     }
 

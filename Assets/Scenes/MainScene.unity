@@ -4927,13 +4927,12 @@ MonoBehaviour:
   globalMax: 120
   globalMin: -10
   refinementLevel: 0
-  vrnPath: C:/Users/jacob/Desktop/C2M2/virtual-reality/Assets/StreamingAssets\test.vrn
-  clampMode: 0
   visualize1D: 0
   color1D:
     serializedVersion: 2
     rgba: 4278512639
   lineWidth1D: 0.005
+  vrnPath: test.vrn
   clampValues: []
   vstart: 55
   endTime: 10000

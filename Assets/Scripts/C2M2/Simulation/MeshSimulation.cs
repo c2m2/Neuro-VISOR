@@ -24,7 +24,7 @@ namespace C2M2.Simulation
         /// </summary>
         public LUTGradient colorLUT { get; private set; } = null;
 
-        public LUTGradient.ExtremaMethod extremaMethod = LUTGradient.ExtremaMethod.RollingExtrema;
+        public LUTGradient.ExtremaMethod extremaMethod = LUTGradient.ExtremaMethod.GlobalExtrema;
         [Tooltip("Must be set if extremaMethod is set to GlobalExtrema")]
         public float globalMax = float.NegativeInfinity;
         [Tooltip("Must be set if extremaMethod is set to GlobalExtrema")]
@@ -54,9 +54,17 @@ namespace C2M2.Simulation
         {
             if (!dryRun)
             {
+                InitRenderer();
+                InitColors();
+                InitInteraction();
+            }
+            return;
+
+            void InitRenderer()
+            {
                 // Safe check for existing MeshFilter, MeshRenderer
                 mf = GetComponent<MeshFilter>();
-                if(mf == null) mf = gameObject.AddComponent<MeshFilter>();
+                if (mf == null) mf = gameObject.AddComponent<MeshFilter>();
                 mf.sharedMesh = viz;
 
                 mr = GetComponent<MeshRenderer>();
@@ -64,19 +72,7 @@ namespace C2M2.Simulation
 
                 // Ensure the renderer has a vertex coloring material     
                 mr.material = GameManager.instance.vertexColorationMaterial;
-
-                InitColors();
-                
-                VRRaycastableMesh raycastable = gameObject.AddComponent<VRRaycastableMesh>();
-
-                if (colliderMesh != null) raycastable.SetSource(colliderMesh);
-                else raycastable.SetSource(viz);
-
-                // Add custom grabbable here
-                gameObject.AddComponent<VRGrabbableMesh>();
             }
-            return;
-
             void InitColors()
             {
                 // Initialize the color lookup table
@@ -88,6 +84,14 @@ namespace C2M2.Simulation
                     colorLUT.globalMax = globalMax;
                     colorLUT.globalMin = globalMin;
                 }
+            }
+            void InitInteraction()
+            {
+                VRRaycastableMesh raycastable = gameObject.AddComponent<VRRaycastableMesh>();
+                if (colliderMesh != null) raycastable.SetSource(colliderMesh);
+                else raycastable.SetSource(viz);
+
+                gameObject.AddComponent<VRGrabbableMesh>();
             }
         }
         #endregion

@@ -10,6 +10,7 @@ namespace C2M2.NeuronalDynamics.Simulation
     [CustomEditor(typeof(NeuronSimulation1D), true)]
     public class NeuronSimulation1DEditor : Editor
     {
+        /*
         private string lastPath = "";
         NeuronSimulation1D neuronSimulation;
 
@@ -59,5 +60,6 @@ namespace C2M2.NeuronalDynamics.Simulation
             }
 
         }
+        */
     }
 }
