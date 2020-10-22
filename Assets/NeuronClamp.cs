@@ -222,16 +222,15 @@ namespace C2M2.NeuronalDynamics.Interaction
 
         private void SetScale(NeuronSimulation1D simulation, NeuronCell.NodeData cellNodeData)
         {
-            currentVisualizationScale = (float) simulation.VisualInflation;
+            float radiuScalarRatio = 3f;
+            float heightScalarRatio = 15f;
 
-            float radiuScalarRatio = 1.5f;
+            currentVisualizationScale = (float)simulation.VisualInflation;
 
-            float heightScalarRatio = 7.5f;
+            float radiusScalingValue = radiuScalarRatio * (float)cellNodeData.nodeRadius * currentVisualizationScale;
+            float heightScalingValue = heightScalarRatio * simulation.AverageDendriteRadius;
 
-            double dendriteDiameter = cellNodeData.nodeRadius * 2;
-
-            float radiusScalingValue = (float)(radiuScalarRatio * dendriteDiameter * currentVisualizationScale);
-            transform.parent.localScale = new Vector3(radiusScalingValue, radiusScalingValue, heightScalarRatio);
+            transform.parent.localScale = new Vector3(radiusScalingValue, radiusScalingValue, heightScalingValue);
         }
 
         public void UpdateScale(float newScale)

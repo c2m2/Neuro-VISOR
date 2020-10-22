@@ -172,6 +172,24 @@ namespace C2M2.NeuronalDynamics.Simulation {
             }
         }
 
+        private float averageDendriteRadius = 0;
+        public float AverageDendriteRadius
+        {
+            get
+            {
+                if (averageDendriteRadius == 0)
+                {
+                    float radiusSum = 0;
+                    foreach (NeuronCell.NodeData node in NeuronCell.nodeData)
+                    {
+                        radiusSum += (float) node.nodeRadius;
+                    }
+                    averageDendriteRadius = radiusSum / NeuronCell.nodeData.Count;
+                }
+                return averageDendriteRadius;
+            }
+        }
+
         // Storing the information from mapping in an array of structs greatly improves time performance
         private Vert3D1DPair[] map = null;
         private Vert3D1DPair[] Map
