@@ -223,14 +223,16 @@ namespace C2M2.NeuronalDynamics.Interaction
         private void SetScale(NeuronSimulation1D simulation, NeuronCell.NodeData cellNodeData)
         {
             float radiuScalarRatio = 3f;
-            float heightScalarRatio = 15f;
+            float heightScalarRatio = 3f;
 
             currentVisualizationScale = (float)simulation.VisualInflation;
 
-            float radiusScalingValue = radiuScalarRatio * (float)cellNodeData.nodeRadius * currentVisualizationScale;
+            float radiusScalingValue = radiuScalarRatio * (float)cellNodeData.nodeRadius;
             float heightScalingValue = heightScalarRatio * simulation.AverageDendriteRadius;
 
-            transform.parent.localScale = new Vector3(radiusScalingValue, radiusScalingValue, heightScalingValue);
+            float radiusLength = Math.Max(radiusScalingValue, heightScalingValue) * currentVisualizationScale; //Ensures that clamp is always at least as wide as tall when Visual Inflation is 1
+
+            transform.parent.localScale = new Vector3(radiusLength, radiusLength, heightScalingValue);
         }
 
         public void UpdateScale(float newScale)
