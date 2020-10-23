@@ -140,12 +140,17 @@ namespace C2M2.Simulation
         // Don't allow threads to keep running when application pauses or quits
         private void OnApplicationPause(bool pause)
         {
+            OnPause();
             if (pause && solveThread != null) solveThread.Abort();
         }
         private void OnApplicationQuit()
         {
+            OnQuit();
             if (solveThread != null) solveThread.Abort();
         }
+        // Use OnPause and OnQuit to wrap up I/O or other processes if the application pauses or quits during solve code.
+        protected virtual void OnPause() { }
+        protected virtual void OnQuit() { }
         #endregion
 
         /// <summary>
