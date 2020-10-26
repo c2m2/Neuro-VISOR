@@ -163,7 +163,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
             set
             {
                 grid1D = value;
-                NeuronCell = new NeuronCell(grid1D);
             }
         }
         public Vector3[] Verts1D { get { return grid1D.Mesh.vertices; } }
@@ -316,11 +315,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
             UpdateGrid1D();
             base.OnAwakePre();
         }
-        protected override void OnAwakePost(Mesh viz)
-        {
-
-            base.OnAwakePost(viz);
-        }
         protected override void OnStart()
         {
             base.OnStart();
@@ -405,6 +399,8 @@ namespace C2M2.NeuronalDynamics.Simulation {
             Grid1D.Attach(new DiameterAttachment());
 
             VrnReader.ReadUGX(meshName1D, ref grid1D);
+
+            NeuronCell = new NeuronCell(grid1D);
         }
         private void Update2DGrid()
         {
