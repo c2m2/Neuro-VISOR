@@ -72,44 +72,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
             }
         }
 
-        private Mesh visualMesh = null;
-        public Mesh VisualMesh
-        {
-            get
-            {
-                return visualMesh;
-            }
-            private set
-            {
-                //if (value == null) return;
-                visualMesh = value;
-
-                var mf = GetComponent<MeshFilter>();
-                if(mf == null) gameObject.AddComponent<MeshFilter>();
-                if (GetComponent<MeshRenderer>() == null)
-                    gameObject.AddComponent<MeshRenderer>().sharedMaterial = GameManager.instance.vertexColorationMaterial;
-                mf.sharedMesh = visualMesh;
-            }
-        }
-        private Mesh colMesh = null;
-        public Mesh ColliderMesh
-        {
-            get { return colMesh; }
-            private set
-            {
-                //if (value == null) return;
-                colMesh = value;
-
-                var cont = GetComponent<MeshColController>() ?? GetComponentInChildren<MeshColController>();
-                if (cont == null)
-                {
-                    cont = gameObject.AddComponent<MeshColController>();
-                }
-                cont.Mesh = colMesh;
-                base.colliderMesh = colMesh;
-            }
-        }
-
         private Dictionary<double, Mesh> meshCache = new Dictionary<double, Mesh>();
 
         private bool clampMode = false;
@@ -326,6 +288,9 @@ namespace C2M2.NeuronalDynamics.Simulation {
         /// Read in the cell and initialize 3D/1D visualization/interaction infrastructure
         /// </summary>
         /// <returns> Unity Mesh visualization of the 3D geometry. </returns>
+        /// <remarks> BuildVisualization is called by Simulation.cs,
+        /// it is called after OnAwakePre and before OnAwakePost.
+        /// If dryRun == true, Simulation will not call BuildVisualization. </remarks>
         protected override Mesh BuildVisualization () {
             if (!dryRun) {
 
@@ -337,8 +302,8 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 VisualMesh.Rescale (transform, new Vector3 (4, 4, 4));
                 VisualMesh.RecalculateNormals ();
 
-                // Pass blownupMesh upwards to SurfaceSimulation
-                colMesh = VisualMesh;
+                // Pass blownupMesh upwards to MeshSimulation
+                ColliderMesh = VisualMesh;
 
                 InitUI ();
             }
