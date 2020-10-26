@@ -49,8 +49,7 @@ namespace C2M2.Simulation
         }
         protected override void UpdateVisualization(in double[] newValues) => UpdateVisualization(newValues.ToFloat());
 
-        #region Unity Methods
-        protected sealed override void OnAwake(Mesh viz)
+        protected override void OnAwakePost(Mesh viz)
         {
             if (!dryRun)
             {
@@ -94,6 +93,5 @@ namespace C2M2.Simulation
                 gameObject.AddComponent<VRGrabbableMesh>();
             }
         }
-        #endregion
     }
 }

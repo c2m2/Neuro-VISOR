@@ -76,6 +76,8 @@ namespace C2M2.Simulation
         #region Unity Methods
         public void Awake()
         {
+            OnAwakePre();
+
             if (!dryRun)
             {
                 viz = BuildVisualization();
@@ -83,7 +85,7 @@ namespace C2M2.Simulation
             }
 
             // Run child awake methods first
-            OnAwake(viz);
+            OnAwakePost(viz);
 
             return;
 
@@ -132,8 +134,9 @@ namespace C2M2.Simulation
             }
         }
 
+        protected virtual void OnAwakePre() { }
         // Allow derived classes to run code in Awake/Start/Update if they choose
-        protected virtual void OnAwake(VizType viz) { }
+        protected virtual void OnAwakePost(VizType viz) { }
         protected virtual void OnStart() { }
         protected virtual void OnUpdate() { }
 

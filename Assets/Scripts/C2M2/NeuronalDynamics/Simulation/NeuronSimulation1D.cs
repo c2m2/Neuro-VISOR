@@ -38,7 +38,10 @@ namespace C2M2.NeuronalDynamics.Simulation {
             {
                 visualInflation = value;
                 if (ColliderInflation < visualInflation) ColliderInflation = visualInflation;
-                VisualMesh = CheckMeshCache(visualInflation);
+
+                Update2DGrid();
+
+                VisualMesh = Grid2D.Mesh;
                 OnVisualInflationChange?.Invoke(visualInflation);
             }
         }
@@ -58,7 +61,16 @@ namespace C2M2.NeuronalDynamics.Simulation {
             }
         }
 
-        public int refinementLevel = 0;
+        private int refinementLevel = 0;
+        public int RefinementLevel
+        {
+            get { return refinementLevel; }
+            set
+            {
+                refinementLevel = value;
+                UpdateGrid1D();
+            }
+        }
 
         private Mesh visualMesh = null;
         public Mesh VisualMesh
@@ -139,17 +151,19 @@ namespace C2M2.NeuronalDynamics.Simulation {
                     vrnReader = new vrnReader(Application.streamingAssetsPath + Path.DirectorySeparatorChar + vrnPath);
                 return vrnReader;
             }
+            set { vrnReader = value; }
         }
 
         private Grid grid1D = null;
         public Grid Grid1D
         {
             get {
-                if (grid1D == null)
-                {
-                    UpdateGrid1D();
-                }
                 return grid1D;
+            }
+            set
+            {
+                grid1D = value;
+                NeuronCell = new NeuronCell(grid1D);
             }
         }
         public Vector3[] Verts1D { get { return grid1D.Mesh.vertices; } }
@@ -159,26 +173,19 @@ namespace C2M2.NeuronalDynamics.Simulation {
         {
             get
             {
-                if (grid2D == null)
-                {
-                    UpdateGrid2D();
-                }
                 return grid2D;
+            }
+            set
+            {
+                grid2D = value;
             }
         }
 
         private NeuronCell neuronCell = null;
         public NeuronCell NeuronCell
         {
-            get
-            {
-                if(neuronCell == null)
-                {
-                    neuronCell = new NeuronCell(Grid1D);
-                }
-                
-                return neuronCell;
-            }
+            get { return neuronCell; }
+            set { neuronCell = value; }
         }
 
         // Storing the information from mapping in an array of structs greatly improves time performance
@@ -304,6 +311,16 @@ namespace C2M2.NeuronalDynamics.Simulation {
         /// <returns></returns>
         public abstract double[] Get1DValues ();
 
+        protected override void OnAwakePre()
+        {
+            UpdateGrid1D();
+            base.OnAwakePre();
+        }
+        protected override void OnAwakePost(Mesh viz)
+        {
+
+            base.OnAwakePost(viz);
+        }
         protected override void OnStart()
         {
             base.OnStart();
@@ -319,6 +336,8 @@ namespace C2M2.NeuronalDynamics.Simulation {
             if (!dryRun) {
 
                 if (visualize1D) Render1DCell ();
+
+                Update2DGrid();
 
                 VisualMesh = Grid2D.Mesh;
                 VisualMesh.Rescale (transform, new Vector3 (4, 4, 4));
@@ -380,21 +399,21 @@ namespace C2M2.NeuronalDynamics.Simulation {
 
         private void UpdateGrid1D()
         {
-            string meshName1D = VrnReader.Retrieve1DMeshName(refinementLevel);
+            string meshName1D = VrnReader.Retrieve1DMeshName(RefinementLevel);
             /// Create empty grid with name of grid in archive
-            grid1D = new Grid(new Mesh(), meshName1D);
-            grid1D.Attach(new DiameterAttachment());
+            Grid1D = new Grid(new Mesh(), meshName1D);
+            Grid1D.Attach(new DiameterAttachment());
 
             VrnReader.ReadUGX(meshName1D, ref grid1D);
         }
-        private void UpdateGrid2D()
+        private void Update2DGrid()
         {
             /// Retrieve mesh names from archive
-            string meshName2D = VrnReader.Retrieve2DMeshName(visualInflation);
+            string meshName2D = VrnReader.Retrieve2DMeshName(VisualInflation);
 
             /// Empty 2D grid which stores geometry + mapping data
-            grid2D = new Grid(new Mesh(), meshName2D);
-            grid2D.Attach(new MappingAttachment());
+            Grid2D = new Grid(new Mesh(), meshName2D);
+            Grid2D.Attach(new MappingAttachment());
             VrnReader.ReadUGX(meshName2D, ref grid2D);
         }
     }
