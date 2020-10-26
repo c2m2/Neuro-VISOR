@@ -25,7 +25,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         public Material activeMaterial = null;
         public Material inactiveMaterial = null;
 
-        public NeuronSimulation1D activeTarget = null;
+        public NDSimulation activeTarget = null;
 
         private bool use1DVerts = true;
 
@@ -104,7 +104,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         {
             if (activeTarget == null)
             {
-                NeuronSimulation1D simulation = other.GetComponentInParent<NeuronSimulation1D>() ?? other.GetComponent<NeuronSimulation1D>();
+                NDSimulation simulation = other.GetComponentInParent<NDSimulation>() ?? other.GetComponent<NDSimulation>();
                 if (simulation != null)
                 {
                     ReportSimulation(simulation, transform.parent.position);
@@ -112,7 +112,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             }
         }
 
-        public NeuronSimulation1D ReportSimulation(NeuronSimulation1D simulation, Vector3 contactPoint)
+        public NDSimulation ReportSimulation(NDSimulation simulation, Vector3 contactPoint)
         {
             if (activeTarget == null)
             {
@@ -154,7 +154,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             activeTarget.clampValues.Remove(this);
         }
 
-        private int GetNearestPoint(NeuronSimulation1D simulation, Vector3 worldPoint)
+        private int GetNearestPoint(NDSimulation simulation, Vector3 worldPoint)
         {
             // Translate contact point to local space
             Vector3 localPoint = activeTarget.transform.InverseTransformPoint(worldPoint);
@@ -220,7 +220,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             return spotOpen;
         }
 
-        private void SetScale(NeuronSimulation1D simulation, NeuronCell.NodeData cellNodeData)
+        private void SetScale(NDSimulation simulation, NeuronCell.NodeData cellNodeData)
         {
             float radiuScalarRatio = 3f;
             float heightScalarRatio = 3f;
@@ -249,7 +249,7 @@ namespace C2M2.NeuronalDynamics.Interaction
 
         }
 
-        public void SetRotation(NeuronSimulation1D simulation, NeuronCell.NodeData cellNodeData)
+        public void SetRotation(NDSimulation simulation, NeuronCell.NodeData cellNodeData)
         {
             List<int> neighbors = cellNodeData.neighborIDs;
 

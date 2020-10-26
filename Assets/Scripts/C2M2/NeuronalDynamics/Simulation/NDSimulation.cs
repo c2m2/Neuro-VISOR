@@ -28,7 +28,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
     /// <remarks>
     /// 1D Neuron surface simulations should derive from this class.
     /// </remarks>
-    public abstract class NeuronSimulation1D : MeshSimulation {
+    public abstract class NDSimulation : MeshSimulation {
 
         private double visualInflation = 1;
         public double VisualInflation

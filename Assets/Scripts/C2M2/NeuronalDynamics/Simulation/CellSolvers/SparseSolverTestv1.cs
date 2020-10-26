@@ -28,7 +28,7 @@ using C2M2.NeuronalDynamics.UGX;
 using Grid = C2M2.NeuronalDynamics.UGX.Grid;
 namespace C2M2.NeuronalDynamics.Simulation
 {
-    public class SparseSolverTestv1 : NeuronSimulation1D
+    public class SparseSolverTestv1 : NDSimulation
     {
         //Simulation parameters
         [Header("Simulation Parameters")]

@@ -22,7 +22,7 @@ using C2M2.Visualization;
 using Grid = C2M2.NeuronalDynamics.UGX.Grid;
 namespace C2M2.NeuronalDynamics.Simulation
 {
-    public class CellSolver2DiffusionReaction : NeuronSimulation1D
+    public class CellSolver2DiffusionReaction : NDSimulation
     {
         //Set cell biological paramaters
         public const double res = 10.0;

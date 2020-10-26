@@ -7,8 +7,8 @@ namespace C2M2.NeuronalDynamics.Simulation
     /// <summary>
     /// Provides editor features so that users can more easily select neuron cells and options for them
     /// </summary>
-    [CustomEditor(typeof(NeuronSimulation1D), true)]
-    public class NeuronSimulation1DEditor : Editor
+    [CustomEditor(typeof(NDSimulation), true)]
+    public class NDSimulationEditor : Editor
     {
         /*
         private string lastPath = "";

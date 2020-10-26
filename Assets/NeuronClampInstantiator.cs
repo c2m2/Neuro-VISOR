@@ -40,7 +40,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         {
             // Make sure we have a valid prefab and simulation
             if (clampPrefab == null) Debug.LogError("No Clamp prefab found");
-            var sim = hit.collider.GetComponentInParent<NeuronSimulation1D>();
+            var sim = hit.collider.GetComponentInParent<NDSimulation>();
             if (sim == null) return;
 
             var clamp = Instantiate(clampPrefab, sim.transform);
