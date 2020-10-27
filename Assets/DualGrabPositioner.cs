@@ -8,6 +8,7 @@ namespace C2M2.Interaction
     {
         protected override IEnumerator GrabAction(Transform handA, Transform handB)
         {
+            // Take the point directly between both hands to be the "hand position"
             Vector3 relPos = transform.position - Vector3.Lerp(handA.position, handB.position, 0.5f);
 
             while (true)
