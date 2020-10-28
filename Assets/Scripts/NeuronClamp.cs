@@ -146,7 +146,7 @@ namespace C2M2.NeuronalDynamics.Interaction
 
                 gradientLUT = this.simulation.GetComponent<LUTGradient>();
 
-                this.simulation.clampValues.Add(this);
+                this.simulation.clamps.Add(this);
 
                 transform.parent.localPosition = focusPos;
             }
@@ -194,7 +194,7 @@ namespace C2M2.NeuronalDynamics.Interaction
 
         private void OnDestroy()
         {
-            simulation.clampValues.Remove(this);
+            simulation.clamps.Remove(this);
         }
 
         private int GetNearestPoint(NDSimulation simulation, RaycastHit hit)

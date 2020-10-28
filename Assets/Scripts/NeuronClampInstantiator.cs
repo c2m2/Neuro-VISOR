@@ -5,35 +5,20 @@ using C2M2.NeuronalDynamics.Simulation;
 
 namespace C2M2.NeuronalDynamics.Interaction
 {
+    /// <summary>
+    /// Provides public method for instantiating clamps. Provides controls for multiple clamps
+    /// </summary>
     public class NeuronClampInstantiator : MonoBehaviour
     {
         public GameObject clampPrefab = null;
         public bool allActive = false;
-        public List<NeuronClamp> clamps = new List<NeuronClamp>();
-        public List<int> ClampInds
-        {
+        public NDSimulation simulation { get; private set; } = null;
+        public List<NeuronClamp> Clamps {
             get
             {
-                List<int> inds = new List<int>();
-                if (clamps.Count > 0) {
-                    foreach (NeuronClamp clamp in clamps)
-                    {
-                        if(clamp != null && clamp.focusVert != -1)
-                        {
-                            inds.Add(clamp.focusVert);
-                        }
-                    }
-                }
-                return inds;
+                if (simulation == null) return null;
+                return simulation.clamps;
             }
-        }
-        private List<NeuronClamp> clampGarbage = new List<NeuronClamp>();
-
-        private void Start()
-        {
-            // Monitors for removed/null clamps
-            StartCoroutine(ClampGC());
-            StartCoroutine(CheckForDuplicates(0.5f));
         }
 
         public void InstantiateClamp(RaycastHit hit)
@@ -42,12 +27,13 @@ namespace C2M2.NeuronalDynamics.Interaction
             if (clampPrefab == null) Debug.LogError("No Clamp prefab found");
             var sim = hit.collider.GetComponentInParent<NDSimulation>();
             if (sim == null) return;
+            if (simulation == null) sim = simulation;
+            // Only allow one simulation
+            if (sim != simulation) return;
 
             var clampObj = Instantiate(clampPrefab, sim.transform);
             NeuronClamp clamp = clampObj.GetComponentInChildren<NeuronClamp>();
             clamp.ReportSimulation(sim, hit);
-            //clampObj.transform.position = hit.point;
-            clamps.Add(clamp);
         }
 
         private int destroyCount = 50;
@@ -91,6 +77,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             }
         }
         private bool powerClick = false;
+
         /// <summary>
         /// If the user holds a raycast down for X seconds on a clamp, it should destroy the clamp
         /// </summary>
@@ -105,10 +92,9 @@ namespace C2M2.NeuronalDynamics.Interaction
             // If clamp power is modified while the user holds a click, don't let the click also toggle/destroy the clamp
             if (power != 0 && !powerClick) powerClick = true;
 
-            foreach (NeuronClamp clamp in clamps)
+            foreach (NeuronClamp clamp in Clamps)
             {
                 if (clamp != null) clamp.clampPower += power;
-                else if (!clampGarbage.Contains(clamp)) clampGarbage.Add(clamp);
             }
             
         }
@@ -131,87 +117,32 @@ namespace C2M2.NeuronalDynamics.Interaction
             holdCount = 0;
             powerClick = false;
         }
+
         private void ToggleAll()
         {
-            if (clamps.Count > 0)
+            if (Clamps.Count > 0)
             {
-                if (allActive)
+                foreach (NeuronClamp clamp in Clamps)
                 {
-                    foreach (NeuronClamp clamp in clamps)
-                    {
-                        if (clamp != null && clamp.focusVert != -1) clamp.DeactivateClamp();
-                        else if (!clampGarbage.Contains(clamp)) clampGarbage.Add(clamp);
+                    if (clamp != null && clamp.focusVert != -1) {
+                        if (allActive)
+                            clamp.DeactivateClamp();
+                        else
+                            clamp.ActivateClamp();
                     }
                 }
-                else
-                {
-                    foreach (NeuronClamp clamp in clamps)
-                    {
-                        if (clamp != null && clamp.focusVert != -1) clamp.ActivateClamp();
-                        else if (!clampGarbage.Contains(clamp)) clampGarbage.Add(clamp);
-                    }
-                }
+
                 allActive = !allActive;
             }
         }
         private void DestroyAll()
         {
-            if (clamps.Count > 0)
+            if (Clamps.Count > 0)
             {
-                foreach (NeuronClamp clamp in clamps)
+                foreach (NeuronClamp clamp in Clamps)
                 {
                     if (clamp != null && clamp.focusVert != -1)
                         Destroy(clamp.transform.parent.gameObject);
-
-                    if (!clampGarbage.Contains(clamp)) clampGarbage.Add(clamp);
-                }
-                clamps.Clear();
-            }
-        }
-
-        private IEnumerator CheckForDuplicates(float waitTime)
-        {
-            while (true)
-            {
-                if (clamps.Count > 0)
-                {
-                    List<int> takenVerts = new List<int>();
-                    
-                    foreach (NeuronClamp clamp in clamps)
-                    {
-                        if (takenVerts.Contains(clamp.focusVert))
-                        {
-                            clampGarbage.Add(clamp);
-                            Destroy(clamp.transform.parent);
-                        }
-                    }
-                }
-                yield return new WaitForSeconds(waitTime);
-            }
-        }
-
-        // TODO: This is is not tested
-        private IEnumerator ClampGC()
-        {
-            int maxGarbage = 10;
-            // How many clamps need to exist before we check for garbage?
-            while (true)
-            {
-                if (clampGarbage.Count >= maxGarbage)
-                {
-                    int garbageCount = clampGarbage.Count;
-                    // Take out the trash
-                    foreach(NeuronClamp clamp in clampGarbage)
-                    {
-                        clamps.Remove(clamp);
-                    }
-                    clampGarbage.Clear();
-                    Debug.Log("Removed " + garbageCount + " null clamps.");
-                }
-                else
-                {
-                    // Wait until there w=are enough clamps in the trash;
-                    yield return new WaitUntil(() => clampGarbage.Count >= maxGarbage);
                 }
             }
         }

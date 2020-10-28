@@ -252,9 +252,9 @@ namespace C2M2.NeuronalDynamics.Simulation
                         if (SomaOn) { U.SetSubVector(0, NeuronCell.vertCount, setSoma(U, NeuronCell.somaID, vstart)); }
 
                         // Apply clamp voltages
-                        if (clampValues.Count > 0)
+                        if (clamps.Count > 0)
                         {
-                            foreach (NeuronClamp clamp in clampValues)
+                            foreach (NeuronClamp clamp in clamps)
                             {
                                 if (clamp.focusVert != -1 && clamp.clampLive)
                                 {

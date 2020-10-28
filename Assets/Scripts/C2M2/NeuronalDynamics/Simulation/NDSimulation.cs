@@ -217,7 +217,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
             }
         }
 
-        public List<NeuronClamp> clampValues = new List<NeuronClamp>();
+        public List<NeuronClamp> clamps = new List<NeuronClamp>();
 
         /// <summary>
         /// Translate 1D vertex values to 3D values and pass them upwards for visualization
