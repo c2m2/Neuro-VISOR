@@ -2,18 +2,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 using C2M2.NeuronalDynamics.Simulation;
-using C2M2.Utils.MeshUtils;
-using Grid = C2M2.NeuronalDynamics.UGX.Grid;
 using C2M2.NeuronalDynamics.UGX;
 using C2M2.Visualization;
-using System.Collections;
-using C2M2.Utils;
 using Math = C2M2.Utils.Math;
 
 namespace C2M2.NeuronalDynamics.Interaction
 {
     public class NeuronClamp : MonoBehaviour
     {
+
+        public float radiusRatio = 3f;
+        public float heightRatio = 3f;
+
         public bool clampLive { get; private set; } = false;
  
         public double clampPower = 55;
@@ -123,7 +123,7 @@ namespace C2M2.NeuronalDynamics.Interaction
                 NeuronCell.NodeData clampCellNodeData = simulation.NeuronCell.nodeData[clampIndex];
 
                 // Check for duplicates
-                if(!VertIsAvailable(clampIndex, clampCellNodeData))
+                if(!VertIsAvailable(clampIndex, simulation))
                 {
                     Destroy(transform.parent.gameObject);
                 }
@@ -154,7 +154,6 @@ namespace C2M2.NeuronalDynamics.Interaction
 
         private int GetNearestPoint(NDSimulation simulation, Vector3 worldPoint)
         {
-            return simulation.Map[]
             // Translate contact point to local space
             Vector3 localPoint = this.simulation.transform.InverseTransformPoint(worldPoint);
 
@@ -196,40 +195,38 @@ namespace C2M2.NeuronalDynamics.Interaction
         }
 
         // Returns true if the that 1D index is available, otherwise returns false
-        private bool VertIsAvailable(int clampIndex, NeuronCell.NodeData cellNodeData)
+        private bool VertIsAvailable(int clampIndex, NDSimulation simulation)
         {
-            List<int> takenSpots = GameManager.instance.clampInstantiator.ClampInds;
-            bool spotOpen = true;
+            bool validLocation = true;
+            float distanceBetweenClamps = simulation.AverageDendriteRadius * heightRatio * 2;
 
-            // If there is a clamp on that 1D vertex, the spot is not open
-            if (takenSpots.Contains(clampIndex))
+            foreach (NeuronClamp clamp in simulation.clampValues)
             {
-                Debug.LogWarning("Clamp already exists on focus vert [" + clampIndex + "]");
-                spotOpen = false;
-            }
-            // If there is a clamp on any of its immediate neighbors, the spot is not open
-            foreach(int n in cellNodeData.neighborIDs)
-            {
-                if (takenSpots.Contains(n))
+                // If there is a clamp on that 1D vertex, the spot is not open
+                if (clamp.focusVert == clampIndex)
                 {
-                    Debug.LogWarning("Clamp already exists on neighbor [" + n + "] of focus vert [" + clampIndex + "].");
-                    spotOpen = false;
+                    Debug.LogWarning("Clamp already exists on focus vert [" + clampIndex + "]");
+                    validLocation = false;
+                }
+                // If there is a clamp within distance of 2, the spot is not open
+                else if ((clamp.transform.parent.localPosition - transform.parent.localPosition).magnitude < distanceBetweenClamps)
+                {
+                    Debug.LogWarning("Clamp too close to clamp located on focus vert [" + clamp.focusVert + "].");
+                    validLocation = false;
                 }
             }
-            return spotOpen;
+            return validLocation;
         }
 
         private void SetScale(NDSimulation simulation, NeuronCell.NodeData cellNodeData)
         {
-            float radiuScalarRatio = 3f;
-            float heightScalarRatio = 3f;
-
             currentVisualizationScale = (float)simulation.VisualInflation;
 
-            float radiusScalingValue = radiuScalarRatio * (float)cellNodeData.nodeRadius;
-            float heightScalingValue = heightScalarRatio * simulation.AverageDendriteRadius;
+            float radiusScalingValue = radiusRatio * (float)cellNodeData.nodeRadius;
+            float heightScalingValue = heightRatio * simulation.AverageDendriteRadius;
 
-            float radiusLength = Math.Max(radiusScalingValue, heightScalingValue) * currentVisualizationScale; //Ensures that clamp is always at least as wide as tall when Visual Inflation is 1
+            //Ensures clamp is always at least as wide as tall when Visual Inflation is 1
+            float radiusLength = Math.Max(radiusScalingValue, heightScalingValue) * currentVisualizationScale;
 
             transform.parent.localScale = new Vector3(radiusLength, radiusLength, heightScalingValue);
         }
