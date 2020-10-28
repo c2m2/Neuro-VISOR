@@ -119,7 +119,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 if (vrnReader == null)
                 {
                     vrnReader = new vrnReader(vrnPath);
-                    Debug.Log(vrnReader.List());
+              //      Debug.Log(vrnReader.List());
                 }
                 return vrnReader;
             }
