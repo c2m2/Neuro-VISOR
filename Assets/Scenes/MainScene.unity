@@ -4941,7 +4941,7 @@ MonoBehaviour:
   globalMax: 120
   globalMin: -10
   refinementLevel: 0
-  vrnPath: C:/Users/jacob/Desktop/C2M2/virtual-reality/Assets/StreamingAssets\44-4.CNG_original.vrn
+  vrnPath: C:/Users/jacob/Desktop/C2M2/virtual-reality/Assets/StreamingAssets/testNew.vrn
   clampMode: 0
   visualize1D: 0
   color1D:

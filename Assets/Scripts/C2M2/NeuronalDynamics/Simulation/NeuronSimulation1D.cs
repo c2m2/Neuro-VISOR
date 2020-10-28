@@ -116,8 +116,11 @@ namespace C2M2.NeuronalDynamics.Simulation {
         {
             get
             {
-                if(vrnReader == null)
+                if (vrnReader == null)
+                {
                     vrnReader = new vrnReader(vrnPath);
+                    Debug.Log(vrnReader.List());
+                }
                 return vrnReader;
             }
         }
@@ -128,7 +131,8 @@ namespace C2M2.NeuronalDynamics.Simulation {
             get {
                 if (grid1D == null)
                 {
-                    string meshName1D = VrnReader.Retrieve1DMeshName(refinementLevel);
+                    //string meshName1D = VrnReader.Retrieve1DMeshName(refinementLevel);
+                    string meshName1D = VrnReader.Retrieve1DMeshName();
                     /// Create empty grid with name of grid in archive
                     grid1D = new Grid(new Mesh(), meshName1D);
                     grid1D.Attach(new DiameterAttachment());
@@ -148,7 +152,8 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 if (grid2D == null)
                 {
                     /// Retrieve mesh names from archive
-                    string meshName2D = VrnReader.Retrieve2DMeshName(visualInflation);
+                    //string meshName2D = VrnReader.Retrieve2DMeshName(visualInflation);
+                    string meshName2D = VrnReader.Retrieve2DMeshName();
 
                     /// Empty 2D grid which stores geometry + mapping data
                     grid2D = new Grid(new Mesh(), meshName2D);
