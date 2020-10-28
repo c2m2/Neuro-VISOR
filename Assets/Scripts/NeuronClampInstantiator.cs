@@ -44,62 +44,10 @@ namespace C2M2.NeuronalDynamics.Interaction
             if (sim == null) return;
 
             var clamp = Instantiate(clampPrefab, sim.transform);
+           
             clamp.transform.position = hit.point;
             clamps.Add(clamp.GetComponentInChildren<NeuronClamp>());
         }
-
-        /*
-        public void ToggleClamps(RaycastHit hit)
-        {
-            if (clamps.Count > 0)
-            {
-                string s = "";
-                if (allActive)
-                {
-                    foreach (NeuronClamp clamp in clamps)
-                    {
-                        if (clamp != null && clamp.focusVert != -1) clamp.DeactivateClamp();
-                        else clampGarbage.Add(clamp);
-                    }
-                    s += "Deactivated ";
-                }
-                else
-                {
-                    foreach (NeuronClamp clamp in clamps)
-                    {
-                        if (clamp != null && clamp.focusVert != -1) clamp.ActivateClamp();
-                        else clampGarbage.Add(clamp);
-                    }
-                    s += "Activated ";
-                }
-                Debug.Log(s + (clamps.Count - clampGarbage.Count) + " clamps.\n" + clampGarbage.Count + " null clamps found.");
-
-                allActive = !allActive;
-            }
-        }
-
-        public void MonitorDestroy(RaycastHit hit)
-        {
-            curCount++;
-            if(curCount == holdCount)
-            {
-                foreach(NeuronClamp clamp in clamps)
-                {
-                    if (clamp != null && clamp.focusVert != -1)
-                    {
-                        Destroy(clamp.transform.parent.gameObject);
-                    }
-                    clampGarbage.Add(clamp);
-                }
-                clamps.Clear();
-            }
-        }
-        public void EndDestroyMonitor(RaycastHit hit)
-        {
-            curCount = 0;
-        }
-
-        */
 
         private int destroyCount = 50;
         private int holdCount = 0;

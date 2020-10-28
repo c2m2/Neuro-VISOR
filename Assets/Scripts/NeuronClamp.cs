@@ -14,8 +14,6 @@ namespace C2M2.NeuronalDynamics.Interaction
 {
     public class NeuronClamp : MonoBehaviour
     {
-
-
         public bool clampLive { get; private set; } = false;
  
         public double clampPower = 55;
@@ -25,7 +23,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         public Material activeMaterial = null;
         public Material inactiveMaterial = null;
 
-        public NDSimulation activeTarget = null;
+        public NDSimulation simulation = null;
 
         private bool use1DVerts = true;
 
@@ -64,7 +62,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         {
             OVRInput.FixedUpdate();
 
-            if(activeTarget != null)
+            if(simulation != null)
             {
                 if (clampLive)
                 {
@@ -102,7 +100,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         // Scan new targets for ND simulations
         private void OnTriggerEnter(Collider other)
         {
-            if (activeTarget == null)
+            if (simulation == null)
             {
                 NDSimulation simulation = other.GetComponentInParent<NDSimulation>() ?? other.GetComponent<NDSimulation>();
                 if (simulation != null)
@@ -114,13 +112,13 @@ namespace C2M2.NeuronalDynamics.Interaction
 
         public NDSimulation ReportSimulation(NDSimulation simulation, Vector3 contactPoint)
         {
-            if (activeTarget == null)
+            if (this.simulation == null)
             {
-                activeTarget = simulation;
+                this.simulation = simulation;
 
                 transform.parent.parent = simulation.transform;
 
-                int clampIndex = GetNearestPoint(activeTarget, contactPoint);
+                int clampIndex = GetNearestPoint(this.simulation, contactPoint);
 
                 NeuronCell.NodeData clampCellNodeData = simulation.NeuronCell.nodeData[clampIndex];
 
@@ -132,8 +130,8 @@ namespace C2M2.NeuronalDynamics.Interaction
 
                 focusVert = clampIndex;
 
-                SetScale(activeTarget, clampCellNodeData);
-                SetRotation(activeTarget, clampCellNodeData);
+                SetScale(this.simulation, clampCellNodeData);
+                SetRotation(this.simulation, clampCellNodeData);
 
                 simulation.OnVisualInflationChange += VisualInflationChangeHandler;
 
@@ -141,23 +139,24 @@ namespace C2M2.NeuronalDynamics.Interaction
                 gameObject.layer = LayerMask.NameToLayer("Raycast");
                 Destroy(gameObject.GetComponent<Rigidbody>());
 
-                gradientLUT = activeTarget.GetComponent<LUTGradient>();
+                gradientLUT = this.simulation.GetComponent<LUTGradient>();
 
-                activeTarget.clampValues.Add(this);
+                this.simulation.clampValues.Add(this);
             }
 
-            return activeTarget;
+            return this.simulation;
         }
 
         private void OnDestroy()
         {
-            activeTarget.clampValues.Remove(this);
+            simulation.clampValues.Remove(this);
         }
 
         private int GetNearestPoint(NDSimulation simulation, Vector3 worldPoint)
         {
+            return simulation.Map[]
             // Translate contact point to local space
-            Vector3 localPoint = activeTarget.transform.InverseTransformPoint(worldPoint);
+            Vector3 localPoint = this.simulation.transform.InverseTransformPoint(worldPoint);
 
             Vector3[] verts;
             if (use1DVerts)

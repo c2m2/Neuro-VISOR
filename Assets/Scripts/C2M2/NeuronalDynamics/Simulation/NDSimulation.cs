@@ -167,9 +167,10 @@ namespace C2M2.NeuronalDynamics.Simulation {
             }
         }
 
-        // Storing the information from mapping in an array of structs greatly improves time performance
+        // Stores the information from mapping in an array of structs. 
+        // Performs much better than using mapping directly.
         private Vert3D1DPair[] map = null;
-        private Vert3D1DPair[] Map
+        public Vert3D1DPair[] Map
         {
             get
             {
@@ -400,6 +401,11 @@ namespace C2M2.NeuronalDynamics.Simulation {
     /// <summary>
     /// Stores two 1D indices and a lambda value for a 3D vertex
     /// </summary>
+    /// <remarks>
+    /// Lambda is a value between 0 and 1. A lambda value greater than 0.5 implies that the 3D vert lies closer to v2.
+    /// A lambda value of 0 would imply that the 3D vert lies directly over v1, 
+    /// and a lambda of 1 implies that it lies completely over v2.
+    /// </remarks>
     public struct Vert3D1DPair
     {
         public int v1 { get; private set; }
