@@ -9,6 +9,7 @@ using C2M2.Visualization;
 using System.Collections;
 using C2M2.Utils;
 using Math = C2M2.Utils.Math;
+using C2M2.Interaction;
 
 namespace C2M2.NeuronalDynamics.Interaction
 {
@@ -19,6 +20,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         public double clampPower = 55;
 
         public int focusVert { get; private set; } = -1;
+        public Vector3 focusPos;
 
         public Material activeMaterial = null;
         public Material inactiveMaterial = null;
@@ -97,6 +99,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             else ActivateClamp();
         }
 
+        /*
         // Scan new targets for ND simulations
         private void OnTriggerEnter(Collider other)
         {
@@ -109,7 +112,48 @@ namespace C2M2.NeuronalDynamics.Interaction
                 }
             }
         }
+        */
+        public NDSimulation ReportSimulation(NDSimulation simulation, RaycastHit hit)
+        {
+            if (this.simulation == null)
+            {
+                this.simulation = simulation;
 
+                transform.parent.parent = simulation.transform;
+
+                int clampIndex = GetNearestPoint(this.simulation, hit);
+
+                NeuronCell.NodeData clampCellNodeData = simulation.NeuronCell.nodeData[clampIndex];
+
+                // Check for duplicates
+                if (!VertIsAvailable(clampIndex, clampCellNodeData))
+                {
+                    Destroy(transform.parent.gameObject);
+                }
+
+                focusVert = clampIndex;
+                focusPos = simulation.Verts1D[focusVert];
+                Debug.Log("Nearest 1D vert:\nind: " + focusVert + "\npos: " + focusPos);
+
+                SetScale(this.simulation, clampCellNodeData);
+                SetRotation(this.simulation, clampCellNodeData);
+
+                simulation.OnVisualInflationChange += VisualInflationChangeHandler;
+
+                // Change object layer to Raycast so the clamp does not continue to interact physically with the simulation
+                gameObject.layer = LayerMask.NameToLayer("Raycast");
+                Destroy(gameObject.GetComponent<Rigidbody>());
+
+                gradientLUT = this.simulation.GetComponent<LUTGradient>();
+
+                this.simulation.clampValues.Add(this);
+
+                transform.parent.localPosition = focusPos;
+            }
+
+            return this.simulation;
+        }
+        /*
         public NDSimulation ReportSimulation(NDSimulation simulation, Vector3 contactPoint)
         {
             if (this.simulation == null)
@@ -146,57 +190,90 @@ namespace C2M2.NeuronalDynamics.Interaction
 
             return this.simulation;
         }
+        */
 
         private void OnDestroy()
         {
             simulation.clampValues.Remove(this);
         }
 
-        private int GetNearestPoint(NDSimulation simulation, Vector3 worldPoint)
+        private int GetNearestPoint(NDSimulation simulation, RaycastHit hit)
         {
-            return simulation.Map[]
-            // Translate contact point to local space
-            Vector3 localPoint = this.simulation.transform.InverseTransformPoint(worldPoint);
 
-            Vector3[] verts;
-            if (use1DVerts)
-            {
-                verts = simulation.Verts1D;
-            }
-            else
-            {
-                MeshFilter mf = simulation.GetComponent<MeshFilter>();
-                if (mf == null) return -1;
-                Mesh mesh = mf.sharedMesh ?? mf.mesh;
-                if (mesh == null) return -1;
+            MeshFilter mf = simulation.transform.GetComponentInParent<MeshFilter>();
+            if (mf == null) return -1;
+            // Get mesh vertices from hit triangle
+            int triInd = hit.triangleIndex * 3;
+            int v1 = mf.mesh.triangles[triInd];
+            int v2 = mf.mesh.triangles[triInd + 1];
+            int v3 = mf.mesh.triangles[triInd + 2];
 
-                verts = mesh.vertices;
-            }
+            // Find nearest 1D vert to these 3D verts
+            int[] verts1D = new int[]{
+                simulation.Map[v1].lambda < 0.5 ? simulation.Map[v1].v1 : simulation.Map[v1].v2,
+                simulation.Map[v2].lambda < 0.5 ? simulation.Map[v2].v1 : simulation.Map[v2].v2,
+                simulation.Map[v3].lambda < 0.5 ? simulation.Map[v3].v1 : simulation.Map[v3].v2};
 
-            int nearestVertInd = -1;
-            Vector3 nearestPos = new Vector3(float.PositiveInfinity, float.PositiveInfinity, float.PositiveInfinity);
             float nearestDist = float.PositiveInfinity;
-            for (int i = 0; i < verts.Length; i++)
+            int nearestVert1D = -1;
+            foreach(int vert in verts1D)
             {
-                float dist = Vector3.Distance(localPoint, verts[i]);
+                float dist = Vector3.Distance(hit.point, simulation.Verts1D[vert]);
                 if (dist < nearestDist)
                 {
                     nearestDist = dist;
-                    nearestVertInd = i;
-                    nearestPos = verts[i];
+                    nearestVert1D = vert;
                 }
             }
 
-            posFocus = nearestPos;
-
-            transform.parent.localPosition = posFocus;
-
-            transform.parent.name = "AttachedNeuronClamp" + nearestVertInd;
-            return nearestVertInd;
+            return nearestVert1D;
         }
+            /*
+            private int GetNearestPoint(NDSimulation simulation, Vector3 worldPoint)
+            {
+                // Translate contact point to local space
+                Vector3 localPoint = this.simulation.transform.InverseTransformPoint(worldPoint);
 
-        // Returns true if the that 1D index is available, otherwise returns false
-        private bool VertIsAvailable(int clampIndex, NeuronCell.NodeData cellNodeData)
+                Vector3[] verts;
+                if (use1DVerts)
+                {
+                    verts = simulation.Verts1D;
+                }
+                else
+                {
+                    MeshFilter mf = simulation.GetComponent<MeshFilter>();
+                    if (mf == null) return -1;
+                    Mesh mesh = mf.sharedMesh ?? mf.mesh;
+                    if (mesh == null) return -1;
+
+                    verts = mesh.vertices;
+                }
+
+                int nearestVertInd = -1;
+                Vector3 nearestPos = new Vector3(float.PositiveInfinity, float.PositiveInfinity, float.PositiveInfinity);
+                float nearestDist = float.PositiveInfinity;
+                for (int i = 0; i < verts.Length; i++)
+                {
+                    float dist = Vector3.Distance(localPoint, verts[i]);
+                    if (dist < nearestDist)
+                    {
+                        nearestDist = dist;
+                        nearestVertInd = i;
+                        nearestPos = verts[i];
+                    }
+                }
+
+                posFocus = nearestPos;
+
+                transform.parent.localPosition = posFocus;
+
+                transform.parent.name = "AttachedNeuronClamp" + nearestVertInd;
+                return nearestVertInd;
+            }
+            */
+
+            // Returns true if the that 1D index is available, otherwise returns false
+            private bool VertIsAvailable(int clampIndex, NeuronCell.NodeData cellNodeData)
         {
             List<int> takenSpots = GameManager.instance.clampInstantiator.ClampInds;
             bool spotOpen = true;

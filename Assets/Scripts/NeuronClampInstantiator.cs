@@ -43,10 +43,11 @@ namespace C2M2.NeuronalDynamics.Interaction
             var sim = hit.collider.GetComponentInParent<NDSimulation>();
             if (sim == null) return;
 
-            var clamp = Instantiate(clampPrefab, sim.transform);
-           
-            clamp.transform.position = hit.point;
-            clamps.Add(clamp.GetComponentInChildren<NeuronClamp>());
+            var clampObj = Instantiate(clampPrefab, sim.transform);
+            NeuronClamp clamp = clampObj.GetComponentInChildren<NeuronClamp>();
+            clamp.ReportSimulation(sim, hit);
+            //clampObj.transform.position = hit.point;
+            clamps.Add(clamp);
         }
 
         private int destroyCount = 50;
