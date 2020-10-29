@@ -11,7 +11,6 @@ namespace C2M2.NeuronalDynamics.Interaction
 {
     public class NeuronClamp : MonoBehaviour
     {
-
         public float radiusRatio = 3f;
         public float heightRatio = 3f;
 
@@ -26,8 +25,6 @@ namespace C2M2.NeuronalDynamics.Interaction
         public Material inactiveMaterial = null;
 
         public NDSimulation simulation = null;
-
-        private bool use1DVerts = true;
 
         private MeshRenderer mr;
         private Vector3 LocalExtents { get { return transform.localScale / 2; } }
@@ -45,12 +42,12 @@ namespace C2M2.NeuronalDynamics.Interaction
         private LUTGradient gradientLUT = null;
 
         float currentVisualizationScale = 1;
-
         private void VisualInflationChangeHandler(double newInflation)
         {
             UpdateScale((float)newInflation);
         }
 
+        #region Unity Methods
         private void Awake()
         {
             mr = GetComponent<MeshRenderer>();
@@ -74,45 +71,82 @@ namespace C2M2.NeuronalDynamics.Interaction
                 }
             }
         }
-
-        public void ActivateClamp()
+        private void OnDestroy()
         {
-            clampLive = true;
+            simulation.clamps.Remove(this);
+        }
+        #endregion
 
-            if (activeMaterial != null)
+        #region Orientation
+        private void SetScale(NDSimulation simulation, NeuronCell.NodeData cellNodeData)
+        {
+            currentVisualizationScale = (float)simulation.VisualInflation;
+
+            float radiusScalingValue = radiusRatio * (float)cellNodeData.nodeRadius;
+            float heightScalingValue = heightRatio * simulation.AverageDendriteRadius;
+
+            //Ensures clamp is always at least as wide as tall when Visual Inflation is 1
+            float radiusLength = Math.Max(radiusScalingValue, heightScalingValue) * currentVisualizationScale;
+
+            transform.parent.localScale = new Vector3(radiusLength, radiusLength, heightScalingValue);
+        }
+        public void UpdateScale(float newScale)
+        {
+            if (this != null)
             {
-                mr.material = activeMaterial;
+                float modifiedScale = newScale / currentVisualizationScale;
+                Vector3 tempVector = transform.parent.localScale;
+                tempVector.x *= modifiedScale;
+                tempVector.y *= modifiedScale;
+                transform.parent.localScale = tempVector;
+                currentVisualizationScale = newScale;
             }
         }
-        public void DeactivateClamp()
+        public void SetRotation(NDSimulation simulation, NeuronCell.NodeData cellNodeData)
         {
-            clampLive = false;
-            if (inactiveMaterial != null)
-            {
-                mr.material = inactiveMaterial;
-            }
-        }
+            List<int> neighbors = cellNodeData.neighborIDs;
 
-        public void ToggleClamp()
-        {
-            if (clampLive) DeactivateClamp();
-            else ActivateClamp();
-        }
-
-        /*
-        // Scan new targets for ND simulations
-        private void OnTriggerEnter(Collider other)
-        {
-            if (simulation == null)
+            // Get each neighbor's Vector3 value
+            List<Vector3> neighborVectors = new List<Vector3>();
+            foreach (int neighbor in neighbors)
             {
-                NDSimulation simulation = other.GetComponentInParent<NDSimulation>() ?? other.GetComponent<NDSimulation>();
-                if (simulation != null)
-                {
-                    ReportSimulation(simulation, transform.parent.position);
-                }
+                neighborVectors.Add(simulation.Verts1D[neighbor]);
             }
+
+            Vector3 rotationVector;
+            if (neighborVectors.Count == 2)
+            {
+                Vector3 clampToFirstNeighborVector = neighborVectors[0] - simulation.Verts1D[cellNodeData.id];
+                Vector3 clampToSecondNeighborVector = neighborVectors[1] - simulation.Verts1D[cellNodeData.id];
+
+                rotationVector = clampToFirstNeighborVector.normalized - clampToSecondNeighborVector.normalized;
+            }
+            else if (neighborVectors.Count > 0)
+            {
+                rotationVector = simulation.Verts1D[cellNodeData.pid].normalized - transform.parent.localPosition.normalized;
+            }
+            else
+            {
+                rotationVector = Vector3.up; //if a clamp has no neighbors it will use a default orientation of facing up
+            }
+            transform.parent.localRotation = Quaternion.LookRotation(rotationVector);
         }
-        */
+        #endregion
+
+        #region Simulation Checks
+        /// <summary>
+        /// Attempt to latcha  clamp onto a simulation object
+        /// </summary>
+        public NDSimulation ReportSimulation(RaycastHit hit)
+        {
+            var sim = hit.collider.GetComponent<NDSimulation>();
+            if (sim == null) sim = hit.collider.GetComponentInParent<NDSimulation>();
+            if (sim == null) return null;
+            return ReportSimulation(sim, hit);
+        }
+        /// <summary>
+        /// Attempt to latch a clamp onto a given simulation
+        /// </summary>
         public NDSimulation ReportSimulation(NDSimulation simulation, RaycastHit hit)
         {
             if (this.simulation == null)
@@ -140,10 +174,6 @@ namespace C2M2.NeuronalDynamics.Interaction
 
                 simulation.OnVisualInflationChange += VisualInflationChangeHandler;
 
-                // Change object layer to Raycast so the clamp does not continue to interact physically with the simulation
-                gameObject.layer = LayerMask.NameToLayer("Raycast");
-                Destroy(gameObject.GetComponent<Rigidbody>());
-
                 gradientLUT = this.simulation.GetComponent<LUTGradient>();
 
                 this.simulation.clamps.Add(this);
@@ -153,50 +183,6 @@ namespace C2M2.NeuronalDynamics.Interaction
 
             return this.simulation;
         }
-        /*
-        public NDSimulation ReportSimulation(NDSimulation simulation, Vector3 contactPoint)
-        {
-            if (this.simulation == null)
-            {
-                this.simulation = simulation;
-
-                transform.parent.parent = simulation.transform;
-
-                int clampIndex = GetNearestPoint(this.simulation, contactPoint);
-
-                NeuronCell.NodeData clampCellNodeData = simulation.NeuronCell.nodeData[clampIndex];
-
-                // Check for duplicates
-                if(!VertIsAvailable(clampIndex, simulation))
-                {
-                    Destroy(transform.parent.gameObject);
-                }
-
-                focusVert = clampIndex;
-
-                SetScale(this.simulation, clampCellNodeData);
-                SetRotation(this.simulation, clampCellNodeData);
-
-                simulation.OnVisualInflationChange += VisualInflationChangeHandler;
-
-                // Change object layer to Raycast so the clamp does not continue to interact physically with the simulation
-                gameObject.layer = LayerMask.NameToLayer("Raycast");
-                Destroy(gameObject.GetComponent<Rigidbody>());
-
-                gradientLUT = this.simulation.GetComponent<LUTGradient>();
-
-                this.simulation.clampValues.Add(this);
-            }
-
-            return this.simulation;
-        }
-        */
-
-        private void OnDestroy()
-        {
-            simulation.clamps.Remove(this);
-        }
-
         private int GetNearestPoint(NDSimulation simulation, RaycastHit hit)
         {
             // Translate contact point to local space
@@ -229,50 +215,6 @@ namespace C2M2.NeuronalDynamics.Interaction
 
             return nearestVert1D;
         }
-            /*
-            private int GetNearestPoint(NDSimulation simulation, Vector3 worldPoint)
-            {
-                // Translate contact point to local space
-                Vector3 localPoint = this.simulation.transform.InverseTransformPoint(worldPoint);
-
-                Vector3[] verts;
-                if (use1DVerts)
-                {
-                    verts = simulation.Verts1D;
-                }
-                else
-                {
-                    MeshFilter mf = simulation.GetComponent<MeshFilter>();
-                    if (mf == null) return -1;
-                    Mesh mesh = mf.sharedMesh ?? mf.mesh;
-                    if (mesh == null) return -1;
-
-                    verts = mesh.vertices;
-                }
-
-                int nearestVertInd = -1;
-                Vector3 nearestPos = new Vector3(float.PositiveInfinity, float.PositiveInfinity, float.PositiveInfinity);
-                float nearestDist = float.PositiveInfinity;
-                for (int i = 0; i < verts.Length; i++)
-                {
-                    float dist = Vector3.Distance(localPoint, verts[i]);
-                    if (dist < nearestDist)
-                    {
-                        nearestDist = dist;
-                        nearestVertInd = i;
-                        nearestPos = verts[i];
-                    }
-                }
-
-                posFocus = nearestPos;
-
-                transform.parent.localPosition = posFocus;
-
-                transform.parent.name = "AttachedNeuronClamp" + nearestVertInd;
-                return nearestVertInd;
-            }
-            */
-
         // Returns true if the that 1D index is available, otherwise returns false
         private bool VertIsAvailable(int clampIndex, NDSimulation simulation)
         {
@@ -296,63 +238,28 @@ namespace C2M2.NeuronalDynamics.Interaction
             }
             return validLocation;
         }
+        #endregion
 
-        private void SetScale(NDSimulation simulation, NeuronCell.NodeData cellNodeData)
+        #region Clamp Controls
+        public void ActivateClamp()
         {
-            currentVisualizationScale = (float)simulation.VisualInflation;
+            clampLive = true;
 
-            float radiusScalingValue = radiusRatio * (float)cellNodeData.nodeRadius;
-            float heightScalingValue = heightRatio * simulation.AverageDendriteRadius;
-
-            //Ensures clamp is always at least as wide as tall when Visual Inflation is 1
-            float radiusLength = Math.Max(radiusScalingValue, heightScalingValue) * currentVisualizationScale;
-
-            transform.parent.localScale = new Vector3(radiusLength, radiusLength, heightScalingValue);
+            if (activeMaterial != null)
+                mr.material = activeMaterial;
         }
-
-        public void UpdateScale(float newScale)
+        public void DeactivateClamp()
         {
-            if (this != null)
-            {
-                float modifiedScale = newScale/currentVisualizationScale;
-                Vector3 tempVector = transform.parent.localScale;
-                tempVector.x *= modifiedScale;
-                tempVector.y *= modifiedScale;
-                transform.parent.localScale = tempVector;
-                currentVisualizationScale = newScale;
-            }
-
+            clampLive = false;
+            if (inactiveMaterial != null)
+                mr.material = inactiveMaterial;
         }
-
-        public void SetRotation(NDSimulation simulation, NeuronCell.NodeData cellNodeData)
+        public void ToggleClamp()
         {
-            List<int> neighbors = cellNodeData.neighborIDs;
-
-            // Get each neighbor's Vector3 value
-            List<Vector3> neighborVectors = new List<Vector3>();
-            foreach (int neighbor in neighbors)
-            {
-                neighborVectors.Add(simulation.Verts1D[neighbor]);
-            }
-
-            Vector3 rotationVector;
-            if (neighborVectors.Count == 2)
-            {
-                Vector3 clampToFirstNeighborVector = neighborVectors[0] - simulation.Verts1D[cellNodeData.id];
-                Vector3 clampToSecondNeighborVector = neighborVectors[1] - simulation.Verts1D[cellNodeData.id];
-
-                rotationVector = clampToFirstNeighborVector.normalized - clampToSecondNeighborVector.normalized;
-            }
-            else if (neighborVectors.Count > 0)
-            {
-                rotationVector = simulation.Verts1D[cellNodeData.pid].normalized - transform.parent.localPosition.normalized;
-            }
-            else
-            {
-                rotationVector = Vector3.up; //if a clamp has no neighbors it will use a default orientation of facing up
-            }
-            transform.parent.localRotation = Quaternion.LookRotation(rotationVector);
+            if (clampLive) DeactivateClamp();
+            else ActivateClamp();
         }
+        #endregion
 
         #region Input
         [Tooltip("Hold down a raycast for this many frames in order to destroy a clamp")]
