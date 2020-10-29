@@ -126,7 +126,7 @@ namespace C2M2.NeuronalDynamics.Interaction
                 NeuronCell.NodeData clampCellNodeData = simulation.NeuronCell.nodeData[clampIndex];
 
                 // Check for duplicates
-                if (!VertIsAvailable(clampIndex, clampCellNodeData))
+                if (!VertIsAvailable(clampIndex, simulation))
                 {
                     Destroy(transform.parent.gameObject);
                 }
@@ -200,7 +200,6 @@ namespace C2M2.NeuronalDynamics.Interaction
         private int GetNearestPoint(NDSimulation simulation, RaycastHit hit)
         {
             // Translate contact point to local space
-            Vector3 localPoint = this.simulation.transform.InverseTransformPoint(worldPoint);
 
             MeshFilter mf = simulation.transform.GetComponentInParent<MeshFilter>();
             if (mf == null) return -1;
@@ -274,18 +273,13 @@ namespace C2M2.NeuronalDynamics.Interaction
             }
             */
 
-<<<<<<< HEAD
-            // Returns true if the that 1D index is available, otherwise returns false
-            private bool VertIsAvailable(int clampIndex, NeuronCell.NodeData cellNodeData)
-=======
         // Returns true if the that 1D index is available, otherwise returns false
         private bool VertIsAvailable(int clampIndex, NDSimulation simulation)
->>>>>>> development
         {
             bool validLocation = true;
             float distanceBetweenClamps = simulation.AverageDendriteRadius * heightRatio * 2;
 
-            foreach (NeuronClamp clamp in simulation.clampValues)
+            foreach (NeuronClamp clamp in simulation.clamps)
             {
                 // If there is a clamp on that 1D vertex, the spot is not open
                 if (clamp.focusVert == clampIndex)
