@@ -23,7 +23,7 @@ using C2M2.Interaction;
 using Grid = C2M2.NeuronalDynamics.UGX.Grid;
 namespace C2M2.NeuronalDynamics.Simulation
 {
-    public class CellSolver2FullAP_DendriteImplicit : NeuronSimulation1D
+    public class CellSolver2FullAP_DendriteImplicit : NDSimulation
     {
         //Set cell biological paramaters
         public const double res = 10.0;

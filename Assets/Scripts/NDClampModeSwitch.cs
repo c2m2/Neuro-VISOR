@@ -6,7 +6,7 @@ namespace C2M2.NeuronalDynamics.Interaction {
     {
         public void Toggle()
         {
-            ndSimulation.clampMode = !ndSimulation.clampMode;
+            ndSimulation.ClampMode = !ndSimulation.ClampMode;
         }
     }
 }

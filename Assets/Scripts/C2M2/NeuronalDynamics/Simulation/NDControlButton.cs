@@ -6,6 +6,6 @@ using C2M2.NeuronalDynamics.Simulation;
 namespace C2M2.NeuronalDynamics.Interaction {
     public class NDControlButton : MonoBehaviour
     {
-        public NeuronSimulation1D ndSimulation = null;
+        public NDSimulation ndSimulation = null;
     }
 }

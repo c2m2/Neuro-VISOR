@@ -2,30 +2,30 @@
 using System.Collections.Generic;
 using UnityEngine;
 using C2M2.NeuronalDynamics.Simulation;
-using C2M2.Utils.MeshUtils;
-using Grid = C2M2.NeuronalDynamics.UGX.Grid;
 using C2M2.NeuronalDynamics.UGX;
 using C2M2.Visualization;
-using System.Collections;
-using C2M2.Utils;
 using Math = C2M2.Utils.Math;
+using C2M2.Interaction;
 
 namespace C2M2.NeuronalDynamics.Interaction
 {
     public class NeuronClamp : MonoBehaviour
     {
 
+        public float radiusRatio = 3f;
+        public float heightRatio = 3f;
 
         public bool clampLive { get; private set; } = false;
- 
+
         public double clampPower = 55;
 
         public int focusVert { get; private set; } = -1;
+        public Vector3 focusPos;
 
         public Material activeMaterial = null;
         public Material inactiveMaterial = null;
 
-        public NeuronSimulation1D activeTarget = null;
+        public NDSimulation simulation = null;
 
         private bool use1DVerts = true;
 
@@ -64,12 +64,12 @@ namespace C2M2.NeuronalDynamics.Interaction
         {
             OVRInput.FixedUpdate();
 
-            if(activeTarget != null)
+            if(simulation != null)
             {
                 if (clampLive)
                 {
                     //activeTarget.Set1DValues(newValues);
-                  
+
                     ClampCol = gradientLUT.EvaluateUnscaled((float)clampPower);
                 }
             }
@@ -99,42 +99,44 @@ namespace C2M2.NeuronalDynamics.Interaction
             else ActivateClamp();
         }
 
+        /*
         // Scan new targets for ND simulations
         private void OnTriggerEnter(Collider other)
         {
-            if (activeTarget == null)
+            if (simulation == null)
             {
-                NeuronSimulation1D simulation = other.GetComponentInParent<NeuronSimulation1D>() ?? other.GetComponent<NeuronSimulation1D>();
+                NDSimulation simulation = other.GetComponentInParent<NDSimulation>() ?? other.GetComponent<NDSimulation>();
                 if (simulation != null)
                 {
                     ReportSimulation(simulation, transform.parent.position);
                 }
             }
         }
-
-        public NeuronSimulation1D ReportSimulation(NeuronSimulation1D simulation, Vector3 contactPoint)
+        */
+        public NDSimulation ReportSimulation(NDSimulation simulation, RaycastHit hit)
         {
-            if (activeTarget == null)
+            if (this.simulation == null)
             {
-                activeTarget = simulation;
+                this.simulation = simulation;
 
                 transform.parent.parent = simulation.transform;
 
-                int clampIndex = GetNearestPoint(activeTarget, contactPoint);
+                int clampIndex = GetNearestPoint(this.simulation, hit);
 
-                // TODO: We shouldn't rebuild the whole cell every time here
-                NeuronCell.NodeData clampCellNodeData = new NeuronCell(simulation.Grid1D).nodeData[clampIndex];
+                NeuronCell.NodeData clampCellNodeData = simulation.NeuronCell.nodeData[clampIndex];
 
                 // Check for duplicates
-                if(!VertIsAvailable(clampIndex, clampCellNodeData))
+                if (!VertIsAvailable(clampIndex, simulation))
                 {
                     Destroy(transform.parent.gameObject);
                 }
 
                 focusVert = clampIndex;
+                focusPos = simulation.Verts1D[focusVert];
+                Debug.Log("Nearest 1D vert:\nind: " + focusVert + "\npos: " + focusPos);
 
-                SetScale(activeTarget, clampCellNodeData);
-                SetRotation(activeTarget, clampCellNodeData);
+                SetScale(this.simulation, clampCellNodeData);
+                SetRotation(this.simulation, clampCellNodeData);
 
                 simulation.OnVisualInflationChange += VisualInflationChangeHandler;
 
@@ -142,97 +144,170 @@ namespace C2M2.NeuronalDynamics.Interaction
                 gameObject.layer = LayerMask.NameToLayer("Raycast");
                 Destroy(gameObject.GetComponent<Rigidbody>());
 
-                gradientLUT = activeTarget.GetComponent<LUTGradient>();
+                gradientLUT = this.simulation.GetComponent<LUTGradient>();
 
-                activeTarget.clampValues.Add(this);
+                this.simulation.clamps.Add(this);
+
+                transform.parent.localPosition = focusPos;
             }
 
-            return activeTarget;
+            return this.simulation;
         }
+        /*
+        public NDSimulation ReportSimulation(NDSimulation simulation, Vector3 contactPoint)
+        {
+            if (this.simulation == null)
+            {
+                this.simulation = simulation;
+
+                transform.parent.parent = simulation.transform;
+
+                int clampIndex = GetNearestPoint(this.simulation, contactPoint);
+
+                NeuronCell.NodeData clampCellNodeData = simulation.NeuronCell.nodeData[clampIndex];
+
+                // Check for duplicates
+                if(!VertIsAvailable(clampIndex, simulation))
+                {
+                    Destroy(transform.parent.gameObject);
+                }
+
+                focusVert = clampIndex;
+
+                SetScale(this.simulation, clampCellNodeData);
+                SetRotation(this.simulation, clampCellNodeData);
+
+                simulation.OnVisualInflationChange += VisualInflationChangeHandler;
+
+                // Change object layer to Raycast so the clamp does not continue to interact physically with the simulation
+                gameObject.layer = LayerMask.NameToLayer("Raycast");
+                Destroy(gameObject.GetComponent<Rigidbody>());
+
+                gradientLUT = this.simulation.GetComponent<LUTGradient>();
+
+                this.simulation.clampValues.Add(this);
+            }
+
+            return this.simulation;
+        }
+        */
 
         private void OnDestroy()
         {
-            activeTarget.clampValues.Remove(this);
+            simulation.clamps.Remove(this);
         }
 
-        private int GetNearestPoint(NeuronSimulation1D simulation, Vector3 worldPoint)
+        private int GetNearestPoint(NDSimulation simulation, RaycastHit hit)
         {
             // Translate contact point to local space
-            Vector3 localPoint = activeTarget.transform.InverseTransformPoint(worldPoint);
 
-            Vector3[] verts;
-            if (use1DVerts)
-            {
-                verts = simulation.Verts1D;
-            }
-            else
-            {
-                MeshFilter mf = simulation.GetComponent<MeshFilter>();
-                if (mf == null) return -1;
-                Mesh mesh = mf.sharedMesh ?? mf.mesh;
-                if (mesh == null) return -1;
+            MeshFilter mf = simulation.transform.GetComponentInParent<MeshFilter>();
+            if (mf == null) return -1;
+            // Get mesh vertices from hit triangle
+            int triInd = hit.triangleIndex * 3;
+            int v1 = mf.mesh.triangles[triInd];
+            int v2 = mf.mesh.triangles[triInd + 1];
+            int v3 = mf.mesh.triangles[triInd + 2];
 
-                verts = mesh.vertices;
-            }
+            // Find nearest 1D vert to these 3D verts
+            int[] verts1D = new int[]{
+                simulation.Map[v1].lambda < 0.5 ? simulation.Map[v1].v1 : simulation.Map[v1].v2,
+                simulation.Map[v2].lambda < 0.5 ? simulation.Map[v2].v1 : simulation.Map[v2].v2,
+                simulation.Map[v3].lambda < 0.5 ? simulation.Map[v3].v1 : simulation.Map[v3].v2};
 
-            int nearestVertInd = -1;
-            Vector3 nearestPos = new Vector3(float.PositiveInfinity, float.PositiveInfinity, float.PositiveInfinity);
             float nearestDist = float.PositiveInfinity;
-            for (int i = 0; i < verts.Length; i++)
+            int nearestVert1D = -1;
+            foreach(int vert in verts1D)
             {
-                float dist = Vector3.Distance(localPoint, verts[i]);
+                float dist = Vector3.Distance(hit.point, simulation.Verts1D[vert]);
                 if (dist < nearestDist)
                 {
                     nearestDist = dist;
-                    nearestVertInd = i;
-                    nearestPos = verts[i];
+                    nearestVert1D = vert;
                 }
             }
 
-            posFocus = nearestPos;
-
-            transform.parent.localPosition = posFocus;
-
-            transform.parent.name = "AttachedNeuronClamp" + nearestVertInd;
-            return nearestVertInd;
+            return nearestVert1D;
         }
+            /*
+            private int GetNearestPoint(NDSimulation simulation, Vector3 worldPoint)
+            {
+                // Translate contact point to local space
+                Vector3 localPoint = this.simulation.transform.InverseTransformPoint(worldPoint);
+
+                Vector3[] verts;
+                if (use1DVerts)
+                {
+                    verts = simulation.Verts1D;
+                }
+                else
+                {
+                    MeshFilter mf = simulation.GetComponent<MeshFilter>();
+                    if (mf == null) return -1;
+                    Mesh mesh = mf.sharedMesh ?? mf.mesh;
+                    if (mesh == null) return -1;
+
+                    verts = mesh.vertices;
+                }
+
+                int nearestVertInd = -1;
+                Vector3 nearestPos = new Vector3(float.PositiveInfinity, float.PositiveInfinity, float.PositiveInfinity);
+                float nearestDist = float.PositiveInfinity;
+                for (int i = 0; i < verts.Length; i++)
+                {
+                    float dist = Vector3.Distance(localPoint, verts[i]);
+                    if (dist < nearestDist)
+                    {
+                        nearestDist = dist;
+                        nearestVertInd = i;
+                        nearestPos = verts[i];
+                    }
+                }
+
+                posFocus = nearestPos;
+
+                transform.parent.localPosition = posFocus;
+
+                transform.parent.name = "AttachedNeuronClamp" + nearestVertInd;
+                return nearestVertInd;
+            }
+            */
 
         // Returns true if the that 1D index is available, otherwise returns false
-        private bool VertIsAvailable(int clampIndex, NeuronCell.NodeData cellNodeData)
+        private bool VertIsAvailable(int clampIndex, NDSimulation simulation)
         {
-            List<int> takenSpots = GameManager.instance.clampInstantiator.ClampInds;
-            bool spotOpen = true;
+            bool validLocation = true;
+            float distanceBetweenClamps = simulation.AverageDendriteRadius * heightRatio * 2;
 
-            // If there is a clamp on that 1D vertex, the spot is not open
-            if (takenSpots.Contains(clampIndex))
+            foreach (NeuronClamp clamp in simulation.clamps)
             {
-                Debug.LogWarning("Clamp already exists on focus vert [" + clampIndex + "]");
-                spotOpen = false;
-            }
-            // If there is a clamp on any of its immediate neighbors, the spot is not open
-            foreach(int n in cellNodeData.neighborIDs)
-            {
-                if (takenSpots.Contains(n))
+                // If there is a clamp on that 1D vertex, the spot is not open
+                if (clamp.focusVert == clampIndex)
                 {
-                    Debug.LogWarning("Clamp already exists on neighbor [" + n + "] of focus vert [" + clampIndex + "].");
-                    spotOpen = false;
+                    Debug.LogWarning("Clamp already exists on focus vert [" + clampIndex + "]");
+                    validLocation = false;
+                }
+                // If there is a clamp within distance of 2, the spot is not open
+                else if ((clamp.transform.parent.localPosition - transform.parent.localPosition).magnitude < distanceBetweenClamps)
+                {
+                    Debug.LogWarning("Clamp too close to clamp located on focus vert [" + clamp.focusVert + "].");
+                    validLocation = false;
                 }
             }
-            return spotOpen;
+            return validLocation;
         }
 
-        private void SetScale(NeuronSimulation1D simulation, NeuronCell.NodeData cellNodeData)
+        private void SetScale(NDSimulation simulation, NeuronCell.NodeData cellNodeData)
         {
-            currentVisualizationScale = (float) simulation.VisualInflation;
+            currentVisualizationScale = (float)simulation.VisualInflation;
 
-            float radiuScalarRatio = 1.5f;
+            float radiusScalingValue = radiusRatio * (float)cellNodeData.nodeRadius;
+            float heightScalingValue = heightRatio * simulation.AverageDendriteRadius;
 
-            float heightScalarRatio = 7.5f;
+            //Ensures clamp is always at least as wide as tall when Visual Inflation is 1
+            float radiusLength = Math.Max(radiusScalingValue, heightScalingValue) * currentVisualizationScale;
 
-            double dendriteDiameter = cellNodeData.nodeRadius * 2;
-
-            float radiusScalingValue = (float)(radiuScalarRatio * dendriteDiameter * currentVisualizationScale);
-            transform.parent.localScale = new Vector3(radiusScalingValue, radiusScalingValue, heightScalarRatio);
+            transform.parent.localScale = new Vector3(radiusLength, radiusLength, heightScalingValue);
         }
 
         public void UpdateScale(float newScale)
@@ -249,7 +324,7 @@ namespace C2M2.NeuronalDynamics.Interaction
 
         }
 
-        public void SetRotation(NeuronSimulation1D simulation, NeuronCell.NodeData cellNodeData)
+        public void SetRotation(NDSimulation simulation, NeuronCell.NodeData cellNodeData)
         {
             List<int> neighbors = cellNodeData.neighborIDs;
 

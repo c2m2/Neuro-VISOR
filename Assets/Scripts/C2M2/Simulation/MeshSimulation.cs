@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using C2M2.Visualization;
+using C2M2.Utils.MeshUtils;
 
 namespace C2M2.Simulation
 {
@@ -24,13 +25,45 @@ namespace C2M2.Simulation
         /// </summary>
         public LUTGradient colorLUT { get; private set; } = null;
 
-        public LUTGradient.ExtremaMethod extremaMethod = LUTGradient.ExtremaMethod.RollingExtrema;
+        public LUTGradient.ExtremaMethod extremaMethod = LUTGradient.ExtremaMethod.GlobalExtrema;
         [Tooltip("Must be set if extremaMethod is set to GlobalExtrema")]
         public float globalMax = float.NegativeInfinity;
         [Tooltip("Must be set if extremaMethod is set to GlobalExtrema")]
         public float globalMin = float.PositiveInfinity;
 
-        protected Mesh colliderMesh = null;
+        private Mesh visualMesh = null;
+        public Mesh VisualMesh
+        {
+            get
+            {
+                return visualMesh;
+            }
+            protected set
+            {
+                //if (value == null) return;
+                visualMesh = value;
+
+                var mf = GetComponent<MeshFilter>();
+                if (mf == null) gameObject.AddComponent<MeshFilter>();
+                if (GetComponent<MeshRenderer>() == null)
+                    gameObject.AddComponent<MeshRenderer>().sharedMaterial = GameManager.instance.vertexColorationMaterial;
+                mf.sharedMesh = visualMesh;
+            }
+        }
+        private Mesh colliderMesh = null;
+        public Mesh ColliderMesh
+        {
+            get { return colliderMesh; }
+            protected set
+            {
+                //if (value == null) return;
+                colliderMesh = value;
+
+                var cont = GetComponent<VRRaycastableMesh>();
+                if (cont == null) { cont = gameObject.AddComponent<VRRaycastableMesh>(); }
+                cont.SetSource(colliderMesh);
+            }
+        }
 
         private MeshFilter mf;
         private MeshRenderer mr;
@@ -49,14 +82,21 @@ namespace C2M2.Simulation
         }
         protected override void UpdateVisualization(in double[] newValues) => UpdateVisualization(newValues.ToFloat());
 
-        #region Unity Methods
-        protected sealed override void OnAwake(Mesh viz)
+        protected override void OnAwakePost(Mesh viz)
         {
             if (!dryRun)
             {
+                InitRenderer();
+                InitColors();
+                InitInteraction();
+            }
+            return;
+
+            void InitRenderer()
+            {
                 // Safe check for existing MeshFilter, MeshRenderer
                 mf = GetComponent<MeshFilter>();
-                if(mf == null) mf = gameObject.AddComponent<MeshFilter>();
+                if (mf == null) mf = gameObject.AddComponent<MeshFilter>();
                 mf.sharedMesh = viz;
 
                 mr = GetComponent<MeshRenderer>();
@@ -64,19 +104,7 @@ namespace C2M2.Simulation
 
                 // Ensure the renderer has a vertex coloring material     
                 mr.material = GameManager.instance.vertexColorationMaterial;
-
-                InitColors();
-                
-                VRRaycastableMesh raycastable = gameObject.AddComponent<VRRaycastableMesh>();
-
-                if (colliderMesh != null) raycastable.SetSource(colliderMesh);
-                else raycastable.SetSource(viz);
-
-                // Add custom grabbable here
-                gameObject.AddComponent<VRGrabbableMesh>();
             }
-            return;
-
             void InitColors()
             {
                 // Initialize the color lookup table
@@ -89,7 +117,14 @@ namespace C2M2.Simulation
                     colorLUT.globalMin = globalMin;
                 }
             }
+            void InitInteraction()
+            {
+                VRRaycastableMesh raycastable = gameObject.AddComponent<VRRaycastableMesh>();
+                if (ColliderMesh != null) raycastable.SetSource(ColliderMesh);
+                else raycastable.SetSource(viz);
+
+                gameObject.AddComponent<VRGrabbableMesh>();
+            }
         }
-        #endregion
     }
 }

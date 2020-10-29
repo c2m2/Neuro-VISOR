@@ -27,7 +27,7 @@ using C2M2.NeuronalDynamics.UGX;
 using Grid = C2M2.NeuronalDynamics.UGX.Grid;
 namespace C2M2.NeuronalDynamics.Simulation
 {
-    public class sparseNoArray_cholesky_time: NeuronSimulation1D
+    public class sparseNoArray_cholesky_time: NDSimulation
     {
         //Simulation parameters
         [Header("Simulation Parameters")]

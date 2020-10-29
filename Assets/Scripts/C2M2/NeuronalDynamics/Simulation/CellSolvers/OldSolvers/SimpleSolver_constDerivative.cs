@@ -19,7 +19,7 @@ using C2M2.NeuronalDynamics.UGX;
 using Grid = C2M2.NeuronalDynamics.UGX.Grid;
 namespace C2M2.NeuronalDynamics.Simulation
 {
-    public class SimpleSolver_constDerivative : NeuronSimulation1D
+    public class SimpleSolver_constDerivative : NDSimulation
     {
         //Set cell biological constants
         public const double res = 10.0;

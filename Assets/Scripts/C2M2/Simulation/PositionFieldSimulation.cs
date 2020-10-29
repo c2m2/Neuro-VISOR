@@ -10,7 +10,7 @@ namespace C2M2.Simulation
     /// </summary>
     public abstract class PositionFieldSimulation : Simulation<Vector3[], Transform[], VRRaycastableColliders, VRGrabbableColliders>
     {
-        protected override void OnAwake(Transform[] viz)
+        protected override void OnAwakePost(Transform[] viz)
         {
             if (!dryRun)
             {

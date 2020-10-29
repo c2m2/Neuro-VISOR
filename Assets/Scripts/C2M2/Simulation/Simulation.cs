@@ -57,24 +57,6 @@ namespace C2M2.Simulation
         protected abstract void UpdateVisualization(in ValueType newValues);
 
         /// <summary>
-        /// Launch Solve thread
-        /// </summary>
-        public void StartSimulation()
-        {
-            StopSimulation();
-            Debug.Log("Running PreSolve...");
-            PreSolve();
-            solveThread = new Thread(Solve);
-            solveThread.Start();
-            Debug.Log("Solve() launched on thread " + solveThread.ManagedThreadId);
-        }
-
-        /// <summary>
-        /// Stop current Solve thread
-        /// </summary>
-        public void StopSimulation() { if (solveThread != null) solveThread.Abort(); }
-
-        /// <summary>
         /// Method containing simulation code
         /// </summary>
         /// <remarks>
@@ -94,6 +76,7 @@ namespace C2M2.Simulation
         #region Unity Methods
         public void Awake()
         {
+            OnAwakePre();
 
             if (!dryRun)
             {
@@ -102,15 +85,12 @@ namespace C2M2.Simulation
             }
 
             // Run child awake methods first
-            OnAwake(viz);
-
-            if (startOnAwake) StartSimulation();
+            OnAwakePost(viz);
 
             return;
 
             void BuildInteraction()
             {
-
                 switch (interactionType)
                 {
                     case (InteractionType.Discrete): Heater = gameObject.AddComponent<RaycastSimHeaterDiscrete>(); break;
@@ -123,12 +103,11 @@ namespace C2M2.Simulation
                 child.transform.position = Vector3.zero;
                 child.transform.eulerAngles = Vector3.zero;
 
-                // Create hit event
+                // Attach hit events to an event manager
+                RaycastEventManager eventManager = gameObject.AddComponent<RaycastEventManager>();
+                // Create hit events
                 RaycastPressEvents raycastEvents = child.AddComponent<RaycastPressEvents>();
                 raycastEvents.OnHoldPress.AddListener((hit) => Heater.Hit(hit));
-
-                // Attach event to an event manager
-                RaycastEventManager eventManager = gameObject.AddComponent<RaycastEventManager>();
                 eventManager.rightTrigger = raycastEvents;
                 eventManager.leftTrigger = raycastEvents;
 
@@ -136,10 +115,12 @@ namespace C2M2.Simulation
                 gameObject.AddComponent<Utils.DebugUtils.Actions.TransformResetter>();
             }
         }
+
         public void Start()
         {
             OnStart();
-            //gameObject.AddComponent<VRGrabbable>();
+
+            if (startOnAwake) StartSimulation();
         }
         public void Update()
         {
@@ -152,21 +133,46 @@ namespace C2M2.Simulation
                 if (simulationValues != null) UpdateVisualization(simulationValues);
             }
         }
+
+        protected virtual void OnAwakePre() { }
         // Allow derived classes to run code in Awake/Start/Update if they choose
-        protected virtual void OnAwake(VizType viz) { }
+        protected virtual void OnAwakePost(VizType viz) { }
         protected virtual void OnStart() { }
         protected virtual void OnUpdate() { }
 
         // Don't allow threads to keep running when application pauses or quits
         private void OnApplicationPause(bool pause)
         {
+            OnPause();
             if (pause && solveThread != null) solveThread.Abort();
         }
         private void OnApplicationQuit()
         {
+            OnQuit();
             if (solveThread != null) solveThread.Abort();
         }
+        // Use OnPause and OnQuit to wrap up I/O or other processes if the application pauses or quits during solve code.
+        protected virtual void OnPause() { }
+        protected virtual void OnQuit() { }
         #endregion
+
+        /// <summary>
+        /// Launch Solve thread
+        /// </summary>
+        public void StartSimulation()
+        {
+            StopSimulation();
+            Debug.Log("Running PreSolve...");
+            PreSolve();
+            solveThread = new Thread(Solve);
+            solveThread.Start();
+            Debug.Log("Solve() launched on thread " + solveThread.ManagedThreadId);
+        }
+
+        /// <summary>
+        /// Stop current Solve thread
+        /// </summary>
+        public void StopSimulation() { if (solveThread != null) solveThread.Abort(); }
     }
     public class SimulationNotFoundException : Exception
     {

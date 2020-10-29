@@ -28,7 +28,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
     /// <remarks>
     /// 1D Neuron surface simulations should derive from this class.
     /// </remarks>
-    public abstract class NeuronSimulation1D : MeshSimulation {
+    public abstract class NDSimulation : MeshSimulation {
 
         private double visualInflation = 1;
         public double VisualInflation
@@ -38,7 +38,10 @@ namespace C2M2.NeuronalDynamics.Simulation {
             {
                 visualInflation = value;
                 if (ColliderInflation < visualInflation) ColliderInflation = visualInflation;
-                VisualMesh = CheckMeshCache(visualInflation);
+
+                Update2DGrid();
+
+                VisualMesh = Grid2D.Mesh;
                 OnVisualInflationChange?.Invoke(visualInflation);
             }
         }
@@ -58,59 +61,50 @@ namespace C2M2.NeuronalDynamics.Simulation {
             }
         }
 
-        public int refinementLevel = 0;
-
-        private Mesh visualMesh = null;
-        public Mesh VisualMesh
+        private int refinementLevel = 0;
+        public int RefinementLevel
         {
-            get
+            get { return refinementLevel; }
+            set
             {
-                return visualMesh;
-            }
-            private set
-            {
-                //if (value == null) return;
-                visualMesh = value;
-
-                var mf = GetComponent<MeshFilter>();
-                if(mf == null) gameObject.AddComponent<MeshFilter>();
-                if (GetComponent<MeshRenderer>() == null)
-                    gameObject.AddComponent<MeshRenderer>().sharedMaterial = GameManager.instance.vertexColorationMaterial;
-                mf.sharedMesh = visualMesh;
-            }
-        }
-        private Mesh colMesh = null;
-        public Mesh ColliderMesh
-        {
-            get { return colMesh; }
-            private set
-            {
-                //if (value == null) return;
-                colMesh = value;
-
-                var cont = GetComponent<MeshColController>() ?? GetComponentInChildren<MeshColController>();
-                if (cont == null)
-                {
-                    cont = gameObject.AddComponent<MeshColController>();
-                }
-                cont.Mesh = colMesh;
-                base.colliderMesh = colMesh;
+                refinementLevel = value;
+                UpdateGrid1D();
             }
         }
 
         private Dictionary<double, Mesh> meshCache = new Dictionary<double, Mesh>();
 
-        // Need mesh options for each refinement, diameter level
-        public string vrnPath = Application.streamingAssetsPath + Path.DirectorySeparatorChar + "test.vrn";
+        private bool clampMode = false;
+        public bool ClampMode
+        {
+            get { return clampMode; }
+            set
+            {
+                clampMode = value;
+                RaycastPressEvents newEvents = clampMode ?
+                    GameManager.instance.gameObject.GetComponent<RaycastPressEvents>()
+                    : GetComponentInChildren<RaycastPressEvents>();
+                if (newEvents == null) return;
+                raycastManager.leftTrigger = newEvents;
+                raycastManager.rightTrigger = newEvents;
 
-        public bool clampMode = true;
-        private bool clampModePrev = false;
+                foreach (GameObject clamp in GameManager.instance.clampControllers)
+                {
+                    MeshRenderChild renderControls = clamp.GetComponentInParent<MeshRenderChild>();
+                    if (renderControls != null) renderControls.enabled = clampMode;
+                    clamp.SetActive(clampMode);
+                }
+            }
+        }
 
         [Header ("1D Visualization")]
         public bool visualize1D = false;
         public Color32 color1D = Color.yellow;
         public float lineWidth1D = 0.005f;
 
+        // Need mesh options for each refinement, diameter level
+        [Tooltip("Name of the vrn file within Assets/StreamingAssets")]
+        public string vrnFileName = "test.vrn";
         private vrnReader vrnReader = null;
         private vrnReader VrnReader
         {
@@ -118,28 +112,23 @@ namespace C2M2.NeuronalDynamics.Simulation {
             {
                 if (vrnReader == null)
                 {
-                    vrnReader = new vrnReader(vrnPath);
-              //      Debug.Log(vrnReader.List());
+                    if (!vrnFileName.EndsWith(".vrn")) vrnFileName = vrnFileName + ".vrn";
+                    vrnReader = new vrnReader(Application.streamingAssetsPath + Path.DirectorySeparatorChar + vrnFileName);
                 }
                 return vrnReader;
             }
+            set { vrnReader = value; }
         }
 
         private Grid grid1D = null;
         public Grid Grid1D
         {
             get {
-                if (grid1D == null)
-                {
-                    string meshName1D = VrnReader.Retrieve1DMeshName(refinementLevel);
-
-                    /// Create empty grid with name of grid in archive
-                    grid1D = new Grid(new Mesh(), meshName1D);
-                    grid1D.Attach(new DiameterAttachment());
-
-                    VrnReader.ReadUGX(meshName1D, ref grid1D);
-                }
                 return grid1D;
+            }
+            set
+            {
+                grid1D = value;
             }
         }
         public Vector3[] Verts1D { get { return grid1D.Mesh.vertices; } }
@@ -149,36 +138,43 @@ namespace C2M2.NeuronalDynamics.Simulation {
         {
             get
             {
-                if (grid2D == null)
-                {
-                    /// Retrieve mesh names from archive
-                    string meshName2D = VrnReader.Retrieve2DMeshName(visualInflation);
-
-                    /// Empty 2D grid which stores geometry + mapping data
-                    grid2D = new Grid(new Mesh(), meshName2D);
-                    grid2D.Attach(new MappingAttachment());
-                    VrnReader.ReadUGX(meshName2D, ref grid2D);
-                }
                 return grid2D;
+            }
+            set
+            {
+                grid2D = value;
             }
         }
 
         private NeuronCell neuronCell = null;
         public NeuronCell NeuronCell
         {
+            get { return neuronCell; }
+            set { neuronCell = value; }
+        }
+
+        private float averageDendriteRadius = 0;
+        public float AverageDendriteRadius
+        {
             get
             {
-                if(neuronCell == null)
+                if (averageDendriteRadius == 0)
                 {
-                    neuronCell = new NeuronCell(Grid1D);
+                    float radiusSum = 0;
+                    foreach (NeuronCell.NodeData node in NeuronCell.nodeData)
+                    {
+                        radiusSum += (float) node.nodeRadius;
+                    }
+                    averageDendriteRadius = radiusSum / NeuronCell.nodeData.Count;
                 }
-                return neuronCell;
+                return averageDendriteRadius;
             }
         }
 
-        // Storing the information from mapping in an array of structs greatly improves time performance
+        // Stores the information from mapping in an array of structs.
+        // Performs much better than using mapping directly.
         private Vert3D1DPair[] map = null;
-        private Vert3D1DPair[] Map
+        public Vert3D1DPair[] Map
         {
             get
             {
@@ -209,6 +205,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 mapping = (MappingInfo)MapUtils.BuildMap(Grid1D, Grid2D);
             }
         }
+
         private RaycastEventManager raycastManager = null;
 
         private double[] scalars3D = new double[0];
@@ -224,7 +221,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
             }
         }
 
-        public List<NeuronClamp> clampValues = new List<NeuronClamp>();
+        public List<NeuronClamp> clamps = new List<NeuronClamp>();
 
         /// <summary>
         /// Translate 1D vertex values to 3D values and pass them upwards for visualization
@@ -261,7 +258,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
         /// <returns>
         /// Either the same set of values given, or values translated
         /// </returns>
-        public void SetValues (Tuple<int, double>[] newValues) {        
+        public void SetValues (Tuple<int, double>[] newValues) {
             // Each 3D index will have TWO associated 1D vertices
             Tuple<int, double>[] new1DValues = new Tuple<int, double>[2 * newValues.Length];
             int j = 0;
@@ -298,54 +295,43 @@ namespace C2M2.NeuronalDynamics.Simulation {
         /// <returns></returns>
         public abstract double[] Get1DValues ();
 
+        protected override void OnAwakePre()
+        {
+            UpdateGrid1D();
+            base.OnAwakePre();
+        }
         protected override void OnStart()
         {
             base.OnStart();
             raycastManager = GetComponent<RaycastEventManager>();
-        }
-        protected override void OnUpdate()
-        {
-            if (clampMode != clampModePrev)
-            {
-                RaycastPressEvents newEvents = clampMode ?
-                    GameManager.instance.gameObject.GetComponent<RaycastPressEvents>()
-                    : GetComponentInChildren<RaycastPressEvents>();
-                if (newEvents == null) return;
-                raycastManager.leftTrigger = newEvents;
-                raycastManager.rightTrigger = newEvents;
-                
-            }
-            foreach (GameObject clamp in GameManager.instance.clampControllers)
-            {
-                MeshRenderChild renderControls = clamp.GetComponentInParent<MeshRenderChild>();
-                if (renderControls != null) renderControls.enabled = clampMode;
-                clamp.SetActive(clampMode);
-            }
 
-            clampModePrev = clampMode;
+            ClampMode = clampMode;
         }
         /// <summary>
         /// Read in the cell and initialize 3D/1D visualization/interaction infrastructure
         /// </summary>
         /// <returns> Unity Mesh visualization of the 3D geometry. </returns>
+        /// <remarks> BuildVisualization is called by Simulation.cs,
+        /// it is called after OnAwakePre and before OnAwakePost.
+        /// If dryRun == true, Simulation will not call BuildVisualization. </remarks>
         protected override Mesh BuildVisualization () {
-            Mesh cellMesh = new Mesh ();
             if (!dryRun) {
 
                 if (visualize1D) Render1DCell ();
 
+                Update2DGrid();
+
                 VisualMesh = Grid2D.Mesh;
                 VisualMesh.Rescale (transform, new Vector3 (4, 4, 4));
                 VisualMesh.RecalculateNormals ();
-                cellMesh = VisualMesh;
 
-                // Pass blownupMesh upwards to SurfaceSimulation
-                colMesh = Grid2D.Mesh;
+                // Pass blownupMesh upwards to MeshSimulation
+                ColliderMesh = VisualMesh;
 
                 InitUI ();
             }
 
-            return cellMesh;
+            return VisualMesh;
 
             void Render1DCell () {
                 Grid geom1D = Mapping.ModelGeometry;
@@ -392,11 +378,38 @@ namespace C2M2.NeuronalDynamics.Simulation {
             inflation = Math.Clamp (inflation, 1, 5);
             VisualInflation = inflation;
         }
+
+        private void UpdateGrid1D()
+        {
+            string meshName1D = VrnReader.Retrieve1DMeshName(RefinementLevel);
+            /// Create empty grid with name of grid in archive
+            Grid1D = new Grid(new Mesh(), meshName1D);
+            Grid1D.Attach(new DiameterAttachment());
+
+            VrnReader.ReadUGX(meshName1D, ref grid1D);
+
+            NeuronCell = new NeuronCell(grid1D);
+        }
+        private void Update2DGrid()
+        {
+            /// Retrieve mesh names from archive
+            string meshName2D = VrnReader.Retrieve2DMeshName(VisualInflation);
+
+            /// Empty 2D grid which stores geometry + mapping data
+            Grid2D = new Grid(new Mesh(), meshName2D);
+            Grid2D.Attach(new MappingAttachment());
+            VrnReader.ReadUGX(meshName2D, ref grid2D);
+        }
     }
 
     /// <summary>
     /// Stores two 1D indices and a lambda value for a 3D vertex
     /// </summary>
+    /// <remarks>
+    /// Lambda is a value between 0 and 1. A lambda value greater than 0.5 implies that the 3D vert lies closer to v2.
+    /// A lambda value of 0 would imply that the 3D vert lies directly over v1,
+    /// and a lambda of 1 implies that it lies completely over v2.
+    /// </remarks>
     public struct Vert3D1DPair
     {
         public int v1 { get; private set; }
