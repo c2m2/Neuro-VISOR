@@ -39,8 +39,6 @@ namespace C2M2.NeuronalDynamics.Simulation
         // Keep track of i locally so that we know which simulation frame to send to other scripts
         private int i = -1;
 
-        private NeuronCell NeuronCell;
-
         public override double[] Get1DValues()
         {
             double[] curVals = null;

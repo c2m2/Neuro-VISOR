@@ -5,7 +5,7 @@ using System;
 using System.Linq;
 using C2M2.NeuronalDynamics.UGX;
 using Grid = C2M2.NeuronalDynamics.UGX.Grid;
-using C2M2.NeuronalDynamics.UGX;
+
 namespace C2M2.NeuronalDynamics.Alg
 {
     /// <summary>

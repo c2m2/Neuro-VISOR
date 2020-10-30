@@ -17,7 +17,7 @@ using C2M2.Utils.Exceptions;
 using C2M2.Utils.MeshUtils;
 using Grid = C2M2.NeuronalDynamics.UGX.Grid;
 using System.Text;
-using C2M2.NeuronalDynamics.Visualization.vrn;
+using C2M2.NeuronalDynamics.Visualization.VRN;
 using C2M2.NeuronalDynamics.Interaction;
 
 namespace C2M2.NeuronalDynamics.Simulation {
@@ -105,15 +105,15 @@ namespace C2M2.NeuronalDynamics.Simulation {
         // Need mesh options for each refinement, diameter level
         [Tooltip("Name of the vrn file within Assets/StreamingAssets")]
         public string vrnFileName = "test.vrn";
-        private vrnReader vrnReader = null;
-        private vrnReader VrnReader
+        private VrnReader vrnReader = null;
+        private VrnReader VrnReader
         {
             get
             {
                 if (vrnReader == null)
                 {
                     if (!vrnFileName.EndsWith(".vrn")) vrnFileName = vrnFileName + ".vrn";
-                    vrnReader = new vrnReader(Application.streamingAssetsPath + Path.DirectorySeparatorChar + vrnFileName);
+                    vrnReader = new VrnReader(Application.streamingAssetsPath + Path.DirectorySeparatorChar + vrnFileName);
                 }
                 return vrnReader;
             }
@@ -170,6 +170,8 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 return averageDendriteRadius;
             }
         }
+
+        public double hitValue = 55;
 
         // Stores the information from mapping in an array of structs.
         // Performs much better than using mapping directly.
@@ -247,11 +249,22 @@ namespace C2M2.NeuronalDynamics.Simulation {
         /// Translate 3D vertex values to 1D values, and pass them downwards for interaction
         /// </summary>
         public sealed override void SetValues (RaycastHit hit) {
-            Tuple<int, double>[] newValues = ((RaycastSimHeaterDiscrete)Heater).HitToTriangles (hit);
+            // We will have 3 new index/value pairings
+            Tuple<int, double>[] newValues = new Tuple<int, double>[3];
+            // Translate hit triangle index so we can index into triangles array
+            int triInd = hit.triangleIndex * 3;
+            MeshFilter mf = hit.transform.GetComponentInParent<MeshFilter>();
+            // Get mesh vertices from hit triangle
+            int v1 = mf.mesh.triangles[triInd];
+            int v2 = mf.mesh.triangles[triInd + 1];
+            int v3 = mf.mesh.triangles[triInd + 2];
+            // Attach new values to new vertices
+            newValues[0] = new Tuple<int, double>(v1, hitValue);
+            newValues[1] = new Tuple<int, double>(v2, hitValue);
+            newValues[2] = new Tuple<int, double>(v3, hitValue);
 
             SetValues (newValues);
         }
-
         /// <summary>
         /// Translate 3D vertex values to 1D values, and pass them downwards for interaction
         /// </summary>
@@ -266,19 +279,16 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 // Get 3D vertex index
                 int vert3D = newValues[i].Item1;
                 double val3D = newValues[i].Item2;
-
                 // TODO: What if a 1D vert belongs to multiple 3D verts in this list?
                 // Translate into two 1D vert indices and a lambda weight
                 double val1D = (1 - Map[vert3D].lambda) * val3D;
                 new1DValues[j] = new Tuple<int, double> (map[vert3D].v1, val1D);
-
                 // Weight newVal by (lambda) for second 1D vert
                 val1D = map[vert3D].lambda * val3D;
                 new1DValues[j + 1] = new Tuple<int, double> (map[vert3D].v2, val1D);
                 // Move up two spots in 1D array
                 j += 2;
             }
-
             // Send 1D-translated scalars to simulation
             Set1DValues (new1DValues);
         }

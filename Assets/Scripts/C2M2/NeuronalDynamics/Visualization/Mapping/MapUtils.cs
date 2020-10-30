@@ -71,13 +71,11 @@ namespace C2M2.NeuronalDynamics.UGX {
             /// 1d mesh needs a diameter
             if (!grid1d.HasVertexAttachment<DiameterAttachment> ()) {
                 throw new MapNotBuildException ("1d mesh needs a diameter attachment");
-                return null;
             }
 
             /// 2d mesh needs a mapping
             if (!grid2d.HasVertexAttachment<MappingAttachment> ()) {
                 throw new MapNotBuildException ("2d needs a mapping attachment");
-                return null;
             }
 
             /// otherwise can build map

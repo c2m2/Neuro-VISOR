@@ -193,7 +193,7 @@ namespace C2M2.NeuronalDynamics.Simulation
                     }
 
                 }
-                catch (Exception e){GameManager.instance.DebugLogSafe(e);}
+                catch (Exception e){GameManager.instance.DebugLogThreadSafe(e);}
                 GameManager.instance.DebugLogSafe("Simulation Over.");
             }
         }

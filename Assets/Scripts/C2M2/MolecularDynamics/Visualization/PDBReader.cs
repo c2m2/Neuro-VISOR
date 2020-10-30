@@ -25,7 +25,6 @@ namespace C2M2
                 string[] fileSplit = pdbFilePath.Split(Path.DirectorySeparatorChar);
                 string fileName = fileSplit[fileSplit.Length - 1];
 
-                bool inPos = false;
                 // Read file until the end
                 while (reader.Peek() > -1)
 		        //for (int i = 0; i < 16; i++)

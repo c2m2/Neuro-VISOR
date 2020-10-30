@@ -9,7 +9,7 @@ using System.Xml.Schema;
 using System.Collections.Generic;
 using System.IO.Compression;
 using System.IO;
-using C2M2.NeuronalDynamics.Visualization.vrn;
+using C2M2.NeuronalDynamics.Visualization.VRN;
 #endregion
 
 namespace C2M2.NeuronalDynamics.UGX

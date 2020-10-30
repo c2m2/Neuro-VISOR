@@ -144,7 +144,7 @@ namespace C2M2
                         {
                             string s = "";
                             foreach(string token in splitLine) { s += token + " "; }
-                            //Debug.LogError("Line: " + s + "; " + e);
+                            Debug.LogError("Line: " + s + "; " + e);
                         }
                     }
                 }

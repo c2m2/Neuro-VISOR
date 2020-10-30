@@ -29,6 +29,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         private MeshRenderer mr;
         private Vector3 LocalExtents { get { return transform.localScale / 2; } }
         private Vector3 posFocus = Vector3.zero;
+
         private Color32 clampCol = Color.black;
         public Color32 ClampCol
         {
@@ -208,6 +209,7 @@ namespace C2M2.NeuronalDynamics.Interaction
                 float dist = Vector3.Distance(hit.point, simulation.Verts1D[vert]);
                 if (dist < nearestDist)
                 {
+
                     nearestDist = dist;
                     nearestVert1D = vert;
                 }

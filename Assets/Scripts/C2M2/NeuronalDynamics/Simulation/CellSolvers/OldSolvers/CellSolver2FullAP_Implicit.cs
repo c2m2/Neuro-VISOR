@@ -240,7 +240,7 @@ namespace C2M2.NeuronalDynamics.Simulation
             }
             catch (Exception e)
             {
-                GameManager.instance.DebugLogSafe(e);
+                GameManager.instance.DebugLogThreadSafe(e);
             }
             finally
             { // Export timer results regardless of if simulation is successful
