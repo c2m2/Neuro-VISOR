@@ -34,7 +34,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         public const int nT = 100000; //9000;  //16000;          // Number of Time steps
         public const double vstart = 55;
 
-        private Vector U;
+        private Vector U = null;
 
         // Keep track of i locally so that we know which simulation frame to send to other scripts
         private int i = -1;

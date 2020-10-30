@@ -13,7 +13,6 @@ namespace C2M2
             public List<TimerNode> timerNodes { get; private set; }
             private DateTime t0;
             private DateTime t1;
-            private bool started = false;
             private Stopwatch stopwatch;
 
             public struct TimerNode

@@ -61,6 +61,11 @@ namespace C2M2.NeuronalDynamics.Visualization {
             [Serializable]
             private class Geometry {                                                                                                         
                 public Geom1d[] geom1d;
+
+                public Geometry(Geom1d[] geom1d)
+                {
+                    this.geom1d = geom1d;
+                }
             }
 
             private readonly string fileName;

@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿#pragma warning disable 0618 // Ignore obsolete script warning
+
+using System.Collections.Generic;
 using UnityEngine;
 using C2M2.Simulation;
 using C2M2.Interaction;
