@@ -22,7 +22,7 @@ namespace C2M2.Interaction
                 // Use the value of whichever joystick is held up furthest
                 float y1 = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick).y;
                 float y2 = OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick).y;
-                return y1 + y2;
+                return (y1 + y2) / 2;
             }
         }
 
@@ -45,7 +45,7 @@ namespace C2M2.Interaction
         {
             if (grabbable.isGrabbed)
             {
-                transform.localScale += ThumbstickScaler * origScale;
+                transform.localScale += scaler * ThumbstickScaler * transform.localScale;
             }
         }
     }

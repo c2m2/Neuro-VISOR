@@ -263,6 +263,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
             newValues[1] = new Tuple<int, double>(v2, hitValue);
             newValues[2] = new Tuple<int, double>(v3, hitValue);
 
+            Debug.Log("hit.point: " + transform.InverseTransformPoint(hit.point));
             SetValues (newValues);
         }
         /// <summary>
@@ -275,6 +276,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
             // Each 3D index will have TWO associated 1D vertices
             Tuple<int, double>[] new1DValues = new Tuple<int, double>[2 * newValues.Length];
             int j = 0;
+            string s = "Hitting points:\n";
             for (int i = 0; i < newValues.Length; i++) {
                 // Get 3D vertex index
                 int vert3D = newValues[i].Item1;
@@ -288,7 +290,10 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 new1DValues[j + 1] = new Tuple<int, double> (map[vert3D].v2, val1D);
                 // Move up two spots in 1D array
                 j += 2;
+                s += "\n\t" + map[vert3D].v1 + "\n\t\tpos: " + Verts1D[map[vert3D].v1];
+                s += "\n\t" + map[vert3D].v2 + "\n\t\tpos: " + Verts1D[map[vert3D].v2];
             }
+            Debug.Log(s);
             // Send 1D-translated scalars to simulation
             Set1DValues (new1DValues);
         }
@@ -316,6 +321,8 @@ namespace C2M2.NeuronalDynamics.Simulation {
             raycastManager = GetComponent<RaycastEventManager>();
 
             ClampMode = clampMode;
+            
+            Debug.Log("Grid2D.Mesh.vertices[0]: " + Grid2D.Mesh.vertices[0]);
         }
         /// <summary>
         /// Read in the cell and initialize 3D/1D visualization/interaction infrastructure
