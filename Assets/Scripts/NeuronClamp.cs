@@ -200,9 +200,9 @@ namespace C2M2.NeuronalDynamics.Interaction
             // Find 1D verts belonging to these 3D verts
             int[] verts1D = new int[]
             {
-                simulation.Map[v1].v1, simulation.Map[v1].v2,
-                simulation.Map[v2].v1, simulation.Map[v2].v2,
-                simulation.Map[v3].v1, simulation.Map[v3].v2
+                simulation.Map[v1].v1, //simulation.Map[v1].v2,
+                simulation.Map[v2].v1, //simulation.Map[v2].v2,
+                simulation.Map[v3].v1, //simulation.Map[v3].v2
             };
 
             float nearestDist = float.PositiveInfinity;

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using C2M2.Visualization;
 using C2M2.Utils.MeshUtils;
+using C2M2.Interaction;
 
 namespace C2M2.Simulation
 {
@@ -124,6 +125,7 @@ namespace C2M2.Simulation
                 else raycastable.SetSource(viz);
 
                 gameObject.AddComponent<VRGrabbableMesh>();
+                gameObject.AddComponent<GrabRescaler>();
             }
         }
     }
