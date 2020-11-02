@@ -190,17 +190,20 @@ namespace C2M2.NeuronalDynamics.Interaction
 
             MeshFilter mf = simulation.transform.GetComponentInParent<MeshFilter>();
             if (mf == null) return -1;
-            // Get mesh vertices from hit triangle
+
+            // Get 3D mesh vertices from hit triangle
             int triInd = hit.triangleIndex * 3;
             int v1 = mf.mesh.triangles[triInd];
             int v2 = mf.mesh.triangles[triInd + 1];
             int v3 = mf.mesh.triangles[triInd + 2];
 
-            // Find nearest 1D vert to these 3D verts
-            int[] verts1D = new int[]{
-                simulation.Map[v1].lambda < 0.5 ? simulation.Map[v1].v1 : simulation.Map[v1].v2,
-                simulation.Map[v2].lambda < 0.5 ? simulation.Map[v2].v1 : simulation.Map[v2].v2,
-                simulation.Map[v3].lambda < 0.5 ? simulation.Map[v3].v1 : simulation.Map[v3].v2};
+            // Find 1D verts belonging to these 3D verts
+            int[] verts1D = new int[]
+            {
+                simulation.Map[v1].v1, simulation.Map[v1].v2,
+                simulation.Map[v2].v1, simulation.Map[v2].v2,
+                simulation.Map[v3].v1, simulation.Map[v3].v2
+            };
 
             float nearestDist = float.PositiveInfinity;
             int nearestVert1D = -1;
@@ -209,7 +212,6 @@ namespace C2M2.NeuronalDynamics.Interaction
                 float dist = Vector3.Distance(hit.point, simulation.Verts1D[vert]);
                 if (dist < nearestDist)
                 {
-
                     nearestDist = dist;
                     nearestVert1D = vert;
                 }
