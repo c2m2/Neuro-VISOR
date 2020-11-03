@@ -67,8 +67,11 @@ namespace C2M2.NeuronalDynamics.Simulation {
             get { return refinementLevel; }
             set
             {
-                refinementLevel = value;
-                UpdateGrid1D();
+                if (refinementLevel != value && value >= 0)
+                {
+                    refinementLevel = value;
+                    UpdateGrid1D();
+                }
             }
         }
 
@@ -442,6 +445,28 @@ namespace C2M2.NeuronalDynamics.Simulation {
         public override string ToString()
         {
             return "v1: " + v1 + "\nv2: " + v2 + "\nlambda: " + lambda;
+        }
+    }
+
+    [CustomEditor(typeof(NDSimulation), true)]
+    public class NDSimulationEditor : Editor
+    {
+        int refinement = 0;
+        static int refinementLevel;
+
+        NDSimulation sim;
+
+        public void Awake()
+        {
+            sim = target as NDSimulation;
+        }
+
+        public override void OnInspectorGUI()
+        {
+            refinementLevel = EditorGUILayout.IntField("Refinement Level: ", sim.RefinementLevel);
+
+            sim.RefinementLevel = refinementLevel;
+            DrawDefaultInspector();
         }
     }
 }
