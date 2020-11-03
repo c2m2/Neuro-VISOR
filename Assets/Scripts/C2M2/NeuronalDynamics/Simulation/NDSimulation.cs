@@ -36,13 +36,16 @@ namespace C2M2.NeuronalDynamics.Simulation {
             get { return visualInflation; }
             set
             {
-                visualInflation = value;
-                if (ColliderInflation < visualInflation) ColliderInflation = visualInflation;
+                if (visualInflation != value)
+                {
+                    visualInflation = value;
+                    if (ColliderInflation < visualInflation) ColliderInflation = visualInflation;
 
-                Update2DGrid();
+                    Update2DGrid();
 
-                VisualMesh = Grid2D.Mesh;
-                OnVisualInflationChange?.Invoke(visualInflation);
+                    VisualMesh = Grid2D.Mesh;
+                    OnVisualInflationChange?.Invoke(visualInflation);
+                }
             }
         }
 
@@ -55,9 +58,12 @@ namespace C2M2.NeuronalDynamics.Simulation {
             get { return colliderInflation; }
             set
             {
-                if (value < visualInflation) return;
-                colliderInflation = value;
-                ColliderMesh = CheckMeshCache(colliderInflation);
+                if (colliderInflation != value)
+                {
+                    if (value < visualInflation) return;
+                    colliderInflation = value;
+                    ColliderMesh = CheckMeshCache(colliderInflation);
+                }
             }
         }
 
@@ -266,7 +272,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
             newValues[1] = new Tuple<int, double>(v2, hitValue);
             newValues[2] = new Tuple<int, double>(v3, hitValue);
 
-            Debug.Log("hit.point: " + transform.InverseTransformPoint(hit.point));
+            Debug.Log("local space hit.point: " + transform.InverseTransformPoint(hit.point));
             SetValues (newValues);
         }
         /// <summary>
@@ -293,8 +299,10 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 new1DValues[j + 1] = new Tuple<int, double> (map[vert3D].v2, val1D);
                 // Move up two spots in 1D array
                 j += 2;
-                s += "\n\t" + map[vert3D].v1 + "\n\t\tpos: " + Verts1D[map[vert3D].v1];
-                s += "\n\t" + map[vert3D].v2 + "\n\t\tpos: " + Verts1D[map[vert3D].v2];
+                s += "\n3D vert " + vert3D + "\tpos: " + Grid2D.Mesh.vertices[vert3D].ToString("F5")
+                    + "\n1D verts: "
+                    + "\n\t" + map[vert3D].v1 + "\tpos: " + Verts1D[map[vert3D].v1]
+                    + "\n\t" + map[vert3D].v2 + "\tpos: " + Verts1D[map[vert3D].v2];
             }
             Debug.Log(s);
             // Send 1D-translated scalars to simulation
@@ -453,6 +461,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
     {
         int refinement = 0;
         static int refinementLevel;
+        static double inflationLevel;
 
         NDSimulation sim;
 
@@ -464,8 +473,10 @@ namespace C2M2.NeuronalDynamics.Simulation {
         public override void OnInspectorGUI()
         {
             refinementLevel = EditorGUILayout.IntField("Refinement Level: ", sim.RefinementLevel);
+            inflationLevel = EditorGUILayout.DoubleField("Inflation Level: ", sim.VisualInflation);
 
             sim.RefinementLevel = refinementLevel;
+            sim.VisualInflation = inflationLevel;
             DrawDefaultInspector();
         }
     }
