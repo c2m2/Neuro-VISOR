@@ -201,22 +201,26 @@ namespace C2M2.NeuronalDynamics.Interaction
             // Find 1D verts belonging to these 3D verts
             int[] verts1D = new int[]
             {
-                simulation.Map[v1].v1, //simulation.Map[v1].v2,
-                simulation.Map[v2].v1, //simulation.Map[v2].v2,
-                simulation.Map[v3].v1, //simulation.Map[v3].v2
+                simulation.Map[v1].v1, simulation.Map[v1].v2,
+                simulation.Map[v2].v1, simulation.Map[v2].v2,
+                simulation.Map[v3].v1, simulation.Map[v3].v2
             };
+            Vector3 localHitPoint = simulation.transform.InverseTransformPoint(hit.point); 
 
             float nearestDist = float.PositiveInfinity;
             int nearestVert1D = -1;
+            string s = "Finding nearest vert for clamp based on hit (" + localHitPoint.ToString("F5") +  ":";
             foreach(int vert in verts1D)
             {
-                float dist = Vector3.Distance(hit.point, simulation.Verts1D[vert]);
+                float dist = Vector3.Distance(localHitPoint, simulation.Verts1D[vert]);
                 if (dist < nearestDist)
                 {
                     nearestDist = dist;
                     nearestVert1D = vert;
+                    s += "\n\tNew nearest vert: " + vert + "\n\t\tpos: " + simulation.Verts1D[nearestVert1D].ToString("F5") + "\n\t\tdist: " + nearestDist;
                 }
             }
+            Debug.Log(s);
 
             return nearestVert1D;
         }
