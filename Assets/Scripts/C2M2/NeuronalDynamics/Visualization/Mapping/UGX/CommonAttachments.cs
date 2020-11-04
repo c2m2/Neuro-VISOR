@@ -20,6 +20,15 @@ namespace C2M2.NeuronalDynamics.UGX
         public DiameterData(in Double diameter) => Diameter = diameter;
     }
 
+    /// <summary>
+    /// IndexData
+    /// </summary>
+    /// <param name="parentIndex"> ParentIndex </param>
+    readonly struct IndexData : IAttachmentData { 
+        public int ParentIndex { get; }
+        public IndexData(in int parentIndex) => ParentIndex = parentIndex;
+    }
+
     /// NormalData
     /// <summary>
     /// Data for normals of grid

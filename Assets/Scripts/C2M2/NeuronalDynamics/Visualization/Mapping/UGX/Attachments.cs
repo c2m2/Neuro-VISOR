@@ -181,6 +181,7 @@ namespace C2M2.NeuronalDynamics.UGX
             Register<IAttachment<MappingData>>("npMapping");
             Register<IAttachment<SynapseData>>("synapses");
             Register<IAttachment<NormalData>>("npNormals");
+            Register<IAttachment<IndexData>>("pid");
         }
     }
 }
