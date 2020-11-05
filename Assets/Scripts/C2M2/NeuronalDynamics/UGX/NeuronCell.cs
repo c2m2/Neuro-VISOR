@@ -22,8 +22,8 @@ namespace C2M2.NeuronalDynamics.UGX
         public struct NodeData
         {
             public int id { get; set; }
-            public int pid { get; set; }
-            public int nodeType { get; set; }
+            public int pid { get; set; }    // pid not use
+            public int nodeType { get; set; } // node type
             public double nodeRadius { get; set; }
             public double xcoords { get; set; }
             public double ycoords { get; set; }
@@ -79,40 +79,40 @@ namespace C2M2.NeuronalDynamics.UGX
         }
 
         // For reading in an swc file
-        public void ReadDataTable(string filePath)
-        {
-            NodeData dr = new NodeData();
+        //public void ReadDataTable(string filePath)
+        //{
+         //   NodeData dr = new NodeData();
 
-            string[] lines = System.IO.File.ReadAllLines(filePath);
-            int lineCount = 0;
+//            string[] lines = System.IO.File.ReadAllLines(filePath);
+  //          int lineCount = 0;
+  //
+    //        foreach (string line in lines)
+      //      {
+        //        var cols = line.Split(' ');
 
-            foreach (string line in lines)
-            {
-                var cols = line.Split(' ');
+            //    dr.id = int.Parse(cols[0], System.Globalization.NumberStyles.Integer);
+          //      dr.nodeType = int.Parse(cols[1], System.Globalization.NumberStyles.Integer);
 
-                dr.id = int.Parse(cols[0], System.Globalization.NumberStyles.Integer);
-                dr.nodeType = int.Parse(cols[1], System.Globalization.NumberStyles.Integer);
+              //  dr.xcoords = double.Parse(cols[2], System.Globalization.NumberStyles.Any);
+              //  dr.ycoords = double.Parse(cols[3], System.Globalization.NumberStyles.Any);
+              //  dr.zcoords = double.Parse(cols[4], System.Globalization.NumberStyles.Any);
 
-                dr.xcoords = double.Parse(cols[2], System.Globalization.NumberStyles.Any);
-                dr.ycoords = double.Parse(cols[3], System.Globalization.NumberStyles.Any);
-                dr.zcoords = double.Parse(cols[4], System.Globalization.NumberStyles.Any);
+              //  dr.nodeRadius = double.Parse(cols[5], System.Globalization.NumberStyles.Any);
+              //  dr.pid = int.Parse(cols[6], System.Globalization.NumberStyles.Integer);
 
-                dr.nodeRadius = double.Parse(cols[5], System.Globalization.NumberStyles.Any);
-                dr.pid = int.Parse(cols[6], System.Globalization.NumberStyles.Integer);
+//                if (lineCount > 0)
+  //              {
+    //                edges.Add((Tuple.Create(dr.id, dr.pid)));
+      //          }
 
-                if (lineCount > 0)
-                {
-                    edges.Add((Tuple.Create(dr.id, dr.pid)));
-                }
+        //        nodeData.Add(dr);
 
-                nodeData.Add(dr);
+          //      lineCount = lineCount + 1;
+           // }
 
-                lineCount = lineCount + 1;
-            }
-
-            vertCount = lineCount;
-            edgeCount = vertCount - 1;
-        }
+           // vertCount = lineCount;
+           // edgeCount = vertCount - 1;
+       // }
 
         static string nodeFormatString =
             "ID = {0}\n" +

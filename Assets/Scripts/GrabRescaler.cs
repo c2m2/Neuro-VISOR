@@ -12,7 +12,7 @@ namespace C2M2.Interaction
     {
         private OVRGrabbable grabbable = null;
         private Vector3 origScale;
-        private float scaler = 0.1f;
+        public float scaler = 0.2f;
 
         // Returns a value between -2 and 2, where -2 implies both thumbsticks are held down, and 2 implies both are held up.
         private float ThumbstickScaler
@@ -36,7 +36,7 @@ namespace C2M2.Interaction
         private void Start()
         {
             // Use this to determine how to scale at runtime
-            origScale = scaler * transform.localScale;
+            origScale = transform.localScale;
         }
 
         // Update is called once per frame
@@ -44,7 +44,11 @@ namespace C2M2.Interaction
         {
             if (grabbable.isGrabbed)
             {
-                transform.localScale += scaler * ThumbstickScaler * transform.localScale;
+                transform.localScale += scaler * ThumbstickScaler * origScale;
+            }
+            else
+            {
+
             }
         }
     }
