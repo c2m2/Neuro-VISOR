@@ -18,7 +18,6 @@ namespace C2M2.Interaction.VR
     [ExecuteInEditMode]
     public class VRDeviceManager : MonoBehaviour
     {
-        public bool vrIsActive { get { return playerController.enabled; } }
         public GameObject informationOverlay = null;
         public GameObject informationDisplayTV = null;
         private MovingOVRHeadsetEmulator emulator;
@@ -26,6 +25,7 @@ namespace C2M2.Interaction.VR
         private OVRPlayerController playerController;
         private MovementController emulatorMove;
         private bool prev;
+        public bool vrIsActive { get { return playerController.enabled; } }
 
         private void Awake()
         {
