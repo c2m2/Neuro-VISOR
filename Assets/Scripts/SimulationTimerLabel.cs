@@ -3,6 +3,7 @@ using System;
 using TMPro;
 using UnityEngine;
 
+[RequireComponent(typeof(SparseSolverTestv1))]
 public class SimulationTimerLabel : MonoBehaviour
 {
     public SparseSolverTestv1 sim = null;

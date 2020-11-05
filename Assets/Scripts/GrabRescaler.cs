@@ -39,7 +39,6 @@ namespace C2M2.Interaction
         // Update is called once per frame
         void Update()
         {
-
             if (grabbable.isGrabbed)
             {
                 Vector3 scaleValue = scaler * ThumbstickScaler * origScale;

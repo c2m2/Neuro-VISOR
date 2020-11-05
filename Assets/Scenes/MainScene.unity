@@ -3301,6 +3301,12 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 5843646974765894135}
   m_PrefabAsset: {fileID: 0}
+--- !u!65 &861837717 stripped
+BoxCollider:
+  m_CorrespondingSourceObject: {fileID: 8385630151330308209, guid: 1f3d7fdf0dd17494cad2086085b3df67,
+    type: 3}
+  m_PrefabInstance: {fileID: 1869367828}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &871495849 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5843646973942382987, guid: 70469a93359ee8b4e98c4c445b157af9,
@@ -5760,7 +5766,7 @@ PrefabInstance:
     - target: {fileID: 8320557830559208807, guid: 1f3d7fdf0dd17494cad2086085b3df67,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 1.461
+      value: 1.41
       objectReference: {fileID: 0}
     - target: {fileID: 8320557830559208807, guid: 1f3d7fdf0dd17494cad2086085b3df67,
         type: 3}
@@ -5872,6 +5878,21 @@ PrefabInstance:
       propertyPath: m_textInfo.pageCount
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2919815283430764373, guid: 1f3d7fdf0dd17494cad2086085b3df67,
+        type: 3}
+      propertyPath: m_grabPoints.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2919815283430764373, guid: 1f3d7fdf0dd17494cad2086085b3df67,
+        type: 3}
+      propertyPath: m_grabPoints.Array.data[0]
+      value: 
+      objectReference: {fileID: 861837717}
+    - target: {fileID: 473024890890826751, guid: 1f3d7fdf0dd17494cad2086085b3df67,
+        type: 3}
+      propertyPath: sim
+      value: 
+      objectReference: {fileID: 1818162880}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1f3d7fdf0dd17494cad2086085b3df67, type: 3}
 --- !u!1 &1899656393
