@@ -76,6 +76,11 @@ namespace C2M2.NeuronalDynamics.Simulation
         // Keep track of i locally so that we know which simulation frame to send to other scripts
         private int i = -1;
 
+        public float GetTime()
+        {
+            return i * (float) k;
+        }
+
         // Send simulation 1D values 
         public override double[] Get1DValues()
         {

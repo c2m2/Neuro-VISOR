@@ -81,6 +81,9 @@ namespace C2M2.NeuronalDynamics.Simulation {
             }
         }
 
+        //returns time simulation has been running in milliseconds (ms)
+        //public abstract float GetTime();
+
         private Dictionary<double, Mesh> meshCache = new Dictionary<double, Mesh>();
 
         private bool clampMode = false;
