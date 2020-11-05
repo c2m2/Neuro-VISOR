@@ -15,7 +15,7 @@ namespace C2M2.NeuronalDynamics.Visualization {
     using DiameterAttachment = IAttachment<DiameterData>;
     namespace VRN {
 
-        sealed public class vrnReader {
+        sealed public class VrnReader {
             /// GEOM1D
             /// <summary>
             /// Stores the 1D geometries by name, refinement and a description
