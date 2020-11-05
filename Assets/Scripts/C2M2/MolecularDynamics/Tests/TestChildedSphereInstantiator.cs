@@ -38,6 +38,7 @@ namespace C2M2.MolecularDynamics.Tests
                 }
             }catch(Exception e)
             {
+                Debug.LogError(e);
                 return false;
             }
             // Let the manager know that the pre test ran successfully
@@ -90,6 +91,7 @@ namespace C2M2.MolecularDynamics.Tests
                 }
             }catch(Exception e)
             {
+                Debug.LogError(e);
                 return false;
             }
             // If every sphere was correct, our test passes
@@ -104,6 +106,7 @@ namespace C2M2.MolecularDynamics.Tests
                 Destroy(this);
             }catch(Exception e)
             {
+                Debug.LogError(e);
                 return false;
             }
             // Let the manager know that the psot test ran successfully

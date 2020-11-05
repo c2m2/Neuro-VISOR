@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿#pragma warning disable 0618 // Ignore obsolete script warning
+
+using System.Collections;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;

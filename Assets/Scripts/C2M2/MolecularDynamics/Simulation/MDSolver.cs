@@ -13,13 +13,8 @@ namespace C2M2.MolecularDynamics.Simulation
         public float kb = 0.001987f; //kcal per mol
         public float T = 100.0f; //K
 
-        public int timestepCount = 50000;
-        public float timestepSize = .1f;
-
         public float kappa = 6f;
         public float r0 = 3.65f;
-
-    	private int[][] angle_topo = null;
         
         // OPTION 2:
         //RaycastHit lastHit = new RaycastHit();

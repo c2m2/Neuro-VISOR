@@ -27,7 +27,7 @@ using C2M2.NeuronalDynamics.UGX;
 using Grid = C2M2.NeuronalDynamics.UGX.Grid;
 namespace C2M2.NeuronalDynamics.Simulation
 {
-    public class sparseNoArray_cholesky_time_test : NeuronSimulation1D
+    public class sparseNoArray_cholesky_time_test : NDSimulation
     {
         //Simulation parameters
         [Header("Simulation Parameters")]
@@ -88,12 +88,6 @@ namespace C2M2.NeuronalDynamics.Simulation
         // Keep track of i locally so that we know which simulation frame to send to other scripts
         private int i = -1;
 
-        private NeuronCell NeuronCell;
-
-        //private TimeUtilities.Timer timer = new TimeUtilities.Timer();
-
-
-
         // Send simulation 1D values 
         public override double[] Get1DValues()
         {
@@ -113,7 +107,7 @@ namespace C2M2.NeuronalDynamics.Simulation
             }
             catch (Exception e)
             {
-                GameManager.instance.DebugLogSafe(e);
+                GameManager.instance.DebugLogThreadSafe(e);
             }
             return curVals;
         }
@@ -134,7 +128,7 @@ namespace C2M2.NeuronalDynamics.Simulation
             }
             catch (Exception e)
             {
-                GameManager.instance.DebugLogSafe(e);
+                GameManager.instance.DebugLogThreadSafe(e);
             }
         }
 
@@ -285,7 +279,7 @@ namespace C2M2.NeuronalDynamics.Simulation
                 }
                 catch (Exception e)
                 {
-                    GameManager.instance.DebugLogSafe(e);
+                    GameManager.instance.DebugLogThreadSafe(e);
                 }
                 finally
                 {

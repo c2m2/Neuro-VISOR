@@ -19,7 +19,7 @@ using C2M2.NeuronalDynamics.UGX;
 using Grid = C2M2.NeuronalDynamics.UGX.Grid;
 namespace C2M2.NeuronalDynamics.Simulation
 {
-    public class CellSolver2vb : NeuronSimulation1D
+    public class CellSolver2vb : NDSimulation
     {
         //Set cell biological constants
         public const double res = 10.0;
@@ -34,12 +34,10 @@ namespace C2M2.NeuronalDynamics.Simulation
         public const int nT = 100000; //9000;  //16000;          // Number of Time steps
         public const double vstart = 55;
 
-        private Vector U;
+        private Vector U = null;
 
         // Keep track of i locally so that we know which simulation frame to send to other scripts
         private int i = -1;
-
-        private NeuronCell NeuronCell;
 
         public override double[] Get1DValues()
         {

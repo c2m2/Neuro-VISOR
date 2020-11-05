@@ -25,7 +25,7 @@ namespace C2M2.NeuronalDynamics.UGX
     {
         private static readonly byte MAPPING_FIELDS = 7;
         private static readonly string XSD_SCHEMA = @Application.dataPath + Path.DirectorySeparatorChar + "ugx.xsd";
-        private static readonly string UGX_EXTENSION = ".ugx";
+        //private static readonly string UGX_EXTENSION = ".ugx";
         public static Boolean Validate = false;
 
         /// ReadUGX

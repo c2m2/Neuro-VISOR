@@ -17,13 +17,12 @@ using MathNet.Numerics.LinearAlgebra.Double.Solvers;
 
 using C2M2.Simulation;
 using C2M2.NeuronalDynamics.UGX;
-using C2M2.NeuronalDynamics.UGX;
 using C2M2.Utils;
 using C2M2.Interaction;
 using Grid = C2M2.NeuronalDynamics.UGX.Grid;
 namespace C2M2.NeuronalDynamics.Simulation
 {
-    public class CellSolver2FullAP_DendriteImplicit : NeuronSimulation1D
+    public class CellSolver2FullAP_DendriteImplicit : NDSimulation
     {
         //Set cell biological paramaters
         public const double res = 10.0;
@@ -193,7 +192,7 @@ namespace C2M2.NeuronalDynamics.Simulation
             }
             catch (Exception e)
             {
-                GameManager.instance.DebugLogSafe(e);
+                GameManager.instance.DebugLogThreadSafe(e);
             }
 
             GameManager.instance.DebugLogSafe("Simulation Over.");

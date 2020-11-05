@@ -13,41 +13,58 @@ using Grid = C2M2.NeuronalDynamics.UGX.Grid;
 
 namespace C2M2.NeuronalDynamics.Visualization {
     using DiameterAttachment = IAttachment<DiameterData>;
-    namespace vrn {
+    namespace VRN {
 
         sealed public class vrnReader {
-            /// GEOM1D                                                                                                                                                                                                                                                            
-            /// <summary>                                                                                                                                                                                                                                                         
+            /// GEOM1D
+            /// <summary>
             /// Stores the 1D geometries by name, refinement and a description
             /// Inflations are attached to the 1D geometries as a list of Geom2ds
-            /// </summary>                                                                                                                                                                                                                                                        
+            /// </summary>
             [Serializable]
             private struct Geom1d {
                 public string name;
                 public string refinement;
                 public string description;
                 public Geom2d[] inflations;
+
+                public Geom1d(string name, string refinement, string description, Geom2d[] inflations)
+                {
+                    this.name = name;
+                    this.refinement = refinement;
+                    this.description = description;
+                    this.inflations = inflations;
+                }
             }
 
-            /// GEOM2D                                                                                                                                                                                                                                                            
-            /// <summary>                                                                                                                                                                                                                                                         
+            /// <summary>
             /// Stores the 2d geometries by name, inflation (factor), and description
-            /// </summary>                                                                                                                                                                                                                                                        
+            /// </summary>
             [Serializable]
             private struct Geom2d {
                 public string inflation;
                 public string name;
                 public string description;
+
+                public Geom2d(string inflation, string name, string description)
+                {
+                    this.inflation = inflation;
+                    this.name = name;
+                    this.description = description;
+                }
             }
 
-            /// GEOMETRY                                                                                                                                                                                                                                                          
-            /// <summary>                                                                                                                                                                                                                                                         
+            /// <summary>
             /// Stores 1D and associated 2D geometries in the member geom1d
-            /// </summary>                                                                                                                                                                                                                                                        
+            /// </summary>
             [Serializable]
-            private class Geometry {
-                /// All 1D geometries                                                                                                                                                                                                                                             
+            private class Geometry {                                                                                                         
                 public Geom1d[] geom1d;
+
+                public Geometry(Geom1d[] geom1d)
+                {
+                    this.geom1d = geom1d;
+                }
             }
 
             private readonly string fileName;
@@ -80,8 +97,7 @@ namespace C2M2.NeuronalDynamics.Visualization {
                 }
             }
 
-            /// LIST
-            /// <summary>
+            ///<summary>
             /// Print out a list of 1D and 2D geometries contained in .vrn archive
             /// </summary>
             public string List () {
@@ -143,7 +159,7 @@ namespace C2M2.NeuronalDynamics.Visualization {
             /// Supplies the reader with an .vrn archive to load and manipulate
             /// </summary>
             /// <param name="fileName"> Archive's file name (.vrn file) </param>
-            public vrnReader (in string fileName) => this.fileName = fileName;
+            public VrnReader (in string fileName) => this.fileName = fileName;
 
             /// EXAMPLE
             /// <summary>
@@ -157,7 +173,7 @@ namespace C2M2.NeuronalDynamics.Visualization {
                     string fileName = "testNew.vrn";
                     try {
                         /// Instantiate the VRN reader with the desired file name
-                        vrnReader reader = new vrnReader (fileName);
+                        VrnReader reader = new VrnReader (fileName);
                         /// Get the name of the 1d mesh (0-th refinement aka coarse grid)
                         Console.WriteLine (reader.Retrieve1DMeshName ());
                         /// Get the name of the inflated 2d mesh by a factor of 2.5
@@ -177,7 +193,7 @@ namespace C2M2.NeuronalDynamics.Visualization {
         /// <summary>
         /// Example behaviour to demonstrate vrnReader usage
         /// </summary>
-        public class vrnReaderBehaviour : MonoBehaviour {
+        public class VrnReaderBehaviour : MonoBehaviour {
             /// the test archive file test.vrn
             public string fileName = "testNew.vrn";
 
@@ -194,7 +210,7 @@ namespace C2M2.NeuronalDynamics.Visualization {
                     ////////////////////////////////////////////////////////////////
                     string fullFileName = Application.dataPath + Path.DirectorySeparatorChar + fileName;
                     /// Instantiate the VRN reader with the desired file name (.vrn archive) to load from Assets
-                    vrnReader reader = new vrnReader (fullFileName);
+                    VrnReader reader = new VrnReader (fullFileName);
                     /// List all 1D and 2D geometries contained in given .vrn archive
                     Debug.Log (reader.List ());
 

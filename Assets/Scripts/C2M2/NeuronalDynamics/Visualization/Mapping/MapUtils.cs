@@ -71,13 +71,11 @@ namespace C2M2.NeuronalDynamics.UGX {
             /// 1d mesh needs a diameter
             if (!grid1d.HasVertexAttachment<DiameterAttachment> ()) {
                 throw new MapNotBuildException ("1d mesh needs a diameter attachment");
-                return null;
             }
 
             /// 2d mesh needs a mapping
             if (!grid2d.HasVertexAttachment<MappingAttachment> ()) {
                 throw new MapNotBuildException ("2d needs a mapping attachment");
-                return null;
             }
 
             /// otherwise can build map
@@ -148,7 +146,6 @@ namespace C2M2.NeuronalDynamics.UGX {
             Grid grid2dvis = new Grid (new Mesh (), "2D geom tris");
             UGXReader.Validate = validate;
             if (geomTris != null) { UGXReader.ReadUGX (geomTris, ref grid2dvis); }
-            Debug.Log (grid2dvis);
 
             // Surface geometry with mapping data
             Grid grid2d = new Grid (new Mesh (), "2D geom mapping");
@@ -156,7 +153,6 @@ namespace C2M2.NeuronalDynamics.UGX {
 
             UGXReader.Validate = validate;
             UGXReader.ReadUGX (geom2d, ref grid2d);
-            Debug.Log (grid2d);
 
             /// build the mapping
             return build (grid2d, grid1d, grid2dvis);

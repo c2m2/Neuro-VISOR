@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿#pragma warning disable 0618 // Ignore obsolete script warning
+
+using System.Collections.Generic;
 using UnityEngine;
 using System.Threading;
 
@@ -84,6 +86,11 @@ namespace C2M2
                 foreach (string s in logQ) { Debug.Log(s); }
                 logQ.Clear();
             }
+            if (eLogQ != null && eLogQ.Count > 0)
+            { // print every queued statement
+                foreach (string s in eLogQ) { Debug.LogError(s); }
+                eLogQ.Clear();
+            }
         }
         public void RaycasterRightChangeColor(Color color) => rightRaycaster.ChangeStaticHandColor(color);
         public void RaycasterLeftChangeColor(Color color) => leftRaycaster.ChangeStaticHandColor(color);
@@ -110,7 +117,31 @@ namespace C2M2
                 logQ.Add(s);
             }
         }
-        public void DebugLogSafe<T>(T t) => DebugLogSafe(t.ToString());
+        public void DebugLogThreadSafe<T>(T t) => DebugLogSafe(t.ToString());
+
+        private List<string> eLogQ = new List<string>();
+        private readonly int eLogQCap = 100;
+        /// <summary>
+        /// Allows other threads to submit messages to be printed at the start of the next frame
+        /// </summary>
+        /// <remarks>
+        /// Making any Unity API call from another thread is not safe. This method is a quick hack
+        /// to avoid mkaing a Unity API call from another thread.
+        /// </remarks>
+        public void DebugLogErrorSafe(string s)
+        {
+            if (isRunning)
+            {
+                if (eLogQ.Count > eLogQCap)
+                {
+                    Debug.LogWarning("Cannot call DebugLogSafe more than [" + logQCap + "] times per frame. New statements will not be added to queue");
+                    return;
+                }
+                eLogQ.Add(s);
+            }
+        }
+        public void DebugLogErrorThreadSafe<T>(T t) => DebugLogErrorSafe(t.ToString());
+
         private void OnApplicationQuit()
         {
             isRunning = false;

@@ -170,15 +170,20 @@ namespace C2M2.NeuronalDynamics.Tests
 
 	    /// DrawLine helper
 	    private static void DrawLine ( in Vector3 start, in Vector3 end, in Color colorStart, in Color colorEnd ) {
-		GameObject myLine = new GameObject();
-		myLine.transform.position = start;
-		myLine.AddComponent<LineRenderer>();
-		LineRenderer lr = myLine.GetComponent<LineRenderer>();
-		lr.material = new Material ( Shader.Find ( "Particles/Standard Surface" ) );
-		lr.SetColors ( colorStart, colorEnd );
-		lr.SetWidth ( 0.05f, 0.05f );
-		lr.SetPosition ( 0, start );
-		lr.SetPosition ( 1, end );
+		    GameObject myLine = new GameObject();
+		    myLine.transform.position = start;
+		    myLine.AddComponent<LineRenderer>();
+		    LineRenderer lr = myLine.GetComponent<LineRenderer>();
+		    lr.material = new Material ( Shader.Find ( "Particles/Standard Surface" ) );
+
+            lr.startColor = colorStart;
+            lr.endColor = colorEnd;
+
+            lr.startWidth = 0.05f;
+            lr.endWidth = 0.05f;
+
+		    lr.SetPosition ( 0, start );
+		    lr.SetPosition ( 1, end );
 	    }
 
 	    
