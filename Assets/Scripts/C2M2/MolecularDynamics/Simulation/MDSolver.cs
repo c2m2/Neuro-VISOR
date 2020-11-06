@@ -23,7 +23,7 @@ namespace C2M2.MolecularDynamics.Simulation
             return coord;
         }
 
-
+        public override float GetSimulationTime() => t * (float)dt;
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
         /// Receive an interaction request, and translate it onto the proper sphere
@@ -106,6 +106,8 @@ namespace C2M2.MolecularDynamics.Simulation
  		    return f;
 	    }
 
+        int t;
+        float dt;
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
         /// Molecular dynamics simulation code
@@ -114,7 +116,7 @@ namespace C2M2.MolecularDynamics.Simulation
         protected override void Solve()
         {
             int nT = timestepCount;
-            float dt = timestepSize;
+            dt = timestepSize;
             //float m = 40.0f;
 	        float gamma = 0.1f;
             float a = ((1-gamma*dt/2)/(1+gamma*dt/2));
@@ -138,7 +140,7 @@ namespace C2M2.MolecularDynamics.Simulation
                                                   //Vector3[] angle = angle_Force(x);
 
             // Iterate over time
-            for (int t = 0; t < nT; t++)
+            for (t = 0; t < nT; t++)
 	        {      
                 // iterate over the atoms
                 for(int i = 0; i < coord.Length; i++)

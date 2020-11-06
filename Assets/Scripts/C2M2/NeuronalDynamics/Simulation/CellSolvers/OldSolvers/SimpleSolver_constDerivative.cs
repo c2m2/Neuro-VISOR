@@ -36,7 +36,8 @@ namespace C2M2.NeuronalDynamics.Simulation
 
         private Vector U;
 
-
+        public override float GetSimulationTime() => i * (float)k;
+        double k;
         // Keep track of i locally so that we know which simulation frame to send to other scripts
         private int i = -1;
 
@@ -67,7 +68,7 @@ namespace C2M2.NeuronalDynamics.Simulation
             int nT = 9000;
             double endTime = 25;
 
-            double k = endTime / nT;
+            k = endTime / nT;
 
             // I am beginning to wonder if the for loop is even necessary
             // Maybe do a solve on every timestep call to solve and increment i  by 1

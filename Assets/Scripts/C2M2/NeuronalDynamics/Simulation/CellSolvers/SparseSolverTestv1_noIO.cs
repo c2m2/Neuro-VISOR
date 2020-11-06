@@ -58,7 +58,8 @@ namespace C2M2.NeuronalDynamics.Simulation
         // Solution vectors
         private Vector U;                                   // [mV]
         private Vector M; Vector N; Vector H;               // no units
-        
+
+        public override float GetSimulationTime() => i * (float)k;
         // Keep track of i locally so that we know which simulation frame to send to other scripts
         private int i = -1;
 

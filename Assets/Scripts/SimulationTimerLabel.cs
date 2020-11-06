@@ -23,7 +23,7 @@ public class SimulationTimerLabel : MonoBehaviour
 
     private void Update()
     {
-        time = sim.GetTime();
+        time = sim.GetSimulationTime();
         timerText.text = ToString();
     }
     public override string ToString()

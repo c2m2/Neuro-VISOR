@@ -16,7 +16,7 @@ namespace C2M2.Simulation.Samples
     public class CombinedMeshSimulation : Simulation.MeshSimulation
     {
         private double[] values;
-
+        public override float GetSimulationTime() { return 0; }
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
         /// Send values upwards for visualization

@@ -46,6 +46,8 @@ namespace C2M2.NeuronalDynamics.Simulation
         private Vector N;
         private Vector H;
 
+        public override float GetSimulationTime() => i * (float)k;
+        double k;
         // Keep track of i locally so that we know which simulation frame to send to other scripts
         private int i = -1;
 
@@ -86,7 +88,7 @@ namespace C2M2.NeuronalDynamics.Simulation
 
             InitializeNeuronCell();
             // Computer simulation stepping parameters
-            double k = endTime / ((double)nT * 0.3); //Time step size min is 0.27
+            k = endTime / ((double)nT * 0.3); //Time step size min is 0.27
                                                      //double h = myCell.edgeLengths.Average();
 
             double h = System.Math.Sqrt(2 * k) + 0.09;
