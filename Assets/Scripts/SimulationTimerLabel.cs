@@ -2,6 +2,7 @@
 using System;
 using TMPro;
 using UnityEngine;
+using System.Runtime.Serialization;
 
 [RequireComponent(typeof(SparseSolverTestv1))]
 public class SimulationTimerLabel : MonoBehaviour
