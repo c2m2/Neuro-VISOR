@@ -20,12 +20,12 @@ public class SimulationTimerLabel : MonoBehaviour
         timerText.text = time.ToString();
     }
 
-
     private void Update()
     {
         time = sim.GetSimulationTime();
         timerText.text = ToString();
     }
+
     public override string ToString()
     {
         if (time > 1000) return String.Format("{0:f0} s     {1:f0} ms", time/1000, time%1000);
@@ -37,5 +37,6 @@ public class SimulationTimerLabel : MonoBehaviour
         public LabelNotFoundException() { }
         public LabelNotFoundException(string message) : base(message) { }
         public LabelNotFoundException(string message, Exception inner) : base(message, inner) { }
+        protected LabelNotFoundException(SerializationInfo info, StreamingContext ctxt) : base (info, ctxt) { }
     }
 }
