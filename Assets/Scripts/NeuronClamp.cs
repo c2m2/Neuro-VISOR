@@ -1,18 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using C2M2.NeuronalDynamics.Simulation;
 using C2M2.NeuronalDynamics.UGX;
 using C2M2.Visualization;
 using Math = C2M2.Utils.Math;
-using C2M2.Interaction;
 
 namespace C2M2.NeuronalDynamics.Interaction
 {
     public class NeuronClamp : MonoBehaviour
     {
         public float radiusRatio = 3f;
-        public float heightRatio = 3f;
+        public float heightRatio = 1f;
 
         public bool clampLive { get; private set; } = false;
 
