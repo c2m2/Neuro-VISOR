@@ -4,7 +4,7 @@ using UnityEngine;
 using System.Runtime.Serialization;
 using C2M2.Simulation;
 
-[RequireComponent(typeof(C2M2.Simulation.Simulation<,,,>))]
+[RequireComponent(typeof(Simulation<,,,>))]
 public class SimulationTimerLabel : MonoBehaviour
 {
     public MeshSimulation sim = null;
