@@ -50,13 +50,21 @@ namespace C2M2.Interaction
         Vector3 posOffset;
         Vector3 GrabberPos { get { return grabbable.grabbedBy.transform.position; } }
         Quaternion GrabberRot { get { return grabbable.grabbedBy.transform.rotation; } }
+
+        Vector3 localPosOffset;
+        Quaternion worldRotOffset;
         void Update()
         {
             if (grabbable.isGrabbed)
             {
                 if (!grabBegun)
                 {
-                    posOffset = transform.position - GrabberPos;
+                    Vector3 relPos = transform.position - GrabberPos;
+                    relPos = Quaternion.Inverse(transform.rotation) * relPos;
+                    localPosOffset = transform.InverseTransformPoint(relPos);
+
+                    Quaternion relOri = Quaternion.Inverse(GrabberRot) * transform.rotation;
+                    worldRotOffset = relOri;
 
                     grabBegun = true;
                 }
@@ -90,16 +98,21 @@ namespace C2M2.Interaction
 
         private void UpdatePosition()
         { // Todo: posOffset shouldn't 
+            /*
             Vector3 relPos = transform.position - GrabberPos;
             relPos = Quaternion.Inverse(transform.rotation) * relPos;
             Vector3 m_grabbedObjectPosOff = relPos;
 
             Quaternion relOri = Quaternion.Inverse(GrabberRot) * transform.rotation;
             Quaternion m_grabbedObjectRotOff = relOri;
+            */
 
-            Vector3 grabbablePosition = GrabberPos + GrabberRot * m_grabbedObjectPosOff;
-            Quaternion grabbableRotation = GrabberRot * m_grabbedObjectRotOff;
-            GetComponent<Rigidbody>().MovePosition(posOffset + GrabberPos);
+            Vector3 worldPosOffset = transform.TransformPoint(localPosOffset);
+
+            Vector3 grabbablePosition = GrabberPos + GrabberRot * worldPosOffset;
+            Quaternion grabbableRotation = GrabberRot * worldRotOffset;
+
+            GetComponent<Rigidbody>().MovePosition(worldPosOffset + GrabberPos);
             GetComponent<Rigidbody>().MoveRotation(grabbableRotation);
         }
     }
