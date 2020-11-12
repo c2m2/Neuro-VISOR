@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7332720629415784852}
   - component: {fileID: 4458065749759181652}
   - component: {fileID: 788583323987378561}
-  m_Layer: 5
+  m_Layer: 12
   m_Name: Marks
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -169,7 +169,7 @@ GameObject:
   - component: {fileID: 6978054425490887901}
   - component: {fileID: 8806620473393019609}
   - component: {fileID: 7239019533408458054}
-  m_Layer: 5
+  m_Layer: 12
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -268,7 +268,7 @@ GameObject:
   - component: {fileID: 1025621842336036839}
   - component: {fileID: 1824232277411321993}
   - component: {fileID: 135725646493827861}
-  m_Layer: 5
+  m_Layer: 12
   m_Name: Values
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -430,7 +430,7 @@ GameObject:
   - component: {fileID: 2919815283430764373}
   - component: {fileID: 6300040451837084289}
   - component: {fileID: 473024890890826751}
-  m_Layer: 11
+  m_Layer: 12
   m_Name: Ruler
   m_TagString: Untagged
   m_Icon: {fileID: 0}

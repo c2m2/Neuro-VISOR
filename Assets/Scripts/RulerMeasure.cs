@@ -3,7 +3,7 @@ using System;
 using TMPro;
 using UnityEngine;
 
-[RequireComponent(typeof(Simulation<,,,>))]
+[RequireComponent(typeof(MeshSimulation))]
 public class RulerMeasure : MonoBehaviour
 {
     public MeshSimulation sim = null;
@@ -15,6 +15,7 @@ public class RulerMeasure : MonoBehaviour
     void Start()
     {
         localSize = Vector3.zero;
+        if (sim == null) Destroy(gameObject);
     }
 
     // Update is called once per frame
