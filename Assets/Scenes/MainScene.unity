@@ -1150,6 +1150,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   grabBegin: 0.55
   grabEnd: 0.35
+  alreadyUpdated: 0
   m_parentHeldObject: 0
   m_moveHandPosition: 0
   m_gripTransform: {fileID: 1246904545894575470}
@@ -1159,6 +1160,16 @@ MonoBehaviour:
   m_controller: 2
   m_parentTransform: {fileID: 0}
   m_player: {fileID: 0}
+  m_grabVolumeEnabled: 1
+  m_lastPos: {x: 0, y: 0, z: 0}
+  m_lastRot: {x: 0, y: 0, z: 0, w: 0}
+  m_anchorOffsetRotation: {x: 0, y: 0, z: 0, w: 0}
+  m_anchorOffsetPosition: {x: 0, y: 0, z: 0}
+  m_prevFlex: 0
+  m_grabbedObj: {fileID: 0}
+  m_grabbedObjectPosOff: {x: 0, y: 0, z: 0}
+  m_grabbedObjectRotOff: {x: 0, y: 0, z: 0, w: 0}
+  m_operatingWithoutOVRCameraRig: 1
 --- !u!1 &425781080 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5843646974205992161, guid: 70469a93359ee8b4e98c4c445b157af9,
@@ -2165,6 +2176,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   grabBegin: 0.55
   grabEnd: 0.35
+  alreadyUpdated: 0
   m_parentHeldObject: 0
   m_moveHandPosition: 0
   m_gripTransform: {fileID: 1246904545894575473}
@@ -2174,6 +2186,16 @@ MonoBehaviour:
   m_controller: 1
   m_parentTransform: {fileID: 0}
   m_player: {fileID: 0}
+  m_grabVolumeEnabled: 1
+  m_lastPos: {x: 0, y: 0, z: 0}
+  m_lastRot: {x: 0, y: 0, z: 0, w: 0}
+  m_anchorOffsetRotation: {x: 0, y: 0, z: 0, w: 0}
+  m_anchorOffsetPosition: {x: 0, y: 0, z: 0}
+  m_prevFlex: 0
+  m_grabbedObj: {fileID: 0}
+  m_grabbedObjectPosOff: {x: 0, y: 0, z: 0}
+  m_grabbedObjectRotOff: {x: 0, y: 0, z: 0, w: 0}
+  m_operatingWithoutOVRCameraRig: 1
 --- !u!1 &735852099
 GameObject:
   m_ObjectHideFlags: 0
@@ -4963,7 +4985,7 @@ MonoBehaviour:
     serializedVersion: 2
     rgba: 4278512639
   lineWidth1D: 0.005
-  vrnFileName: 0-2a.CNG
+  vrnFileName: 44-4.CNG_original
   hitValue: 55
   clamps: []
   vstart: 55

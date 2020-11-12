@@ -20,6 +20,7 @@ namespace C2M2.Interaction
         {
             if (OVRInput.Get(resetButton))
             {
+                Debug.Log("Resetting " + target.name + "'s position to " + resetPosition.ToString("F4"));
                 target.position = resetPosition;
             }
         }
