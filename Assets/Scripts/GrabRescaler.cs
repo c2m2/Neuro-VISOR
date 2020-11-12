@@ -112,7 +112,7 @@ namespace C2M2.Interaction
             Vector3 grabbablePosition = GrabberPos + GrabberRot * worldPosOffset;
             Quaternion grabbableRotation = GrabberRot * worldRotOffset;
 
-            GetComponent<Rigidbody>().MovePosition(worldPosOffset + GrabberPos);
+            GetComponent<Rigidbody>().MovePosition(grabbablePosition);
             GetComponent<Rigidbody>().MoveRotation(grabbableRotation);
         }
     }
