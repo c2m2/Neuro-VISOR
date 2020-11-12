@@ -49,6 +49,7 @@ namespace C2M2.Interaction
         // Update is called once per frame
         Vector3 posOffset;
         Vector3 GrabberPos { get { return grabbable.grabbedBy.transform.position; } }
+        Quaternion GrabberRot { get { return grabbable.grabbedBy.transform.rotation; } }
         void Update()
         {
             if (grabbable.isGrabbed)
@@ -60,17 +61,25 @@ namespace C2M2.Interaction
                     grabBegun = true;
                 }
 
-                Vector3 scaleValue = scaler * ThumbstickScaler * origScale;
-                Vector3 newLocalScale = transform.localScale + scaleValue;
-                if (newLocalScale.magnitude > (minPercentage*origScale).magnitude && newLocalScale.magnitude < (maxPercentage*origScale).magnitude)
-                {
-                    transform.localScale = newLocalScale;
-                }
                 // if both joysticks are pressed in, it resets the scale to the original scale
                 if (ThumbsticksPressed)
                 {
                     transform.localScale = origScale;
                 }
+                else
+                { // Otherwise resolve our new scale
+                    Vector3 scaleValue = scaler * ThumbstickScaler * origScale;
+                    Vector3 newLocalScale = transform.localScale + scaleValue;
+
+                    // Is the new scale too big or too small?
+                    bool newScaleAcceptable = newLocalScale.magnitude > (minPercentage * origScale).magnitude
+                        && newLocalScale.magnitude < (maxPercentage * origScale).magnitude;
+                    if (newScaleAcceptable)
+                    {
+                        transform.localScale = newLocalScale;
+                    }
+                }
+
                 UpdatePosition();
             }
             else
@@ -80,8 +89,18 @@ namespace C2M2.Interaction
         }
 
         private void UpdatePosition()
-        {
-            transform.position = posOffset + GrabberPos;
+        { // Todo: posOffset shouldn't 
+            Vector3 relPos = transform.position - GrabberPos;
+            relPos = Quaternion.Inverse(transform.rotation) * relPos;
+            Vector3 m_grabbedObjectPosOff = relPos;
+
+            Quaternion relOri = Quaternion.Inverse(GrabberRot) * transform.rotation;
+            Quaternion m_grabbedObjectRotOff = relOri;
+
+            Vector3 grabbablePosition = GrabberPos + GrabberRot * m_grabbedObjectPosOff;
+            Quaternion grabbableRotation = GrabberRot * m_grabbedObjectRotOff;
+            GetComponent<Rigidbody>().MovePosition(posOffset + GrabberPos);
+            GetComponent<Rigidbody>().MoveRotation(grabbableRotation);
         }
     }
 }
