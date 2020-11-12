@@ -59,12 +59,7 @@ namespace C2M2.Interaction
             {
                 if (!grabBegun)
                 {
-                    Vector3 relPos = transform.position - GrabberPos;
-                    relPos = Quaternion.Inverse(transform.rotation) * relPos;
-                    localPosOffset = transform.InverseTransformPoint(relPos);
-
-                    Quaternion relOri = Quaternion.Inverse(GrabberRot) * transform.rotation;
-                    worldRotOffset = relOri;
+                    transform.parent = grabbable.grabbedBy.transform;
 
                     grabBegun = true;
                 }
@@ -88,32 +83,12 @@ namespace C2M2.Interaction
                     }
                 }
 
-                UpdatePosition();
             }
             else
             {
                 grabBegun = false;
+                transform.parent = null;
             }
-        }
-
-        private void UpdatePosition()
-        { // Todo: posOffset shouldn't 
-            /*
-            Vector3 relPos = transform.position - GrabberPos;
-            relPos = Quaternion.Inverse(transform.rotation) * relPos;
-            Vector3 m_grabbedObjectPosOff = relPos;
-
-            Quaternion relOri = Quaternion.Inverse(GrabberRot) * transform.rotation;
-            Quaternion m_grabbedObjectRotOff = relOri;
-            */
-
-            Vector3 worldPosOffset = transform.TransformPoint(localPosOffset);
-
-            Vector3 grabbablePosition = GrabberPos + GrabberRot * worldPosOffset;
-            Quaternion grabbableRotation = GrabberRot * worldRotOffset;
-
-            GetComponent<Rigidbody>().MovePosition(grabbablePosition);
-            GetComponent<Rigidbody>().MoveRotation(grabbableRotation);
         }
     }
 }
