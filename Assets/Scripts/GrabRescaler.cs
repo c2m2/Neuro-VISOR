@@ -45,27 +45,10 @@ namespace C2M2.Interaction
             origScale = transform.localScale;
         }
 
-        private bool grabBegun = false;
-        // Update is called once per frame
-        Vector3 posOffset;
-        Vector3 GrabberPos { get { return grabbable.grabbedBy.transform.position; } }
-        Quaternion GrabberRot { get { return grabbable.grabbedBy.transform.rotation; } }
-
-        Vector3 localPosOffset;
-        Quaternion worldRotOffset;
-        Vector3 localPos;
         void Update()
         {
             if (grabbable.isGrabbed)
             {
-                if (!grabBegun)
-                {
-                    transform.parent = grabbable.grabbedBy.transform;
-                    localPos = transform.localPosition;
-
-                    grabBegun = true;
-                }
-
                 // if both joysticks are pressed in, it resets the scale to the original scale
                 if (ThumbsticksPressed)
                 {
@@ -84,13 +67,6 @@ namespace C2M2.Interaction
                         transform.localScale = newLocalScale;
                     }
                 }
-                transform.localPosition = localPos;
-            }
-            else
-            {
-                grabBegun = false;
-                transform.parent = null;
-                
             }
         }
     }
