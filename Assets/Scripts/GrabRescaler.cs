@@ -53,6 +53,7 @@ namespace C2M2.Interaction
 
         Vector3 localPosOffset;
         Quaternion worldRotOffset;
+        Vector3 localPos;
         void Update()
         {
             if (grabbable.isGrabbed)
@@ -60,6 +61,7 @@ namespace C2M2.Interaction
                 if (!grabBegun)
                 {
                     transform.parent = grabbable.grabbedBy.transform;
+                    localPos = transform.localPosition;
 
                     grabBegun = true;
                 }
@@ -82,12 +84,13 @@ namespace C2M2.Interaction
                         transform.localScale = newLocalScale;
                     }
                 }
-
+                transform.localPosition = localPos;
             }
             else
             {
                 grabBegun = false;
                 transform.parent = null;
+                
             }
         }
     }
