@@ -48,10 +48,18 @@ namespace C2M2.Interaction
                     transform.localScale = newLocalScale;
                 }
                 // if both joysticks are pressed in, it resets the scale to the original scale
-                if (OVRInput.Get(OVRInput.Button.SecondaryThumbstick) && OVRInput.Get(OVRInput.Button.PrimaryThumbstick))
+                if (ThumbsticksPressed)
                 {
                     transform.localScale = origScale;
                 }
+            }
+        }
+
+        private bool ThumbsticksPressed
+        {
+            get
+            {
+                return OVRInput.Get(OVRInput.Button.SecondaryThumbstick) && OVRInput.Get(OVRInput.Button.PrimaryThumbstick);
             }
         }
     }
