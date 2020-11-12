@@ -26,6 +26,15 @@ namespace C2M2.Interaction
             }
         }
 
+        private bool ThumbsticksPressed
+        {
+            get
+            {
+                return OVRInput.Get(OVRInput.Button.SecondaryThumbstick) 
+                    && OVRInput.Get(OVRInput.Button.PrimaryThumbstick);
+            }
+        }
+
         private void Start()
         {
             if (!GameManager.instance.vrIsActive) Destroy(this);
@@ -36,11 +45,21 @@ namespace C2M2.Interaction
             origScale = transform.localScale;
         }
 
+        private bool grabBegun = false;
         // Update is called once per frame
+        Vector3 posOffset;
+        Vector3 GrabberPos { get { return grabbable.grabbedBy.transform.position; } }
         void Update()
         {
             if (grabbable.isGrabbed)
             {
+                if (!grabBegun)
+                {
+                    posOffset = transform.position - GrabberPos;
+
+                    grabBegun = true;
+                }
+
                 Vector3 scaleValue = scaler * ThumbstickScaler * origScale;
                 Vector3 newLocalScale = transform.localScale + scaleValue;
                 if (newLocalScale.magnitude > (minPercentage*origScale).magnitude && newLocalScale.magnitude < (maxPercentage*origScale).magnitude)
@@ -52,15 +71,17 @@ namespace C2M2.Interaction
                 {
                     transform.localScale = origScale;
                 }
+                UpdatePosition();
+            }
+            else
+            {
+                grabBegun = false;
             }
         }
 
-        private bool ThumbsticksPressed
+        private void UpdatePosition()
         {
-            get
-            {
-                return OVRInput.Get(OVRInput.Button.SecondaryThumbstick) && OVRInput.Get(OVRInput.Button.PrimaryThumbstick);
-            }
+            transform.position = posOffset + GrabberPos;
         }
     }
 }
