@@ -1,13 +1,13 @@
-﻿using C2M2.NeuronalDynamics.Simulation;
-using System;
+﻿using System;
 using TMPro;
 using UnityEngine;
 using System.Runtime.Serialization;
+using C2M2.Simulation;
 
-[RequireComponent(typeof(SparseSolverTestv1))]
+[RequireComponent(typeof(Simulation<,,,>))]
 public class SimulationTimerLabel : MonoBehaviour
 {
-    public SparseSolverTestv1 sim = null;
+    public MeshSimulation sim = null;
     public TextMeshProUGUI timerText;
 
     /// <summary>
@@ -21,7 +21,7 @@ public class SimulationTimerLabel : MonoBehaviour
         timerText.text = time.ToString();
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         time = sim.GetSimulationTime();
         timerText.text = ToString();
