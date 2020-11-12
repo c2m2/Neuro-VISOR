@@ -2,7 +2,6 @@
 using System.Threading;
 using System;
 using C2M2.Interaction;
-using C2M2.Interaction.VR;
 
 namespace C2M2.Simulation
 {
@@ -38,11 +37,6 @@ namespace C2M2.Simulation
         /// </summary>
         public abstract ValueType GetValues();
 
-        /// <summary>
-        /// Return the current timestep for the simulation
-        /// </summary>
-        /// <returns></returns>
-        public abstract float GetSimulationTime();
 
         /// <summary>
         /// Simulations must know how to build their visualization and what type the visualization is

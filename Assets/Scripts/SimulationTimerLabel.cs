@@ -7,7 +7,7 @@ using C2M2.Simulation;
 [RequireComponent(typeof(Simulation<,,,>))]
 public class SimulationTimerLabel : MonoBehaviour
 {
-    public MeshSimulation sim = null;
+    public Interactable sim = null;
     public TextMeshProUGUI timerText;
 
     /// <summary>
