@@ -106,22 +106,7 @@ namespace C2M2.NeuronalDynamics.Interaction
                 CheckInput();
 
             // Highlight all clamps if either hand trigger is held down
-            if (PressedHighlight)
-            {
-                if (highlightPrev == false)
-                {
-                    HighlightAll(true);
-                    highlightPrev = true;
-                }
-            }
-            else
-            {
-                if (highlightPrev == true)
-                {
-                    HighlightAll(false);
-                    highlightPrev = false;
-                }
-            }
+            HighlightAll(PressedHighlight);
 
             float power = PowerModifier;
             // If clamp power is modified while the user holds a click, don't let the click also toggle/destroy the clamp
