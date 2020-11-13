@@ -59,6 +59,8 @@ namespace C2M2.NeuronalDynamics.Interaction
             UpdateScale((float)newInflation);
         }
 
+        public GameObject highlightObj;
+
         #region Unity Methods
         private void Awake()
         {

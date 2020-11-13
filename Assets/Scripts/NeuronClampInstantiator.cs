@@ -187,7 +187,10 @@ namespace C2M2.NeuronalDynamics.Interaction
             {
                 foreach (NeuronClamp clamp in Clamps)
                 {
-                    transform.parent.FindChildRecursive("Highlight").gameObject.SetActive(highlight);
+                   if(clamp.highlightObj != null)
+                    {
+                        clamp.highlightObj.SetActive(highlight);
+                    }
                 }
             }
         }
