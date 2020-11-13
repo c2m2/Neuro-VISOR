@@ -20,6 +20,7 @@ namespace C2M2.NeuronalDynamics.Interaction
                 return simulation.clamps;
             }
         }
+        public Color32 inactiveCol = Color.black;
 
         public void InstantiateClamp(RaycastHit hit)
         {
@@ -31,8 +32,12 @@ namespace C2M2.NeuronalDynamics.Interaction
             // Only allow one simulation
             if (sim != simulation) return;
 
+
             var clampObj = Instantiate(clampPrefab, sim.transform);
             NeuronClamp clamp = clampObj.GetComponentInChildren<NeuronClamp>();
+
+            clamp.InactiveCol = inactiveCol;
+
             clamp.ReportSimulation(sim, hit);
         }
 

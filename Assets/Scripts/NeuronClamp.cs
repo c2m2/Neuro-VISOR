@@ -28,14 +28,27 @@ namespace C2M2.NeuronalDynamics.Interaction
         private Vector3 LocalExtents { get { return transform.localScale / 2; } }
         private Vector3 posFocus = Vector3.zero;
 
-        private Color32 clampCol = Color.black;
-        public Color32 ClampCol
+        private Color32 inactiveCol = Color.black;
+        public Color32 InactiveCol
         {
-            get { return clampCol; }
+            get
+            {
+                return inactiveCol;
+            }
+            set
+            {
+                inactiveCol = value;
+                inactiveMaterial.SetColor("_Color", inactiveCol);
+            }
+        }
+        private Color32 activeCol = Color.white;
+        public Color32 ActiveColor
+        {
+            get { return activeCol; }
             private set
             {
-                clampCol = value;
-                mr.material.SetColor("_Color", clampCol);
+                activeCol = value;
+                activeMaterial.SetColor("_Color", activeCol);
             }
         }
         private LUTGradient gradientLUT = null;
@@ -66,7 +79,7 @@ namespace C2M2.NeuronalDynamics.Interaction
                 {
                     //activeTarget.Set1DValues(newValues);
 
-                    ClampCol = gradientLUT.EvaluateUnscaled((float)clampPower);
+                    ActiveColor = gradientLUT.EvaluateUnscaled((float)clampPower);
                 }
             }
         }
