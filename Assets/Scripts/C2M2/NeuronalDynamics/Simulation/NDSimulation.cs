@@ -81,6 +81,9 @@ namespace C2M2.NeuronalDynamics.Simulation {
             }
         }
 
+        //returns time simulation has been running in milliseconds (ms)
+        //public abstract float GetTime();
+
         private Dictionary<double, Mesh> meshCache = new Dictionary<double, Mesh>();
 
         private bool clampMode = false;
@@ -272,7 +275,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
             newValues[1] = new Tuple<int, double>(v2, hitValue);
             newValues[2] = new Tuple<int, double>(v3, hitValue);
 
-            Debug.Log("local space hit.point: " + transform.InverseTransformPoint(hit.point));
             SetValues (newValues);
         }
         /// <summary>
@@ -285,7 +287,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
             // Each 3D index will have TWO associated 1D vertices
             Tuple<int, double>[] new1DValues = new Tuple<int, double>[2 * newValues.Length];
             int j = 0;
-            string s = "Hitting points:\n";
             for (int i = 0; i < newValues.Length; i++) {
                 // Get 3D vertex index
                 int vert3D = newValues[i].Item1;
@@ -299,12 +300,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 new1DValues[j + 1] = new Tuple<int, double> (map[vert3D].v2, val1D);
                 // Move up two spots in 1D array
                 j += 2;
-                s += "\n3D vert " + vert3D + "\tpos: " + Grid2D.Mesh.vertices[vert3D].ToString("F5")
-                    + "\n1D verts: "
-                    + "\n\t" + map[vert3D].v1 + "\tpos: " + Verts1D[map[vert3D].v1]
-                    + "\n\t" + map[vert3D].v2 + "\tpos: " + Verts1D[map[vert3D].v2];
             }
-            Debug.Log(s);
             // Send 1D-translated scalars to simulation
             Set1DValues (new1DValues);
         }
@@ -376,11 +372,11 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 GameObject.Instantiate (diameterControlPanel, GameManager.instance.whiteboard);
 
                 // Instantiate a ruler to allow the cell to be scaled interactively
-                GameObject ruler = Resources.Load ("Prefabs/Ruler") as GameObject;
-                ruler.GetComponent<GrabbableRuler> ().scaleTarget = transform;
-                GameObject.Instantiate (ruler);
+                //GameObject ruler = Resources.Load ("Prefabs/Ruler") as GameObject;
+                //ruler.GetComponent<GrabbableRuler> ().scaleTarget = transform;
+                //GameObject.Instantiate (ruler);
 
-                gameObject.AddComponent<ScaleLimiter> ();
+               // gameObject.AddComponent<ScaleLimiter> ();
             }
         }
 
@@ -459,7 +455,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
     [CustomEditor(typeof(NDSimulation), true)]
     public class NDSimulationEditor : Editor
     {
-        int refinement = 0;
         static int refinementLevel;
         static double inflationLevel;
 

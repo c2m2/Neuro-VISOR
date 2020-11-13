@@ -8,6 +8,7 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Schema;
 using C2M2.NeuronalDynamics.Visualization.VRN;
+using C2M2.NeuronalDynamics.Visualization;
 using UnityEditor;
 using UnityEngine;
 #endregion
@@ -135,7 +136,7 @@ namespace C2M2.NeuronalDynamics.UGX {
                                     grid.Vertices[indices[i * 2]].Neighbors.Add (grid.Vertices[indices[(i * 2) + 1]]);
                                     grid.Vertices[indices[(i * 2) + 1]].Neighbors.Add (grid.Vertices[indices[(i * 2)]]);
                                 }
-                                
+
                                 if (grid.HasVertexAttachment<IndexAttachment> ()) {
                                     VertexAttachementAccessor<IndexData> accessor =
                                         new VertexAttachementAccessor<IndexData> (grid, indices.Length, new IndexData ());
@@ -291,7 +292,7 @@ namespace C2M2.NeuronalDynamics.UGX {
                                         String subsetName = el.Attribute ("name").Value;
                                         /// We ignore subsets with name defSub and zero vertices. These should never be contained in a valid .ugx file.
                                         if (subsetName.Equals ("defSub") && IsEmpty (subsetName, el)) {
-                                            UnityEngine.Debug.Log (@"Subsets with name defSub (And 0 vertices) are ignored. 
+                                            UnityEngine.Debug.Log (@"Subsets with name defSub (And 0 vertices) are ignored.
                                             Make sure your input geometry (.ugx) is consistent and does not contain empty subsets");
                                             continue;
                                         }
@@ -316,4 +317,3 @@ namespace C2M2.NeuronalDynamics.UGX {
         }
     }
 }
-

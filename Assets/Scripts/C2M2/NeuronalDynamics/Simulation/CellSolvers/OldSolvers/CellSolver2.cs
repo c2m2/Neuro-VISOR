@@ -38,6 +38,9 @@ namespace C2M2.NeuronalDynamics.Simulation
         // Keep track of i locally so that we know which simulation frame to send to other scripts
         private int i = -1;
 
+
+        public override float GetSimulationTime() => i * (float)k;
+
         public override double[] Get1DValues()
         {
             return (U != null && i > -1) ? U.SubMatrix(0, U.RowCount, i, 1).ToColumnMajorArray() : null;
@@ -56,12 +59,13 @@ namespace C2M2.NeuronalDynamics.Simulation
             }
         }
 
+        double k;
         protected override void Solve()
         {
             //Set solving parameters standard run set endTime = 2 and nT = 1000;
             double endTime = 25; //25;//32;    // End time value
             int nT = 9000; //9000;  //16000;          // Number of Time steps
-            double k = endTime / (double)nT; //Time step size
+            k = endTime / (double)nT; //Time step size
                                              //double h = 0.008; //myCell.edgeLengths.Average()*1e4; //Spatial Step Size
             double h = NeuronCell.edgeLengths.Average() * 1e4;
 

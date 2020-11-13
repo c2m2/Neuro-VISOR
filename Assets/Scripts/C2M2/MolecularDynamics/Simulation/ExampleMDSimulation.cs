@@ -15,7 +15,9 @@ namespace C2M2.MolecularDynamics.Simulation
 
         private Vector3[] force = null;
 
-        
+
+        public override float GetSimulationTime() => t * (float)dt;
+
         // OPTION 2:
         //RaycastHit lastHit = new RaycastHit();
         public override Vector3[] GetValues()
@@ -100,6 +102,8 @@ namespace C2M2.MolecularDynamics.Simulation
  		    return f;
 	    }
 
+        float dt;
+        int t;
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
         /// Molecular dynamics simulation code
@@ -108,13 +112,13 @@ namespace C2M2.MolecularDynamics.Simulation
         protected override void Solve()
         {
             int nT = timestepCount;
-            float dt = timestepSize;
+            dt = timestepSize;
 
 	        //instantiate a normal dist.
 	        var normal = Normal.WithMeanPrecision(0.0, 1.0);
 	        force = Force(coord,bond_topo); // + angle_Force(x,angle_topo);
             // Iterate over time
-            for (int t = 0; t < nT; t++)
+            for (t = 0; t < nT; t++)
 	        {
                 // iterate over the atoms
                 for(int i = 0; i < coord.Length; i++)

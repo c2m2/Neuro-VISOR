@@ -1,18 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using C2M2.NeuronalDynamics.Simulation;
 using C2M2.NeuronalDynamics.UGX;
 using C2M2.Visualization;
 using Math = C2M2.Utils.Math;
-using C2M2.Interaction;
 
 namespace C2M2.NeuronalDynamics.Interaction
 {
     public class NeuronClamp : MonoBehaviour
     {
         public float radiusRatio = 3f;
-        public float heightRatio = 3f;
+        public float heightRatio = 1f;
 
         public bool clampLive { get; private set; } = false;
 
@@ -168,7 +166,6 @@ namespace C2M2.NeuronalDynamics.Interaction
 
                 focusVert = clampIndex;
                 focusPos = simulation.Verts1D[focusVert];
-                Debug.Log("Nearest 1D vert:\nind: " + focusVert + "\npos: " + focusPos + "\nraycast hit point: " + simulation.transform.InverseTransformPoint(hit.point));
 
                 SetScale(this.simulation, clampCellNodeData);
                 SetRotation(this.simulation, clampCellNodeData);
@@ -180,7 +177,6 @@ namespace C2M2.NeuronalDynamics.Interaction
                 this.simulation.clamps.Add(this);
 
                 transform.parent.localPosition = focusPos;
-                Debug.Log("pos[0]: " + simulation.Verts1D[0] + "\npos[1]: " + simulation.Verts1D[1] + "\npos[-1]: " + simulation.Verts1D[simulation.Verts1D.Length-1]);
             }
 
             return this.simulation;
