@@ -126,6 +126,7 @@ namespace C2M2.Simulation
 
                 gameObject.AddComponent<VRGrabbableMesh>();
                 gameObject.AddComponent<GrabRescaler>();
+                gameObject.AddComponent<PositionResetControl>();
             }
         }
     }

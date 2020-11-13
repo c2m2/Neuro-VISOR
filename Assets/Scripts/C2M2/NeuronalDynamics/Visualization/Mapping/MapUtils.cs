@@ -113,8 +113,9 @@ namespace C2M2.NeuronalDynamics.UGX {
             }
 
             for (int i = 0; i < size3d; i++) {
-                var node = tree.GetNearestNeighbours (new [] { accessor[i].Start[0], accessor[i].Start[1], accessor[i].Start[2] }, 1);
-                map2d1d[i] = new Tuple<int, int, double> (node[0].Value, node[0].Value, accessor[i].Lambda);
+                var node1 = tree.GetNearestNeighbours (new [] { accessor[i].Start[0], accessor[i].Start[1], accessor[i].Start[2] }, 1);
+                var node2 = tree.GetNearestNeighbours (new [] { accessor[i].End[0], accessor[i].End[1], accessor[i].End[2] }, 1);
+                map2d1d[i] = new Tuple<int, int, double> (node1[0].Value, node2[0].Value, accessor[i].Lambda);
             }
 
             return new MappingInfo (grid1d, grid2dvis, map2d1d);

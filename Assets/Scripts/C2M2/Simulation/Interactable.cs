@@ -35,5 +35,11 @@ namespace C2M2.Simulation
         /// In order to affect live simulations, this method must know how to add values between 0 and 1 to the current simulation values
         /// </remarks>
         public abstract void SetValues(RaycastHit hit);
+
+        /// <summary>
+        /// Return the current timestep for the simulation
+        /// </summary>
+        /// <returns></returns>
+        public abstract float GetSimulationTime();
     }
 }

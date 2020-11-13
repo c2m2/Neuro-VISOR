@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace C2M2.Interaction
 {
@@ -12,39 +10,63 @@ namespace C2M2.Interaction
     {
         private OVRGrabbable grabbable = null;
         private Vector3 origScale;
-        private float scaler = 0.1f;
+        public float scaler = 0.2f;
+        public float minPercentage = 0.1f;
+        public float maxPercentage = 10f;
 
         // Returns a value between -2 and 2, where -2 implies both thumbsticks are held down, and 2 implies both are held up.
         private float ThumbstickScaler
         {
             get
             {
-                // Use the value of whichever joystick is held up furthest
+                // Uses average joystick y axis value
                 float y1 = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick).y;
                 float y2 = OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick).y;
                 return (y1 + y2) / 2;
             }
         }
 
-        private void Awake()
+        private bool ThumbsticksPressed
         {
-            if (!GameManager.instance.vrIsActive) Destroy(this);
-
-            grabbable = GetComponent<OVRGrabbable>();         
+            get
+            {
+                return OVRInput.Get(OVRInput.Button.SecondaryThumbstick) 
+                    && OVRInput.Get(OVRInput.Button.PrimaryThumbstick);
+            }
         }
 
         private void Start()
         {
+            if (!GameManager.instance.vrIsActive) Destroy(this);
+
+            grabbable = GetComponent<OVRGrabbable>();
+
             // Use this to determine how to scale at runtime
-            origScale = scaler * transform.localScale;
+            origScale = transform.localScale;
         }
 
-        // Update is called once per frame
         void Update()
         {
             if (grabbable.isGrabbed)
             {
-                transform.localScale += scaler * ThumbstickScaler * transform.localScale;
+                // if both joysticks are pressed in, it resets the scale to the original scale
+                if (ThumbsticksPressed)
+                {
+                    transform.localScale = origScale;
+                }
+                else
+                { // Otherwise resolve our new scale
+                    Vector3 scaleValue = scaler * ThumbstickScaler * origScale;
+                    Vector3 newLocalScale = transform.localScale + scaleValue;
+
+                    // Is the new scale too big or too small?
+                    bool newScaleAcceptable = newLocalScale.magnitude > (minPercentage * origScale).magnitude
+                        && newLocalScale.magnitude < (maxPercentage * origScale).magnitude;
+                    if (newScaleAcceptable)
+                    {
+                        transform.localScale = newLocalScale;
+                    }
+                }
             }
         }
     }

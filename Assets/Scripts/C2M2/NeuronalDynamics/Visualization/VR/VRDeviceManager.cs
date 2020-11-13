@@ -18,14 +18,14 @@ namespace C2M2.Interaction.VR
     [ExecuteInEditMode]
     public class VRDeviceManager : MonoBehaviour
     {
-        public bool vrIsActive { get { return playerController.enabled; } }
-        public GameObject fpsOverlay = null;
-        public GameObject fpsTVScreen = null;
+        public GameObject informationOverlay = null;
+        public GameObject informationDisplayTV = null;
         private MovingOVRHeadsetEmulator emulator;
         private MouseEventSignaler mouseSignaler;
         private OVRPlayerController playerController;
         private MovementController emulatorMove;
         private bool prev;
+        public bool vrIsActive { get { return playerController.enabled; } }
 
         private void Awake()
         {
@@ -47,9 +47,9 @@ namespace C2M2.Interaction.VR
                 emulator.enabled = !vrIsActive;
                 mouseSignaler.enabled = !vrIsActive;
                 emulatorMove.enabled = !vrIsActive;
-                if (fpsOverlay != null) fpsOverlay.SetActive(!vrIsActive);
+                if (informationOverlay != null) informationOverlay.SetActive(!vrIsActive);
 
-                if (fpsTVScreen != null) fpsTVScreen.SetActive(vrIsActive);
+                if (informationDisplayTV != null) informationDisplayTV.SetActive(vrIsActive);
 
                 // only enable oculus signalers if player controller is enabled
                 OculusEventSignaler[] oculusSignalers = GetComponentsInChildren<OculusEventSignaler>();

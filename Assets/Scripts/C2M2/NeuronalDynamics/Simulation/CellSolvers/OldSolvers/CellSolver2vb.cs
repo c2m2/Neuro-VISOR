@@ -36,6 +36,8 @@ namespace C2M2.NeuronalDynamics.Simulation
 
         private Vector U = null;
 
+        public override float GetSimulationTime() => i * (float)k;
+        double k;
         // Keep track of i locally so that we know which simulation frame to send to other scripts
         private int i = -1;
 
@@ -66,7 +68,7 @@ namespace C2M2.NeuronalDynamics.Simulation
             double endTime = 25; //25;//32;    // End time value
                                  //int nT = 9000; //9000;  //16000;          // Number of Time steps
 
-            double k = endTime / (double)nT; //Time step size
+            k = endTime / (double)nT; //Time step size
                                              //double h = 0.008; //myCell.edgeLengths.Average()*1e4; //Spatial Step Size
 
             //double h = myCell.edgeLengths.Average() * 1e4;

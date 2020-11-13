@@ -83,6 +83,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         private Vector N;
         private Vector H;
 
+        public override float GetSimulationTime() => i * (float)k;
         // Keep track of i locally so that we know which simulation frame to send to other scripts
         private int i = -1;
 

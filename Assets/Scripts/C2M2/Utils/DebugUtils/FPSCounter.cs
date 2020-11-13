@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using TMPro;
+﻿using UnityEngine;
 using System;
 
 namespace C2M2.Utils.DebugUtils
@@ -81,7 +78,6 @@ namespace C2M2.Utils.DebugUtils
             }
             UpdateBuffer();
             CalculateFPS();
-            //UpdateTexts();
         }
         private void InitializeBuffer()
         {
@@ -109,12 +105,6 @@ namespace C2M2.Utils.DebugUtils
             avg = sum / sampleSize;
             high = highest;
             low = lowest;
-        }
-        private void UpdateTexts()
-        {
-            //averageFPSString = staticNumStrings[Clamp(AverageFPS, 0, 100)];
-            //highestFPSString = staticNumStrings[Clamp(HighestFPS, 0, 100)];
-            //lowestFPSString = staticNumStrings[Clamp(LowestFPS, 0, 100)];
         }
         public override string ToString() => String.Format(formatString, highStr, avgStr, lowStr);
     }

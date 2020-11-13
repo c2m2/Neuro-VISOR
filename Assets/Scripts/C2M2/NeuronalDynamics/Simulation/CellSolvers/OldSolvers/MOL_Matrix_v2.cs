@@ -46,6 +46,8 @@ namespace C2M2.NeuronalDynamics.Simulation
         public const double c = 0.09;                           // capacitance
                                                                 //------------------------------------------------------------------------//
         private Matrix U;
+        public override float GetSimulationTime() => i * (float)k;
+        double k;
         private int i = -1;
         private double[] newValues;
         // Initialize one end of the rod
@@ -74,7 +76,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         protected override void Solve()
         {
             // Compute step sizes
-            double k = MOL_Matrix_v2.T / MOL_Matrix_v2.nT;    // Time step size
+            k = MOL_Matrix_v2.T / MOL_Matrix_v2.nT;    // Time step size
             double h = MOL_Matrix_v2.X / MOL_Matrix_v2.nX;  // Spatial step size
 
             // Note this is how I converted a double to int

@@ -13,6 +13,8 @@ namespace C2M2.Simulation.Samples
     /// </remarks>
     public class MeshSimulation : Simulation.MeshSimulation
     {
+        public override float GetSimulationTime() { return 0; }
+
         private double[] scalars;
 
         public override double[] GetValues() => scalars;
