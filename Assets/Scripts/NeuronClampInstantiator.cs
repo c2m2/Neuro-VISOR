@@ -121,6 +121,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         public void ResetInput()
         {
             CheckInput();
+            HighlightAll(false);
         }
 
         private void CheckInput()
