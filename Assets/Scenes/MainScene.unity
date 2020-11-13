@@ -6480,10 +6480,15 @@ MonoBehaviour:
   clampPrefab: {fileID: 7051469727396962550, guid: 4565241fccd266147a078e252b27d27f,
     type: 3}
   allActive: 0
+  inactiveCol:
+    serializedVersion: 2
+    rgba: 4291348680
   toggleDestroyOVR: 2
   toggleDestroyOVRS: 8
   powerModifierPlusKey: 273
   powerModifierMinusKey: 274
+  highlightOVR: 16384
+  highlightOVRS: 4194304
 --- !u!114 &3671467347388522960
 MonoBehaviour:
   m_ObjectHideFlags: 0
