@@ -33,12 +33,9 @@ namespace C2M2
         public NeuronClampInstantiator clampInstantiator = null;
         public GameObject[] clampControllers = new GameObject[0];
 
-        public enum RoomType { LabRoom, DarkWalls, LightWalls }
         [Header("Environment")]
-        public RoomType room = RoomType.LabRoom;
-        public GameObject c2m2Room;
-        public GameObject lightWalls;
-        public GameObject darkWalls;
+        public MeshRenderer[] walls;
+        public Color wallColor = Color.white;
         [Header("Materials")]
         public Material defaultMaterial;
         public Material vertexColorationMaterial;
@@ -79,23 +76,12 @@ namespace C2M2
 
             clampInstantiator = GetComponent<NeuronClampInstantiator>();
 
-            switch (room)
+            if (walls.Length > 0)
             {
-                case (RoomType.LabRoom):
-                    c2m2Room.SetActive(true);
-                    lightWalls.SetActive(false);
-                    darkWalls.SetActive(false);
-                    break;
-                case (RoomType.DarkWalls):
-                    c2m2Room.SetActive(false);
-                    lightWalls.SetActive(false);
-                    darkWalls.SetActive(true);
-                    break;
-                case (RoomType.LightWalls):
-                    c2m2Room.SetActive(false);
-                    lightWalls.SetActive(true);
-                    darkWalls.SetActive(false);
-                    break;
+                foreach (MeshRenderer wall in walls)
+                {
+                    wall.material.SetColor("_Color", wallColor);
+                }
             }
             // Initialize keyboard
             //raycastKeyboardPrefab = Instantiate(raycastKeyboardPrefab, new Vector3(50, 50, 50), Quaternion.identity);
