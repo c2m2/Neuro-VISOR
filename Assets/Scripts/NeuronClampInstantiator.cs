@@ -78,6 +78,18 @@ namespace C2M2.NeuronalDynamics.Interaction
         }
         private bool powerClick = false;
 
+        public OVRInput.Button highlightOVR = OVRInput.Button.PrimaryHandTrigger;
+        public OVRInput.Button highlightOVRS = OVRInput.Button.SecondaryHandTrigger;
+        private bool PressedHighlight
+        {
+            get
+            {
+                if (GameManager.instance.vrIsActive)
+                    return (OVRInput.Get(highlightOVR) || OVRInput.Get(highlightOVRS));
+                else return false;
+            }
+        }
+
         /// <summary>
         /// If the user holds a raycast down for X seconds on a clamp, it should destroy the clamp
         /// </summary>
@@ -88,6 +100,24 @@ namespace C2M2.NeuronalDynamics.Interaction
             else
                 CheckInput();
 
+            // Highlight all clamps if either hand trigger is held down
+            if (PressedHighlight)
+            {
+                if (highlightPrev == false)
+                {
+                    HighlightAll(true);
+                    highlightPrev = true;
+                }
+            }
+            else
+            {
+                if (highlightPrev == true)
+                {
+                    HighlightAll(false);
+                    highlightPrev = false;
+                }
+            }
+
             float power = PowerModifier;
             // If clamp power is modified while the user holds a click, don't let the click also toggle/destroy the clamp
             if (power != 0 && !powerClick) powerClick = true;
@@ -95,8 +125,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             foreach (NeuronClamp clamp in Clamps)
             {
                 if (clamp != null) clamp.clampPower += power;
-            }
-            
+            }       
         }
 
         public void ResetInput()
@@ -143,6 +172,17 @@ namespace C2M2.NeuronalDynamics.Interaction
                 {
                     if (clamp != null && clamp.focusVert != -1)
                         Destroy(clamp.transform.parent.gameObject);
+                }
+            }
+        }
+        private bool highlightPrev = false;
+        private void HighlightAll(bool highlight)
+        {
+            if (Clamps.Count > 0)
+            {
+                foreach (NeuronClamp clamp in Clamps)
+                {
+                    transform.parent.FindChildRecursive("Highlight").gameObject.SetActive(highlight);
                 }
             }
         }
