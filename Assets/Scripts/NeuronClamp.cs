@@ -103,6 +103,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             float radiusLength = Math.Max(radiusScalingValue, heightScalingValue) * currentVisualizationScale;
 
             transform.parent.localScale = new Vector3(radiusLength, radiusLength, heightScalingValue);
+            UpdateHighLightScale();
         }
         public void UpdateScale(float newScale)
         {
@@ -114,7 +115,17 @@ namespace C2M2.NeuronalDynamics.Interaction
                 tempVector.y *= modifiedScale;
                 transform.parent.localScale = tempVector;
                 currentVisualizationScale = newScale;
+                UpdateHighLightScale();
+                
             }
+        }
+        private void UpdateHighLightScale()
+        {
+            Vector3 clampScale = transform.parent.localScale;
+            float max = Math.Max(clampScale) * 2;
+            highlightObj.transform.localScale = new Vector3((1 / clampScale.x) * max, 
+                (1 / clampScale.y) * max, 
+                (1 / clampScale.z) * max);
         }
         public void SetRotation(NDSimulation simulation, NeuronCell.NodeData cellNodeData)
         {

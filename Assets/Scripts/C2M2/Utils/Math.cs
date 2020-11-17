@@ -22,6 +22,8 @@ namespace C2M2
             public static int Max(int a, int b) => (a > b) ? a : b;
             public static float Max(float a, float b) => (a > b) ? a : b;
             public static double Max(double a, double b) => (a > b) ? a : b;
+            public static float Max(this Vector3 a) => Max(Max(a.x, a.y), a.z);
+            public static float Min(this Vector3 a) => Min(Min(a.x, a.y), a.z);
             #endregion
             #region Clamp
             /// <summary> 
