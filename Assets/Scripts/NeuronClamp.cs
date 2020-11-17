@@ -11,6 +11,8 @@ namespace C2M2.NeuronalDynamics.Interaction
     {
         public float radiusRatio = 3f;
         public float heightRatio = 1f;
+        [Tooltip("The highlight sphere's radius is some real multiple of the clamp's radius")]
+        public float highlightSphereScale = 3f;
 
         public bool clampLive { get; private set; } = false;
 
@@ -122,7 +124,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         private void UpdateHighLightScale()
         {
             Vector3 clampScale = transform.parent.localScale;
-            float max = Math.Max(clampScale) * 2;
+            float max = Math.Max(clampScale) * highlightSphereScale;
             highlightObj.transform.localScale = new Vector3((1 / clampScale.x) * max, 
                 (1 / clampScale.y) * max, 
                 (1 / clampScale.z) * max);
@@ -351,6 +353,12 @@ namespace C2M2.NeuronalDynamics.Interaction
             if (power != 0 && !powerClick) powerClick = true;
 
             clampPower += power;
+        }
+
+        public void Highlight(bool highlight)
+        {
+            if (highlightObj != null)
+                highlightObj.SetActive(highlight);
         }
 
         public void ResetInput()

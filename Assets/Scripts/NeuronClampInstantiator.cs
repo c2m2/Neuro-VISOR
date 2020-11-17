@@ -21,6 +21,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             }
         }
         public Color32 inactiveCol = Color.black;
+        public float highlightSphereScale = 3f;
 
         public void InstantiateClamp(RaycastHit hit)
         {
@@ -37,6 +38,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             NeuronClamp clamp = clampObj.GetComponentInChildren<NeuronClamp>();
 
             clamp.InactiveCol = inactiveCol;
+            clamp.highlightSphereScale = highlightSphereScale;
 
             clamp.ReportSimulation(sim, hit);
         }
@@ -49,7 +51,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         /// </summary>
         public OVRInput.Button toggleDestroyOVR = OVRInput.Button.Two;
         public OVRInput.Button toggleDestroyOVRS = OVRInput.Button.Four;
-        private bool PressedToggleDestroy
+        public bool PressedToggleDestroy
         {
             get
             {
@@ -60,7 +62,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         }
         public KeyCode powerModifierPlusKey = KeyCode.UpArrow;
         public KeyCode powerModifierMinusKey = KeyCode.DownArrow;
-        private float PowerModifier
+        public float PowerModifier
         {
             get
             {
@@ -85,13 +87,14 @@ namespace C2M2.NeuronalDynamics.Interaction
 
         public OVRInput.Button highlightOVR = OVRInput.Button.PrimaryHandTrigger;
         public OVRInput.Button highlightOVRS = OVRInput.Button.SecondaryHandTrigger;
-        private bool PressedHighlight
+        public KeyCode highlightKey = KeyCode.H;
+        public bool PressedHighlight
         {
             get
             {
                 if (GameManager.instance.vrIsActive)
                     return (OVRInput.Get(highlightOVR) || OVRInput.Get(highlightOVRS));
-                else return false;
+                else return Input.GetKey(highlightKey);
             }
         }
 
@@ -167,16 +170,13 @@ namespace C2M2.NeuronalDynamics.Interaction
             }
         }
         private bool highlightPrev = false;
-        private void HighlightAll(bool highlight)
+        public void HighlightAll(bool highlight)
         {
             if (Clamps.Count > 0)
             {
                 foreach (NeuronClamp clamp in Clamps)
                 {
-                   if(clamp.highlightObj != null)
-                    {
-                        clamp.highlightObj.SetActive(highlight);
-                    }
+                    clamp.Highlight(highlight);
                 }
             }
         }
