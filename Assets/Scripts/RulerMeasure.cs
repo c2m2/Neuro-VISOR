@@ -10,7 +10,6 @@ public class RulerMeasure : MonoBehaviour
     public MeshSimulation sim = null;
     public TextMeshProUGUI textTMP;
     private float relativeLength;
-    private float rulerLength;
 
     // Start is called before the first frame update
     void Start()
@@ -22,28 +21,26 @@ public class RulerMeasure : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        relativeLength = 1/sim.transform.localScale.z; //~200 is in world space, 1 should be replaced with local size of ruler's parent
-        // should rename
+        relativeLength = transform.parent.lossyScale.z/sim.transform.localScale.z;
         
         int magnitude = GetMagnitude(relativeLength);
         string unit = GetUnit(magnitude);
-        Tuple<int, float> data = GetNumberAndRulerSize(relativeLength, magnitude);
+        Tuple<int, float> numberAndRulerSize = GetNumberAndRulerSize(relativeLength, magnitude);
 
-        transform.localScale = new Vector3(transform.localScale.x, transform.localScale.y, data.Item2);
-        textTMP.text = data.Item1 + unit;
+        transform.localScale = new Vector3(transform.localScale.x, transform.localScale.y, numberAndRulerSize.Item2);
+        textTMP.text = numberAndRulerSize.Item1 + unit;
 
         //TODO change to only update when simulation changes size
     }
 
-    private int GetMagnitude(float relativeLength)
+    private int GetMagnitude(float length)
     {
-        double lengthLog10 = Math.Log10(relativeLength);
+        double lengthLog10 = Math.Log10(length);
         return Convert.ToInt32(Math.Floor(lengthLog10));
     }
 
     private string GetUnit(int magnitude)
     {
-        //TODO check if for really big and really small ones which units it should be in terms of
         if (magnitude < -3)
         {
             // takes the magnitude and puts it in terms of nm by adding three. Then divides by 3 to get unit group and rounds down.
