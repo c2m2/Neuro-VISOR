@@ -8,38 +8,31 @@ using UnityEngine;
 public class RulerMeasure : MonoBehaviour
 {
     public MeshSimulation sim = null;
-    public Canvas canvas;
-    private Vector3 localSize;
+    public TextMeshProUGUI textTMP;
+    private float relativeLength;
     private float rulerLength;
 
     // Start is called before the first frame update
     void Start()
     {
-        localSize = Vector3.zero;
+        relativeLength = 0;
         if (sim == null) Destroy(gameObject);
     }
 
     // Update is called once per frame
     void Update()
     {
-        localSize = sim.transform.localScale;
-        rulerLength = transform.lossyScale.z;
-
-        float relativeLength = ReturnRulerMeshLength();
+        relativeLength = 1/sim.transform.localScale.z; //~200 is in world space, 1 should be replaced with local size of ruler's parent
+        // should rename
+        
         int magnitude = GetMagnitude(relativeLength);
         string unit = GetUnit(magnitude);
-        foreach (KeyValuePair<float, float> measurement in GetNumbersAndLocation(relativeLength, magnitude))
-        {
-            AddToRuler(measurement.Key, measurement.Value, unit, canvas);
-        }
+        Tuple<int, float> data = GetNumberAndRulerSize(relativeLength, magnitude);
 
-        //numberValues.text = ToString();
-    }
+        transform.localScale = new Vector3(transform.localScale.x, transform.localScale.y, data.Item2);
+        textTMP.text = data.Item1 + unit;
 
-    // returns rulers length relative the the mesh
-    private float ReturnRulerMeshLength()
-    {
-        return rulerLength/localSize.z;
+        //TODO change to only update when simulation changes size
     }
 
     private int GetMagnitude(float relativeLength)
@@ -75,67 +68,20 @@ public class RulerMeasure : MonoBehaviour
         }
     }
 
-    private SortedDictionary<float, float> GetNumbersAndLocation(float relativeLength, int magnitude)
+    private Tuple<int, float> GetNumberAndRulerSize(float relativeLength, int magnitude)
     {
-
+        int unitGroup = magnitude / 3;
         // length is a scaled version of relativelength so it is between 1 and 1000
-        float length = (float)(relativeLength / Math.Pow(10, magnitude));
+        float length = (float)(relativeLength / Math.Pow(10, unitGroup));
 
         // scale is the scientific notation power of 10 to convert adjustlength to a scientific notation coefficient
         int scale = Convert.ToInt32(Math.Pow(10, Math.Floor(Math.Log10(length))));
 
-        float adjustedLength = length / scale;
+        int number = Convert.ToInt32(Math.Floor(length / scale)*scale);
 
-        List<float> numbers = new List<float>();
+        float length2 = number/length;
 
-        if (adjustedLength < 2)
-        {
-            numbers.Add(0.5f);
-            numbers.Add(1);
-        }
-        else if (adjustedLength < 3)
-        {
-            numbers.Add(1);
-            numbers.Add(2);
-        }
-        else if (adjustedLength < 4)
-        {
-            numbers.Add(1);
-            numbers.Add(2);
-            numbers.Add(3);
-        }
-        else if (adjustedLength < 6)
-        {
-            numbers.Add(1);
-            numbers.Add(2);
-            numbers.Add(4);
-        }
-        else if (adjustedLength < 8)
-        {
-            numbers.Add(1);
-            numbers.Add(3);
-            numbers.Add(6);
-        }
-        else if (adjustedLength < 10)
-        {
-            numbers.Add(2);
-            numbers.Add(4);
-            numbers.Add(8);
-        }
-
-        SortedDictionary<float, float> numbersAndLocations = new SortedDictionary<float, float>();
-
-        foreach (float num in numbers)
-        {
-            numbersAndLocations.Add(num*scale, num*scale/length);
-        }
-
-        return numbersAndLocations;
+        return new Tuple<int, float>(number, length2);
     }
 
-    private void AddToRuler(float value, float location, string unit, Canvas rulerCanvas)
-    {
-        string measurement = value + unit;
-        //Debug.LogError(value + ":" + location + ":" + unit);
-    }
 }
