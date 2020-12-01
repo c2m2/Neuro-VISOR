@@ -181,6 +181,7 @@ MonoBehaviour:
   inactiveMaterial: {fileID: 2100000, guid: b5682c8bb520e8a46bbeab52c1a74097, type: 2}
   simulation: {fileID: 0}
   highlightObj: {fileID: 7733468709602801279}
+  minHighlightGlobalSize: 0.03333333
   destroyCount: 50
   toggleDestroyOVR: 2
   toggleDestroyOVRS: 8
@@ -382,7 +383,9 @@ GameObject:
   - component: {fileID: 7770937968939835838}
   - component: {fileID: 7460303369972632099}
   - component: {fileID: 3389635001864028061}
-  m_Layer: 0
+  - component: {fileID: 4191064570392900090}
+  - component: {fileID: 7125117444696267372}
+  m_Layer: 8
   m_Name: Highlight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -448,3 +451,30 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+--- !u!135 &4191064570392900090
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7733468709602801279}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &7125117444696267372
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7733468709602801279}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6dee7b5c4ddc78f44b1b1919d3ea115d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rightTrigger: {fileID: 835368085250037502}
+  leftTrigger: {fileID: 835368085250037502}
