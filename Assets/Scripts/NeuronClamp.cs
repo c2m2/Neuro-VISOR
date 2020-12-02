@@ -62,6 +62,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         }
 
         public GameObject highlightObj;
+        public float minHighlightGlobalSize = 0.1f * (1/3);
 
         #region Unity Methods
         private void Awake()
@@ -105,7 +106,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             float radiusLength = Math.Max(radiusScalingValue, heightScalingValue) * currentVisualizationScale;
 
             transform.parent.localScale = new Vector3(radiusLength, radiusLength, heightScalingValue);
-            UpdateHighLightScale();
+            UpdateHighLightScale(transform.parent.localScale);
         }
         public void UpdateScale(float newScale)
         {
@@ -117,17 +118,39 @@ namespace C2M2.NeuronalDynamics.Interaction
                 tempVector.y *= modifiedScale;
                 transform.parent.localScale = tempVector;
                 currentVisualizationScale = newScale;
-                UpdateHighLightScale();
+                UpdateHighLightScale(transform.parent.localScale);
                 
             }
         }
-        private void UpdateHighLightScale()
+        private void UpdateHighLightScale(Vector3 clampScale)
         {
-            Vector3 clampScale = transform.parent.localScale;
             float max = Math.Max(clampScale) * highlightSphereScale;
             highlightObj.transform.localScale = new Vector3((1 / clampScale.x) * max, 
                 (1 / clampScale.y) * max, 
                 (1 / clampScale.z) * max);
+
+            // If tbe clamp is too small, match a minimum global size
+            if (highlightObj.transform.lossyScale.x < minHighlightGlobalSize)
+            {
+                Vector3 globalSize = new Vector3(minHighlightGlobalSize, minHighlightGlobalSize, minHighlightGlobalSize);
+                Transform curParent = transform.parent;
+                // Convert global size to local space
+                do
+                {
+                    globalSize = new Vector3(globalSize.x / curParent.localScale.x,
+                        globalSize.y / curParent.localScale.y,
+                        globalSize.z / curParent.localScale.z);
+                    curParent = curParent.parent;
+                } while (curParent.parent != null);
+                globalSize = new Vector3(globalSize.x / curParent.localScale.x,
+                    globalSize.y / curParent.localScale.y,
+                    globalSize.z / curParent.localScale.z);
+
+                highlightObj.transform.localScale = globalSize;
+                Debug.Log("Highlight size increased to match minimum");
+            }
+
+            Debug.Log("highlight global scale: " + highlightObj.transform.lossyScale.ToString("F5") + "\nlocal scale: " + highlightObj.transform.localScale.ToString("F5"));
         }
         public void SetRotation(NDSimulation simulation, NeuronCell.NodeData cellNodeData)
         {
