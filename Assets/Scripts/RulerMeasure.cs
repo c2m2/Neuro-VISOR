@@ -11,24 +11,26 @@ public class RulerMeasure : MonoBehaviour
     public MeshSimulation sim = null;
     public List<TextMeshProUGUI> measurementDisplays;
     private float relativeLength;
+    private float originalLength;
 
     // Start is called before the first frame update
     void Start()
     {
         relativeLength = 0;
+        originalLength = transform.lossyScale.z;
         if (sim == null) Destroy(gameObject);
     }
 
     // Update is called once per frame
     void Update()
     {
-        relativeLength = transform.lossyScale.z/sim.transform.localScale.z;
+        relativeLength = originalLength/sim.transform.localScale.z;
         
         int magnitude = GetMagnitude(relativeLength);
         string unit = GetUnit(magnitude);
         Tuple<int, float> numberAndRulerSize = GetNumberAndRulerSize(relativeLength, magnitude);
 
-        transform.localScale = new Vector3(transform.localScale.x, transform.localScale.y, numberAndRulerSize.Item2);
+        transform.localScale = new Vector3(transform.localScale.x, transform.localScale.y, originalLength*numberAndRulerSize.Item2);
         measurementDisplays.ForEach(measurementDisplay => measurementDisplay.text = numberAndRulerSize.Item1 + unit);
     }
 
@@ -75,9 +77,9 @@ public class RulerMeasure : MonoBehaviour
 
         int number = Convert.ToInt32(Math.Floor(length / scale)*scale);
 
-        float length2 = number/length;
+        float lengthRatio = number/length;
 
-        return new Tuple<int, float>(number, length2);
+        return new Tuple<int, float>(number, lengthRatio);
     }
 
 }
