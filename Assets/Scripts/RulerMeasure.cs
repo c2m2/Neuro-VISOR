@@ -5,7 +5,7 @@ using TMPro;
 using UnityEngine;
 
 [RequireComponent(typeof(MeshSimulation))]
-[RequireComponent(typeof(TextMeshProUGUI))]
+[RequireComponent(typeof(List<TextMeshProUGUI>))]
 public class RulerMeasure : MonoBehaviour
 {
     public MeshSimulation sim = null;
@@ -22,7 +22,7 @@ public class RulerMeasure : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        relativeLength = transform.parent.lossyScale.z/sim.transform.localScale.z;
+        relativeLength = transform.lossyScale.z/sim.transform.localScale.z;
         
         int magnitude = GetMagnitude(relativeLength);
         string unit = GetUnit(magnitude);
