@@ -5,10 +5,11 @@ using TMPro;
 using UnityEngine;
 
 [RequireComponent(typeof(MeshSimulation))]
+[RequireComponent(typeof(TextMeshProUGUI))]
 public class RulerMeasure : MonoBehaviour
 {
     public MeshSimulation sim = null;
-    public TextMeshProUGUI textTMP;
+    public List<TextMeshProUGUI> measurementDisplays;
     private float relativeLength;
 
     // Start is called before the first frame update
@@ -28,9 +29,7 @@ public class RulerMeasure : MonoBehaviour
         Tuple<int, float> numberAndRulerSize = GetNumberAndRulerSize(relativeLength, magnitude);
 
         transform.localScale = new Vector3(transform.localScale.x, transform.localScale.y, numberAndRulerSize.Item2);
-        textTMP.text = numberAndRulerSize.Item1 + unit;
-
-        //TODO change to only update when simulation changes size
+        measurementDisplays.ForEach(measurementDisplay => measurementDisplay.text = numberAndRulerSize.Item1 + unit);
     }
 
     private int GetMagnitude(float length)
