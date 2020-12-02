@@ -3273,7 +3273,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1103864542
 Transform:
   m_ObjectHideFlags: 0
@@ -5068,7 +5068,7 @@ MonoBehaviour:
   h: 0.27
   k: 0.0027
   HK_auto: 1
-  SomaOn: 0
+  SomaOn: 1
   numRuns: 0
   randomPermute: 0
   printMatrices: 0
@@ -5249,6 +5249,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Ruler
+      objectReference: {fileID: 0}
+    - target: {fileID: 4174845952812593659, guid: 1f3d7fdf0dd17494cad2086085b3df67,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8320557830559208807, guid: 1f3d7fdf0dd17494cad2086085b3df67,
         type: 3}
@@ -6671,12 +6676,14 @@ MonoBehaviour:
   inactiveCol:
     serializedVersion: 2
     rgba: 4291348680
+  highlightSphereScale: 3
   toggleDestroyOVR: 2
   toggleDestroyOVRS: 8
   powerModifierPlusKey: 273
   powerModifierMinusKey: 274
   highlightOVR: 16384
   highlightOVRS: 4194304
+  highlightKey: 104
 --- !u!114 &3671467347388522960
 MonoBehaviour:
   m_ObjectHideFlags: 0
