@@ -115,7 +115,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
         public float lineWidth1D = 0.005f;
 
         // Need mesh options for each refinement, diameter level
-        [Tooltip("Name of the vrn file within Assets/StreamingAssets")]
+        [Tooltip("Name of the vrn file within Assets/StreamingAssets/NeuronalDynamics/Geometries")]
         public string vrnFileName = "test.vrn";
         private VrnReader vrnReader = null;
         private VrnReader VrnReader
@@ -124,8 +124,9 @@ namespace C2M2.NeuronalDynamics.Simulation {
             {
                 if (vrnReader == null)
                 {
+                    char sl = Path.DirectorySeparatorChar;
                     if (!vrnFileName.EndsWith(".vrn")) vrnFileName = vrnFileName + ".vrn";
-                    vrnReader = new VrnReader(Application.streamingAssetsPath + Path.DirectorySeparatorChar + vrnFileName);
+                    vrnReader = new VrnReader(Application.streamingAssetsPath + sl + "NeuronalDynamics" + sl + "Geometries" + sl + vrnFileName);
                 }
                 return vrnReader;
             }
