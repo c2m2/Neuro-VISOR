@@ -5,33 +5,36 @@ using TMPro;
 using UnityEngine;
 
 [RequireComponent(typeof(MeshSimulation))]
-[RequireComponent(typeof(List<TextMeshProUGUI>))]
+[RequireComponent(typeof(List<Canvas>))]
+[RequireComponent(typeof(List<int>))]
 public class RulerMeasure : MonoBehaviour
 {
     public MeshSimulation sim = null;
-    public List<TextMeshProUGUI> measurementDisplays;
+    public List<Canvas> measurementDisplays;
+    public List<int> numbers;
+    private List<Tuple<TextMeshProUGUI, int>> markers = new List<Tuple<TextMeshProUGUI, int>>();
     private float relativeLength;
-    private float originalLength;
 
     // Start is called before the first frame update
     void Start()
     {
-        relativeLength = 0;
-        originalLength = transform.lossyScale.z;
         if (sim == null) Destroy(gameObject);
+        relativeLength = 0;
+        CreateMarkers();
     }
 
     // Update is called once per frame
     void Update()
     {
-        relativeLength = originalLength/sim.transform.localScale.z;
+        relativeLength = transform.lossyScale.z / sim.transform.localScale.z;
         
         int magnitude = GetMagnitude(relativeLength);
         string unit = GetUnit(magnitude);
-        Tuple<int, float> numberAndRulerSize = GetNumberAndRulerSize(relativeLength, magnitude);
 
-        transform.localScale = new Vector3(transform.localScale.x, transform.localScale.y, originalLength*numberAndRulerSize.Item2);
-        measurementDisplays.ForEach(measurementDisplay => measurementDisplay.text = numberAndRulerSize.Item1 + unit);
+        int unitGroup = magnitude / 3;
+        // length is a scaled version of relativelength so it is between 1 and 1000
+        float length = (float)(relativeLength / Math.Pow(10, unitGroup));
+        UpdateMarkers(length, unit);
     }
 
     private int GetMagnitude(float length)
@@ -66,20 +69,47 @@ public class RulerMeasure : MonoBehaviour
         }
     }
 
-    private Tuple<int, float> GetNumberAndRulerSize(float relativeLength, int magnitude)
+    private void CreateMarkers()
     {
-        int unitGroup = magnitude / 3;
-        // length is a scaled version of relativelength so it is between 1 and 1000
-        float length = (float)(relativeLength / Math.Pow(10, unitGroup));
+        foreach(Canvas measurementDisplay in measurementDisplays)
+        {
+            foreach(int number in numbers)
+            {
+                GameObject marker = new GameObject();
+                marker.transform.SetParent(measurementDisplay.transform);
+                TextMeshProUGUI markerText = marker.AddComponent<TextMeshProUGUI>();
+                markerText.alignment = TextAlignmentOptions.Center;
+                markerText.rectTransform.localPosition = new Vector3(0, 0, 0);
+                markerText.fontSize = 0.05f;
+                markerText.color = Color.black;
+                marker.transform.localRotation = Quaternion.Euler(0,0,90);
+                marker.transform.localScale = Vector3.one;
+                markers.Add(new Tuple<TextMeshProUGUI, int>(markerText, number));
+            }
+            
+        }
+    }
 
-        // scale is the scientific notation power of 10 to convert adjustlength to a scientific notation coefficient
-        int scale = Convert.ToInt32(Math.Pow(10, Math.Floor(Math.Log10(length))));
+    private void UpdateMarkers(float scaledRulerLength, string unit)
+    {
+        foreach (Tuple<TextMeshProUGUI, int> marker in markers)
+        {
+            int markerNumber = marker.Item2;
+            TextMeshProUGUI markerText = marker.Item1;
 
-        int number = Convert.ToInt32(Math.Floor(length / scale)*scale);
-
-        float lengthRatio = number/length;
-
-        return new Tuple<int, float>(number, lengthRatio);
+            float lengthRatio = markerNumber / scaledRulerLength;
+            if (lengthRatio >= .05 && lengthRatio < .95)
+            {
+                float rulerPoint = 2 * (lengthRatio - .5f); // converts lengthRatio which goes from 0 to 1 to a point on the ruler which goes from -1 to 1
+                markerText.rectTransform.localPosition = new Vector3(rulerPoint, 0, 0);
+                markerText.text = "- " + markerNumber + " " + unit;
+                markerText.gameObject.SetActive(true);
+            }
+            else
+            {
+                markerText.gameObject.SetActive(false);
+            }
+        }
     }
 
 }

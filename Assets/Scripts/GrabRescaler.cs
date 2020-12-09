@@ -13,25 +13,26 @@ namespace C2M2.Interaction
         public float scaler = 0.2f;
         public float minPercentage = 0.1f;
         public float maxPercentage = 10f;
+        public bool xScale = true;
+        public bool yScale = true;
+        public bool zScale = true;
 
-        // Returns a value between -2 and 2, where -2 implies both thumbsticks are held down, and 2 implies both are held up.
+        // Returns a value between -.5 and .5, where -.5 implies the thumbstick is all the way down and .5 implies it is all the way up
         private float ThumbstickScaler
         {
             get
             {
-                // Uses average joystick y axis value
-                float y1 = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick).y;
-                float y2 = OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick).y;
-                return (y1 + y2) / 2;
+                // Uses joystick y axis value divided by 2
+                float y = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick).y;
+                return y / 2;
             }
         }
 
-        private bool ThumbsticksPressed
+        private bool ThumbstickPressed
         {
             get
             {
-                return OVRInput.Get(OVRInput.Button.SecondaryThumbstick) 
-                    && OVRInput.Get(OVRInput.Button.PrimaryThumbstick);
+                return OVRInput.Get(OVRInput.Button.PrimaryThumbstick);
             }
         }
 
@@ -49,8 +50,8 @@ namespace C2M2.Interaction
         {
             if (grabbable.isGrabbed)
             {
-                // if both joysticks are pressed in, it resets the scale to the original scale
-                if (ThumbsticksPressed)
+                // if joystick is pressed in, it resets the scale to the original scale
+                if (ThumbstickPressed)
                 {
                     transform.localScale = origScale;
                 }
@@ -64,6 +65,9 @@ namespace C2M2.Interaction
                         && newLocalScale.magnitude < (maxPercentage * origScale).magnitude;
                     if (newScaleAcceptable)
                     {
+                        if (!xScale) newLocalScale.x = transform.localScale.x;
+                        if (!yScale) newLocalScale.y = transform.localScale.y;
+                        if (!zScale) newLocalScale.z = transform.localScale.z;
                         transform.localScale = newLocalScale;
                     }
                 }
