@@ -23,8 +23,8 @@ namespace C2M2.Interaction
             get
             {
                 // Uses joystick y axis value divided by 2
-                float y1 = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick).y;
-                return y1 / 2;
+                float y = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick).y;
+                return y / 2;
             }
         }
 
@@ -65,9 +65,9 @@ namespace C2M2.Interaction
                         && newLocalScale.magnitude < (maxPercentage * origScale).magnitude;
                     if (newScaleAcceptable)
                     {
-                        if (!xScale) scaleValue.x = transform.localScale.x;
-                        if (!yScale) scaleValue.y = transform.localScale.y;
-                        if (!zScale) scaleValue.z = transform.localScale.z;
+                        if (!xScale) newLocalScale.x = transform.localScale.x;
+                        if (!yScale) newLocalScale.y = transform.localScale.y;
+                        if (!zScale) newLocalScale.z = transform.localScale.z;
                         transform.localScale = newLocalScale;
                     }
                 }
