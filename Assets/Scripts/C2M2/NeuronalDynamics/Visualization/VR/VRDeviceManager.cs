@@ -24,7 +24,7 @@ namespace C2M2.Interaction.VR
         private MouseEventSignaler mouseSignaler;
         private OVRPlayerController playerController;
         private MovementController emulatorMove;
-        private bool prev = false;
+
         public bool VrIsActive { get { return !vrDevice.Equals("null"); } }
         public string vrDevice { get; private set; } = "null";
 
@@ -46,18 +46,8 @@ namespace C2M2.Interaction.VR
                 if (VrIsActive) { Debug.Log("Running in VR mode on device [" + vrDevice + "]"); }
                 else Debug.Log("Running in emulator mode.");
             }
-
-           // prev = vrActive;
         }
 
-        /*private void Update()
-        {
-            if (prev != VrIsActive && !Application.isPlaying)
-            {
-
-                prev = VrIsActive;
-            }
-        }*/
         private void SwitchState(bool vrActive)
         {
             if (informationDisplayTV != null) informationDisplayTV.SetActive(vrActive);
