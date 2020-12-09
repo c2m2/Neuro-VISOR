@@ -34,7 +34,6 @@ public class RulerMeasure : MonoBehaviour
         int unitGroup = magnitude / 3;
         // length is a scaled version of relativelength so it is between 1 and 1000
         float length = (float)(relativeLength / Math.Pow(10, unitGroup));
-        Debug.LogError("MEOW: " + length);
         UpdateMarkers(length, unit);
     }
 
@@ -83,7 +82,7 @@ public class RulerMeasure : MonoBehaviour
                 markerText.rectTransform.localPosition = new Vector3(0, 0, 0);
                 markerText.fontSize = 0.1f;
                 markerText.color = Color.black;
-                marker.transform.localRotation = Quaternion.identity;
+                marker.transform.localRotation = Quaternion.Euler(0,0,90);
                 marker.transform.localScale = Vector3.one;
                 //maybe need to set width and height
                 markers.Add(new Tuple<TextMeshProUGUI, int>(markerText, number)); //maybe change to passing gameobject
@@ -103,12 +102,14 @@ public class RulerMeasure : MonoBehaviour
             if (lengthRatio >= .1 && lengthRatio < .9) //update to make minimum and maximum changeable
             {
                 markerText.rectTransform.localPosition = new Vector3(2*(lengthRatio-.5f), 0, 0); //since center of ruler is 0
-                markerText.text = "|\n" + markerNumber + " " + unit;
+                markerText.text = "- " + markerNumber + " " + unit;
                 markerText.gameObject.SetActive(true);
+                //markerText.gameObject.GetComponent<MeshRenderer>().enabled = true;
             }
             else
             {
                 markerText.gameObject.SetActive(false);
+                //markerText.gameObject.GetComponent<MeshRenderer>().enabled = false;
             }
         }
     }
