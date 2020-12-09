@@ -80,12 +80,11 @@ public class RulerMeasure : MonoBehaviour
                 TextMeshProUGUI markerText = marker.AddComponent<TextMeshProUGUI>();
                 markerText.alignment = TextAlignmentOptions.Center;
                 markerText.rectTransform.localPosition = new Vector3(0, 0, 0);
-                markerText.fontSize = 0.1f;
+                markerText.fontSize = 0.05f;
                 markerText.color = Color.black;
                 marker.transform.localRotation = Quaternion.Euler(0,0,90);
                 marker.transform.localScale = Vector3.one;
-                //maybe need to set width and height
-                markers.Add(new Tuple<TextMeshProUGUI, int>(markerText, number)); //maybe change to passing gameobject
+                markers.Add(new Tuple<TextMeshProUGUI, int>(markerText, number));
             }
             
         }
@@ -99,17 +98,16 @@ public class RulerMeasure : MonoBehaviour
             TextMeshProUGUI markerText = marker.Item1;
 
             float lengthRatio = markerNumber / scaledRulerLength;
-            if (lengthRatio >= .1 && lengthRatio < .9) //update to make minimum and maximum changeable
+            if (lengthRatio >= .05 && lengthRatio < .95)
             {
-                markerText.rectTransform.localPosition = new Vector3(2*(lengthRatio-.5f), 0, 0); //since center of ruler is 0
+                float rulerPoint = 2 * (lengthRatio - .5f); // converts lengthRatio which goes from 0 to 1 to a point on the ruler which goes from -1 to 1
+                markerText.rectTransform.localPosition = new Vector3(rulerPoint, 0, 0);
                 markerText.text = "- " + markerNumber + " " + unit;
                 markerText.gameObject.SetActive(true);
-                //markerText.gameObject.GetComponent<MeshRenderer>().enabled = true;
             }
             else
             {
                 markerText.gameObject.SetActive(false);
-                //markerText.gameObject.GetComponent<MeshRenderer>().enabled = false;
             }
         }
     }

@@ -17,7 +17,7 @@ namespace C2M2.Interaction
         public bool yScale = true;
         public bool zScale = true;
 
-        // Returns a value between -2 and 2, where -2 implies both thumbsticks are held down, and 2 implies both are held up.
+        // Returns a value between -.5 and .5, where -.5 implies the thumbstick is all the way down and .5 implies it is all the way up
         private float ThumbstickScaler
         {
             get
