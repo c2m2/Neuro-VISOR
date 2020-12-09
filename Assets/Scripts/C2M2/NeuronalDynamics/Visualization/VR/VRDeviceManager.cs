@@ -60,12 +60,14 @@ namespace C2M2.Interaction.VR
         }*/
         private void SwitchState(bool vrActive)
         {
+            if (informationDisplayTV != null) informationDisplayTV.SetActive(vrActive);
+            playerController.enabled = vrActive;
+
             emulator.enabled = !vrActive;
             mouseSignaler.enabled = !vrActive;
             emulatorMove.enabled = !vrActive;
             if (informationOverlay != null) informationOverlay.SetActive(!vrActive);
 
-            if (informationDisplayTV != null) informationDisplayTV.SetActive(vrActive);
 
             // only enable oculus signalers if player controller is enabled
             OculusEventSignaler[] oculusSignalers = GetComponentsInChildren<OculusEventSignaler>();
