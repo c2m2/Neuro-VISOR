@@ -26,7 +26,7 @@ namespace C2M2.Interaction.VR
         private MovementController emulatorMove;
         private bool prev;
         public bool VrIsActive { get { return !vrDevice.Equals("null"); } }
-        public string vrDevice { get; private set; }
+        public string vrDevice { get; private set; } = "null";
 
         private void Awake()
         {
@@ -42,7 +42,7 @@ namespace C2M2.Interaction.VR
 
             if (Application.isPlaying)
             {
-                if (VrIsActive) { Debug.Log("Running in VR mode."); }
+                if (VrIsActive) { Debug.Log("Running in VR mode on device [" + vrDevice + "]"); }
                 else Debug.Log("Running in emulator mode.");
             }
         }

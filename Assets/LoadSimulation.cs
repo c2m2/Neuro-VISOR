@@ -31,20 +31,29 @@ namespace C2M2.NeuronalDynamics.Interaction
         }
         private void Awake()
         {
-            GetGeometries();
+            string[] geoms = GetGeometryNames();
+            string s = "Available geometries:";
+            foreach(string geom in geoms)
+            {
+                s += "\n" + geom;
+            }
+            Debug.Log(s);
         }
-        private void GetGeometries()
+        private string[] GetGeometryNames()
         {
             char sl = Path.DirectorySeparatorChar; ;
             string targetDir = Application.streamingAssetsPath + sl + "NeuronalDynamics" + sl + "Geometries";
             DirectoryInfo d = new DirectoryInfo(targetDir);
 
             FileInfo[] files = d.GetFiles("*.vrn");
-            if (files.Length == 0) Debug.Log("No .vrn files found in " + targetDir);
-            foreach (var file in files)
+            if (files.Length == 0) return null;
+
+            string[] fileNames = new string[files.Length];
+            for(int i = 0; i < files.Length; i++)
             {
-                Debug.Log(file.Name);
+                fileNames[i] = files[i].Name;
             }
+            return fileNames;
         }
     }
 }
