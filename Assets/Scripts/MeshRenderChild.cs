@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 namespace C2M2.Utils
 {
@@ -26,6 +27,9 @@ namespace C2M2.Utils
                 if(parent == null)
                     Debug.LogError("No MeshRenderer given to MeshRenderChild");
             }
+            TextMeshProUGUI marker = gameObject.AddComponent<TextMeshProUGUI>();
+
+
         }
 
         // Update is called once per frame
