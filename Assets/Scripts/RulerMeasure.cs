@@ -80,7 +80,7 @@ public class RulerMeasure : MonoBehaviour
                 TextMeshProUGUI markerText = marker.AddComponent<TextMeshProUGUI>();
                 markerText.alignment = TextAlignmentOptions.Center;
                 markerText.rectTransform.localPosition = new Vector3(0, 0, 0);
-                markerText.fontSize = 0.05f;
+                markerText.fontSize = 0.03f;
                 markerText.color = Color.black;
                 marker.transform.localRotation = Quaternion.Euler(0,0,90);
                 marker.transform.localScale = Vector3.one;
@@ -102,7 +102,7 @@ public class RulerMeasure : MonoBehaviour
             {
                 float rulerPoint = 2 * (lengthRatio - .5f); // converts lengthRatio which goes from 0 to 1 to a point on the ruler which goes from -1 to 1
                 markerText.rectTransform.localPosition = new Vector3(rulerPoint, 0, 0);
-                markerText.text = "- " + markerNumber + " " + unit;
+                markerText.text = "― " + markerNumber + " " + unit;
                 markerText.gameObject.SetActive(true);
             }
             else
