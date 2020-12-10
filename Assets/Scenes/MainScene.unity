@@ -4798,7 +4798,7 @@ MonoBehaviour:
     serializedVersion: 2
     rgba: 4278512639
   lineWidth1D: 0.005
-  vrnFileName: n400.CNG
+  vrnFileName: 10-dkvm2_1d
   hitValue: 55
   clamps: []
   vstart: 55
