@@ -10,21 +10,20 @@ namespace C2M2.Interaction
     {
         private OVRGrabbable grabbable = null;
         private Vector3 origScale;
-        public float scaler = 0.2f;
+        public float scaler = 0.1f;
         public float minPercentage = 0.1f;
         public float maxPercentage = 10f;
         public bool xScale = true;
         public bool yScale = true;
         public bool zScale = true;
 
-        // Returns a value between -.5 and .5, where -.5 implies the thumbstick is all the way down and .5 implies it is all the way up
+        // Returns a value between -1 and 1, where -1 implies the thumbstick is all the way down and 1 implies it is all the way up
         private float ThumbstickScaler
         {
             get
             {
-                // Uses joystick y axis value divided by 2
-                float y = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick).y;
-                return y / 2;
+                // Uses joystick y axis value
+                return OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick).y;
             }
         }
 
