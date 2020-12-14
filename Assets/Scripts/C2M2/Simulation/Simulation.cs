@@ -74,7 +74,7 @@ namespace C2M2.Simulation
         protected virtual void PreSolve() { }
 
         #region Unity Methods
-        public void Awake()
+        public void Initialize()
         {
             OnAwakePre();
 
@@ -113,15 +113,17 @@ namespace C2M2.Simulation
 
                 // Some scripts change transform position for some reason, reset the position/rotation at the first frame
                 gameObject.AddComponent<Utils.DebugUtils.Actions.TransformResetter>();
+
+                OnStart();
+
+                if (startOnAwake) StartSimulation();
             }
         }
 
-        public void Start()
-        {
-            OnStart();
+        //public void Start()
+        //{
 
-            if (startOnAwake) StartSimulation();
-        }
+        //}
         public void Update()
         {
             OnUpdate();

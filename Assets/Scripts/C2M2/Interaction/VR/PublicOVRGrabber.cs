@@ -14,5 +14,6 @@ namespace C2M2.Interaction.VR
     public class PublicOVRGrabber : OVRGrabber
     {
         public Collider[] M_GrabVolumes { get { return m_grabVolumes; } set { m_grabVolumes = value; } }
+        public OVRInput.Controller Controller { get { return m_controller; } }
     }
 }

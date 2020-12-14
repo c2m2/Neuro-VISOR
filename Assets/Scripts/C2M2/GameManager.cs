@@ -26,7 +26,7 @@ namespace C2M2
             get
             {
                 if (vrDeviceManager == null) Debug.LogError("No VR Device Manager Found!");
-                return vrDeviceManager.vrIsActive;
+                return vrDeviceManager.VrIsActive;
             }
         }
 
