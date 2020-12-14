@@ -1320,20 +1320,26 @@ public class OVRManager : MonoBehaviour
 		OVRPlugin.occlusionMesh = true;
 #endif
 		OVRManagerinitialized = true;
-
 	}
 
 	private void Awake()
 	{
+
 #if !USING_XR_SDK
-		//For legacy, we should initialize OVRManager in all cases.
-		//For now, in XR SDK, only initialize if OVRPlugin is initialized.
-		InitOVRManager();
+        //For legacy, we should initialize OVRManager in all cases.
+        //For now, in XR SDK, only initialize if OVRPlugin is initialized.
+        // InitOVRManager();
+
+        //If OVRPlugin is initialized on Awake(), or if the device is OpenVR, OVRManager should be initialized right away.
+        if (!OVRPlugin.initialized || (Settings.enabled && Settings.loadedDeviceName == OPENVR_UNITY_NAME_STR))
+        {
+            InitOVRManager();
+        }
 #else
 		if (OVRPlugin.initialized)
 			InitOVRManager();
 #endif
-	}
+    }
 
 #if UNITY_EDITOR
 	private static bool _scriptsReloaded;
