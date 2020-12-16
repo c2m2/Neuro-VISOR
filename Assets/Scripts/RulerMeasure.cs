@@ -6,13 +6,13 @@ using UnityEngine;
 
 [RequireComponent(typeof(MeshSimulation))]
 [RequireComponent(typeof(List<Canvas>))]
-[RequireComponent(typeof(List<int>))]
+[RequireComponent(typeof(List<float>))]
 public class RulerMeasure : MonoBehaviour
 {
     public MeshSimulation sim = null;
     public List<Canvas> measurementDisplays;
-    public List<int> numbers;
-    private List<Tuple<TextMeshProUGUI, int>> markers = new List<Tuple<TextMeshProUGUI, int>>();
+    public List<float> numbers;
+    private List<Tuple<TextMeshProUGUI, float>> markers = new List<Tuple<TextMeshProUGUI, float>>();
     private float relativeLength;
 
     // Start is called before the first frame update
@@ -73,7 +73,7 @@ public class RulerMeasure : MonoBehaviour
     {
         foreach(Canvas measurementDisplay in measurementDisplays)
         {
-            foreach(int number in numbers)
+            foreach(float number in numbers)
             {
                 GameObject marker = new GameObject();
                 marker.transform.SetParent(measurementDisplay.transform);
@@ -84,7 +84,7 @@ public class RulerMeasure : MonoBehaviour
                 markerText.color = Color.black;
                 marker.transform.localRotation = Quaternion.Euler(0,0,90);
                 marker.transform.localScale = Vector3.one;
-                markers.Add(new Tuple<TextMeshProUGUI, int>(markerText, number));
+                markers.Add(new Tuple<TextMeshProUGUI, float>(markerText, number));
             }
             
         }
@@ -92,9 +92,9 @@ public class RulerMeasure : MonoBehaviour
 
     private void UpdateMarkers(float scaledRulerLength, string unit)
     {
-        foreach (Tuple<TextMeshProUGUI, int> marker in markers)
+        foreach (Tuple<TextMeshProUGUI, float> marker in markers)
         {
-            int markerNumber = marker.Item2;
+            float markerNumber = marker.Item2;
             TextMeshProUGUI markerText = marker.Item1;
 
             float lengthRatio = markerNumber / scaledRulerLength;
