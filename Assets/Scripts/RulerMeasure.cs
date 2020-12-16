@@ -14,12 +14,14 @@ public class RulerMeasure : MonoBehaviour
     public List<float> numbers;
     private List<Tuple<TextMeshProUGUI, float>> markers = new List<Tuple<TextMeshProUGUI, float>>();
     private float relativeLength;
+    private float initialRulerLength;
 
     // Start is called before the first frame update
     void Start()
     {
         if (sim == null) Destroy(gameObject);
         relativeLength = 0;
+        initialRulerLength = transform.lossyScale.z;
         CreateMarkers();
     }
 
@@ -31,7 +33,7 @@ public class RulerMeasure : MonoBehaviour
         int magnitude = GetMagnitude(relativeLength);
         string unit = GetUnit(magnitude);
 
-        int unitGroup = magnitude / 3;
+        int unitGroup = (int)Math.Floor(magnitude/3.0);
         // length is a scaled version of relativelength so it is between 1 and 1000
         float length = (float)(relativeLength / Math.Pow(10, unitGroup));
         UpdateMarkers(length, unit);
@@ -98,11 +100,12 @@ public class RulerMeasure : MonoBehaviour
             TextMeshProUGUI markerText = marker.Item1;
 
             float lengthRatio = markerNumber / scaledRulerLength;
-            if (lengthRatio >= .05 && lengthRatio < .95)
+            if (lengthRatio >= .05 && lengthRatio <= .95)
             {
                 float rulerPoint = 2 * (lengthRatio - .5f); // converts lengthRatio which goes from 0 to 1 to a point on the ruler which goes from -1 to 1
                 markerText.rectTransform.localPosition = new Vector3(rulerPoint, 0, 0);
                 markerText.text = "― " + markerNumber + " " + unit + " ―";
+                markerText.transform.localScale = new Vector3(markerText.transform.localScale.x, markerText.transform.localScale.y, transform.lossyScale.z/initialRulerLength);
                 markerText.gameObject.SetActive(true);
             }
             else
