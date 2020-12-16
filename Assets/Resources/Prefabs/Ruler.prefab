@@ -226,8 +226,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4174845952812593659}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: -0.5, y: 0.443, z: -0.322}
   m_LocalScale: {x: 0.005, y: 0.05, z: 0.5}
   m_Children:
   - {fileID: 9001017224966188945}
@@ -343,7 +343,7 @@ MonoBehaviour:
   measurementDisplays:
   - {fileID: 6978054425490887901}
   - {fileID: 899021641628970695}
-  numbers: 010000000200000004000000080000000a00000014000000280000005000000064000000c80000009001000020030000
+  numbers: 0100000002000000050000000a000000140000003200000064000000c8000000f4010000
 --- !u!114 &9098607124181544640
 MonoBehaviour:
   m_ObjectHideFlags: 0

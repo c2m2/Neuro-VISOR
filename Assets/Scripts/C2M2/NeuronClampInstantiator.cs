@@ -169,7 +169,6 @@ namespace C2M2.NeuronalDynamics.Interaction
                 }
             }
         }
-        private bool highlightPrev = false;
         public void HighlightAll(bool highlight)
         {
             if (Clamps.Count > 0)

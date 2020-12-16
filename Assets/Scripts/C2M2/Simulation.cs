@@ -120,10 +120,6 @@ namespace C2M2.Simulation
             }
         }
 
-        //public void Start()
-        //{
-
-        //}
         public void Update()
         {
             OnUpdate();

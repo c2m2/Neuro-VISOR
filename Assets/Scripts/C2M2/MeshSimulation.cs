@@ -32,6 +32,9 @@ namespace C2M2.Simulation
         [Tooltip("Must be set if extremaMethod is set to GlobalExtrema")]
         public float globalMin = float.PositiveInfinity;
 
+        public Vector3 rulerInitPos = new Vector3(-0.5f, 0.443f, -0.322f);
+        public Vector3 rulerInitRot = new Vector3(90, 0, 0);
+
         private Mesh visualMesh = null;
         public Mesh VisualMesh
         {
@@ -127,6 +130,14 @@ namespace C2M2.Simulation
                 gameObject.AddComponent<VRGrabbableMesh>();
                 gameObject.AddComponent<GrabRescaler>();
                 gameObject.AddComponent<PositionResetControl>();
+
+                // Instantiate ruler
+                GameObject rulerObj = Resources.Load("Prefabs/Ruler") as GameObject;
+                RulerMeasure ruler = GameObject.Instantiate(rulerObj).GetComponent<RulerMeasure>();
+                ruler.sim = this;
+                rulerObj.transform.position = rulerInitPos;
+                rulerObj.transform.eulerAngles = rulerInitRot;
+                rulerObj.name = gameObject.name + "Ruler";
             }
         }
     }
