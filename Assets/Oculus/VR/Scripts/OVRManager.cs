@@ -1328,13 +1328,13 @@ public class OVRManager : MonoBehaviour
 #if !USING_XR_SDK
         //For legacy, we should initialize OVRManager in all cases.
         //For now, in XR SDK, only initialize if OVRPlugin is initialized.
-        // InitOVRManager();
+         InitOVRManager();
 
         //If OVRPlugin is initialized on Awake(), or if the device is OpenVR, OVRManager should be initialized right away.
-        if (!OVRPlugin.initialized || (Settings.enabled && Settings.loadedDeviceName == OPENVR_UNITY_NAME_STR))
-        {
-            InitOVRManager();
-        }
+        //if (!OVRPlugin.initialized || (Settings.enabled && Settings.loadedDeviceName == OPENVR_UNITY_NAME_STR))
+        //{
+         //   InitOVRManager();
+        //}
 #else
 		if (OVRPlugin.initialized)
 			InitOVRManager();
