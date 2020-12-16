@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using C2M2.Interaction.VR;
 
 namespace C2M2.Interaction
 {
@@ -16,6 +17,7 @@ namespace C2M2.Interaction
         public bool xScale = true;
         public bool yScale = true;
         public bool zScale = true;
+        private PublicOVRGrabber grabber;
 
         // Returns a value between -1 and 1, where -1 implies the thumbstick is all the way down and 1 implies it is all the way up
         private float ThumbstickScaler
@@ -23,7 +25,8 @@ namespace C2M2.Interaction
             get
             {
                 // Uses joystick y axis value
-                return OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick).y;
+                grabber = (PublicOVRGrabber)grabbable.grabbedBy;
+                return OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick, grabber.Controller).y;
             }
         }
 

@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-[RequireComponent(typeof(MeshSimulation))]
 [RequireComponent(typeof(List<Canvas>))]
 [RequireComponent(typeof(List<float>))]
 public class RulerMeasure : MonoBehaviour
@@ -17,11 +16,11 @@ public class RulerMeasure : MonoBehaviour
     private float initialRulerLength;
     private float minimumMarker = 0.05f; //earliest location on the ruler a marker can appear
     private float maximumMarker = 0.95f; //last location on the ruler a marker can appear
+    private float markerSpacing = 0.05f; //minimum spacing between each marker
 
     // Start is called before the first frame update
     void Start()
     {
-        if (sim == null) Destroy(gameObject);
         relativeLength = 0;
         initialRulerLength = transform.lossyScale.z;
         CreateMarkers();
@@ -30,15 +29,18 @@ public class RulerMeasure : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        relativeLength = maximumMarker*(transform.lossyScale.z / sim.transform.localScale.z);
-        
-        int magnitude = GetMagnitude(relativeLength);
-        string unit = GetUnit(magnitude);
+        if (sim != null)
+        {
+            relativeLength = maximumMarker * (transform.lossyScale.z / sim.transform.localScale.z);
 
-        int unitGroup = (int)Math.Floor(magnitude/3.0);
-        // length is a scaled version of relativelength so it is between 1 and 1000
-        float length = (float)(relativeLength / Math.Pow(10, unitGroup));
-        UpdateMarkers(length, unit);
+            int magnitude = GetMagnitude(relativeLength);
+            string unit = GetUnit(magnitude);
+
+            int siPrefixGroup = (int)Math.Floor(magnitude / 3.0);
+            // length is a scaled version of relativelength so it is between 1 and 1000
+            float length = (float)(relativeLength / Math.Pow(10, siPrefixGroup));
+            UpdateMarkers(length, unit);
+        }
     }
 
     private int GetMagnitude(float length)
@@ -96,19 +98,20 @@ public class RulerMeasure : MonoBehaviour
 
     private void UpdateMarkers(float scaledRulerLength, string unit)
     {
+        float previousLengthRatio = 0;
         foreach (Tuple<TextMeshProUGUI, float> marker in markers)
         {
             float markerNumber = marker.Item2;
             TextMeshProUGUI markerText = marker.Item1;
             float lengthRatio = (1/maximumMarker) * (markerNumber / scaledRulerLength);
-            Debug.LogWarning("Init: " + initialRulerLength + "Scale: " + scaledRulerLength + "Rel: " + relativeLength + "Num: " + markerNumber + "Ratio: " + lengthRatio);
-            if (lengthRatio >= minimumMarker && lengthRatio <= maximumMarker)
+            if (lengthRatio >= minimumMarker && lengthRatio <= maximumMarker && Math.Abs(lengthRatio-previousLengthRatio) > markerSpacing)
             {
                 float rulerPoint = transform.localScale.z * (lengthRatio - .5f); // converts lengthRatio which goes from 0 to 1 to a point on the ruler which goes from -(length/2) to +(length/2)
                 markerText.rectTransform.localPosition = new Vector3(rulerPoint, 0, 0);
                 markerText.text = "― " + markerNumber + " " + unit + " ―";
                 markerText.transform.localScale = new Vector3(markerText.transform.localScale.x, markerText.transform.localScale.y, transform.lossyScale.z/initialRulerLength);
                 markerText.gameObject.SetActive(true);
+                previousLengthRatio = lengthRatio;
             }
             else
             {
