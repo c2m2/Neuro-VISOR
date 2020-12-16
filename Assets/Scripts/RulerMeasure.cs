@@ -15,6 +15,8 @@ public class RulerMeasure : MonoBehaviour
     private List<Tuple<TextMeshProUGUI, float>> markers = new List<Tuple<TextMeshProUGUI, float>>();
     private float relativeLength;
     private float initialRulerLength;
+    private float minimumMarker = 0.05f; //earliest location on the ruler a marker can appear
+    private float maximumMarker = 0.95f; //last location on the ruler a marker can appear
 
     // Start is called before the first frame update
     void Start()
@@ -28,7 +30,7 @@ public class RulerMeasure : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        relativeLength = transform.lossyScale.z / sim.transform.localScale.z;
+        relativeLength = maximumMarker*(transform.lossyScale.z / sim.transform.localScale.z);
         
         int magnitude = GetMagnitude(relativeLength);
         string unit = GetUnit(magnitude);
@@ -98,11 +100,11 @@ public class RulerMeasure : MonoBehaviour
         {
             float markerNumber = marker.Item2;
             TextMeshProUGUI markerText = marker.Item1;
-
-            float lengthRatio = markerNumber / scaledRulerLength;
-            if (lengthRatio >= .05 && lengthRatio <= .95)
+            float lengthRatio = (1/maximumMarker) * (markerNumber / scaledRulerLength);
+            Debug.LogWarning("Init: " + initialRulerLength + "Scale: " + scaledRulerLength + "Rel: " + relativeLength + "Num: " + markerNumber + "Ratio: " + lengthRatio);
+            if (lengthRatio >= minimumMarker && lengthRatio <= maximumMarker)
             {
-                float rulerPoint = 2 * (lengthRatio - .5f); // converts lengthRatio which goes from 0 to 1 to a point on the ruler which goes from -1 to 1
+                float rulerPoint = transform.localScale.z * (lengthRatio - .5f); // converts lengthRatio which goes from 0 to 1 to a point on the ruler which goes from -(length/2) to +(length/2)
                 markerText.rectTransform.localPosition = new Vector3(rulerPoint, 0, 0);
                 markerText.text = "― " + markerNumber + " " + unit + " ―";
                 markerText.transform.localScale = new Vector3(markerText.transform.localScale.x, markerText.transform.localScale.y, transform.lossyScale.z/initialRulerLength);
