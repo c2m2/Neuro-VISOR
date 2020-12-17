@@ -23,16 +23,29 @@ namespace C2M2.NeuronalDynamics.Visualization
         public LoadSimulation loader = null;
         private VrnReader vrnReader = null;
 
+        /*
         private void Awake()
         {
+
             PreviewCell(vrnFileName);
             if(loader == null)
             {
                 loader = GetComponentInParent<LoadSimulation>();
             }
         }
-        public void PreviewCell(string vrnFileName)
+        */
+        public void PreviewCell()
         {
+            PreviewCell(vrnFileName, color);
+        }
+        public void PreviewCell(string vrnFileName, Color color)
+        {
+            if(vrnFileName == "null")
+            {
+                Debug.LogError("Null cell given to NeuronCellPreview");
+                return;
+            }
+
             char sl = Path.DirectorySeparatorChar;
             if (!vrnFileName.EndsWith(".vrn")) vrnFileName = vrnFileName + ".vrn";
             vrnReader = new VrnReader(Application.streamingAssetsPath + sl + "NeuronalDynamics" + sl + "Geometries" + sl + vrnFileName);

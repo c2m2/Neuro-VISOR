@@ -329,8 +329,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
             raycastManager = GetComponent<RaycastEventManager>();
 
             ClampMode = clampMode;
-            
-            Debug.Log("Grid2D.Mesh.vertices[0]: " + Grid2D.Mesh.vertices[0]);
         }
         /// <summary>
         /// Read in the cell and initialize 3D/1D visualization/interaction infrastructure
@@ -371,13 +369,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 }
 
                 GameObject.Instantiate (diameterControlPanel, GameManager.instance.whiteboard);
-
-                // Instantiate a ruler to allow the cell to be scaled interactively
-                //GameObject ruler = Resources.Load ("Prefabs/Ruler") as GameObject;
-                //ruler.GetComponent<GrabbableRuler> ().scaleTarget = transform;
-                //GameObject.Instantiate (ruler);
-
-               // gameObject.AddComponent<ScaleLimiter> ();
             }
         }
 
