@@ -24,7 +24,7 @@ namespace C2M2.NeuronalDynamics.UGX {
     /// Methods provided below will allow to read in UGX grids into Unity Meshes with additional / arbitrary attachment data
     public static class UGXReader {
         private static readonly byte MAPPING_FIELDS = 7;
-        private static readonly string XSD_SCHEMA = @Application.streamingAssetsPath+ Path.DirectorySeparatorChar + "ugx.xsd";
+        private static readonly string XSD_SCHEMA = @Application.streamingAssetsPath + Path.DirectorySeparatorChar + "ugx.xsd";
         //private static readonly string UGX_EXTENSION = ".ugx";
         public static Boolean Validate = false;
 

@@ -26,7 +26,7 @@ namespace C2M2.NeuronalDynamics.Interaction
                 solver.Initialize();
 
                 loaded = true;
-                transform.parent.gameObject.SetActive(false);
+                transform.gameObject.SetActive(false);
             }
         }
         private void Awake()
