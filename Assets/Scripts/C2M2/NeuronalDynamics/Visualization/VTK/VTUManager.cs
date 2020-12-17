@@ -9,7 +9,7 @@ namespace C2M2.NeuronalDynamics.Visualization.VTK
 {
     public class VTUManager : MonoBehaviour
     {
-        private ObjectManager objectManager;
+      //  private ObjectManager objectManager;
         [Header("Data Information")]
         [Tooltip("Type of file to read in")]
         public string dataExtension = "*.vtu";
@@ -32,9 +32,10 @@ namespace C2M2.NeuronalDynamics.Visualization.VTK
         private MeshFilter meshf;
         public Gradient gradient { get; set; }
 
-        public void Initialize(ObjectManager objectManager)
+        //public void Initialize(ObjectManager objectManager)
+        public void Initialize()
         {
-            this.objectManager = objectManager;
+           // this.objectManager = objectManager;
             meshf = GetComponent<MeshFilter>();
             // Read files and build VTU objects
             vtuList = BuildVTUList();

@@ -360,7 +360,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
 
             void Render1DCell () {
                 Grid geom1D = Mapping.ModelGeometry;
-                GameObject lines1D = gameObject.AddComponent<LinesRenderer> ().Constr (geom1D, color1D, lineWidth1D);
+                GameObject lines1D = gameObject.AddComponent<LinesRenderer> ().Draw (geom1D, color1D, lineWidth1D);
             }
             void InitUI () {
                 // Instantiate neuron diameter control panel, announce active simulation to each button
