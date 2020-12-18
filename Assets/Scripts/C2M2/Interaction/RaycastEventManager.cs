@@ -29,6 +29,17 @@ namespace C2M2.Interaction
         public void TriggerEmptyRight() => TriggerChangeRight(emptyTrigger);
         public void TriggerEmptyLeft() => TriggerChangeLeft(emptyTrigger);
         public void TriggerEmptyBoth() => TriggerChangeBoth(emptyTrigger);
+
+        public void HoverEvent(bool rightHand, RaycastHit hit)
+        {
+            if (rightHand && rightTrigger != null) { rightTrigger.Hover(hit); }
+            else if (!rightHand && leftTrigger != null) { leftTrigger.Hover(hit); }
+        }
+        public void HoverEndEvent(bool rightHand, RaycastHit hit)
+        {
+            if (rightHand && rightTrigger != null) { rightTrigger.EndHover(hit); }
+            else if (!rightHand && leftTrigger != null) { leftTrigger.EndHover(hit); }
+        }
         public void PressEvent(bool rightHand, RaycastHit hit)
         {
             if (rightHand && rightTrigger != null) { rightTrigger.Press(hit); }

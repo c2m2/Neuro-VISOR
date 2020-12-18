@@ -13,6 +13,13 @@ namespace C2M2.Interaction
         public class RaycastHitEvent : UnityEvent<RaycastHit> { }
         // Event for when we click on an object for the first time
         [SerializeField]
+        private RaycastHitEvent onHover = new RaycastHitEvent();
+        public RaycastHitEvent OnHover { get { return onHover; } set { onHover = value; } }
+        [SerializeField]
+        private RaycastHitEvent onHoverEnd = new RaycastHitEvent();
+        public RaycastHitEvent OnHoverEnd { get { return onHoverEnd; } set { onHoverEnd = value; } }
+        // Event for when we click on an object for the first time
+        [SerializeField]
         private RaycastHitEvent onPress = new RaycastHitEvent();
         public RaycastHitEvent OnPress { get { return onPress; } set { onPress = value; } }
         // Event for when we are holding a raycast click on an object
@@ -24,6 +31,8 @@ namespace C2M2.Interaction
         private RaycastHitEvent onEndPress = new RaycastHitEvent();
         public RaycastHitEvent OnEndPress { get { return onEndPress; } set { onEndPress = value; } }
         // Calling these methods invokes the corresponding event
+        public void Hover(RaycastHit hit) { OnHover.Invoke(hit); }
+        public void EndHover(RaycastHit hit) { OnHoverEnd.Invoke(hit); }
         public void Press(RaycastHit hit) { OnPress.Invoke(hit); }
         public void HoldPress(RaycastHit hit) { OnHoldPress.Invoke(hit); }
         public void EndPress(RaycastHit hit) { OnEndPress.Invoke(hit); }

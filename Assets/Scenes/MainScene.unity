@@ -371,18 +371,11 @@ MonoBehaviour:
   previewWindowPrefab: {fileID: 3442635864417745502, guid: 74fbe5514a368c44daac8627240e0553,
     type: 3}
   loader: {fileID: 99744259}
-  possiblePositions:
-  - {x: 0, y: 0, z: 0}
-  - {x: -1, y: 0, z: 0}
-  - {x: -1, y: 0, z: 1}
-  - {x: 0, y: 0, z: 1}
-  - {x: 0, y: 0, z: -1}
-  - {x: -1, y: 0, z: -1}
-  possibleColors:
-  - {r: 1, g: 0.78431374, b: 0, a: 1}
-  - {r: 0, g: 0.78431374, b: 0, a: 1}
-  - {r: 0, g: 0.39215687, b: 1, a: 1}
-  - {r: 0.78431374, g: 0, b: 0, a: 1}
+  cellColors:
+  - {r: 822.8782, g: 645.39465, b: 0, a: 1}
+  - {r: 0, g: 200, b: 0, a: 1}
+  - {r: 0, g: 100, b: 255, a: 1}
+  - {r: 200, g: 0, b: 0, a: 1}
 --- !u!4 &107604231 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1246904544822792153, guid: 3cd62f4122818be4585249f5083a977d,

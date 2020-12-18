@@ -43,8 +43,10 @@ namespace C2M2.Interaction.Signaling
                 }
             }
         }
-        protected abstract void OnPress();
-        protected abstract void OnHoldPress();
-        protected abstract void OnEndPress();
+        protected virtual void OnHover() { }
+        protected virtual void OnHoverEnd() { }
+        protected virtual void OnPress() { }
+        protected virtual void OnHoldPress() { }
+        protected virtual void OnEndPress() { }
     }
 }

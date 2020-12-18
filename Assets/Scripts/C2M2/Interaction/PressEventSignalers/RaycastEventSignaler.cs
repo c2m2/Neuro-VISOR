@@ -30,14 +30,25 @@ namespace C2M2.Interaction.Signaling
         private void FixedUpdate()
         {          
             if (BeginRaycastingCondition())
-            { /* This is the 'A' button on Oculus */
-                if (RaycastingMethod(out lastHit, maxRaycastDistance, layerMask))
+            { /* This is the 'A' button on Oculus, mouse always raycasts */
+                bool raycastHit = RaycastingMethod(out lastHit, maxRaycastDistance, layerMask);
+                if (raycastHit)
                 { /* If we hit a raycastable target, try to find a trigger target */
                     activeEvent = FindRaycastTrigger(lastHit);
                 }
                 else { activeEvent = null; }
                 // Check if the next button is pressed, and then try to activate relevant events
+                // TODO: If you hover over a different raycastable object immediately, this will not end the hover on the old object
+                //      This needs to track if the raycastHit object changes
                 Pressed = ChildsPressCondition();
+                if(raycastHit && !Pressed)
+                {
+                    OnHover();
+                }
+                else
+                { // If we didn't hit a valid target or a press is happening, we are no longer hovering
+                    OnHoverEnd();
+                }
             }
             else { Pressed = false; }
         }
@@ -46,6 +57,18 @@ namespace C2M2.Interaction.Signaling
         {
             return hit.collider.GetComponentInParent<RaycastEventManager>();
 
+        }
+        protected sealed override void OnHover()
+        {
+            Debug.Log("Hovering...");
+            OnHoverSub();
+            if (activeEvent != null) activeEvent.HoverEvent(rightHand, lastHit);
+        }
+        protected sealed override void OnHoverEnd()
+        {
+            Debug.Log("Ending hover...");
+            OnHoverEndSub();
+            if (activeEvent != null) activeEvent.HoverEndEvent(rightHand, lastHit);
         }
         sealed protected override void OnPress()
         {
@@ -62,12 +85,16 @@ namespace C2M2.Interaction.Signaling
             OnEndPressSub();
             if (activeEvent != null) activeEvent.EndEvent(rightHand, lastHit);
         }
+        /// <summary> Signal children that a hover is happening </summary>
+        protected virtual void OnHoverSub() { }
+        /// <summary> Signal children that a hover is not happening </summary>
+        protected virtual void OnHoverEndSub() { }
         /// <summary> Signal children that a press is beginning </summary>
-        protected abstract void OnPressSub();
+        protected virtual void OnPressSub() { }
         /// <summary> Signal children that a press is being held </summary>
-        protected abstract void OnHoldPressSub();
+        protected virtual void OnHoldPressSub() { }
         /// <summary> Signal children that a press is ending </summary>
-        protected abstract void OnEndPressSub();
+        protected virtual void OnEndPressSub() { }
         /// <summary> Let the input type choose their own raycasting method </summary>
         /// <param name="hit"> Resulting hit of the raycast </param>
         /// <param name="layerMask"> Which layer(s) should the raycast paya attention to? </param>

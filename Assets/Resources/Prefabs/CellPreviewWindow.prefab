@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3442635864027007642}
   - component: {fileID: 3442635864027007641}
+  - component: {fileID: 2778667178379150955}
   m_Layer: 0
   m_Name: CellPreview
   m_TagString: Untagged
@@ -46,6 +47,19 @@ MonoBehaviour:
   vrnFileName: n400.CNG
   color: {r: 1, g: 0.7401557, b: 0, a: 1}
   loader: {fileID: 0}
+--- !u!114 &2778667178379150955
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3442635864027007643}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3db420013a40521468e2b9bb8364531e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rotateSpeed: 0.1
 --- !u!1 &3442635864291955634
 GameObject:
   m_ObjectHideFlags: 0
@@ -294,6 +308,38 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2066920c5141f0e4ca235394b5f8bd4a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  onHover:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 2778667178379150955}
+        m_MethodName: set_enabled
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
+    m_TypeName: C2M2.Interaction.RaycastPressEvents+RaycastHitEvent, Assembly-CSharp,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+  onHoverEnd:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 2778667178379150955}
+        m_MethodName: set_enabled
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_TypeName: C2M2.Interaction.RaycastPressEvents+RaycastHitEvent, Assembly-CSharp,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
   onPress:
     m_PersistentCalls:
       m_Calls:

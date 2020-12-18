@@ -35,7 +35,7 @@ namespace C2M2.Interaction.Signaling
         /// <summary>
         /// This is returns true if the left mouse button is pressed down
         /// </summary>
-        protected override bool BeginRaycastingCondition() => Input.GetMouseButton(0);
+        protected override bool BeginRaycastingCondition() => true;
         /// <summary>
         /// This builds a ray from the mouse's position, and attempts a raycast using that ray
         /// </summary>
@@ -43,37 +43,12 @@ namespace C2M2.Interaction.Signaling
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             bool raycastHit = Physics.Raycast(ray, out hit, maxDistance, layerMask);
-           
-            /*
-            bool grabPressed = false;
-            foreach(KeyCode key in grabKeys)
-            {
-                if (Input.GetKey(key)) grabPressed = true;
-            }
-
-            if (grabPressed)
-            {
-                grabVolume.enabled = true;
-
-                if (raycastHit) grabTransform.position = hit.point;
-
-                // Don't allow raycast event signalling if a grab is happening
-                return false;
-            }
-            else grabVolume.enabled = false;
-            */
 
             return raycastHit;
         }
         /// <summary>
         /// With mouse raycasting, we only want to press the mouse button to trigger events
         /// </summary>
-        protected override bool ChildsPressCondition() => true;
-
-        /// We don't need any extra functionality for our mouse activator,
-        /// so these just return immediatley
-        protected override void OnPressSub() { }
-        protected override void OnHoldPressSub() { }
-        protected override void OnEndPressSub() { }
+        protected override bool ChildsPressCondition() => Input.GetMouseButton(0);
     }
 }
