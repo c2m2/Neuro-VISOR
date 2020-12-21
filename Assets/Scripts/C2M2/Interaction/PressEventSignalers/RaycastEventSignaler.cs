@@ -10,6 +10,7 @@ namespace C2M2.Interaction.Signaling
         public float maxRaycastDistance = 10f;
         private RaycastEventManager activeEvent = null;
         private RaycastHit lastHit;
+        private GameObject prevObj; // Used to track if raycasted object has changed
 
         protected abstract void OnAwake();
         protected void Awake()
@@ -34,9 +35,20 @@ namespace C2M2.Interaction.Signaling
                 bool raycastHit = RaycastingMethod(out lastHit, maxRaycastDistance, layerMask);
                 if (raycastHit)
                 { /* If we hit a raycastable target, try to find a trigger target */
+                    // If the hit object has changed
+                    if(prevObj != lastHit.collider.gameObject)
+                    {
+                        OnHoverEnd();
+                        prevObj = lastHit.collider.gameObject;
+                    }
+
                     activeEvent = FindRaycastTrigger(lastHit);
                 }
-                else { activeEvent = null; }
+                else
+                {
+                    OnHoverEnd();
+                    activeEvent = null;
+                }
                 // Check if the next button is pressed, and then try to activate relevant events
                 // TODO: If you hover over a different raycastable object immediately, this will not end the hover on the old object
                 //      This needs to track if the raycastHit object changes
@@ -58,15 +70,18 @@ namespace C2M2.Interaction.Signaling
             return hit.collider.GetComponentInParent<RaycastEventManager>();
 
         }
+
+        private void OnObjectChange()
+        {
+            OnHoverEnd();
+        }
         protected sealed override void OnHover()
         {
-            Debug.Log("Hovering...");
             OnHoverSub();
             if (activeEvent != null) activeEvent.HoverEvent(rightHand, lastHit);
         }
         protected sealed override void OnHoverEnd()
         {
-            Debug.Log("Ending hover...");
             OnHoverEndSub();
             if (activeEvent != null) activeEvent.HoverEndEvent(rightHand, lastHit);
         }

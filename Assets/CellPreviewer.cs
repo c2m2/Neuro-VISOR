@@ -20,6 +20,7 @@ namespace C2M2.NeuronalDynamics.Interaction {
             new Color(0f, 100f, 255f, 255f),
             new Color(200f, 0f, 0f, 255f)
         };
+
         /// <summary>
         /// Decides how preview windows can be placed, where one vector is the normalized position of one preview window.
         /// </summary>
@@ -27,15 +28,16 @@ namespace C2M2.NeuronalDynamics.Interaction {
         /// The default array represents normalized positions of placing up to six preview windows in a two-by-three alignment.
         /// CellPreviewer will automatically allow this orientation to "stack" by altering the y axis for up to 3*positionsNorm.Length windows
         /// </remarks>
-        private Vector3[] positionsNorm = new Vector3[]
+        public Vector3[] positionsNorm = new Vector3[]
         {
             new Vector3(0, 0, 0),
             new Vector3(0, 0, 1),
             new Vector3(0, 0, -1),
-            new Vector3(-1, 0, 0),
-            new Vector3(-1, 0, 1),
-            new Vector3(-1, 0, -1)
+            new Vector3(0, 0, -2),
         };
+        [Tooltip("If true, positionsNorm will stack above and below on the y axis")]
+        public bool stackPos = true;
+
         private void Awake()
         {
             // Make sure we have window preview prefab and a pointer to a simulation loader
@@ -109,17 +111,23 @@ namespace C2M2.NeuronalDynamics.Interaction {
                 {
                     // 0 <= i < 6 is the original row, 6 <= i < 12 is stacked ontop, 12 <= i < 18 is stacked below
                     int stackAmount = 0;
-                    if (i < positionsNorm.Length) stackAmount = 0;
-                    else if (i < positionsNorm.Length * 2) stackAmount = 1;
-                    else if (i < positionsNorm.Length * 3) stackAmount = -1;
+                    if (stackPos)
+                    {
+                        if (i < positionsNorm.Length) stackAmount = 0;
+                        else if (i < positionsNorm.Length * 2) stackAmount = 1;
+                        else if (i < positionsNorm.Length * 3) stackAmount = -1;
+                    }
 
                     // possiblePositions only contains indices 0-5
+                    
                     int ind = (i % positionsNorm.Length);
+
 
                     // Copies positions from possiblePositions, stacks if necessary, and scales positions using window length
                     positions[i] = new Vector3(windowLength.x * positionsNorm[ind].x, 
                         windowLength.y * (positionsNorm[ind].y + stackAmount), 
                         windowLength.z * positionsNorm[ind].z);
+                        
                 }
 
                 return positions;

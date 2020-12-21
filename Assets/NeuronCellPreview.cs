@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
+using TMPro;
 
 namespace C2M2.NeuronalDynamics.Visualization
 {
@@ -21,6 +22,7 @@ namespace C2M2.NeuronalDynamics.Visualization
         public string vrnFileName = "null";
         public Color color;
         public LoadSimulation loader = null;
+        public TextMeshProUGUI fileNameDisplay;
         private VrnReader vrnReader = null;
 
         /*
@@ -43,6 +45,7 @@ namespace C2M2.NeuronalDynamics.Visualization
             if(vrnFileName == "null")
             {
                 Debug.LogError("Null cell given to NeuronCellPreview");
+                if (fileNameDisplay != null) fileNameDisplay.text = "null";
                 return;
             }
 
@@ -72,6 +75,8 @@ namespace C2M2.NeuronalDynamics.Visualization
             LinesRenderer lines = gameObject.AddComponent<LinesRenderer>();
             // (line width = scale)
             lines.Draw(grid, color, scale);
+
+            if(fileNameDisplay != null) fileNameDisplay.text = vrnFileName;
         }
         public void LoadThisCell(RaycastHit hit)
         {
