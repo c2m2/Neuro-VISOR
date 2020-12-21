@@ -20,7 +20,7 @@ namespace C2M2.NeuronalDynamics.Visualization
     public class NeuronCellPreview : MonoBehaviour
     {
         public string vrnFileName = "null";
-        public Color color;
+        public Color32 color;
         public LoadSimulation loader = null;
         public TextMeshProUGUI fileNameDisplay;
         private VrnReader vrnReader = null;
@@ -40,7 +40,7 @@ namespace C2M2.NeuronalDynamics.Visualization
         {
             PreviewCell(vrnFileName, color);
         }
-        public void PreviewCell(string vrnFileName, Color color)
+        public void PreviewCell(string vrnFileName, Color32 color)
         {
             if(vrnFileName == "null")
             {
@@ -76,7 +76,7 @@ namespace C2M2.NeuronalDynamics.Visualization
             // (line width = scale)
             lines.Draw(grid, color, scale);
 
-            if(fileNameDisplay != null) fileNameDisplay.text = vrnFileName;
+            if(fileNameDisplay != null) fileNameDisplay.text = vrnFileName.Remove(vrnFileName.Length - 4);
         }
         public void LoadThisCell(RaycastHit hit)
         {

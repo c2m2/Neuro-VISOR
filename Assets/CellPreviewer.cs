@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
+using System.Linq;
+using Random = System.Random;
 
 namespace C2M2.NeuronalDynamics.Interaction {
     using Utils.DebugUtils;
@@ -13,12 +15,12 @@ namespace C2M2.NeuronalDynamics.Interaction {
         /// <summary>
         /// Colors ot use for the 1D cell renderings. More than cellColors.Length cells will repeat these colors
         /// </summary>
-        public Color[] cellColors = new Color[]
+        public Color32[] cellColors = new Color32[]
         {
-            new Color(255f, 200f, 0f, 255f),
-            new Color(0f, 200f, 0f, 255f),
-            new Color(0f, 100f, 255f, 255f),
-            new Color(200f, 0f, 0f, 255f)
+            new Color32(255, 200, 0, 255),
+            new Color32(0, 200, 0, 255),
+            new Color32(0, 100, 255, 255),
+            new Color32(200, 0, 0, 255)
         };
 
         /// <summary>
@@ -49,7 +51,7 @@ namespace C2M2.NeuronalDynamics.Interaction {
 
             // Make a preview window for each found geometry
             Vector3[] windowPositions = GetWindowPositions(geoms.Length);
-            Color[] previewColors = GetWindowColors(geoms.Length);
+            Color32[] previewColors = GetWindowColors(geoms.Length);
             for(int i = 0; i < geoms.Length; i++)
             {
                 InstantiatePreviewWindow(geoms[i], windowPositions[i], previewColors[i]);
@@ -132,18 +134,20 @@ namespace C2M2.NeuronalDynamics.Interaction {
 
                 return positions;
             }
-            Color[] GetWindowColors(int numColors)
+            Color32[] GetWindowColors(int numColors)
             {
                 numColors = Utils.Math.Clamp(numColors, 0, positionsNorm.Length * 3);
                 if (numColors == 0) return null;
 
-                Color[] colors = new Color[numColors];
+                Color32[] colors = new Color32[numColors];
                 for (int i = 0; i < colors.Length; i++)
                 {
                     colors[i] = cellColors[i % cellColors.Length];
                 }
+                Random rnd = new Random();
 
-                return colors;
+                // Randomize the order of the colors and return them
+                return colors.OrderBy(x => rnd.Next()).ToArray();
             }
             void InstantiatePreviewWindow(string fileName, Vector3 position, Color color)
             {
