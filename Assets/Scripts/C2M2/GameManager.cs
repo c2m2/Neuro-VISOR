@@ -10,6 +10,7 @@ namespace C2M2
     using Interaction.UI;
     using Interaction.VR;
     using NeuronalDynamics.Interaction;
+    using Simulation;
     /// <summary>
     /// Stores many global variables, handles pregame initializations
     /// </summary>
@@ -29,6 +30,7 @@ namespace C2M2
                 return vrDeviceManager.VrIsActive;
             }
         }
+        public Interactable simulation = null;
 
         public NeuronClampInstantiator clampInstantiator = null;
         public GameObject[] clampControllers = new GameObject[0];

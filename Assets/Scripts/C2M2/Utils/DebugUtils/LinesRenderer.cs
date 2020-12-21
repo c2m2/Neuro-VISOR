@@ -20,7 +20,7 @@ namespace C2M2.Utils.DebugUtils
         /// <summary>
         /// Build line renderers and get parent GameObject back
         /// </summary>
-        public GameObject Constr(Grid grid, Color color, float lineWidth)
+        public GameObject Draw(Grid grid, Color color, float lineWidth)
         {
             this.color = color;
 

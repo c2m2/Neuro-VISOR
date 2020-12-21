@@ -329,8 +329,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
             raycastManager = GetComponent<RaycastEventManager>();
 
             ClampMode = clampMode;
-            
-            Debug.Log("Grid2D.Mesh.vertices[0]: " + Grid2D.Mesh.vertices[0]);
         }
         /// <summary>
         /// Read in the cell and initialize 3D/1D visualization/interaction infrastructure
@@ -360,7 +358,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
 
             void Render1DCell () {
                 Grid geom1D = Mapping.ModelGeometry;
-                GameObject lines1D = gameObject.AddComponent<LinesRenderer> ().Constr (geom1D, color1D, lineWidth1D);
+                GameObject lines1D = gameObject.AddComponent<LinesRenderer> ().Draw (geom1D, color1D, lineWidth1D);
             }
             void InitUI () {
                 // Instantiate neuron diameter control panel, announce active simulation to each button
@@ -371,13 +369,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 }
 
                 GameObject.Instantiate (diameterControlPanel, GameManager.instance.whiteboard);
-
-                // Instantiate a ruler to allow the cell to be scaled interactively
-                //GameObject ruler = Resources.Load ("Prefabs/Ruler") as GameObject;
-                //ruler.GetComponent<GrabbableRuler> ().scaleTarget = transform;
-                //GameObject.Instantiate (ruler);
-
-               // gameObject.AddComponent<ScaleLimiter> ();
             }
         }
 
