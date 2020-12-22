@@ -7287,6 +7287,11 @@ PrefabInstance:
       propertyPath: walls.Array.data[9]
       value: 
       objectReference: {fileID: 473930038}
+    - target: {fileID: 3671467348768610598, guid: f49e57d0c1b71c4418326894ace9a9b5,
+        type: 3}
+      propertyPath: timerLabel
+      value: 
+      objectReference: {fileID: 1971653367}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f49e57d0c1b71c4418326894ace9a9b5, type: 3}
 --- !u!1 &3671467347388522958 stripped

@@ -31,6 +31,7 @@ namespace C2M2
             }
         }
         public Interactable simulation = null;
+        public SimulationTimerLabel timerLabel = null;
 
         public NeuronClampInstantiator clampInstantiator = null;
         public GameObject[] clampControllers = new GameObject[0];
