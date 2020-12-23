@@ -24,11 +24,11 @@ namespace C2M2.NeuronalDynamics.Interaction {
         };
 
         /// <summary>
-        /// Decides how preview windows can be placed, where one vector is the normalized position of one preview window.
+        /// Defines the normalized positions of the first x-y row of preview windows.
         /// </summary>
         /// <remarks>
-        /// The default array represents normalized positions of placing up to six preview windows in a two-by-three alignment.
-        /// CellPreviewer will automatically allow this orientation to "stack" by altering the y axis for up to 3*positionsNorm.Length windows
+        /// The default array represents normalized positions of placing up to four preview windows in a four-by-one alignment.
+        /// if stackPos is true, this will automatically "stack" positionsNorm above and below this array in the y-axis
         /// </remarks>
         public Vector3[] positionsNorm = new Vector3[]
         {
