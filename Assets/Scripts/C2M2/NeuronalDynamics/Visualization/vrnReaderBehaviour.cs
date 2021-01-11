@@ -4,12 +4,11 @@ using System.IO;
 using C2M2.NeuronalDynamics.UGX;
 using UnityEngine;
 using Grid = C2M2.NeuronalDynamics.UGX.Grid;
+using static UnityEngine.Debug;
 #endregion
 
 namespace C2M2.NeuronalDynamics.Visualization.VRN {
     using DiameterAttachment = IAttachment<DiameterData>;
-        
-
     /// VRNREADERBEHAVIOUR
     /// <summary>
     /// Example behaviour to demonstrate vrnReader usage
@@ -33,21 +32,20 @@ namespace C2M2.NeuronalDynamics.Visualization.VRN {
                 /// Instantiate the VRN reader with the desired file name (.vrn archive) to load from Assets
                 VrnReader reader = new VrnReader (fullFileName);
                 /// List all 1D and 2D geometries contained in given .vrn archive
-                Debug.Log (reader.List ());
-
+                Log (reader.List ());
                 /// Get the name of the 1d mesh (0-th refinement aka coarse grid) in archive
-                UnityEngine.Debug.Log (reader.Retrieve1DMeshName ());
+                Log (reader.Retrieve1DMeshName ());
                 /// Get the name of the inflated 2d mesh by a factor of 2.5 in archive
-                UnityEngine.Debug.Log (reader.Retrieve2DMeshName (2.5));
-                ////////////////////////////////////////////////////////////////
-
+                Log (reader.Retrieve2DMeshName (2.5));
+                ///////////////////////////////////////////////////////////////
                 string meshName1D = reader.Retrieve1DMeshName ();
                 /// Create empty grid with name of grid in archive
                 Grid grid1D = new Grid (new Mesh (), meshName1D);
                 grid1D.Attach (new DiameterAttachment ());
                 /// Read in the .ugx file into the grid (read_ugx uses UGXReader internally)
-                UnityEngine.Debug.Log ("Reading now mesh: " + meshName1D);
+                Log ($"Reading now mesh {meshName1D}...");
                 reader.ReadUGX (meshName1D, ref grid1D);
+
                 ////////////////////////////////////////////////////////////////
                 /// Example 2: Load a UGX file (mesh) from the .vrn archive and 
                 /// store it in a Grid object: Here the 1D coarse grid is loaded
@@ -62,18 +60,19 @@ namespace C2M2.NeuronalDynamics.Visualization.VRN {
                 Grid grid2D = new Grid (new Mesh (), meshName2D);
                 grid2D.Attach (new DiameterAttachment ());
                 /// Read in the .ugx file into the grid (read_ugx uses UGXReader internally)
-                UnityEngine.Debug.Log ("Reading now mesh: " + meshName2D);
+                Log ("Reading now mesh {meshName2D}...");
                 reader.ReadUGX (meshName2D, ref grid2D);
-
                 GetComponent<MeshFilter> ().sharedMesh = grid2D.Mesh;
                 ////////////////////////////////////////////////////////////////
             } catch (Exception ex) when (ex is System.IO.FileNotFoundException || ex is System.ArgumentNullException) {
-                UnityEngine.Debug.LogError ($"Archive not found or unable to open the .vrn archive: {fileName}.");
-                UnityEngine.Debug.LogError (ex);
-
+                LogError ($"Archive not found on disk or unable to open the .vrn archive: {fileName}.");
+                LogError (ex);
+            } catch (Exception ex) when (ex is CouldNotReadVRNArchive) {
+                LogError ($"Given .vrn archive could not be read from file: {fileName}.");
+                LogError (ex);
             } catch (Exception ex) when (ex is CouldNotReadMeshFromVRNArchive) {
-                UnityEngine.Debug.LogError ($"Requested mesh not contained in MetaInfo.json or given .vrn archive {fileName}.");
-                UnityEngine.Debug.LogError (ex);
+                LogError ($"Requested mesh not contained in MetaInfo.json or given .vrn archive {fileName}.");
+                LogError (ex);
             }
         }
     }
