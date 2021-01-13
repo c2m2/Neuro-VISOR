@@ -8,6 +8,8 @@ using C2M2.NeuronalDynamics.UGX;
 using UnityEngine;
 using Grid = C2M2.NeuronalDynamics.UGX.Grid;
 using static System.String;
+/// Enable contracts by uncommenting the line below:
+/// #define CONTRACTS_FULL
 
 namespace C2M2.NeuronalDynamics.Visualization.VRN {
     sealed class VrnReader {
