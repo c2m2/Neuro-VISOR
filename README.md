@@ -2,7 +2,7 @@
 Repository for Temple University's Center for Computational Mathematics and Modeling's virtual reality project
 
 ## Documentation
-Our code is documented [here](https://c2m2.github.io/)
+Our code is documented [here](https://c2m2.github.io/doxyhtml/index.html)
 
 ## Build
 A standalone build of this project is maintained [here](https://github.com/c2m2/virtual-reality-build). This can be run independently from the Unity editor and will improve performance.
