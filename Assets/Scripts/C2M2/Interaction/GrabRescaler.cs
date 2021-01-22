@@ -11,9 +11,11 @@ namespace C2M2.Interaction
     {
         private OVRGrabbable grabbable = null;
         private Vector3 origScale;
-        public float scaler = 0.1f;
-        public float minPercentage = 0.1f;
-        public float maxPercentage = 10f;
+        private Vector3 minScale;
+        private Vector3 maxScale;
+        public float scaler = 0.2f;
+        public float minPercentage = 0.25f;
+        public float maxPercentage = 4f;
         public bool xScale = true;
         public bool yScale = true;
         public bool zScale = true;
@@ -46,6 +48,8 @@ namespace C2M2.Interaction
 
             // Use this to determine how to scale at runtime
             origScale = transform.localScale;
+            minScale = minPercentage * origScale;
+            maxScale = maxPercentage * origScale;
         }
 
         void Update()
@@ -62,16 +66,16 @@ namespace C2M2.Interaction
                     Vector3 scaleValue = scaler * ThumbstickScaler * origScale;
                     Vector3 newLocalScale = transform.localScale + scaleValue;
 
-                    // Is the new scale too big or too small?
-                    bool newScaleAcceptable = newLocalScale.magnitude > (minPercentage * origScale).magnitude
-                        && newLocalScale.magnitude < (maxPercentage * origScale).magnitude;
-                    if (newScaleAcceptable)
-                    {
-                        if (!xScale) newLocalScale.x = transform.localScale.x;
-                        if (!yScale) newLocalScale.y = transform.localScale.y;
-                        if (!zScale) newLocalScale.z = transform.localScale.z;
-                        transform.localScale = newLocalScale;
-                    }
+                    // Makes sure the new scale is within the determined range
+                    if (newLocalScale.x < minScale.x || newLocalScale.y < minScale.y || newLocalScale.z < minScale.z) newLocalScale = minScale;
+                    if (newLocalScale.x > maxScale.x || newLocalScale.y > maxScale.y || newLocalScale.z > maxScale.z) newLocalScale = maxScale;
+                    
+                    // Which dimensions are actually getting scaled
+                    if (!xScale) newLocalScale.x = transform.localScale.x;
+                    if (!yScale) newLocalScale.y = transform.localScale.y;
+                    if (!zScale) newLocalScale.z = transform.localScale.z;
+
+                    transform.localScale = newLocalScale;
                 }
             }
         }
