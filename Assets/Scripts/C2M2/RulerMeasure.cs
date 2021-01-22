@@ -38,7 +38,7 @@ public class RulerMeasure : MonoBehaviour
 
             int siPrefixGroup = (int)Math.Floor(magnitude / 3.0);
             // length is a scaled version of relativelength so it is between 1 and 1000
-            float length = (float)(relativeLength / Math.Pow(10, siPrefixGroup));
+            float length = (float)(relativeLength / Math.Pow(10, siPrefixGroup*3));
             UpdateMarkers(length, unit);
         }
     }
