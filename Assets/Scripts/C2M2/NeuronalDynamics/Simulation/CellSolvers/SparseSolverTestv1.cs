@@ -37,7 +37,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         public double h = 0.27;                           // User enters spatial step size
         public double k = 0.0027;                         // User enters time step size
         public bool HK_auto = true;                       // auto choose H and K
-        public bool SomaOn = true;                        // set soma to be clamped to vstart
+        public bool SomaOn = false;                        // set soma to be clamped to vstart
 
         [Header("Print Output files")]
         public int numRuns = 0;                           // Number of Runs
@@ -252,7 +252,7 @@ namespace C2M2.NeuronalDynamics.Simulation
                         H.Add(fH(tempV, H).Multiply(k), H);
 
                         //Always reset to IC conditions and boundary conditions (for now)
-                        U.SetSubVector(0, NeuronCell.vertCount, boundaryConditions(U, NeuronCell.boundaryID));
+                        //U.SetSubVector(0, NeuronCell.vertCount, boundaryConditions(U, NeuronCell.boundaryID));
                         if (SomaOn) { U.SetSubVector(0, NeuronCell.vertCount, setSoma(U, NeuronCell.somaID, vstart)); }
 
                         // Apply clamp voltages
@@ -303,8 +303,9 @@ namespace C2M2.NeuronalDynamics.Simulation
             H[0] = hi;
 
             //Set the initial conditions of the solution
-            U.SetSubVector(0, NeuronCell.vertCount, initialConditions(U, NeuronCell.boundaryID));
+            //U.SetSubVector(0, NeuronCell.vertCount, initialConditions(U, NeuronCell.boundaryID));
             if (SomaOn) { U.SetSubVector(0, NeuronCell.vertCount, setSoma(U, NeuronCell.somaID, vstart)); }
+           // U.SetSubVector(0, NeuronCell.vertCount, setSoma(U, NeuronCell.somaID, 0));
         }
 
         // This is the thomas_algorithm

@@ -11,7 +11,7 @@ namespace C2M2.NeuronalDynamics.Interaction {
     public class CellPreviewer : MonoBehaviour
     {
         public GameObject previewWindowPrefab = null;
-        public LoadSimulation loader = null;
+        public SimulationLoader loader = null;
         /// <summary>
         /// Colors ot use for the 1D cell renderings. More than cellColors.Length cells will repeat these colors
         /// </summary>
@@ -74,7 +74,7 @@ namespace C2M2.NeuronalDynamics.Interaction {
             {
                 if (loader == null)
                 {
-                    loader = GetComponent<LoadSimulation>();
+                    loader = GetComponent<SimulationLoader>();
                     if (loader == null)
                     {
                         Debug.LogError("No simulation loader given to CellPreviewer!");
