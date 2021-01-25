@@ -14,9 +14,8 @@ public class RulerMeasure : MonoBehaviour
     private List<Tuple<TextMeshProUGUI, float>> markers = new List<Tuple<TextMeshProUGUI, float>>();
     private float relativeLength;
     private float initialRulerLength;
-    private float minimumMarker = 0.05f; //earliest location on the ruler a marker can appear
-    private float maximumMarker = 0.95f; //last location on the ruler a marker can appear
-    private float markerSpacing = 0.05f; //minimum spacing between each marker
+    private float markerSpacing = 0.05f; //minimum spacing between each marker and beginning and end of ruler
+    private float markerSpacingPercent; //minimum spacing between each marker and beginning and end of ruler in percent of rulers length
 
     // Start is called before the first frame update
     void Start()
@@ -29,16 +28,17 @@ public class RulerMeasure : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        markerSpacingPercent = markerSpacing * initialRulerLength / transform.lossyScale.z;
         if (sim != null)
         {
-            relativeLength = maximumMarker * (transform.lossyScale.z / sim.transform.localScale.z);
+            relativeLength = (1-markerSpacingPercent) * (transform.lossyScale.z / sim.transform.localScale.z);
 
-            int magnitude = GetMagnitude(relativeLength);
+            int magnitude = GetMagnitude(relativeLength); //number of zeros after first digit
             string unit = GetUnit(magnitude);
 
             int siPrefixGroup = (int)Math.Floor(magnitude / 3.0);
             // length is a scaled version of relativelength so it is between 1 and 1000
-            float length = (float)(relativeLength / Math.Pow(10, siPrefixGroup));
+            float length = (float)(relativeLength / Math.Pow(10, siPrefixGroup*3));
             UpdateMarkers(length, unit);
         }
     }
@@ -103,13 +103,13 @@ public class RulerMeasure : MonoBehaviour
         {
             float markerNumber = marker.Item2;
             TextMeshProUGUI markerText = marker.Item1;
-            float lengthRatio = (1/maximumMarker) * (markerNumber / scaledRulerLength);
-            if (lengthRatio >= minimumMarker && lengthRatio <= maximumMarker && Math.Abs(lengthRatio-previousLengthRatio) > markerSpacing)
+            float lengthRatio = (1 - markerSpacingPercent) * (markerNumber / scaledRulerLength);
+            if (lengthRatio >= markerSpacingPercent && lengthRatio <= (1 - markerSpacingPercent) && lengthRatio-previousLengthRatio > markerSpacingPercent)
             {
-                float rulerPoint = transform.localScale.z * (lengthRatio - .5f); // converts lengthRatio which goes from 0 to 1 to a point on the ruler which goes from -(length/2) to +(length/2)
+                float rulerPoint = lengthRatio - .5f; // converts lengthRatio which goes from 0 to 1 to a point on the ruler which goes from -0.5 to +0.5
                 markerText.rectTransform.localPosition = new Vector3(rulerPoint, 0, 0);
                 markerText.text = "― " + markerNumber + " " + unit + " ―";
-                markerText.transform.localScale = new Vector3(markerText.transform.localScale.x, markerText.transform.localScale.y, transform.lossyScale.z/initialRulerLength);
+                markerText.transform.localScale = new Vector3(markerText.transform.localScale.x, initialRulerLength/transform.lossyScale.z, markerText.transform.localScale.z);
                 markerText.gameObject.SetActive(true);
                 previousLengthRatio = lengthRatio;
             }
