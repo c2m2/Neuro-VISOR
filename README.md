@@ -1,6 +1,9 @@
 # virtual-reality
 Repository for Temple University's Center for Computational Mathematics and Modeling's virtual reality project
 
+## Code quality
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/ac2c4122b3174e4a8209ef2e791792b3)](https://www.codacy.com?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=c2m2/virtual-reality&amp;utm_campaign=Badge_Grade)
+
 ## Documentation
 Our code is documented [here](https://c2m2.github.io/doxyhtml/index.html)
 
