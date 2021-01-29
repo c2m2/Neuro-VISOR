@@ -4,14 +4,15 @@
 name: doxygen
 on: [push]
 jobs:
-   steps:
-      - name: Generate doxygen
-        uses: mattnotmitt/doxygen-action@v1
-        with:
-          working-directory: 'submodule/'
-          doxyfile-path: 'docs/Doxygen'
-      - name: Deploy doxygen
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./public
+   setup:
+     name: Generate doxygen
+     uses: mattnotmitt/doxygen-action@v1
+     with:
+       working-directory: 'submodule/'
+       doxyfile-path: 'docs/Doxygen'
+   deploy:
+      name: Deploy doxygen
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./public
