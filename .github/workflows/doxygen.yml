@@ -1,0 +1,17 @@
+# see:
+# 1) https://github.com/mattnotmitt/doxygen-action
+# 2) https://github.com/peaceiris/actions-gh-pages
+name: doxygen
+on: [push]
+jobs:
+   steps:
+      - name: Generate doxygen
+        uses: mattnotmitt/doxygen-action@v1
+        with:
+          working-directory: 'submodule/'
+          doxyfile-path: 'docs/Doxygen'
+      - name: Deploy doxygen
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
