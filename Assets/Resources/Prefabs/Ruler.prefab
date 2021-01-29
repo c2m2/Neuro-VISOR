@@ -371,6 +371,9 @@ MonoBehaviour:
   - 700
   - 800
   - 900
+  - 0.25
+  - 0.5
+  - 0.75
 --- !u!114 &9098607124181544640
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -385,7 +388,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   scaler: 0.2
   minPercentage: 0.25
-  maxPercentage: 5
+  maxPercentage: 4
   xScale: 0
   yScale: 0
   zScale: 1

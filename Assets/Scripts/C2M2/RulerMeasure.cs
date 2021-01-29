@@ -20,6 +20,7 @@ public class RulerMeasure : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        numbers.Sort();
         relativeLength = 0;
         initialRulerLength = transform.lossyScale.z;
         CreateMarkers();
@@ -106,7 +107,7 @@ public class RulerMeasure : MonoBehaviour
             foreach (Marker marker in markedDisplay.markers)
             {
                 float lengthRatio = (1 - markerSpacingPercent) * (marker.number / scaledRulerLength);
-                if (lengthRatio >= markerSpacingPercent && lengthRatio <= (1 - markerSpacingPercent) && lengthRatio - previousSuccessfulLengthRatio > markerSpacingPercent)
+                if (lengthRatio >= markerSpacingPercent && lengthRatio <= (1 - markerSpacingPercent) && lengthRatio - previousSuccessfulLengthRatio >= markerSpacingPercent)
                 {
                     float rulerPoint = lengthRatio - .5f; // converts lengthRatio which goes from 0 to 1 to a point on the ruler which goes from -0.5 to +0.5
                     marker.textmesh.rectTransform.localPosition = new Vector3(rulerPoint, 0, 0);
