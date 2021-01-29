@@ -2,7 +2,10 @@
 # 1) https://github.com/mattnotmitt/doxygen-action
 # 2) https://github.com/peaceiris/actions-gh-pages
 name: doxygen
-on: [push]
+on: 
+   push:
+      branches:
+      - 'workflow'
 jobs:
    setup:
      steps:
