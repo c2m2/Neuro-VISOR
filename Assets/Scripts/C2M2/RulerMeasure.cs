@@ -11,7 +11,7 @@ public class RulerMeasure : MonoBehaviour
     public MeshSimulation sim = null;
     public List<Canvas> measurementDisplays;
     public List<float> numbers;
-    private List<Tuple<TextMeshProUGUI, float>> markers = new List<Tuple<TextMeshProUGUI, float>>();
+    private List<Marker> markers = new List<Marker>();
     private float relativeLength;
     private float initialRulerLength;
     private float markerSpacing = 0.05f; //minimum spacing between each marker and beginning and end of ruler
@@ -31,14 +31,14 @@ public class RulerMeasure : MonoBehaviour
         markerSpacingPercent = markerSpacing * initialRulerLength / transform.lossyScale.z;
         if (sim != null)
         {
-            relativeLength = (1-markerSpacingPercent) * (transform.lossyScale.z / sim.transform.localScale.z);
+            relativeLength = (1 - markerSpacingPercent) * (transform.lossyScale.z / sim.transform.localScale.z);
 
             int magnitude = GetMagnitude(relativeLength); //number of zeros after first digit
             string unit = GetUnit(magnitude);
 
             int siPrefixGroup = (int)Math.Floor(magnitude / 3.0);
             // length is a scaled version of relativelength so it is between 1 and 1000
-            float length = (float)(relativeLength / Math.Pow(10, siPrefixGroup*3));
+            float length = (float)(relativeLength / Math.Pow(10, siPrefixGroup * 3));
             UpdateMarkers(length, unit);
         }
     }
@@ -77,46 +77,57 @@ public class RulerMeasure : MonoBehaviour
 
     private void CreateMarkers()
     {
-        foreach(Canvas measurementDisplay in measurementDisplays)
+        foreach (Canvas measurementDisplay in measurementDisplays)
         {
-            foreach(float number in numbers)
+            foreach (float number in numbers)
             {
-                GameObject marker = new GameObject();
-                marker.transform.SetParent(measurementDisplay.transform);
-                TextMeshProUGUI markerText = marker.AddComponent<TextMeshProUGUI>();
+                GameObject gObj = new GameObject();
+                gObj.transform.SetParent(measurementDisplay.transform);
+                TextMeshProUGUI markerText = gObj.AddComponent<TextMeshProUGUI>();
                 markerText.alignment = TextAlignmentOptions.Center;
                 markerText.rectTransform.localPosition = new Vector3(0, 0, 0);
                 markerText.fontSize = 0.03f;
                 markerText.color = Color.black;
-                marker.transform.localRotation = Quaternion.Euler(0,0,90);
-                marker.transform.localScale = Vector3.one;
-                markers.Add(new Tuple<TextMeshProUGUI, float>(markerText, number));
+                gObj.transform.localRotation = Quaternion.Euler(0, 0, 90);
+                gObj.transform.localScale = Vector3.one;
+                markers.Add(new Marker(number, markerText));
             }
-            
+
         }
     }
 
     private void UpdateMarkers(float scaledRulerLength, string unit)
     {
         float previousLengthRatio = 0;
-        foreach (Tuple<TextMeshProUGUI, float> marker in markers)
+        foreach (Marker marker in markers)
         {
-            float markerNumber = marker.Item2;
-            TextMeshProUGUI markerText = marker.Item1;
-            float lengthRatio = (1 - markerSpacingPercent) * (markerNumber / scaledRulerLength);
-            if (lengthRatio >= markerSpacingPercent && lengthRatio <= (1 - markerSpacingPercent) && lengthRatio-previousLengthRatio > markerSpacingPercent)
+            float lengthRatio = (1 - markerSpacingPercent) * (marker.number / scaledRulerLength);
+            if (lengthRatio >= markerSpacingPercent && lengthRatio <= (1 - markerSpacingPercent) && lengthRatio - previousLengthRatio > markerSpacingPercent)
             {
                 float rulerPoint = lengthRatio - .5f; // converts lengthRatio which goes from 0 to 1 to a point on the ruler which goes from -0.5 to +0.5
-                markerText.rectTransform.localPosition = new Vector3(rulerPoint, 0, 0);
-                markerText.text = "― " + markerNumber + " " + unit + " ―";
-                markerText.transform.localScale = new Vector3(markerText.transform.localScale.x, initialRulerLength/transform.lossyScale.z, markerText.transform.localScale.z);
-                markerText.gameObject.SetActive(true);
+                marker.textmesh.rectTransform.localPosition = new Vector3(rulerPoint, 0, 0);
+                marker.textmesh.text = "― " + marker.number + " " + unit + " ―";
+                marker.textmesh.transform.localScale = new Vector3(marker.textmesh.transform.localScale.x, initialRulerLength / transform.lossyScale.z, marker.textmesh.transform.localScale.z);
+                marker.textmesh.gameObject.SetActive(true);
                 previousLengthRatio = lengthRatio;
             }
             else
             {
-                markerText.gameObject.SetActive(false);
+                marker.textmesh.gameObject.SetActive(false);
             }
+        }
+    }
+
+
+    private class Marker
+    {
+        public float number;
+        public TextMeshProUGUI textmesh;
+
+        public Marker(float number, TextMeshProUGUI textmesh)
+        {
+            this.number = number;
+            this.textmesh = textmesh;
         }
     }
 

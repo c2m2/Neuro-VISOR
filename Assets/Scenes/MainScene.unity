@@ -198,6 +198,7 @@ MonoBehaviour:
     m_NumAlphaKeys: 2
   globalMin: -5
   globalMax: 100
+  solverType: SparseSolverTestv1
 --- !u!114 &99744260
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3273,6 +3274,7 @@ MonoBehaviour:
     m_NumAlphaKeys: 2
   globalMin: Infinity
   globalMax: -Infinity
+  solverType: SparseSolverTestv1
 --- !u!114 &887169813
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3674,7 +3676,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f6e5e0a37b8f7c419fa8be41d5e9f60, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sim: {fileID: 1818162880}
+  sim: {fileID: 0}
   timerText: {fileID: 1429169106}
   time: -1
 --- !u!1 &1237049054
@@ -6540,7 +6542,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f6e5e0a37b8f7c419fa8be41d5e9f60, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sim: {fileID: 1818162880}
+  sim: {fileID: 0}
   timerText: {fileID: 739553468}
   time: -1
 --- !u!1 &2012984921 stripped
@@ -7088,6 +7090,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3671467348768610598, guid: f49e57d0c1b71c4418326894ace9a9b5,
         type: 3}
+      propertyPath: timerLabels.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3671467348768610598, guid: f49e57d0c1b71c4418326894ace9a9b5,
+        type: 3}
       propertyPath: rightRaycaster
       value: 
       objectReference: {fileID: 0}
@@ -7299,6 +7306,16 @@ PrefabInstance:
     - target: {fileID: 3671467348768610598, guid: f49e57d0c1b71c4418326894ace9a9b5,
         type: 3}
       propertyPath: timerLabel
+      value: 
+      objectReference: {fileID: 1231859776}
+    - target: {fileID: 3671467348768610598, guid: f49e57d0c1b71c4418326894ace9a9b5,
+        type: 3}
+      propertyPath: timerLabels.Array.data[0]
+      value: 
+      objectReference: {fileID: 1231859776}
+    - target: {fileID: 3671467348768610598, guid: f49e57d0c1b71c4418326894ace9a9b5,
+        type: 3}
+      propertyPath: timerLabels.Array.data[1]
       value: 
       objectReference: {fileID: 1971653367}
     m_RemovedComponents: []
