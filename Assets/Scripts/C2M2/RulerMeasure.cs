@@ -11,7 +11,7 @@ public class RulerMeasure : MonoBehaviour
     public MeshSimulation sim = null;
     public List<Canvas> measurementDisplays;
     public List<float> numbers;
-    private List<Marker> markers = new List<Marker>();
+    private List<MarkedDisplay> markedDisplays = new List<MarkedDisplay>();
     private float relativeLength;
     private float initialRulerLength;
     private float markerSpacing = 0.05f; //minimum spacing between each marker and beginning and end of ruler
@@ -79,6 +79,7 @@ public class RulerMeasure : MonoBehaviour
     {
         foreach (Canvas measurementDisplay in measurementDisplays)
         {
+            List<Marker> markers = new List<Marker>();
             foreach (float number in numbers)
             {
                 GameObject gObj = new GameObject();
@@ -92,29 +93,46 @@ public class RulerMeasure : MonoBehaviour
                 gObj.transform.localScale = Vector3.one;
                 markers.Add(new Marker(number, markerText));
             }
-
+            MarkedDisplay markedDisplay = new MarkedDisplay(measurementDisplay, markers);
+            markedDisplays.Add(markedDisplay);
         }
     }
 
     private void UpdateMarkers(float scaledRulerLength, string unit)
     {
-        float previousLengthRatio = 0;
-        foreach (Marker marker in markers)
+        foreach (MarkedDisplay markedDisplay in markedDisplays)
         {
-            float lengthRatio = (1 - markerSpacingPercent) * (marker.number / scaledRulerLength);
-            if (lengthRatio >= markerSpacingPercent && lengthRatio <= (1 - markerSpacingPercent) && lengthRatio - previousLengthRatio > markerSpacingPercent)
+            float previousSuccessfulLengthRatio = 0;
+            foreach (Marker marker in markedDisplay.markers)
             {
-                float rulerPoint = lengthRatio - .5f; // converts lengthRatio which goes from 0 to 1 to a point on the ruler which goes from -0.5 to +0.5
-                marker.textmesh.rectTransform.localPosition = new Vector3(rulerPoint, 0, 0);
-                marker.textmesh.text = "― " + marker.number + " " + unit + " ―";
-                marker.textmesh.transform.localScale = new Vector3(marker.textmesh.transform.localScale.x, initialRulerLength / transform.lossyScale.z, marker.textmesh.transform.localScale.z);
-                marker.textmesh.gameObject.SetActive(true);
-                previousLengthRatio = lengthRatio;
+                float lengthRatio = (1 - markerSpacingPercent) * (marker.number / scaledRulerLength);
+                if (lengthRatio >= markerSpacingPercent && lengthRatio <= (1 - markerSpacingPercent) && lengthRatio - previousSuccessfulLengthRatio > markerSpacingPercent)
+                {
+                    float rulerPoint = lengthRatio - .5f; // converts lengthRatio which goes from 0 to 1 to a point on the ruler which goes from -0.5 to +0.5
+                    marker.textmesh.rectTransform.localPosition = new Vector3(rulerPoint, 0, 0);
+                    marker.textmesh.text = "― " + marker.number + " " + unit + " ―";
+                    marker.textmesh.transform.localScale = new Vector3(marker.textmesh.transform.localScale.x, initialRulerLength / transform.lossyScale.z, marker.textmesh.transform.localScale.z);
+                    marker.textmesh.gameObject.SetActive(true);
+                    previousSuccessfulLengthRatio = lengthRatio;
+                }
+                else
+                {
+                    marker.textmesh.gameObject.SetActive(false);
+                }
             }
-            else
-            {
-                marker.textmesh.gameObject.SetActive(false);
-            }
+            
+        }
+    }
+
+    private class MarkedDisplay
+    {
+        public Canvas display;
+        public List<Marker> markers;
+
+        public MarkedDisplay(Canvas display, List<Marker> markers)
+        {
+            this.display = display;
+            this.markers = markers;
         }
     }
 
