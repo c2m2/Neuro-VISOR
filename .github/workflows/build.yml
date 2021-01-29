@@ -4,3 +4,8 @@
 # 3) https://game.ci/docs/github/getting-started
 # 4) https://docs.github.com/en/actions/reference/specifications-for-github-hosted-runners?WT.mc_id=timheuer-blog-timheuer#supported-runners-and-hardware-resources
 # TODO: Add automatic build with GH actions
+
+on:
+   push:
+      branches:
+      - 'workflow'
