@@ -9,7 +9,6 @@
 
 
 name: doxygen
-runs-on: ubuntu-latest
 on: 
    push:
       branches:
@@ -17,6 +16,7 @@ on:
 
 jobs:
    setup:
+     runs-on: ubuntu-latest
      steps:
          - name: Generate doxygen
            uses: mattnotmitt/doxygen-action@v1
@@ -24,6 +24,7 @@ jobs:
              working-directory: 'submodule/'
              doxyfile-path: 'docs/Doxygen'
    deploy:
+      runs-on: ubuntu-latest
       steps:
          - name: Deploy doxygen
            uses: peaceiris/actions-gh-pages@v3
