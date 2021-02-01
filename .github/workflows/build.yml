@@ -22,3 +22,8 @@ jobs:
            with:
             name: Build
             path: build
+
+         - name: Download artifacts
+           uses: actions/download-artifact@v2
+           with: 
+               name: Build
