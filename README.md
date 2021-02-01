@@ -4,6 +4,12 @@ Repository for Temple University's Center for Computational Mathematics and Mode
 ## Code quality
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/ac2c4122b3174e4a8209ef2e791792b3)](https://www.codacy.com?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=c2m2/virtual-reality&amp;utm_campaign=Badge_Grade)
 
+## Github actions
+![Get Unity license for VM build](https://github.com/c2m2/virtual-reality/workflows/Acquire%20activation%20file/badge.svg)
+![Doxygen documentation](https://github.com/c2m2/virtual-reality/workflows/doxygen/badge.svg)
+![Unity standalone build](https://github.com/c2m2/virtual-reality/workflows/Build/badge.svg)
+
+
 ## Documentation
 Our code is documented [here](https://c2m2.github.io/doxyhtml/index.html)
 
