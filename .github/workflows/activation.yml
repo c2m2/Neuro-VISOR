@@ -16,10 +16,10 @@ jobs:
                name: ${{ steps.getManualLicenseFile.outputs.filePath }}
                path: ${{ steps.getManualLicenseFile.outputs.filePath }}
 
-         - name: checkout
+         - name: Checkout
            uses: actions/checkout@v2
 
          - name: Download artifacts
            uses: actions/download-artifact@v2
            with: 
-               name: my-artifacts
+               name: Unity_v2019.2.11f1.alf
