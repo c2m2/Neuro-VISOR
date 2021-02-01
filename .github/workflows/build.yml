@@ -10,7 +10,7 @@ jobs:
       runs-on: ubuntu-latest
       steps:
          - name: Build Unity project
-           uses: webbertakken/unity-builder@v2
+           uses: webbertakken/unity-builder@v0.10
            env:
                UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
            with:
