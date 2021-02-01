@@ -15,5 +15,5 @@ jobs:
                UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
            with:
               projectPath: .
-              unityVersion: 2019.2
+              unityVersion: Unity_v2019.2.11f1
               targetPlatform: StandaloneWindows
