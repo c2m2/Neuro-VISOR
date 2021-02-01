@@ -1,9 +1,16 @@
 name: Build
 
-- uses: webbertakken/unity-builder@<version>
-  env:
-    UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-  with:
-    projectPath: .
-    unityVersion: 2019.2
-    targetPlatform: StandaloneWindows
+on: 
+   push:
+      branches:
+      - 'workflow'
+
+jobs:
+   build:
+      - uses: webbertakken/unity-builder@<version>
+      env:
+      UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+      with:
+      projectPath: .
+      unityVersion: 2019.2
+      targetPlatform: StandaloneWindows
