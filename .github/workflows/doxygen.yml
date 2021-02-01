@@ -1,14 +1,8 @@
 # see:
 # 1) https://github.com/mattnotmitt/doxygen-action
 # 2) https://github.com/peaceiris/actions-gh-pages
-# see also:
-# 1) https://docs.github.com/en/actions/learn-github-actions/introduction-to-github-actions
-# 2) https://github.com/game-ci/unity-actions
-# 3) https://game.ci/docs/github/getting-started
-# 4) https://docs.github.com/en/actions/reference/specifications-for-github-hosted-runners?WT.mc_id=timheuer-blog-timheuer#supported-runners-and-hardware-resources
 
-
-name: doxygen
+name: Doxygen
 on: 
    push:
       branches:
