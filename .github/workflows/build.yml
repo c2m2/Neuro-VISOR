@@ -9,10 +9,10 @@ jobs:
    build:
       steps:
          - name: Build Unity project
-           uses: webbertakken/unity-builder@<version>
-            env:
+           uses: webbertakken/unity-builder@v2
+           env:
                UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-            with:
-               projectPath: .
-               unityVersion: 2019.2
-               targetPlatform: StandaloneWindows
+           with:
+              projectPath: .
+              unityVersion: 2019.2
+              targetPlatform: StandaloneWindows
