@@ -17,3 +17,8 @@ jobs:
               projectPath: .
               unityVersion: 2019.2.11f1
               targetPlatform: StandaloneWindows
+         - name: Upload artifacts
+           uses: actions/upload-artifact@v1
+           with:
+            name: Build
+            path: build
