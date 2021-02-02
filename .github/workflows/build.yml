@@ -20,7 +20,7 @@ jobs:
            with:
               projectPath: .
               unityVersion: 2019.2.11f1
-              targetPlatform: StandaloneWindows
+              targetPlatform: StandaloneLinux64
          - name: Upload artifacts
            uses: actions/upload-artifact@v1
            with:
