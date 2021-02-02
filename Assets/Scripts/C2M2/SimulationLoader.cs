@@ -32,6 +32,7 @@ namespace C2M2.NeuronalDynamics.Interaction
                 try
                 {
                     solver.RefinementLevel = refinementLevel;
+                    
                 }
                 catch (Exception e)
                 {
