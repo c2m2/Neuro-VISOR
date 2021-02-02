@@ -9,6 +9,10 @@ jobs:
    build:
       runs-on: ubuntu-latest
       steps:
+         - name: Clone Unity project
+            uses: actions/checkout@v2
+            with:
+               lfs: true
          - name: Build Unity project
            uses: webbertakken/unity-builder@v0.10
            env:
