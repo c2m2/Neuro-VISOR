@@ -35,7 +35,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         public double vstart = 0.050;           // 50 [mV]
         public double endTime = 0.1;           // End time value [s]
         public double k = 0.0025 * 1.0E-3;         // User enters time step size [s]
-        public bool SomaOn = true;              // set soma to be clamped to vstart
+        public bool SomaOn = false;              // set soma to be clamped to vstart
         private bool saveMatrices = false;      // send LHS and RHS matrices to output
 
         //Biological parameters

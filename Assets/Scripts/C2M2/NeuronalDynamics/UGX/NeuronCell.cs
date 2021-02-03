@@ -14,8 +14,6 @@ namespace C2M2.NeuronalDynamics.UGX
         public List<double> edgeLengths = new List<double>();
         public List<int> boundaryID = new List<int>();
         public List<int> somaID = new List<int>();
-        //public List<int> brchID = new List<int>();
-
         public int vertCount = new int();
         public int edgeCount = new int();
 
@@ -75,44 +73,7 @@ namespace C2M2.NeuronalDynamics.UGX
             this.edgeCount = this.edges.Count();
 
             this.somaID = grid.Subsets["soma"].Indices.ToList();
-            //this.brchID = grid.Subsets["testbranch"].Indices.ToList();
         }
-
-        // For reading in an swc file
-        //public void ReadDataTable(string filePath)
-        //{
-         //   NodeData dr = new NodeData();
-
-//            string[] lines = System.IO.File.ReadAllLines(filePath);
-  //          int lineCount = 0;
-  //
-    //        foreach (string line in lines)
-      //      {
-        //        var cols = line.Split(' ');
-
-            //    dr.id = int.Parse(cols[0], System.Globalization.NumberStyles.Integer);
-          //      dr.nodeType = int.Parse(cols[1], System.Globalization.NumberStyles.Integer);
-
-              //  dr.xcoords = double.Parse(cols[2], System.Globalization.NumberStyles.Any);
-              //  dr.ycoords = double.Parse(cols[3], System.Globalization.NumberStyles.Any);
-              //  dr.zcoords = double.Parse(cols[4], System.Globalization.NumberStyles.Any);
-
-              //  dr.nodeRadius = double.Parse(cols[5], System.Globalization.NumberStyles.Any);
-              //  dr.pid = int.Parse(cols[6], System.Globalization.NumberStyles.Integer);
-
-//                if (lineCount > 0)
-  //              {
-    //                edges.Add((Tuple.Create(dr.id, dr.pid)));
-      //          }
-
-        //        nodeData.Add(dr);
-
-          //      lineCount = lineCount + 1;
-           // }
-
-           // vertCount = lineCount;
-           // edgeCount = vertCount - 1;
-       // }
 
         static string nodeFormatString =
             "ID = {0}\n" +
@@ -143,7 +104,7 @@ namespace C2M2.NeuronalDynamics.UGX
             "Min edge length = {4}";
         public override string ToString() => String.Format(cellFormatString, vertCount, edgeCount, edgeLengths.Max(), edgeLengths.Average(), edgeLengths.Min());
 
-        private double GetEdgeLength(int startId, int endId)
+        public double GetEdgeLength(int startId, int endId)
         {
             double x1 = nodeData[startId].xcoords;
             double y1 = nodeData[startId].ycoords;
