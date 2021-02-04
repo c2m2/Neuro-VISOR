@@ -196,8 +196,10 @@ MonoBehaviour:
     m_Mode: 0
     m_NumColorKeys: 5
     m_NumAlphaKeys: 2
-  globalMin: -5
-  globalMax: 100
+  globalMin: -0.005
+  globalMax: 0.05
+  refinementLevel: 1
+  solverType: SparseSolverTestv1
 --- !u!114 &99744260
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1379,7 +1381,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 1246904545894575464}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 475776573}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0950df82e7936c84983497630bde5b54, type: 3}
   m_Name: 
@@ -1423,7 +1425,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 475776573}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 597233ff510da7843934b28b865314c0, type: 3}
   m_Name: 
@@ -3273,6 +3275,8 @@ MonoBehaviour:
     m_NumAlphaKeys: 2
   globalMin: Infinity
   globalMax: -Infinity
+  refinementLevel: 0
+  solverType: SparseSolverTestv1
 --- !u!114 &887169813
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3674,7 +3678,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f6e5e0a37b8f7c419fa8be41d5e9f60, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sim: {fileID: 1818162880}
+  sim: {fileID: 0}
   timerText: {fileID: 1429169106}
   time: -1
 --- !u!1 &1237049054
@@ -4277,7 +4281,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1494866335
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4929,7 +4933,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1763904073
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5317,29 +5321,8 @@ MonoBehaviour:
   clamps: []
   vstart: 55
   endTime: 10000
-  h: 0.27
   k: 0.0027
-  HK_auto: 1
   SomaOn: 1
-  numRuns: 0
-  randomPermute: 0
-  printMatrices: 0
-  printCellInfo: 0
-  printVolt_time: 0
-  res: 0.3
-  cap: 0.3
-  ni: 0.317677
-  mi: 0.0529325
-  hi: 0.596121
-  k_ONOFF: 1
-  gk: 36
-  ek: -2
-  na_ONOFF: 1
-  gna: 153
-  ena: 120
-  leak_ONOFF: 1
-  gl: 0.3
-  el: -10
 --- !u!23 &1818162881
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -6137,11 +6120,6 @@ PrefabInstance:
       propertyPath: m_textInfo.pageCount
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 9098607124181544640, guid: 1f3d7fdf0dd17494cad2086085b3df67,
-        type: 3}
-      propertyPath: maxPercentage
-      value: 4
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1f3d7fdf0dd17494cad2086085b3df67, type: 3}
 --- !u!1 &1899656393
@@ -6540,7 +6518,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f6e5e0a37b8f7c419fa8be41d5e9f60, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sim: {fileID: 1818162880}
+  sim: {fileID: 0}
   timerText: {fileID: 739553468}
   time: -1
 --- !u!1 &2012984921 stripped
@@ -7088,6 +7066,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3671467348768610598, guid: f49e57d0c1b71c4418326894ace9a9b5,
         type: 3}
+      propertyPath: timerLabels.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3671467348768610598, guid: f49e57d0c1b71c4418326894ace9a9b5,
+        type: 3}
       propertyPath: rightRaycaster
       value: 
       objectReference: {fileID: 0}
@@ -7299,6 +7282,16 @@ PrefabInstance:
     - target: {fileID: 3671467348768610598, guid: f49e57d0c1b71c4418326894ace9a9b5,
         type: 3}
       propertyPath: timerLabel
+      value: 
+      objectReference: {fileID: 1231859776}
+    - target: {fileID: 3671467348768610598, guid: f49e57d0c1b71c4418326894ace9a9b5,
+        type: 3}
+      propertyPath: timerLabels.Array.data[0]
+      value: 
+      objectReference: {fileID: 1231859776}
+    - target: {fileID: 3671467348768610598, guid: f49e57d0c1b71c4418326894ace9a9b5,
+        type: 3}
+      propertyPath: timerLabels.Array.data[1]
       value: 
       objectReference: {fileID: 1971653367}
     m_RemovedComponents: []

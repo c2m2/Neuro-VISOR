@@ -397,6 +397,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
 
         private void UpdateGrid1D()
         {
+            Debug.Log(VrnReader.List());
             string meshName1D = VrnReader.Retrieve1DMeshName(RefinementLevel);
             /// Create empty grid with name of grid in archive
             Grid1D = new Grid(new Mesh(), meshName1D);

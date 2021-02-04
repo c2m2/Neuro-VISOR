@@ -11,16 +11,20 @@ public class RulerMeasure : MonoBehaviour
     public MeshSimulation sim = null;
     public List<Canvas> measurementDisplays;
     public List<float> numbers;
-    private List<Tuple<TextMeshProUGUI, float>> markers = new List<Tuple<TextMeshProUGUI, float>>();
-    private float relativeLength;
+    private List<MarkedDisplay> markedDisplays = new List<MarkedDisplay>();
+    private int markerCount = 25; //Maximum number of markers
+    private float firstMarkerLength;
     private float initialRulerLength;
+    private float rulerLength;
+    private float scaledRulerLength;
     private float markerSpacing = 0.05f; //minimum spacing between each marker and beginning and end of ruler
     private float markerSpacingPercent; //minimum spacing between each marker and beginning and end of ruler in percent of rulers length
 
     // Start is called before the first frame update
     void Start()
     {
-        relativeLength = 0;
+        numbers.Sort();
+        firstMarkerLength = 0;
         initialRulerLength = transform.lossyScale.z;
         CreateMarkers();
     }
@@ -31,15 +35,18 @@ public class RulerMeasure : MonoBehaviour
         markerSpacingPercent = markerSpacing * initialRulerLength / transform.lossyScale.z;
         if (sim != null)
         {
-            relativeLength = (1-markerSpacingPercent) * (transform.lossyScale.z / sim.transform.localScale.z);
+            rulerLength = transform.lossyScale.z / sim.transform.localScale.z;
+            firstMarkerLength = markerSpacingPercent * rulerLength;
 
-            int magnitude = GetMagnitude(relativeLength); //number of zeros after first digit
-            string unit = GetUnit(magnitude);
+            int magnitude = GetMagnitude(firstMarkerLength); //number of zeros after first digit
+            string siPrefixGroupText = GetUnit(magnitude);
 
             int siPrefixGroup = (int)Math.Floor(magnitude / 3.0);
-            // length is a scaled version of relativelength so it is between 1 and 1000
-            float length = (float)(relativeLength / Math.Pow(10, siPrefixGroup*3));
-            UpdateMarkers(length, unit);
+            // scaledFirstMarkerLength is a scaled version of firstMarkerLength so it is between 1 and 1000
+            float scaledFirstMarkerLength = (float)(firstMarkerLength / Math.Pow(10, siPrefixGroup * 3));
+            scaledRulerLength = (float)(rulerLength / Math.Pow(10, siPrefixGroup * 3));
+            UpdateMarkers(scaledFirstMarkerLength);
+            //TODO Put Units somewhere
         }
     }
 
@@ -77,46 +84,82 @@ public class RulerMeasure : MonoBehaviour
 
     private void CreateMarkers()
     {
-        foreach(Canvas measurementDisplay in measurementDisplays)
+        foreach (Canvas measurementDisplay in measurementDisplays)
         {
-            foreach(float number in numbers)
+            List<TextMeshProUGUI> markers = new List<TextMeshProUGUI>();
+            for (int i = 0; i < markerCount; i++)
             {
-                GameObject marker = new GameObject();
-                marker.transform.SetParent(measurementDisplay.transform);
-                TextMeshProUGUI markerText = marker.AddComponent<TextMeshProUGUI>();
+                GameObject gObj = new GameObject();
+                gObj.transform.SetParent(measurementDisplay.transform);
+                TextMeshProUGUI markerText = gObj.AddComponent<TextMeshProUGUI>();
                 markerText.alignment = TextAlignmentOptions.Center;
                 markerText.rectTransform.localPosition = new Vector3(0, 0, 0);
                 markerText.fontSize = 0.03f;
                 markerText.color = Color.black;
-                marker.transform.localRotation = Quaternion.Euler(0,0,90);
-                marker.transform.localScale = Vector3.one;
-                markers.Add(new Tuple<TextMeshProUGUI, float>(markerText, number));
+                gObj.transform.localRotation = Quaternion.Euler(0, 0, 90);
+                gObj.transform.localScale = Vector3.one;
+                markers.Add(markerText);
+            }
+            MarkedDisplay markedDisplay = new MarkedDisplay(measurementDisplay, markers);
+            markedDisplays.Add(markedDisplay);
+        }
+    }
+
+    private void UpdateMarkers(float scaledFirstMarkerLength)
+    {
+        float interval = 0;
+        int currentNumber = 0;
+        while(interval == 0)
+        {
+            if (currentNumber >= numbers.Count)
+            {
+                Debug.LogError("No Ruler Marker Large Enough");
+                interval = float.NaN;
+            }
+            else if (numbers[currentNumber] > scaledFirstMarkerLength)
+                {
+                    interval = numbers[currentNumber];
+                }
+            currentNumber++;
+        }
+
+        foreach (MarkedDisplay markedDisplay in markedDisplays)
+        {
+            int markerNumber = 0;
+            for (float i = 0; i <= scaledRulerLength; i+=interval)
+            {
+                float rulerPoint = (i/scaledRulerLength) - 0.5f;
+            
+                if (markedDisplay.markers.Count <= markerNumber)
+                {
+                    //Occurs when there are more markers then the preset limit
+                    break;
+                }
+                markedDisplay.markers[markerNumber].text = "‒ " + i + " ‒";
+                markedDisplay.markers[markerNumber].rectTransform.localPosition = new Vector3(rulerPoint, 0, 0);
+                markedDisplay.markers[markerNumber].transform.localScale = new Vector3(markedDisplay.markers[markerNumber].transform.localScale.x, initialRulerLength / transform.lossyScale.z, markedDisplay.markers[markerNumber].transform.localScale.z);
+
+                markedDisplay.markers[markerNumber].gameObject.SetActive(true);
+                markerNumber++;
+            }
+            while (markerNumber < markedDisplay.markers.Count)
+            {
+                markedDisplay.markers[markerNumber].gameObject.SetActive(false);
+                markerNumber++;
             }
             
         }
     }
 
-    private void UpdateMarkers(float scaledRulerLength, string unit)
+    private class MarkedDisplay
     {
-        float previousLengthRatio = 0;
-        foreach (Tuple<TextMeshProUGUI, float> marker in markers)
+        public Canvas display;
+        public List<TextMeshProUGUI> markers;
+
+        public MarkedDisplay(Canvas display, List<TextMeshProUGUI> markers)
         {
-            float markerNumber = marker.Item2;
-            TextMeshProUGUI markerText = marker.Item1;
-            float lengthRatio = (1 - markerSpacingPercent) * (markerNumber / scaledRulerLength);
-            if (lengthRatio >= markerSpacingPercent && lengthRatio <= (1 - markerSpacingPercent) && lengthRatio-previousLengthRatio > markerSpacingPercent)
-            {
-                float rulerPoint = lengthRatio - .5f; // converts lengthRatio which goes from 0 to 1 to a point on the ruler which goes from -0.5 to +0.5
-                markerText.rectTransform.localPosition = new Vector3(rulerPoint, 0, 0);
-                markerText.text = "― " + markerNumber + " " + unit + " ―";
-                markerText.transform.localScale = new Vector3(markerText.transform.localScale.x, initialRulerLength/transform.lossyScale.z, markerText.transform.localScale.z);
-                markerText.gameObject.SetActive(true);
-                previousLengthRatio = lengthRatio;
-            }
-            else
-            {
-                markerText.gameObject.SetActive(false);
-            }
+            this.display = display;
+            this.markers = markers;
         }
     }
 

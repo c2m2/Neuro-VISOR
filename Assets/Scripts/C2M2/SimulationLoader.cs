@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System;
 using UnityEngine;
 using C2M2.NeuronalDynamics.Simulation;
 namespace C2M2.NeuronalDynamics.Interaction
@@ -10,6 +9,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         public Gradient gradient;
         public float globalMin = float.PositiveInfinity;
         public float globalMax = float.NegativeInfinity;
+        public int refinementLevel = 0;
 
         private bool loaded = false;
         public string solverType = "SparseSolverTestv1";
@@ -29,8 +29,20 @@ namespace C2M2.NeuronalDynamics.Interaction
                 solver.gradient = gradient;
                 solver.globalMin = globalMin;
                 solver.globalMax = globalMax;
+                try
+                {
+                    solver.RefinementLevel = refinementLevel;
+                    
+                }
+                catch (Exception e)
+                {
+                    Debug.LogWarning("Refinement level " + refinementLevel + " not found. Reverting to 0 refinement.");
+                    refinementLevel = 0;
+                    solver.RefinementLevel = 0;
+                }
 
                 solver.Initialize();
+
 
                 loaded = true;
                 transform.gameObject.SetActive(false);
