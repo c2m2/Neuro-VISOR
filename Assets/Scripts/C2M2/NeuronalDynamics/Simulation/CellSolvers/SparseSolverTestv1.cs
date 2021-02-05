@@ -10,8 +10,8 @@ using C2M2.NeuronalDynamics.Interaction;
 
 // These are the MathNet Numerics Libraries needed
 // They need to dragged and dropped into the Unity assets plugins folder!
-//using SparseMatrix = MathNet.Numerics.LinearAlgebra.Double.SparseMatrix;
-//using Matrix = MathNet.Numerics.LinearAlgebra.Matrix<double>;
+// using SparseMatrix = MathNet.Numerics.LinearAlgebra.Double.SparseMatrix;
+// using Matrix = MathNet.Numerics.LinearAlgebra.Matrix<double>;
 
 using Vector = MathNet.Numerics.LinearAlgebra.Vector<double>;
 using MathNet.Numerics.LinearAlgebra.Double;
@@ -28,28 +28,73 @@ using C2M2.NeuronalDynamics.UGX;
 using Grid = C2M2.NeuronalDynamics.UGX.Grid;
 namespace C2M2.NeuronalDynamics.Simulation
 {
+    /// <summary>
+    /// This is the sparse solver class for solving the Hodgkin-Huxley equations for the propagation of action potentials.
+    /// The main solver begins with the function call <c>Solve()</c> prior to each iteration of <c>Solve()</c> the new voltage
+    /// values <c>U</c> are sent to this class and then new <c>U</c> are sent out from <c>Solve()</c>
+    /// 
+    /// The solver currently uses Forward Euler time stepping and the spatial solve is done using Crank-Nicolson in 1D
+    /// The solver takes into account the non-uniform radii of the geometry and the non-uniform edgelength of the geometry
+    /// 
+    /// The first part of the code is labeled with 'Simulation Parameters' and 'Biological Parameters'
+    /// These parameters need to be made available to the user to modify for their particular simulation parameters
+    /// The rate functions are defined at the end
+    /// Note: Very important --> ALL UNITS FOR THE SOLVER ARE IN MKS, therefore when modifying the color bars ranges, and raycast/clamp hit values
+    /// they need to be in [V] not [mV] so if you intend to use 50 [mV] it needs to be coded as 0.05 [V]
+    /// </summary>
     public class SparseSolverTestv1 : NDSimulation
     {
-        //Simulation parameters
+        /// <summary>
+        /// These are the simulation parameters, initial voltage hit value for raycasting, the endTime, time step size (k)
+        /// Also other options are defined here such as having the SomaOn for clamping the soma on for voltage clamp tests (this is 
+        /// mostly used for verifying the voltage output against Yale Neuron).
+        /// Another set of options that need to be incorporated is to select whether to output voltage data
+        /// 
+        /// TODO: define default time step size
+        /// TODO: get rid of end time user should signal off in vr, this will require changing the loop structure in the solver
+        /// to a while loop()
+        /// </summary>
+        /// 
+        ///<param><c>vstart</c> voltage for soma clamp in    [V]     </param> 
+        ///<param><c>endTime</c> endTime of the simulation in [s]     </param>
+        ///<param><c>k</c> User enters time step size   [s]     </param> 
+        ///<param><c>SomaOn</c> This is for turning the soma on/off  </param>
+        ///<param><c>saveMatrices</c> send LHS and RHS matrices to output  </param> 
         [Header("Simulation Parameters")]
-        public double vstart = 0.050;           // 50 [mV]
-        public double endTime = 0.1;           // End time value [s]
-        public double k = 0.0025 * 1.0E-3;         // User enters time step size [s]
-        public bool SomaOn = false;              // set soma to be clamped to vstart
-        private bool saveMatrices = false;      // send LHS and RHS matrices to output
+        public double vstart = 0.050;           
+        public double endTime = 0.1;            
+        public double k = 0.0025 * 1.0E-3;      
+        public bool SomaOn = false;             
+        private bool saveMatrices = false;
 
-        //Biological parameters
-        private double res = 2500.0 * 1.0E-2;      // [ohm.m] resistance.length
-        private double cap = 1.0 * 1.0E-2;        // [F/m2] capacitance per unit area
-        private double gk = 5.0 * 1.0E1;          // [S/m2] potassium conductance per unit area
-        private double gna = 50.0 * 1.0E1;        // [S/m2] sodium conductance per unit area
-        private double gl = 0.0 * 1.0E1;          // [S/m2] leak conductance per unit area
-        private double ek = -90.0 * 1.0E-3;       // [V] potassium reversal potential
-        private double ena = 50.0 * 1.0E-3;       // [V] sodium reversal potential
-        private double el = -70.0 * 1.0E-3;       // [V] leak reversal potential
-        private double ni = 0.0376969;            // [] potassium channel state probability, unitless
-        private double mi = 0.0147567;            // [] sodium channel state probability, unitless
-        private double hi = 0.9959410;            // [] sodium channel state probability, unitless                        // [mV]
+        ///<summary>
+        /// These are the biological parameters that can also be set by the user, right now they are set to private
+        /// but we want the user to be able to modify these prior to the start of the simulation
+        /// 
+        /// TODO: have the inputs for these parameters be shown inspector for easy changing --> as sliders
+        /// </summary>
+        ///<param><c>res</c> [ohm.m] resistance.length</param> 
+        ///<param><c>cap</c> [F/m2] capacitance per unit area</param>
+        ///<param><c>gk</c>  [S/m2] potassium conductance per unit area</param> 
+        ///<param><c>gna</c> [S/m2] sodium conductance per unit area</param>
+        ///<param><c>gl</c>  [S/m2] leak conductance per unit area</param>
+        ///<param><c>ek</c>  [V] potassium reversal potential</param>
+        ///<param><c>ena</c> [V] sodium reversal potential</param> 
+        ///<param><c>el</c>  [V] leak reversal potential</param> 
+        ///<param><c>ni</c>  [] potassium channel state probability, unitless</param> 
+        ///<param><c>mi</c>  [] sodium channel state probability, unitless</param> 
+        ///<param><c>hi</c>  [] sodium channel state probability, unitless</param>   
+        private double res = 2500.0 * 1.0E-2;     
+        private double cap = 1.0 * 1.0E-2;        
+        private double gk = 5.0 * 1.0E1;          
+        private double gna = 50.0 * 1.0E1;        
+        private double gl = 0.0 * 1.0E1;          
+        private double ek = -90.0 * 1.0E-3;        
+        private double ena = 50.0 * 1.0E-3;       
+        private double el = -70.0 * 1.0E-3;       
+        private double ni = 0.0376969;            
+        private double mi = 0.0147567;            
+        private double hi = 0.9959410;                                 
 
         // Solution vectors
         private Vector U;
