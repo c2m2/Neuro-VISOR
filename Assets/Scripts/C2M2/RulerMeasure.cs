@@ -44,7 +44,6 @@ public class RulerMeasure : MonoBehaviour
             float scaledFirstMarkerLength = (float)(firstMarkerLength / Math.Pow(10, siPrefixGroup * 3));
             scaledRulerLength = (float)(rulerLength / Math.Pow(10, siPrefixGroup * 3));
             UpdateMarkers(scaledFirstMarkerLength);
-            //TODO Put Units somewhere
         }
     }
 
