@@ -42,6 +42,14 @@ namespace C2M2.NeuronalDynamics.Simulation
     /// Note: Very important --> ALL UNITS FOR THE SOLVER ARE IN MKS, therefore when modifying the color bars ranges, and raycast/clamp hit values
     /// they need to be in [V] not [mV] so if you intend to use 50 [mV] it needs to be coded as 0.05 [V]
     /// </summary>
+    /// 
+
+    //tex: Below are the Hodgkin Huxley equations
+    //$$\frac{a}{2R}\frac{\partial^2V}{\partial x^2}=C\frac{\partial V}{\partial t}+\bar{g}_{K}n^4(V-V_k)+\bar{g}_{Na}m^3h(V-V_{Na})+\bar{g}_l(V-V_l)$$
+    //$$\frac{dn}{dt}=\alpha_n(V)(1-n)-\beta_n(V)n$$
+    //$$\frac{dm}{dt}=\alpha_m(V)(1-m)-\beta_m(V)m$$
+    //$$\frac{dh}{dt}=\alpha_h(V)(1-h)-\beta_h(V)h$$
+
     public class SparseSolverTestv1 : NDSimulation
     {
         /// <summary>
@@ -96,18 +104,34 @@ namespace C2M2.NeuronalDynamics.Simulation
         private double mi = 0.0147567;            
         private double hi = 0.9959410;                                 
 
-        // Solution vectors
+        /// <summary>
+        /// These are the solution vectors for the voltage <code>U</code>
+        /// the state <c>M</c>, state <c>N</c>, and state <c>H</c>
+        /// </summary>
         private Vector U;
         private Vector M;
         private Vector N;
         private Vector H;
 
-        // Keep track of i locally so that we know which simulation frame to send to other scripts
+        /// <summary>
+        /// This keeps track of which simulation frame to send to the other scripts
+        /// <c>i</c> gets track of the time step number
+        /// </summary>
         private int i = -1;
 
+        /// <summary>
+        /// This sends the current time to the simulation timer
+        /// Carefully notice that it has to be multiplied by 1000, this is because the solver is in MKS
+        /// and the simulation timer object uses [ms]!
+        /// </summary>
+        /// <returns>i*(float)1000*(float) k</returns>
         public override float GetSimulationTime() => i*(float)1000*(float) k;
 
-        // Send simulation 1D values 
+        /// <summary>
+        /// Send simulation 1D values, this send the current voltage after the solve runs 1 iteration
+        /// it passes <c>curVals</c>
+        /// </summary>
+        /// <returns>curVals</returns>
         public override double[] Get1DValues()
         {
             double[] curVals = null;
@@ -132,7 +156,12 @@ namespace C2M2.NeuronalDynamics.Simulation
             return curVals;
         }
 
-        // Receive new simulation 1D index/value pairings
+        /// <summary>
+        /// Receive new simulation 1D index/value pairings
+        /// Carefully, notice that <c>val</c> needs to be multiplied by 0.001 this is because
+        /// the hit value is in [mV] and the solver uses [V]
+        /// </summary>
+        /// <param name="newValues"></param>
         public override void Set1DValues(Tuple<int, double>[] newValues)
         {
             try
@@ -153,10 +182,33 @@ namespace C2M2.NeuronalDynamics.Simulation
             }
         }
 
+        /// <summary>
+        /// This is a small routine call to initialize the Neuron Cell
+        /// this will initialize the solution vectors which are <c>U</c>, <c>M</c>, <c>N</c>, and <c>H</c>
+        /// </summary>
         protected override void PreSolve()
         {
             InitializeNeuronCell();
         }
+
+        /// <summary>
+        /// This is the main solver, it is running on it own thread.
+        /// Inside this solver it 
+        /// 1. initialize the stencil matrix (only once) for the diffusion solve of the operator splitting
+        /// 2. there is a for-loop which is controled by <c>i</c>
+        /// 3. Inside the for-loop we do the diffusion solve first, then reaction solve, and then updated the state ODEs
+        /// </summary>
+        /// 
+        //tex:
+        //$$A(V):=\frac{a}{2RC}\frac{\partial ^ 2V}{\partial x^2}$$
+        //$$r(V):= -\frac{\bar{ g} _{ K} }{ C}n ^ 4(V - V_k) -\frac{\bar{ g} _{ Na} }{ C}m ^ 3h(V - V_{ Na})-\frac{\bar{ g} _l}{ C} (V - V_l)$$
+        // then we solve in two separate steps
+        //$$\frac{dV}{dt}=A(V)+r(V),$$
+        //where $A(V)$ is the second order differential operator on $V$ and $r(V)$ is the reaction term on $V$. We employ a Lie Splitting by first solving
+        //$$\frac{ dV ^ *}{ dt}= A(V ^ *)$$
+        //with initial condition $V_0^*=V(t_n)= V_n$ at the beginning of the time step to get the intermediate solution $V^*$. Then we solve
+        //$\frac{dV^{**}}{dt}=r(V^{**})$ with initial condition $V_0^{**}=V^*$ to get $V^{**}$, and $V_{n+1}=V(t_{n+1})=V^{**}$ the voltage at the end of the time step.
+        //For equation the diffusion we use a Crank-Nicolson scheme
 
         protected override void Solve()
         {       
