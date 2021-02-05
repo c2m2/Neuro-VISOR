@@ -10,21 +10,17 @@ public class RulerMeasure : MonoBehaviour
 {
     public MeshSimulation sim = null;
     public List<Canvas> measurementDisplays;
-    public List<float> numbers;
+    public List<int> numbers;
     private List<MarkedDisplay> markedDisplays = new List<MarkedDisplay>();
-    private int markerCount = 25; //Maximum number of markers
-    private float firstMarkerLength;
+    private readonly int markerCount = 100; //Maximum number of markers
     private float initialRulerLength;
-    private float rulerLength;
     private float scaledRulerLength;
-    private float markerSpacing = 0.05f; //minimum spacing between each marker and beginning and end of ruler
     private float markerSpacingPercent; //minimum spacing between each marker and beginning and end of ruler in percent of rulers length
 
     // Start is called before the first frame update
     void Start()
     {
         numbers.Sort();
-        firstMarkerLength = 0;
         initialRulerLength = transform.lossyScale.z;
         CreateMarkers();
     }
@@ -32,11 +28,12 @@ public class RulerMeasure : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        float markerSpacing = 0.05f; //minimum spacing between each marker and beginning and end of ruler
         markerSpacingPercent = markerSpacing * initialRulerLength / transform.lossyScale.z;
         if (sim != null)
         {
-            rulerLength = transform.lossyScale.z / sim.transform.localScale.z;
-            firstMarkerLength = markerSpacingPercent * rulerLength;
+            float rulerLength = transform.lossyScale.z / sim.transform.localScale.z;
+            float firstMarkerLength = markerSpacingPercent * rulerLength;
 
             int magnitude = GetMagnitude(firstMarkerLength); //number of zeros after first digit
             string siPrefixGroupText = GetUnit(magnitude);
@@ -107,14 +104,14 @@ public class RulerMeasure : MonoBehaviour
 
     private void UpdateMarkers(float scaledFirstMarkerLength)
     {
-        float interval = 0;
+        int interval = 0;
         int currentNumber = 0;
         while(interval == 0)
         {
             if (currentNumber >= numbers.Count)
             {
                 Debug.LogError("No Ruler Marker Large Enough");
-                interval = float.NaN;
+                interval = 1000;
             }
             else if (numbers[currentNumber] > scaledFirstMarkerLength)
                 {
