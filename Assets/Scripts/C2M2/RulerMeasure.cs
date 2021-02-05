@@ -15,6 +15,7 @@ public class RulerMeasure : MonoBehaviour
     private readonly int markerCount = 100; //Maximum number of markers
     private float initialRulerLength;
     private float scaledRulerLength;
+    private string units;
     private float markerSpacingPercent; //minimum spacing between each marker and beginning and end of ruler in percent of rulers length
 
     // Start is called before the first frame update
@@ -32,11 +33,11 @@ public class RulerMeasure : MonoBehaviour
         markerSpacingPercent = markerSpacing * initialRulerLength / transform.lossyScale.z;
         if (sim != null)
         {
-            float rulerLength = transform.lossyScale.z / sim.transform.localScale.z;
+            float rulerLength = transform.lossyScale.z / sim.transform.lossyScale.z; //in terms of simulation
             float firstMarkerLength = markerSpacingPercent * rulerLength;
 
             int magnitude = GetMagnitude(firstMarkerLength); //number of zeros after first digit
-            string siPrefixGroupText = GetUnit(magnitude);
+            units = GetUnit(magnitude);
 
             int siPrefixGroup = (int)Math.Floor(magnitude / 3.0);
             // scaledFirstMarkerLength is a scaled version of firstMarkerLength so it is between 1 and 1000
@@ -55,18 +56,18 @@ public class RulerMeasure : MonoBehaviour
 
     private string GetUnit(int magnitude)
     {
-        if (magnitude < -3)
+        if (magnitude < -9)
         {
             // takes the magnitude and puts it in terms of nm by adding three. Then divides by 3 to get unit group and rounds down.
             int eTerm = (magnitude + 3) / 3;
             return " e" + 3 * eTerm + " nm";
         }
-        else if (magnitude < 0) return " nm";
-        else if (magnitude < 3) return " μm";
-        else if (magnitude < 6) return " mm";
-        else if (magnitude < 9) return " m";
-        else if (magnitude <= 12) return " km";
-        else if (magnitude > 12)
+        else if (magnitude < -6) return " nm";
+        else if (magnitude < -3) return " μm";
+        else if (magnitude < 0) return " mm";
+        else if (magnitude < 3) return " m";
+        else if (magnitude <= 6) return " km";
+        else if (magnitude > 6)
         {
             // takes the magnitude and puts it in terms of km by subtracting twelve. Then divides by 3 to get unit group and rounds down.
             int eTerm = (magnitude - 12) / 3;
@@ -111,7 +112,7 @@ public class RulerMeasure : MonoBehaviour
             if (currentNumber >= numbers.Count)
             {
                 Debug.LogError("No Ruler Marker Large Enough");
-                interval = 1000;
+                interval = -1;
             }
             else if (numbers[currentNumber] > scaledFirstMarkerLength)
                 {
@@ -132,7 +133,16 @@ public class RulerMeasure : MonoBehaviour
                     //Occurs when there are more markers then the preset limit
                     break;
                 }
-                markedDisplay.markers[markerNumber].text = "‒ " + i + " ‒";
+
+                if (i == 0)
+                {
+                    markedDisplay.markers[markerNumber].text = "‒ " + i + " " + units + " ‒";
+                }
+                else
+                {
+                    markedDisplay.markers[markerNumber].text = "‒ " + i + " ‒";
+                }
+                
                 markedDisplay.markers[markerNumber].rectTransform.localPosition = new Vector3(rulerPoint, 0, 0);
                 markedDisplay.markers[markerNumber].transform.localScale = new Vector3(markedDisplay.markers[markerNumber].transform.localScale.x, initialRulerLength / transform.lossyScale.z, markedDisplay.markers[markerNumber].transform.localScale.z);
 
