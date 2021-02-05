@@ -94,7 +94,7 @@ public class RulerMeasure : MonoBehaviour
                 TextMeshProUGUI markerText = gObj.AddComponent<TextMeshProUGUI>();
                 markerText.alignment = TextAlignmentOptions.Center;
                 markerText.rectTransform.localPosition = new Vector3(0, 0, 0);
-                markerText.fontSize = 0.03f;
+                markerText.fontSize = 0.04f;
                 markerText.color = Color.black;
                 gObj.transform.localRotation = Quaternion.Euler(0, 0, 90);
                 gObj.transform.localScale = Vector3.one;
