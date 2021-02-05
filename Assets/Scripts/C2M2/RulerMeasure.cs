@@ -123,7 +123,7 @@ public class RulerMeasure : MonoBehaviour
         foreach (MarkedDisplay markedDisplay in markedDisplays)
         {
             int markerNumber = 0;
-            for (float i = 0; i <= scaledRulerLength; i+=interval)
+            for (int i = 0; i <= scaledRulerLength; i+=interval)
             {
                 float rulerPoint = (i/scaledRulerLength) - 0.5f;
             
