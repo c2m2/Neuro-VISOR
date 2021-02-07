@@ -7,22 +7,14 @@ using System;
 using System.Diagnostics;
 using UnityEngine;
 using C2M2.NeuronalDynamics.Interaction;
-
-// These are the MathNet Numerics Libraries needed
-// They need to dragged and dropped into the Unity assets plugins folder!
-// using SparseMatrix = MathNet.Numerics.LinearAlgebra.Double.SparseMatrix;
-// using Matrix = MathNet.Numerics.LinearAlgebra.Matrix<double>;
-
+/// These libraries are for using the Vector data type
 using Vector = MathNet.Numerics.LinearAlgebra.Vector<double>;
 using MathNet.Numerics.LinearAlgebra.Double;
 using MathNet.Numerics.Data.Text;
-
-// These are for the sparse solving
+/// These are for the sparse solving functionality
 using CSparse.Storage;
 using CSparse.Double.Factorization;
-//using Vector=CSparse.Double.Vector;
 using CSparse;
-
 using C2M2.Utils;
 using C2M2.NeuronalDynamics.UGX;
 using Grid = C2M2.NeuronalDynamics.UGX.Grid;
@@ -412,67 +404,63 @@ namespace C2M2.NeuronalDynamics.Simulation
         {
             /// send output matrices as a list {rhs, lhs}\n
             /// <c>List<CoordinateStorage<double>> stencils = new List<CoordinateStorage<double>>();</c> initializes empty list storage for the stencil matrices \n
-            /// in this case they are of type <c>CoordinateStorage</c>
+            /// in this case they are of type <c>CoordinateStorage</c> \n
             List<CoordinateStorage<double>> stencils = new List<CoordinateStorage<double>>();
 
-            /// initialize new coordinate storage
+            /// initialize new coordinate storage \n
             /// <c>var rhs = new CoordinateStorage<double>(myCell.vertCount, myCell.vertCount, myCell.vertCount * myCell.vertCount);</c> this initializes our empty coordinate storage matrices <c>rhs</c> and <c>lhs</c>
             var rhs = new CoordinateStorage<double>(myCell.vertCount, myCell.vertCount, myCell.vertCount * myCell.vertCount);
             var lhs = new CoordinateStorage<double>(myCell.vertCount, myCell.vertCount, myCell.vertCount * myCell.vertCount);
 
-            /// for keeping track of the neighbors of a node
+            /// for keeping track of the neighbors of a node \n
             /// <c>List<int> nghbrlist;</c> this is for collecting the neighbor indices of the current node 
             List<int> nghbrlist;
             int nghbrLen;
 
-            /// make an empty list to collect edgelengths
+            /// make an empty list to collect edgelengths \n
             /// <c>List<double> edgelengths = new List<double>();</c> initialize empty list for collecting edgelengths
             List<double> edgelengths = new List<double>();
             double tempEdgeLen, tempRadius, aveEdgeLengths;
-            /// <c>double sumRecip = 0;</c> this is for adding the sum of reciprocals which is in our stencil scheme
+            /// <c>double sumRecip = 0;</c> this is for adding the sum of reciprocals which is in our stencil scheme \n
             double sumRecip = 0;
-            double scf = 1E-6;  /// 1e-6 scale factor to convert to micrometers for radii and edge length
+            double scf = 1E-6;  /// 1e-6 scale factor to convert to micrometers for radii and edge length \n
 
             for (int j = 0; j < myCell.vertCount; j++)
             {
-                // this gets the current neighbor list for node j
+                /// <c>nghbrlist = myCell.nodeData[j].neighborIDs;</c> this gets the current neighbor list for node j \n
                 nghbrlist = myCell.nodeData[j].neighborIDs;
 
-                // this is the length of the neighbor list
+                /// <c>nghbrLen = nghbrlist.Count();</c> this is the length of the neighbor list \n
                 nghbrLen = nghbrlist.Count();
-
                 edgelengths.Clear();
                 sumRecip = 0;
 
-                // get the current radius at node j
+                /// <c>tempRadius = myCell.nodeData[j].nodeRadius*scf;</c> get the current radius at node j \n
                 tempRadius = myCell.nodeData[j].nodeRadius*scf;
 
-                // in this loop we collect the edgelengths that 
-                // go to node j, and we compute the coefficient given in 
-                // our paper
+                /// in this loop we collect the edgelengths that go to node j, and we compute the coefficient given in our paper \n
                 for (int p = 0; p < nghbrLen; p++)
                 {
-                    // get the edge length at current node j, to node neighbor p, scale to micro meters
+                    /// <c>tempEdgeLen = myCell.GetEdgeLength(j, nghbrlist[p])*scf;</c> get the edge length at current node j, to node neighbor p, scale to micro meters \n
                     tempEdgeLen = myCell.GetEdgeLength(j, nghbrlist[p])*scf;
-
-                    // put the edge length in the list, this list of edges will have length equal to length of neighbor list
+                    /// <c>edgelengths.Add(tempEdgeLen);</c> put the edge length in the list, this list of edges will have length equal to length of neighbor list \n
                     edgelengths.Add(tempEdgeLen);
                     sumRecip = sumRecip + 1 / (tempEdgeLen * tempRadius * ((1 / (myCell.nodeData[nghbrlist[p]].nodeRadius*scf* myCell.nodeData[nghbrlist[p]].nodeRadius*scf)) + (1 / (tempRadius * tempRadius))));
                 }
-                // get the average edge lengths of neighbors
+                /// get the average edge lengths of neighbors \n
+                /// <c>foreach {... aveEdgeLengths = aveEdgeLengths + val;} aveEdgeLengths = aveEdgeLengths / edgelengths.Count;</c>
                 aveEdgeLengths = 0;
                 foreach (double val in edgelengths)
                 {
                     aveEdgeLengths = aveEdgeLengths + val;
                 }
                 aveEdgeLengths = aveEdgeLengths / edgelengths.Count;
-                //GameManager.instance.DebugLogSafe("ave = " + aveEdgeLengths);
-
-                // set main diagonal entries
+               
+                /// set main diagonal entries using <c>rhs.At()</c>
                 rhs.At(j, j, 1 - (k * sumRecip) / (2.0 * res * cap * aveEdgeLengths));
                 lhs.At(j, j, 1 + (k * sumRecip) / (2.0 * res * cap * aveEdgeLengths));
 
-                // set off diagonal entries
+                /// set off diagonal entries by going through the neighbor list, and using <c>rhs.At()</c>
                 for (int p = 0; p < nghbrLen; p++)
                 {
                     rhs.At(j, nghbrlist[p], k / (2 * res * cap * tempRadius* aveEdgeLengths * edgelengths[p] * ((1 / (myCell.nodeData[nghbrlist[p]].nodeRadius*scf * myCell.nodeData[nghbrlist[p]].nodeRadius*scf)) + (1 / (tempRadius * tempRadius)))));
@@ -483,6 +471,7 @@ namespace C2M2.NeuronalDynamics.Simulation
             //rhs.At(0, 0, 1);
             //lhs.At(0, 0, 1);
 
+            /// <c>stencil.Add()</c> this adds the completed stencil matrices to the output list
             stencils.Add(rhs);
             stencils.Add(lhs);
             return stencils;
@@ -501,39 +490,69 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// <returns></returns>
         private static Vector reactF(List<double> reactConst, Vector V, Vector NN, Vector MM, Vector HH, double cap)
         {
+            /// initialize the output vector and prod vector these will be used to assemble the different parts of the reaction calculation \n
+            /// <c>Vector output = Vector.Build.Dense(V.Count, 0.0);</c> initializes the output vector of length equation to number of entries in voltage vector, initialized to 0 \n
+            /// <c>Vector prod = Vector.Build.Dense(V.Count, 0.0);</c> initializes the product vector of length equation to number of entries in voltage vector, initialized to 0 \n
+            /// <c>double ek, ena, el, gk, gna, gl; </c> these are the conductances and reversal potentials that we need to assign using <c>reactConst</c> parameter that is sent \n
             Vector output = Vector.Build.Dense(V.Count, 0.0);
             Vector prod = Vector.Build.Dense(V.Count, 0.0);
             double ek, ena, el, gk, gna, gl;
-
-            // set constants for voltage
+            /// this sets the constants for the conductances \n
+            /// <c>gk = reactConst[0]; gna = reactConst[1]; gl = reactConst[2];</c>
             gk = reactConst[0]; gna = reactConst[1]; gl = reactConst[2];
-            // set constants for conductances
+            /// this sets constants for reversal potentials \n
+            /// <c>ek = reactConst[3]; ena = reactConst[4]; el = reactConst[5];</c>
             ek = reactConst[3]; ena = reactConst[4]; el = reactConst[5];
-
-            // Add current due to potassium
+            /// <c>output.Add(prod.Multiply(gk), output);</c> this adds current due to potassium
             prod.SetSubVector(0, V.Count, NN.PointwisePower(4.0));
             prod.SetSubVector(0, V.Count, (V.Subtract(ek)).PointwiseMultiply(prod));
             output.Add(prod.Multiply(gk), output);
-
-            // Add current due to sodium
+            /// <c>output.Add(prod.Multiply(gna), output);</c> this adds current due to sodium
             prod.SetSubVector(0, V.Count, MM.PointwisePower(3.0));
             prod.SetSubVector(0, V.Count, HH.PointwiseMultiply(prod)); prod.SetSubVector(0, V.Count, (V.Subtract(ena)).PointwiseMultiply(prod));
             output.Add(prod.Multiply(gna), output);
-
-            // Add leak current
+            /// <c>output.Add((V.Subtract(el)).Multiply(gl), output);</c> this adds leak current
             output.Add((V.Subtract(el)).Multiply(gl), output);
-            // Return the negative of the total
+            /// Return the negative of the total
             output.Multiply(-1.0 / cap, output);
 
             return output;
         }
-        // The following functions are for the state variable ODEs on M,N,H
+        /// <summary>
+        /// This is the function for the right hand side of the ODE on state N, which is given by:
+        /// \f[\frac{dn}{dt}=\alpha_n(V)(1-n)-\beta_n(V)n\f]
+        /// </summary>
+        /// <param name="V"></param> this is the current input voltage for the geometry
+        /// <param name="N"></param> this is the current vector of state N for the geometry
+        /// <returns>f(V,N)</returns> the function returns the right hand side of the state N ODE.
         private static Vector fN(Vector V, Vector N) { return an(V).PointwiseMultiply(1 - N) - bn(V).PointwiseMultiply(N); }
+        /// <summary>
+        /// This is the function for the right hand side of the ODE on state M, which is given by:
+        /// \f[\frac{dm}{dt}=\alpha_m(V)(1-m)-\beta_m(V)m\f]
+        /// </summary>
+        /// <param name="V"></param> this is the current input voltage for the geometry
+        /// <param name="M"></param> this is the current vector of state M for the geometry
+        /// <returns>f(V,M)</returns> the function returns the right hand side of the state M ODE.
         private static Vector fM(Vector V, Vector M) { return am(V).PointwiseMultiply(1 - M) - bm(V).PointwiseMultiply(M); }
+        /// <summary>
+        /// This is the function for the right hand side of the ODE on state H, which is given by:
+        /// \f[\frac{dh}{dt}=\alpha_h(V)(1-h)-\beta_h(V)h\f]
+        /// </summary>
+        /// <param name="V"></param> this is the current input voltage for the geometry
+        /// <param name="H"></param> this is the current vector of state H for the geometry
+        /// <returns>f(V,H)</returns> the function returns the right hand side of the state H ODE.
         private static Vector fH(Vector V, Vector H) { return ah(V).PointwiseMultiply(1 - H) - bh(V).PointwiseMultiply(H); }
-        //The following functions are for the state variable ODEs on M,N,H
-
-        //The following functions are for the state variable ODEs on M,N,H
+       
+        /// <summary>
+        /// This is \f$\alpha_n\f$ rate function, the rate functions take the form of
+        /// \f[
+        /// \frac{a_p(V-B_p)}{\exp(\frac{V-B_p}{C_p})-D_p}
+        /// \f]
+        /// the constants \f$a_p,B_p,C_p,D_p\f$ are manually coded in for this version of the simulation\n
+        /// TODO: come up with an implementation where the user can enter in their own parameters (Yale Neuron has this capability)
+        /// </summary>
+        /// <param name="V"></param> this is the input voltage
+        /// <returns>an</returns> this function returns the rate at the given voltage
         private static Vector an(Vector V)
         {
             Vector Vin = Vector.Build.DenseOfVector(V);
@@ -541,7 +560,16 @@ namespace C2M2.NeuronalDynamics.Simulation
             Vin.Multiply(1.0E3, Vin);
             return (1.0E3) * (0.032) * (15.0 - Vin).PointwiseDivide(((15.0 - Vin) / 5.0).PointwiseExp() - 1.0);
         }
-
+        /// <summary>
+        /// This is \f$\beta_n\f$ rate function, the rate functions take the form of
+        /// \f[
+        /// \frac{a_p(V-B_p)}{\exp(\frac{V-B_p}{C_p})-D_p}
+        /// \f]
+        /// the constants \f$a_p,B_p,C_p,D_p\f$ are manually coded in for this version of the simulation\n
+        /// TODO: come up with an implementation where the user can enter in their own parameters (Yale Neuron has this capability)
+        /// </summary>
+        /// <param name="V"></param> this is the input voltage
+        /// <returns>bn</returns> this function returns the rate at the given voltage
         private static Vector bn(Vector V)
         {
             Vector Vin = Vector.Build.DenseOfVector(V);
@@ -549,6 +577,16 @@ namespace C2M2.NeuronalDynamics.Simulation
             Vin.Multiply(1.0E3, Vin);
             return (1.0E3) * (0.5) * ((10.0 - Vin) / 40.0).PointwiseExp();
         }
+        /// <summary>
+        /// This is \f$\alpha_m\f$ rate function, the rate functions take the form of
+        /// \f[
+        /// \frac{a_p(V-B_p)}{\exp(\frac{V-B_p}{C_p})-D_p}
+        /// \f]
+        /// the constants \f$a_p,B_p,C_p,D_p\f$ are manually coded in for this version of the simulation\n
+        /// TODO: come up with an implementation where the user can enter in their own parameters (Yale Neuron has this capability)
+        /// </summary>
+        /// <param name="V"></param> this is the input voltage
+        /// <returns>am</returns> this function returns the rate at the given voltage
         private static Vector am(Vector V)
         {
             Vector Vin = Vector.Build.DenseOfVector(V);
@@ -556,6 +594,16 @@ namespace C2M2.NeuronalDynamics.Simulation
             Vin.Multiply(1.0E3, Vin);
             return (1.0E3) * (0.32) * (13.0 - Vin).PointwiseDivide(((13.0 - Vin) / 4.0).PointwiseExp() - 1.0);
         }
+        /// <summary>
+        /// This is \f$\beta_m\f$ rate function, the rate functions take the form of
+        /// \f[
+        /// \frac{a_p(V-B_p)}{\exp(\frac{V-B_p}{C_p})-D_p}
+        /// \f]
+        /// the constants \f$a_p,B_p,C_p,D_p\f$ are manually coded in for this version of the simulation\n
+        /// TODO: come up with an implementation where the user can enter in their own parameters (Yale Neuron has this capability)
+        /// </summary>
+        /// <param name="V"></param> this is the input voltage
+        /// <returns>bm</returns> this function returns the rate at the given voltage
         private static Vector bm(Vector V)
         {
             Vector Vin = Vector.Build.DenseOfVector(V);
@@ -563,6 +611,16 @@ namespace C2M2.NeuronalDynamics.Simulation
             Vin.Multiply(1.0E3, Vin);
             return (1.0E3) * (0.28) * (Vin - 40.0).PointwiseDivide(((Vin - 40.0) / 5.0).PointwiseExp() - 1.0);
         }
+        /// <summary>
+        /// This is \f$\alpha_h\f$ rate function, the rate functions take the form of
+        /// \f[
+        /// \frac{a_p(V-B_p)}{\exp(\frac{V-B_p}{C_p})-D_p}
+        /// \f]
+        /// the constants \f$a_p,B_p,C_p,D_p\f$ are manually coded in for this version of the simulation\n
+        /// TODO: come up with an implementation where the user can enter in their own parameters (Yale Neuron has this capability)
+        /// </summary>
+        /// <param name="V"></param> this is the input voltage
+        /// <returns>ah</returns> this function returns the rate at the given voltage
         private static Vector ah(Vector V)
         {
             Vector Vin = Vector.Build.DenseOfVector(V);
@@ -570,6 +628,16 @@ namespace C2M2.NeuronalDynamics.Simulation
             Vin.Multiply(1.0E3, Vin);
             return (1.0E3) * (0.128) * ((17.0 - Vin) / 18.0).PointwiseExp();
         }
+        /// <summary>
+        /// This is \f$\beta_h\f$ rate function, the rate functions take the form of
+        /// \f[
+        /// \frac{a_p(V-B_p)}{\exp(\frac{V-B_p}{C_p})-D_p}
+        /// \f]
+        /// the constants \f$a_p,B_p,C_p,D_p\f$ are manually coded in for this version of the simulation\n
+        /// TODO: come up with an implementation where the user can enter in their own parameters (Yale Neuron has this capability)
+        /// </summary>
+        /// <param name="V"></param> this is the input voltage
+        /// <returns>bh</returns> this function returns the rate at the given voltage
         private static Vector bh(Vector V)
         {
             Vector Vin = Vector.Build.DenseOfVector(V);
