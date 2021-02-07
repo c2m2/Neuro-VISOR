@@ -79,7 +79,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// 
         /// TODO: we would like the simulation to run without an endtime and the use clicks an 'end button' to terminate the vr-simulation
         /// </summary>
-        public double endTime = 0.1;      
+        public double endTime = 0.5;      
         /// <summary>
         /// User enters the time step size [s], this is the time step size of the simulation, this needs to be chosen carefully as too large of 
         /// a time step size may cause numerical instability for the solver. Notice that that this is in [s] therefore 0.0025[ms] = 0.0025e-3 [s]
@@ -101,7 +101,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// [ohm.m] resistance.length, this is the axial resistence of the neuron, increasing this value has the effect of making the AP waves more localized and slower conduction speed
         /// decreasing this value has the effect of make the AP waves larger and have a faster conduction speed
         /// </summary>
-        private double res = 2500.0 * 1.0E-2;
+        private double res = 250.0 * 1.0E-2;
         /// <summary>
         /// [F/m2] capacitance per unit area, this is the plasma membrane capacitance, this a standard value for the capacitance
         /// </summary>
@@ -178,7 +178,7 @@ namespace C2M2.NeuronalDynamics.Simulation
 
         /// <summary>
         /// This sends the current time to the simulation timer
-        /// Carefully notice that it has to be multiplied by 1000, this is because the solver is in MKS
+        /// Note that the solver is in MKS, right now the simulation timer uses MKS, no need to multiply by 1000
         /// and the simulation timer object uses [ms]!
         /// </summary>
         /// <returns>i*(float)1000*(float) k</returns>
@@ -233,7 +233,7 @@ namespace C2M2.NeuronalDynamics.Simulation
                     int j = newVal.Item1;
                     double val = newVal.Item2;
                     /// here we set the voltage at the location, notice that we multiply by 0.0001 to convert to volts [V] 
-                    U[j] = val*(1E-3);
+                    U[j] = val * (1E-3);
                 }
                 mutex.ReleaseMutex();
             }
@@ -284,16 +284,13 @@ namespace C2M2.NeuronalDynamics.Simulation
         //For equation the diffusion we use a Crank-Nicolson scheme
 
         protected override void Solve()
-        {       
-            int nT;                                                                        
+        {                                                                          
             ///<c>int nT</c> is the Number of time steps
-            nT = (int)System.Math.Floor(endTime / k);
-               
+            int nT = (int)System.Math.Floor(endTime / k);
             ///<c>R</c> this is the reaction vector for the reaction solve
             Vector R = Vector.Build.Dense(NeuronCell.vertCount);
             ///<c>reactConst</c> this is a small list for collecting the conductances and reversal potential which is sent to the reaction solve routine
             List<double> reactConst = new List<double> { gk, gna, gl, ek, ena, el };
-
             ///<c>List<CoordinateStorage<double>> sparse_stencils = makeSparseStencils(NeuronCell, res, cap, k);</c> Construct sparse RHS and LHS in coordinate storage format, no zeros are stored \n
             /// <c>sparse_stencils</c> this is a list which contains only two matrices the LHS and RHS matrices for the Crank-Nicolson solve
             List<CoordinateStorage<double>> sparse_stencils = makeSparseStencils(NeuronCell, res, cap, k);
@@ -348,19 +345,15 @@ namespace C2M2.NeuronalDynamics.Simulation
                             }
                         }
                     }
-
                     mutex.ReleaseMutex();
-                }
-                  
+                }     
             }
             catch (Exception e)
             {
                 GameManager.instance.DebugLogErrorThreadSafe(e);
                 mutex.ReleaseMutex();
             }
-                
             GameManager.instance.DebugLogSafe("Simulation Over.");
-            
         }
 
         #region Local Functions
@@ -429,12 +422,10 @@ namespace C2M2.NeuronalDynamics.Simulation
             {
                 /// <c>nghbrlist = myCell.nodeData[j].neighborIDs;</c> this gets the current neighbor list for node j \n
                 nghbrlist = myCell.nodeData[j].neighborIDs;
-
                 /// <c>nghbrLen = nghbrlist.Count();</c> this is the length of the neighbor list \n
                 nghbrLen = nghbrlist.Count();
                 edgelengths.Clear();
                 sumRecip = 0;
-
                 /// <c>tempRadius = myCell.nodeData[j].nodeRadius*scf;</c> get the current radius at node j \n
                 tempRadius = myCell.nodeData[j].nodeRadius*scf;
 
@@ -455,18 +446,15 @@ namespace C2M2.NeuronalDynamics.Simulation
                     aveEdgeLengths = aveEdgeLengths + val;
                 }
                 aveEdgeLengths = aveEdgeLengths / edgelengths.Count;
-               
                 /// set main diagonal entries using <c>rhs.At()</c>
                 rhs.At(j, j, 1 - (k * sumRecip) / (2.0 * res * cap * aveEdgeLengths));
                 lhs.At(j, j, 1 + (k * sumRecip) / (2.0 * res * cap * aveEdgeLengths));
-
                 /// set off diagonal entries by going through the neighbor list, and using <c>rhs.At()</c>
                 for (int p = 0; p < nghbrLen; p++)
                 {
                     rhs.At(j, nghbrlist[p], k / (2 * res * cap * tempRadius* aveEdgeLengths * edgelengths[p] * ((1 / (myCell.nodeData[nghbrlist[p]].nodeRadius*scf * myCell.nodeData[nghbrlist[p]].nodeRadius*scf)) + (1 / (tempRadius * tempRadius)))));
                     lhs.At(j, nghbrlist[p], -1.0 * k / (2 * res * cap * tempRadius * aveEdgeLengths * edgelengths[p] * ((1 / (myCell.nodeData[nghbrlist[p]].nodeRadius*scf * myCell.nodeData[nghbrlist[p]].nodeRadius*scf)) + (1 / (tempRadius * tempRadius)))));
                 }
-
             }
             //rhs.At(0, 0, 1);
             //lhs.At(0, 0, 1);
@@ -556,7 +544,6 @@ namespace C2M2.NeuronalDynamics.Simulation
         private static Vector an(Vector V)
         {
             Vector Vin = Vector.Build.DenseOfVector(V);
-
             Vin.Multiply(1.0E3, Vin);
             return (1.0E3) * (0.032) * (15.0 - Vin).PointwiseDivide(((15.0 - Vin) / 5.0).PointwiseExp() - 1.0);
         }
@@ -573,7 +560,6 @@ namespace C2M2.NeuronalDynamics.Simulation
         private static Vector bn(Vector V)
         {
             Vector Vin = Vector.Build.DenseOfVector(V);
-
             Vin.Multiply(1.0E3, Vin);
             return (1.0E3) * (0.5) * ((10.0 - Vin) / 40.0).PointwiseExp();
         }
@@ -590,7 +576,6 @@ namespace C2M2.NeuronalDynamics.Simulation
         private static Vector am(Vector V)
         {
             Vector Vin = Vector.Build.DenseOfVector(V);
-
             Vin.Multiply(1.0E3, Vin);
             return (1.0E3) * (0.32) * (13.0 - Vin).PointwiseDivide(((13.0 - Vin) / 4.0).PointwiseExp() - 1.0);
         }
@@ -607,7 +592,6 @@ namespace C2M2.NeuronalDynamics.Simulation
         private static Vector bm(Vector V)
         {
             Vector Vin = Vector.Build.DenseOfVector(V);
-
             Vin.Multiply(1.0E3, Vin);
             return (1.0E3) * (0.28) * (Vin - 40.0).PointwiseDivide(((Vin - 40.0) / 5.0).PointwiseExp() - 1.0);
         }
@@ -624,7 +608,6 @@ namespace C2M2.NeuronalDynamics.Simulation
         private static Vector ah(Vector V)
         {
             Vector Vin = Vector.Build.DenseOfVector(V);
-
             Vin.Multiply(1.0E3, Vin);
             return (1.0E3) * (0.128) * ((17.0 - Vin) / 18.0).PointwiseExp();
         }
@@ -641,12 +624,9 @@ namespace C2M2.NeuronalDynamics.Simulation
         private static Vector bh(Vector V)
         {
             Vector Vin = Vector.Build.DenseOfVector(V);
-
             Vin.Multiply(1.0E3, Vin);
             return (1.0E3) * 4.0 / (((40.0 - Vin) / 5.0).PointwiseExp() + 1.0);
         }
-
-
         #endregion
     }
 }
