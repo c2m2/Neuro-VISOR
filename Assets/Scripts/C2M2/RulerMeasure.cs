@@ -12,7 +12,7 @@ public class RulerMeasure : MonoBehaviour
     public List<Canvas> measurementDisplays;
     public GameObject topEndcap;
     public GameObject bottomEndCap;
-    private List<int> numbers = new List<int>() { 1, 2, 5, 10, 20, 50, 100, 200, 500 };
+    private readonly List<int> numbers = new List<int> { 1, 2, 5, 10, 20, 50, 100, 200, 500 };
     private List<MarkedDisplay> markedDisplays = new List<MarkedDisplay>();
     private readonly int markerCount = 100; //Maximum number of markers
     private float initialTopEndCapLength;
@@ -20,7 +20,6 @@ public class RulerMeasure : MonoBehaviour
     private float initialRulerLength;
     private float scaledRulerLength;
     private string units;
-    private float markerSpacingPercent; //minimum spacing between each marker and beginning and end of ruler in percent of ruler's length
 
     // Start is called before the first frame update
     void Start()
@@ -35,7 +34,7 @@ public class RulerMeasure : MonoBehaviour
     void Update()
     {
         float markerSpacing = 0.03f; //minimum spacing between each marker and beginning and end of ruler
-        markerSpacingPercent = markerSpacing * initialRulerLength / transform.lossyScale.z;
+        float markerSpacingPercent = markerSpacing * initialRulerLength / transform.lossyScale.z; //minimum spacing between each marker and beginning and end of ruler in percent of ruler's length
         if (sim != null)
         {
             float rulerLength = transform.lossyScale.z / sim.transform.lossyScale.z; //in terms of simulation
