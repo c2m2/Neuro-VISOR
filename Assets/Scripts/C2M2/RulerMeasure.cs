@@ -10,17 +10,23 @@ public class RulerMeasure : MonoBehaviour
 {
     public MeshSimulation sim = null;
     public List<Canvas> measurementDisplays;
+    public GameObject topEndcap;
+    public GameObject bottomEndCap;
     private List<int> numbers = new List<int>() { 1, 2, 5, 10, 20, 50, 100, 200, 500 };
     private List<MarkedDisplay> markedDisplays = new List<MarkedDisplay>();
     private readonly int markerCount = 100; //Maximum number of markers
+    private float initialTopEndCapLength;
+    private float initialBottomEndCapLength;
     private float initialRulerLength;
     private float scaledRulerLength;
     private string units;
-    private float markerSpacingPercent; //minimum spacing between each marker and beginning and end of ruler in percent of rulers length
+    private float markerSpacingPercent; //minimum spacing between each marker and beginning and end of ruler in percent of ruler's length
 
     // Start is called before the first frame update
     void Start()
     {
+        initialTopEndCapLength = topEndcap.transform.localScale.y;
+        initialBottomEndCapLength = bottomEndCap.transform.localScale.y;
         initialRulerLength = transform.lossyScale.z;
         CreateMarkers();
     }
@@ -43,6 +49,7 @@ public class RulerMeasure : MonoBehaviour
             float scaledFirstMarkerLength = (float)(firstMarkerLength / Math.Pow(10, siPrefixGroup * 3));
             scaledRulerLength = (float)(rulerLength / Math.Pow(10, siPrefixGroup * 3));
             UpdateMarkers(scaledFirstMarkerLength);
+            UpdateEndCaps();
         }
     }
 
@@ -153,6 +160,21 @@ public class RulerMeasure : MonoBehaviour
                 markerNumber++;
             }
             
+        }
+    }
+
+    private void UpdateEndCaps()
+    {
+        if (topEndcap != null)
+        {
+            topEndcap.transform.localScale = new Vector3(topEndcap.transform.localScale.x, initialTopEndCapLength*(initialRulerLength / transform.lossyScale.z), topEndcap.transform.localScale.z);
+            topEndcap.transform.localPosition = new Vector3(0, 0, -(0.5f + topEndcap.transform.localScale.y/2));
+        }
+
+        if (bottomEndCap != null)
+        {
+            bottomEndCap.transform.localScale = new Vector3(bottomEndCap.transform.localScale.x, initialBottomEndCapLength * (initialRulerLength / transform.lossyScale.z), bottomEndCap.transform.localScale.z);
+            bottomEndCap.transform.localPosition = new Vector3(0, 0, 0.5f + bottomEndCap.transform.localScale.y/2);
         }
     }
 
