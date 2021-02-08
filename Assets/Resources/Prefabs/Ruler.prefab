@@ -345,7 +345,7 @@ MonoBehaviour:
   measurementDisplays:
   - {fileID: 6978054425490887901}
   - {fileID: 899021641628970695}
-  numbers: 0100000002000000050000000a000000140000003200000064000000c8000000f4010000
+  numbers: 0100000002000000050000000a000000190000003200000064000000fa000000f4010000
 --- !u!114 &9098607124181544640
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -359,8 +359,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scaler: 0.2
-  minPercentage: 0.25
-  maxPercentage: 4
+  minPercentage: 0.5
+  maxPercentage: 2
   xScale: 0
   yScale: 0
   zScale: 1

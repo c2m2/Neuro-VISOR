@@ -29,7 +29,7 @@ public class RulerMeasure : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        float markerSpacing = 0.05f; //minimum spacing between each marker and beginning and end of ruler
+        float markerSpacing = 0.03f; //minimum spacing between each marker and beginning and end of ruler
         markerSpacingPercent = markerSpacing * initialRulerLength / transform.lossyScale.z;
         if (sim != null)
         {
@@ -40,7 +40,7 @@ public class RulerMeasure : MonoBehaviour
             units = GetUnit(magnitude);
 
             int siPrefixGroup = (int)Math.Floor(magnitude / 3.0);
-            // scaledFirstMarkerLength is a scaled version of firstMarkerLength so it is between 1 and 1000
+            // scaledFirstMarkerLength is a scaled version of firstMarkerLength so it is between .5 and 500
             float scaledFirstMarkerLength = (float)(firstMarkerLength / Math.Pow(10, siPrefixGroup * 3));
             scaledRulerLength = (float)(rulerLength / Math.Pow(10, siPrefixGroup * 3));
             UpdateMarkers(scaledFirstMarkerLength);
@@ -49,24 +49,24 @@ public class RulerMeasure : MonoBehaviour
 
     private int GetMagnitude(float length)
     {
-        double lengthLog10 = Math.Log10(length);
+        double lengthLog10 = Math.Log10(length*2); //multiplication by 2 ensures that markers above 500 get treated as the next unit up
         return Convert.ToInt32(Math.Floor(lengthLog10));
     }
 
     private string GetUnit(int magnitude)
     {
-        if (magnitude < -9)
+        if (magnitude < -3)
         {
             // takes the magnitude and puts it in terms of nm by adding three. Then divides by 3 to get unit group and rounds down.
             int eTerm = (magnitude + 3) / 3;
             return " e" + 3 * eTerm + " nm";
         }
-        else if (magnitude < -6) return " nm";
-        else if (magnitude < -3) return " μm";
-        else if (magnitude < 0) return " mm";
-        else if (magnitude < 3) return " m";
-        else if (magnitude <= 6) return " km";
-        else if (magnitude > 6)
+        else if (magnitude < 0) return " nm";
+        else if (magnitude < 3) return " μm";
+        else if (magnitude < 6) return " mm";
+        else if (magnitude < 9) return " m";
+        else if (magnitude <= 12) return " km";
+        else if (magnitude > 12)
         {
             // takes the magnitude and puts it in terms of km by subtracting twelve. Then divides by 3 to get unit group and rounds down.
             int eTerm = (magnitude - 12) / 3;
@@ -91,7 +91,7 @@ public class RulerMeasure : MonoBehaviour
                 TextMeshProUGUI markerText = gObj.AddComponent<TextMeshProUGUI>();
                 markerText.alignment = TextAlignmentOptions.Center;
                 markerText.rectTransform.localPosition = new Vector3(0, 0, 0);
-                markerText.fontSize = 0.04f;
+                markerText.fontSize = 0.03f;
                 markerText.color = Color.black;
                 gObj.transform.localRotation = Quaternion.Euler(0, 0, 90);
                 gObj.transform.localScale = Vector3.one;
