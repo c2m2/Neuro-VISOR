@@ -10,7 +10,7 @@ public class RulerMeasure : MonoBehaviour
 {
     public MeshSimulation sim = null;
     public List<Canvas> measurementDisplays;
-    public List<int> numbers;
+    private List<int> numbers = new List<int>() { 1, 2, 5, 10, 20, 50, 100, 200, 500 };
     private List<MarkedDisplay> markedDisplays = new List<MarkedDisplay>();
     private readonly int markerCount = 100; //Maximum number of markers
     private float initialRulerLength;
@@ -21,7 +21,6 @@ public class RulerMeasure : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        numbers.Sort();
         initialRulerLength = transform.lossyScale.z;
         CreateMarkers();
     }
