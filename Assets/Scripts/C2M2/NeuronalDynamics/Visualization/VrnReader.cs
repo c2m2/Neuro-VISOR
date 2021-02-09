@@ -54,6 +54,8 @@ namespace C2M2.NeuronalDynamics.Visualization.VRN
         /// <summary>
         /// Stores 1D and associated 2D geometries in the member geom1d
         /// </summary>
+        /// Revision is a git SHA1 hash (alphanumeric)
+        /// Date is in unix time (seconds)
         [Serializable]
         private class Geometry
         {
@@ -64,10 +66,10 @@ namespace C2M2.NeuronalDynamics.Visualization.VRN
             /// <summary>
             /// Constructs a geometry
             /// </summary>
-            public Geometry(Geom1d[] geom1d, string version, string date)
+            public Geometry(Geom1d[] geom1d, string revision, string date)
             {
                 this.geom1d = geom1d;
-                this.version = version;
+                this.revision = revision;
                 this.date = date;
             }
         }
