@@ -58,7 +58,7 @@ namespace C2M2.NeuronalDynamics.Visualization.VRN
         private class Geometry
         {
             public Geom1d[] geom1d;
-            public string version; 
+            public string revision; 
             public string date;
 
             /// <summary>
