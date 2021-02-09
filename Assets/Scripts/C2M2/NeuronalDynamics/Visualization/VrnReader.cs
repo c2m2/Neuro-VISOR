@@ -58,10 +58,17 @@ namespace C2M2.NeuronalDynamics.Visualization.VRN
         private class Geometry
         {
             public Geom1d[] geom1d;
+            public string version; 
+            public string date;
 
-            public Geometry(Geom1d[] geom1d)
+            /// <summary>
+            /// Constructs a geometry
+            /// </summary>
+            public Geometry(Geom1d[] geom1d, string version, string date)
             {
                 this.geom1d = geom1d;
+                this.version = version;
+                this.date = date;
             }
         }
 
@@ -103,7 +110,8 @@ namespace C2M2.NeuronalDynamics.Visualization.VRN
         public string List()
         {
             Load();
-            string s = $"Geometries contained in supplied .vrn archive ({this.fileName}): ";
+            string s = $"Geometries contained in supplied .vrn archive ({this.fileName}) created ";
+            s += $"with revision {geometry.revision} on date {geometry.date}.";
             foreach (var geom in geometry.geom1d.Select((x, i) => new { Value = x, Index = i }))
             {
                 s += $"{Environment.NewLine}#{geom.Index + 1} 1D geometry: {geom.Value.name} with refinement {geom.Value.refinement} ({geom.Value.description}).";
