@@ -12,6 +12,9 @@ namespace C2M2.NeuronalDynamics.Interaction {
     {
         public GameObject previewWindowPrefab = null;
         public SimulationLoader loader = null;
+        public bool renderOutline = true;
+        public bool renderWalls = true;
+        public Color32 windowColor = Color.black;
         /// <summary>
         /// Colors ot use for the 1D cell renderings. More than cellColors.Length cells will repeat these colors
         /// </summary>
@@ -151,16 +154,42 @@ namespace C2M2.NeuronalDynamics.Interaction {
             }
             void InstantiatePreviewWindow(string fileName, Vector3 position, Color color)
             {
+                // Instantiate window
                 GameObject go = Instantiate(previewWindowPrefab);
                 go.transform.parent = transform;
                 go.transform.localPosition = position;
                 go.name = fileName + "Preview";
 
+                // Find all line renderers in window, color according to input
+                LineRenderer[] prefabLines = go.GetComponentsInChildren<LineRenderer>();
+                if (prefabLines.Length > 0)
+                {
+                    foreach (LineRenderer r in prefabLines)
+                    {
+                        r.startColor = windowColor;
+                        r.endColor = windowColor;
+                        r.enabled = renderOutline;
+                    }
+                }
+
+                // Find each wall in window, color accoring to input
+                MeshRenderer[] prefabWalls = go.GetComponentsInChildren<MeshRenderer>();
+                if (prefabWalls.Length > 0)
+                {
+                    foreach (MeshRenderer r in prefabWalls)
+                    {
+                        r.enabled = renderWalls;
+                        r.material.SetColor("_Color", windowColor);
+                    }
+                }
+
+                // Start neuron cell previewer.
                 NeuronCellPreview preview = go.GetComponentInChildren<NeuronCellPreview>();
                 preview.vrnFileName = fileName;
                 preview.color = color;
                 preview.loader = loader;
                 preview.PreviewCell(fileName, color);
+
             }
         }
     }

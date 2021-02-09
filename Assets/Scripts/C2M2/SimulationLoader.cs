@@ -3,9 +3,12 @@ using UnityEngine;
 using C2M2.NeuronalDynamics.Simulation;
 namespace C2M2.NeuronalDynamics.Interaction
 {
+    /// <summary>
+    /// Provides an editor interface and method for loading simulations on demand.
+    /// </summary>
     public class SimulationLoader : MonoBehaviour
     {
-        public string vrnFileName = "null";
+        public string vrnFileName { get; set; } = "null";
         public Gradient gradient;
         public float globalMin = float.PositiveInfinity;
         public float globalMax = float.NegativeInfinity;
