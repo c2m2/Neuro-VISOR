@@ -35,8 +35,8 @@ public class SimulationTimerLabel : MonoBehaviour
 
     public override string ToString()
     {
-        if (time > 1000) return String.Format("{0:f0} s     {1:f0} ms", time/1000, time%1000);
-        else return String.Format("{0:f0} ms", time);
+        if (time > 1) return String.Format("{0:f0} s     {1:f0} ms", (int)time, (int)((time-(int)time)*1000));
+        else return String.Format("{0:f0} ms", (int)(time*1000));
     }
 
     public class LabelNotFoundException : Exception

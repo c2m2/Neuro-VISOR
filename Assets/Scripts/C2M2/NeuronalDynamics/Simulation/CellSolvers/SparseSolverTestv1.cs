@@ -7,90 +7,203 @@ using System;
 using System.Diagnostics;
 using UnityEngine;
 using C2M2.NeuronalDynamics.Interaction;
-
-// These are the MathNet Numerics Libraries needed
-// They need to dragged and dropped into the Unity assets plugins folder!
-//using SparseMatrix = MathNet.Numerics.LinearAlgebra.Double.SparseMatrix;
-//using Matrix = MathNet.Numerics.LinearAlgebra.Matrix<double>;
-
+/// These libraries are for using the Vector data type
 using Vector = MathNet.Numerics.LinearAlgebra.Vector<double>;
 using MathNet.Numerics.LinearAlgebra.Double;
 using MathNet.Numerics.Data.Text;
-
-// These are for the sparse solving
+/// These are for the sparse solving functionality
 using CSparse.Storage;
 using CSparse.Double.Factorization;
-//using Vector=CSparse.Double.Vector;
 using CSparse;
-
 using C2M2.Utils;
 using C2M2.NeuronalDynamics.UGX;
 using Grid = C2M2.NeuronalDynamics.UGX.Grid;
 namespace C2M2.NeuronalDynamics.Simulation
 {
+    /// <summary>
+    /// This is the sparse solver class for solving the Hodgkin-Huxley equations for the propagation of action potentials. Below are the HH equations
+    /// this is a system of partial differential equations (PDE), the first equation is for the membrane potential (voltage) it is time spatially dependent
+    /// and the remaining equations are the ODE equations for the state variables n,m,h (these are unitless). The system is non-trivial in that the PDE equation on Voltage
+    /// is coupled to the ODE equations using n,m,h and these ODE equations are also non-linear.
+    /// 
+    ///\f[\frac{a}{2R}\frac{\partial^2V}{\partial x^2}=C\frac{\partial V}{\partial t}+\bar{g}_{K}n^4(V-V_k)+\bar{g}_{Na}m^3h(V-V_{Na})+\bar{g}_l(V-V_l)\f]
+    ///
+    ///\f[\frac{dn}{dt}=\alpha_n(V)(1-n)-\beta_n(V)n\f]
+    ///
+    ///\f[\frac{dm}{dt}=\alpha_m(V)(1-m)-\beta_m(V)m\f]
+    ///
+    ///\f[\frac{dh}{dt}=\alpha_h(V)(1-h)-\beta_h(V)h\f]
+    ///
+    /// The main solver begins with the function call <c>Solve()</c> prior to each iteration of <c>Solve()</c> the new voltage
+    /// values <c>U</c> are sent to this class and then new <c>U</c> are sent out from <c>Solve()</c>
+    /// 
+    /// The solver currently uses Forward Euler time stepping and the spatial solve is done using Crank-Nicolson in 1D
+    /// The solver takes into account the non-uniform radii of the geometry and the non-uniform edgelength of the geometry
+    /// 
+    /// The first part of the code is labeled with 'Simulation Parameters' and 'Biological Parameters'
+    /// These parameters need to be made available to the user to modify for their particular simulation parameters
+    /// The rate functions are defined at the end
+    /// Note: Very important --> ALL UNITS FOR THE SOLVER ARE IN MKS, therefore when modifying the color bars ranges, and raycast/clamp hit values
+    /// they need to be in [V] not [mV] so if you intend to use 50 [mV] it needs to be coded as 0.05 [V]
+    /// 
+    /// The simulation parameters are defined first, initial voltage hit value for raycasting, the endTime, time step size (k)
+    /// Also other options are defined here such as having the SomaOn for clamping the soma on for voltage clamp tests (this is 
+    /// mostly used for verifying the voltage output against Yale Neuron).
+    /// Another set of options that need to be incorporated is to select whether to output voltage data
+    /// 
+    /// 1) TODO: define default time step size
+    /// 
+    /// 2) TODO: get rid of end time user should signal off in vr, this will require changing the loop structure in the solver to a while loop()
+    /// 
+    /// 3) These are the biological parameters that can also be set by the user, right now they are set to private but we want the user to be able to modify these prior to the start of the simulation
+    /// 
+    /// 4) TODO: have the inputs for these parameters be shown inspector for easy changing --> as sliders
+    /// </summary>
+
+    //tex: Below are the Hodgkin Huxley equations
+    //$$\frac{a}{2R}\frac{\partial^2V}{\partial x^2}=C\frac{\partial V}{\partial t}+\bar{g}_{K}n^4(V-V_k)+\bar{g}_{Na}m^3h(V-V_{Na})+\bar{g}_l(V-V_l)$$
+    //$$\frac{dn}{dt}=\alpha_n(V)(1-n)-\beta_n(V)n$$
+    //$$\frac{dm}{dt}=\alpha_m(V)(1-m)-\beta_m(V)m$$
+    //$$\frac{dh}{dt}=\alpha_h(V)(1-h)-\beta_h(V)h$$
+
     public class SparseSolverTestv1 : NDSimulation
     {
-        //Simulation parameters
         [Header("Simulation Parameters")]
-        public double vstart = 55;                        // 55 [mV]
-        public double endTime = 100000;                      // End time value
-        public double h = 0.27;                           // User enters spatial step size
-        public double k = 0.0027;                         // User enters time step size
-        public bool HK_auto = true;                       // auto choose H and K
-        public bool SomaOn = false;                        // set soma to be clamped to vstart
+        ///<summary>
+        /// This is the voltage for the voltage clamp, this is primarily used for when we do the convergence analysis of the code using a 
+        /// soma clamp at 50 [mV], the units for voltage in the solver is [V] that is why <c>vstart</c> is set to 0.05
+        ///</summary>
+        public double vstart = 0.050;     
+        /// <summary>
+        /// [s] endTime of the simulation. This is the endtime of the simulation which is measured in seconds, this is a parameter that the user can set for now
+        /// 
+        /// TODO: we would like the simulation to run without an endtime and the use clicks an 'end button' to terminate the vr-simulation
+        /// </summary>
+        public double endTime = 0.5;      
+        /// <summary>
+        /// User enters the time step size [s], this is the time step size of the simulation, this needs to be chosen carefully as too large of 
+        /// a time step size may cause numerical instability for the solver. Notice that that this is in [s] therefore 0.0025[ms] = 0.0025e-3 [s]
+        /// 
+        /// TODO: need to formulate a default time step size given a refinement level of geometry
+        /// </summary>
+        public double k = 0.0025 * 1.0E-3;    
+        /// <summary>
+        /// This is for turning the soma on/off, this option is primarily used for testing purposes for the convergence analysis, for a soma clamp experiment
+        /// </summary>
+        public bool SomaOn = false;            
+        /// <summary>
+        /// send LHS and RHS stencil matrices to output file for saving. This option is available if the user would like to check the sparsity pattern of the HINES matrix,
+        /// this is a sparse matrix which corresponds to the sparsity nature of the stencil matrix. The stencil matrix is used for the diffusion solve of the PDE equation when
+        /// we perform the operator splitting.
+        /// </summary>
+        private bool saveMatrices = false;
+        ///<summary>
+        /// [ohm.m] resistance.length, this is the axial resistence of the neuron, increasing this value has the effect of making the AP waves more localized and slower conduction speed
+        /// decreasing this value has the effect of make the AP waves larger and have a faster conduction speed
+        /// </summary>
+        private double res = 250.0 * 1.0E-2;
+        /// <summary>
+        /// [F/m2] capacitance per unit area, this is the plasma membrane capacitance, this a standard value for the capacitance
+        /// </summary>
+        private double cap = 1.0 * 1.0E-2;
+        /// <summary>
+        /// [S/m2] potassium conductance per unit area, this is the Potassium conductance per unit area, it is used in this term
+        /// \f[\bar{g}_{K}n^4(V-V_k)\f]
+        /// where \f$n\f$ is the state variable, and \f$V_k\f$ is the reversal potential.
+        /// </summary>
+        private double gk = 5.0 * 1.0E1;
+        /// <summary>
+        /// [S/m2] sodium conductance per unit area, this is the Sodium conductance per unit area, it is used in this term
+        /// \f[\bar{g}_{Na}m^3h(V-V_{Na})\f]
+        /// where \f$m,h\f$ are the state variables, and \f$V_{Na}\f$ is the reversal potential for sodium.
+        /// </summary>
+        private double gna = 50.0 * 1.0E1;
+        /// <summary>
+        /// [S/m2] leak conductance per unit area, this is the leak conductance per unit area, it is used in this term
+        /// \f[\bar{g}_{l}(V-V_l)\f]
+        /// \f$V_l\f$ is the leak reversal potential.
+        /// </summary>
+        private double gl = 0.0 * 1.0E1;
+        /// <summary>
+        /// [V] potassium reversal potential
+        /// </summary>
+        private double ek = -90.0 * 1.0E-3;
+        /// <summary>
+        /// [V] sodium reversal potential
+        /// </summary>
+        private double ena = 50.0 * 1.0E-3;
+        /// <summary>
+        /// [V] leak reversal potential
+        /// </summary>
+        private double el = -70.0 * 1.0E-3;
+        /// <summary>
+        /// [] potassium channel state probability, unitless
+        /// </summary>
+        private double ni = 0.0376969;
+        /// <summary>
+        /// [] sodium channel state probability, unitless
+        /// </summary>
+        private double mi = 0.0147567;
+        /// <summary>
+        /// [] sodium channel state probability, unitless  
+        /// </summary>
+        private double hi = 0.9959410;            
 
-        [Header("Print Output files")]
-        public int numRuns = 0;                           // Number of Runs
-        public bool randomPermute = false;                // Randomly permute the order of the solution entries
-        public bool printMatrices = false;                // turn on/off printing of system matrices
-        public bool printCellInfo = false;                // turn on/off printing of cell info
-        public bool printVolt_time = false;               // turn on/off printing of voltage and times
-
-        //Set cell biological paramaters
-        [Header("Biological Parameters")]
-        public double res = 0.3;                          // Ohm.cm
-        public double cap = 0.3;                          // [uF/cm^2]
-        public double ni = 0.317677, mi = 0.0529325, hi = 0.596121;       //state probabilities, unitless
-
-        // Turn On/Off Potassium
-        public bool k_ONOFF = true;
-        public double gk = 36.0;                          // [mS/cm^2]
-        public double ek = -2.0;                          // [mV]
-
-        // Turn On/Off Sodium
-        public bool na_ONOFF = true;
-        public double gna = 153.0;                        // [mS/cm^2]
-        public double ena = 120;                           // [mV]
-
-        // Turn On/Off Leak
-        public bool leak_ONOFF = true;
-        public double gl = 0.3;                           // [mS/cm^2]
-        public double el = -10.0;                         // [mV]
-
-        // Solution vectors
+        /// <summary>
+        /// These are the solution vectors for the voltage <code>U</code>
+        /// the state <c>M</c>, state <c>N</c>, and state <c>H</c>
+        /// </summary>
         private Vector U;
+        /// <summary>
+        /// These are the solution vectors for the voltage <code>U</code>
+        /// the state <c>M</c>, state <c>N</c>, and state <c>H</c>
+        /// </summary>
         private Vector M;
+        /// <summary>
+        /// These are the solution vectors for the voltage <code>U</code>
+        /// the state <c>M</c>, state <c>N</c>, and state <c>H</c>
+        /// </summary>
         private Vector N;
+        /// <summary>
+        /// These are the solution vectors for the voltage <code>U</code>
+        /// the state <c>M</c>, state <c>N</c>, and state <c>H</c>
+        /// </summary>
         private Vector H;
 
-        // Keep track of i locally so that we know which simulation frame to send to other scripts
+        /// <summary>
+        /// This keeps track of which simulation frame to send to the other scripts
+        /// <c>i</c> gets track of the time step number
+        /// </summary>
         private int i = -1;
 
-        public override float GetSimulationTime() => i* (float) k;
+        /// <summary>
+        /// This sends the current time to the simulation timer
+        /// Note that the solver is in MKS, right now the simulation timer uses MKS, no need to multiply by 1000
+        /// and the simulation timer object uses [ms]!
+        /// </summary>
+        /// <returns>i*(float)1000*(float) k</returns>
+        public override float GetSimulationTime() => i*(float) k;
 
-        // Send simulation 1D values 
+        /// <summary>
+        /// Send simulation 1D values, this send the current voltage after the solve runs 1 iteration
+        /// it passes <c>curVals</c>
+        /// </summary>
+        /// <returns>curVals</returns>
         public override double[] Get1DValues()
         {
+            /// this initialize the curvals which will be sent back to the VR simulation
             double[] curVals = null;
             try
             {
                 mutex.WaitOne();
-
+                /// check if this beginning of the simulation
                 if (i > -1)
                 {
+                    /// define the current time slice to send and initialize it to the correct size which is the number of vertices in the geometry
+                    /// initialize it to the current state of the voltage, this is the voltage we are sending back to vr simulation
                     Vector curTimeSlice = U.SubVector(0, NeuronCell.vertCount);
-                    curTimeSlice.Multiply(1, curTimeSlice);
-                    //curTimeSlice = curTimeSlice - 70;
+                    curTimeSlice.Multiply(1, curTimeSlice);   
+                    /// convert the time slice to an Array
                     curVals = curTimeSlice.ToArray();
                 }
 
@@ -104,7 +217,12 @@ namespace C2M2.NeuronalDynamics.Simulation
             return curVals;
         }
 
-        // Receive new simulation 1D index/value pairings
+        /// <summary>
+        /// Receive new simulation 1D index/value pairings
+        /// Carefully, notice that <c>val</c> needs to be multiplied by 0.001 this is because
+        /// the hit value is in [mV] and the solver uses [V]
+        /// </summary>
+        /// <param name="newValues"></param>
         public override void Set1DValues(Tuple<int, double>[] newValues)
         {
             try
@@ -114,7 +232,8 @@ namespace C2M2.NeuronalDynamics.Simulation
                 {
                     int j = newVal.Item1;
                     double val = newVal.Item2;
-                    U[j] += val;
+                    /// here we set the voltage at the location, notice that we multiply by 0.0001 to convert to volts [V] 
+                    U[j] = val * (1E-3);
                 }
                 mutex.ReleaseMutex();
             }
@@ -125,450 +244,389 @@ namespace C2M2.NeuronalDynamics.Simulation
             }
         }
 
+        /// <summary>
+        /// This is a small routine call to initialize the Neuron Cell
+        /// this will initialize the solution vectors which are <c>U</c>, <c>M</c>, <c>N</c>, and <c>H</c>
+        /// </summary>
         protected override void PreSolve()
         {
             InitializeNeuronCell();
         }
 
+        /// <summary>
+        /// This is the main solver, it is running on it own thread.
+        /// Inside this solver it 
+        /// 1. initialize the stencil matrix (only once) for the diffusion solve of the operator splitting
+        /// 2. there is a for-loop which is controled by <c>i</c>
+        /// 3. Inside the for-loop we do the diffusion solve first, then reaction solve, and then updated the state ODEs
+        /// We make the following definitions: \n
+        ///\f[A(V):=\frac{a}{2RC}\frac{\partial ^ 2V}{\partial x^2}\f] \n
+        ///\f[r(V):= -\frac{\bar{ g} _{ K} }{ C}n ^ 4(V - V_k) -\frac{\bar{ g} _{ Na} }{ C}m ^ 3h(V - V_{ Na})-\frac{\bar{ g} _l}{ C} (V - V_l)\f] \n
+        /// then we solve in two separate steps \n
+        ///\f[\frac{dV}{dt}=A(V)+r(V),\f] \n
+        /// where \f$A(V)\f$ is the second order differential operator on \f$V\f$ and \f$r(V)\f$ is the reaction part.
+        /// We employ a Lie Splitting by first solving \n
+        /// \f[\frac{ dV ^ *}{ dt}= A(V ^ *)\f] \n
+        /// with initial conditions \f$V_0^*=V(t_n)= V_n\f$ at the beginning of the time step to get the intermediate solution \f$V^*\f$
+        /// Then we solve \f$\frac{dV^{**}}{dt}=r(V^{**})\f$ with initial condition \f$V_0^{**}=V^*\f$ to get \f$V^{**}\f$, and \f$V_{n+1}=V(t_{n+1})=V^{**}\f$ the voltage at the end of the time step.
+        /// For equation the diffusion we use a Crank-Nicolson scheme
+        /// </summary>
+        /// 
+        //tex:
+        //$$A(V):=\frac{a}{2RC}\frac{\partial ^ 2V}{\partial x^2}$$
+        //$$r(V):= -\frac{\bar{ g} _{ K} }{ C}n ^ 4(V - V_k) -\frac{\bar{ g} _{ Na} }{ C}m ^ 3h(V - V_{ Na})-\frac{\bar{ g} _l}{ C} (V - V_l)$$
+        // then we solve in two separate steps
+        //$$\frac{dV}{dt}=A(V)+r(V),$$
+        //where $A(V)$ is the second order differential operator on $V$ and $r(V)$ is the reaction term on $V$. We employ a Lie Splitting by first solving
+        //$$\frac{ dV ^ *}{ dt}= A(V ^ *)$$
+        //with initial condition $V_0^*=V(t_n)= V_n$ at the beginning of the time step to get the intermediate solution $V^*$. Then we solve
+        //$\frac{dV^{**}}{dt}=r(V^{**})$ with initial condition $V_0^{**}=V^*$ to get $V^{**}$, and $V_{n+1}=V(t_{n+1})=V^{**}$ the voltage at the end of the time step.
+        //For equation the diffusion we use a Crank-Nicolson scheme
+
         protected override void Solve()
-        {
+        {                                                                          
+            ///<c>int nT</c> is the Number of time steps
+            int nT = (int)System.Math.Floor(endTime / k);
+            ///<c>R</c> this is the reaction vector for the reaction solve
+            Vector R = Vector.Build.Dense(NeuronCell.vertCount);
+            ///<c>reactConst</c> this is a small list for collecting the conductances and reversal potential which is sent to the reaction solve routine
+            List<double> reactConst = new List<double> { gk, gna, gl, ek, ena, el };
+            ///<c>List<CoordinateStorage<double>> sparse_stencils = makeSparseStencils(NeuronCell, res, cap, k);</c> Construct sparse RHS and LHS in coordinate storage format, no zeros are stored \n
+            /// <c>sparse_stencils</c> this is a list which contains only two matrices the LHS and RHS matrices for the Crank-Nicolson solve
+            List<CoordinateStorage<double>> sparse_stencils = makeSparseStencils(NeuronCell, res, cap, k);
+            ///<c>CompressedColumnStorage</c> call Compresses the sparse matrices which are stored in <c>sparse_stencils[0]</c> and <c>sparse_stencils[1]</c>
+            CompressedColumnStorage<double> r_csc = CompressedColumnStorage<double>.OfIndexed(sparse_stencils[0]); //null;
+            CompressedColumnStorage<double> l_csc = CompressedColumnStorage<double>.OfIndexed(sparse_stencils[1]); //null;
+            ///<c>double [] b</c> we define storage for the diffusion solve part
+            double[] b = new double[NeuronCell.vertCount];
+            ///<c>var lu = SparseLU.Create(l_csc, ColumnOrdering.MinimumDegreeAtA, 0.1);</c> this creates the LU decomposition of the HINES matrix which is defined by <c>l_csc</c>
+            var lu = SparseLU.Create(l_csc, ColumnOrdering.MinimumDegreeAtA, 0.1);
 
-            for (int kSim = 0; kSim <= numRuns; kSim++)
+            try
             {
-                int nT;                                                             // Number of Time steps
-                List<bool> channels = new List<bool> { false, false, false };       // For adding/removing channels
+                for (i = 0; i < nT; i++)
+                {                       
+                    mutex.WaitOne();
+                    ///<c>if ((i * k >= 0.015) && SomaOn) { U[0] = vstart; }</c> this checks of the somaclamp is on and sets the soma location to <c>vstart</c>
+                    if ((i * k >= 0.015) && SomaOn) { U[0] = vstart; }
+                    ///This part does the diffusion solve \n
+                    /// <c>r_csc.Multiply(U.ToArray(), b);</c> the performs the RHS*Ucurr and stores it in <c>b</c> \n
+                    /// <c>lu.Solve(b, b);</c> this does the forward/backward substitution of the LU solve and sovles LHS = b \n
+                    /// <c>U.SetSubVector(0, NeuronCell.vertCount, Vector.Build.DenseOfArray(b));</c> this sets the U vector to the voltage at the end of the diffusion solve
+                    r_csc.Multiply(U.ToArray(), b);
+                    lu.Solve(b, b);
+                    U.SetSubVector(0, NeuronCell.vertCount, Vector.Build.DenseOfArray(b));
+                    /// this part solves the reaction portion of the operator splitting \n
+                    /// <c>R.SetSubVector(0, NeuronCell.vertCount, reactF(reactConst, U, N, M, H, cap));</c> this first evaluates at the reaction function \f$r(V)\f$ \n
+                    /// <c>R.Multiply(k, R); </c> this multiplies by the time step size \n
+                    /// <c>U.add(R,U)</c> adds it back to U to finish off the operator splitting
+                    /// For the reaction solve we are solving
+                    /// \f[\frac{U_{next}-U_{curr}}{k} = R(U_{curr})\f]
+                    R.SetSubVector(0, NeuronCell.vertCount, reactF(reactConst, U, N, M, H, cap));
+                    R.Multiply(k, R);
+                    U.Add(R, U);
+                    /// this part solve the state variables using Forward Euler
+                    /// the general rule is \f$N_{next} = N_{curr}+k\cdot f_N(U_{curr},N_{curr})\f$
+                    N.Add(fN(U, N).Multiply(k), N);
+                    M.Add(fM(U, M).Multiply(k), M);
+                    H.Add(fH(U, H).Multiply(k), H);
+                    ///<c>if ((i * k >= 0.015) && SomaOn) { U[0] = vstart; }</c> this checks of the somaclamp is on and sets the soma location to <c>vstart</c>
+                    if ((i * k >= 0.015) && SomaOn) { U[0] = vstart; }
 
-                // TODO: NEED TO DO THIS BETTER
-                if (HK_auto)
-                {
-                    h = 0.1 * NeuronCell.edgeLengths.Average();
-                    if (h <= 1) { k = h / 130; }                // 0 refine       
-                    if (h <= 0.5) { k = h / 65; }               // 1 refine
-                    if (h <= 0.25) { k = h / 32.5; }            // 2 refine
-                    if (h <= 0.12) { k = h / 18; }              // 3 refine
-                    if (h <= 0.06) { k = h / 9; }               // 4 refine
-                    if (h <= 0.03) { k = h / 5; }
-                }
-
-                // setup up paths for writing output
-                //string strPath = Environment.GetFolderPath(System.Environment.SpecialFolder.DesktopDirectory);
-                //string subPath = strPath + @"\VR_Simulations";
-                //bool exists = System.IO.Directory.Exists(subPath);
-
-                // check if directory exists
-                //if (!exists) { System.IO.Directory.CreateDirectory(subPath); }
-
-                // set the path for writing
-                //strPath = subPath;
-                //DirectoryInfo di = Directory.CreateDirectory(strPath + @"\SimulationRun" + "_" + kSim);
-                //strPath = strPath + @"\SimulationRun" + "_" + kSim;
-
-                // Number of time steps
-                nT = (int)System.Math.Floor(endTime / k);
-
-                // set some constants for the HINES matrix
-                double diffConst = (1 / (2 * res * cap));
-                double cfl = diffConst * k / h;
-
-                // reaction vector
-                Vector R = Vector.Build.Dense(NeuronCell.vertCount);
-                List<double> reactConst = new List<double> { gk, gna, gl, ek, ena, el };
-
-                // temporary voltage vector
-                Vector tempV = Vector.Build.Dense(NeuronCell.vertCount);
-
-                // Construct sparse RHS and LHS in coordinate storage format, no zeros are stored
-                List<CoordinateStorage<double>> sparse_stencils = makeSparseStencils(NeuronCell, h, k, diffConst);
-
-                // Compress the sparse matrices
-                CompressedColumnStorage<double> r_csc = CompressedColumnStorage<double>.OfIndexed(sparse_stencils[0]); //null;
-                CompressedColumnStorage<double> l_csc = CompressedColumnStorage<double>.OfIndexed(sparse_stencils[1]); //null;
-
-                // Permutation matrix----------------------------------------------------------------------//
-                int[] p = new int[NeuronCell.vertCount];
-                if (randomPermute) { p = Permutation.Create(NeuronCell.vertCount, 1); }
-                else { p = Permutation.Create(NeuronCell.vertCount, 0); }
-
-                CompressedColumnStorage<double> Id_csc = CompressedColumnStorage<double>.CreateDiagonal(NeuronCell.vertCount, 1);
-                Id_csc.PermuteRows(p);
-                //--------------------------------------------------------------------------------------------//
-
-                // for solving Ax = b problem
-                double[] b = new double[NeuronCell.vertCount];
-
-                // Apply column ordering to A to reduce fill-in.
-                //var order = ColumnOrdering.MinimumDegreeAtPlusA;
-
-                // Create Cholesky factorization setup
-               // Timer timer = new Timer();
-                //timer.StartTimer();
-                var chl = SparseCholesky.Create(l_csc, p);
-                //var chl = SparseCholesky.Create(l_csc, order);
-                //timer.StopTimer("Matrix Setup");
-                //timer.ExportCSV_path(strPath + @"\chlSetup_" + kSim);
-
-                // Write permutation, rhsM, lhsM, and choleskyR matrix to file
-                //if (printMatrices) { printMatrix(Id_csc, r_csc, l_csc, chl.L, strPath, kSim); }
-                // Print cell info to a text file
-                //if (printCellInfo) { printCell(NeuronCell, h, k, nT, endTime, cfl, strPath, kSim); }
-
-                // For printing voltage data and time steps
-                //var sw = new StreamWriter(strPath + @"\outputVoltage_" + kSim + ".txt", true);
-                //var tw = new StreamWriter(strPath + @"\timesteps_" + kSim + ".txt", true);
-
-                //timer = new Timer(nT);
-                try
-                {
-                    for (i = 0; i < nT; i++)
+                    ///<c>if (clamps != null && clamps.Count > 0)</c> this if statement is where we apply voltage clamps
+                    if (clamps != null && clamps.Count > 0)
                     {
-                        if (SomaOn) { U.SetSubVector(0, NeuronCell.vertCount, setSoma(U, NeuronCell.somaID, vstart)); }
-                        mutex.WaitOne();
-
-                        r_csc.Multiply(U.ToArray(), b);         // Peform b = rhs * U_curr 
-                        // Diffusion solver
-                  //      timer.StartTimer();
-                        chl.Solve(b, b);
-                    //    timer.StopTimer(i.ToString());
-
-                        // Set U_next = b
-                        U.SetSubVector(0, NeuronCell.vertCount, Vector.Build.DenseOfArray(b));
-
-                        // Save voltage from diffusion step for state probabilities
-                        tempV.SetSubVector(0, NeuronCell.vertCount, U);
-
-                        // Reaction
-                        channels[0] = na_ONOFF;
-                        channels[1] = k_ONOFF;
-                        channels[2] = leak_ONOFF;
-                        R.SetSubVector(0, NeuronCell.vertCount, reactF(reactConst, U, N, M, H, channels, NeuronCell.boundaryID));
-                        R.Multiply(k / cap, R);
-
-                        // This is the solution for the voltage after the reaction is included!
-                        U.Add(R, U);
-
-                        //Now update state variables using FE on M,N,H
-                        N.Add(fN(tempV, N).Multiply(k), N);
-                        M.Add(fM(tempV, M).Multiply(k), M);
-                        H.Add(fH(tempV, H).Multiply(k), H);
-
-                        //Always reset to IC conditions and boundary conditions (for now)
-                        //U.SetSubVector(0, NeuronCell.vertCount, boundaryConditions(U, NeuronCell.boundaryID));
-                        if (SomaOn) { U.SetSubVector(0, NeuronCell.vertCount, setSoma(U, NeuronCell.somaID, vstart)); }
-
-                        // Apply clamp voltages
-                        if (clamps != null && clamps.Count > 0)
+                        foreach (NeuronClamp clamp in clamps)
                         {
-                            foreach (NeuronClamp clamp in clamps)
+                            if (clamp != null && clamp.focusVert != -1 && clamp.clampLive)
                             {
-                                if (clamp != null && clamp.focusVert != -1 && clamp.clampLive)
-                                {
-                                    U[clamp.focusVert] = clamp.clampPower;
-                                }
+                                ///<c>U[clamp.focusVert] = (1E-03)*clamp.clampPower;</c> notice we multiply by 1e-3 since the hit value is in [mV] we need to convert to [V], volts.
+                                U[clamp.focusVert] = (1E-03)*clamp.clampPower;
                             }
                         }
-
-                        mutex.ReleaseMutex();
                     }
-                  //  sw.Close();
-                   // tw.Close();
-                }
-                catch (Exception e)
-                {
-                    GameManager.instance.DebugLogErrorThreadSafe(e);
                     mutex.ReleaseMutex();
-                }
-                finally
-                {
-                  //  timer.ExportCSV_path(strPath + @"\diffusionTimes_" + kSim);
-                   // sw.Close();
-                //    tw.Close();
-                }
-                GameManager.instance.DebugLogSafe("Simulation Over.");
+                }     
             }
+            catch (Exception e)
+            {
+                GameManager.instance.DebugLogErrorThreadSafe(e);
+                mutex.ReleaseMutex();
+            }
+            GameManager.instance.DebugLogSafe("Simulation Over.");
         }
 
         #region Local Functions
-
+        /// <summary>
+        /// This function initializes the voltage vector <c>U</c> and the state vectors
+        /// <c>M</c>, <c>N</c>, and <c>H</c> \n
+        /// The input <c>NeuronCell.vertCount</c> is the vertex count of the neuron geometry \n
+        /// <c>U</c> is initialized to 0 [V] for the entire cell \n
+        /// <c>M</c> is initialized to \f$m_i\f$ which is set by <c>mi</c> \n
+        /// <c>N</c> is initialized to \f$n_i\f$ which is set by <c>ni</c> \n
+        /// <c>H</c> is initialized to \f$h_i\f$ which is set by <c>hi</c>
+        /// </summary>
         private void InitializeNeuronCell()
         {
-            //Initialize vector with all zeros
             U = Vector.Build.Dense(NeuronCell.vertCount, 0);
             M = Vector.Build.Dense(NeuronCell.vertCount, mi);
             N = Vector.Build.Dense(NeuronCell.vertCount, ni);
             H = Vector.Build.Dense(NeuronCell.vertCount, hi);
-
-            //Set all initial state probabilities
-            M[0] = mi;
-            N[0] = ni;
-            H[0] = hi;
-
-            //Set the initial conditions of the solution
-            //U.SetSubVector(0, NeuronCell.vertCount, initialConditions(U, NeuronCell.boundaryID));
-            if (SomaOn) { U.SetSubVector(0, NeuronCell.vertCount, setSoma(U, NeuronCell.somaID, vstart)); }
-           // U.SetSubVector(0, NeuronCell.vertCount, setSoma(U, NeuronCell.somaID, 0));
         }
-
-        // This is the thomas_algorithm
-        // Input: D = diagonal of LHS
-        //        u = upper diagonal of LHS
-        //        b = this is the vector in the equation LHS*x = b
-        // Output: vector x which is solution to LHS*x = b
-        public static Vector thomas_algorithm(Vector D, Vector u, Vector b)
+        /// <summary>
+        /// This is for constructing the lhs and rhs of system matrix \n
+        /// This will construct a HINES matrix (symmetric), it should be tridiagonal with some off
+        /// diagonal entries corresponding to a branch location in the neuron graph \n
+        /// The entries are defined by the following:
+        /// \f[
+        /// \left(-\sum_{k\in\mathcal{N}_j}\eta_kV_k^{n+1}\right)+\omega_jV_j^{n+1}=\left(\sum_{k\in\mathcal{N}_j}\eta_kV_k^{n}\right)+\bar{\omega}_jV_j^{n}
+        /// \f]
+        /// where
+        /// \f[\eta_k = \frac{\gamma_{k, j}\Delta t}{ 2}\f]
+        /// and
+        /// \f[\omega_j = 1+\frac{\theta_j\Delta t}{ 2} = 1 +\frac{\Delta t\sum_{ p\in\mathcal{ N} _j}\gamma_{ p,j} }{ 2}\f]
+        /// and \f$\gamma_{ k,j}\f$ is defined as
+        /// \f[\gamma_{k, j}:=\frac{ 1}{ C_mR_a a_j\widetilde{\Delta x_j} }\cdot \frac{ 1}{\left(\frac{ 1} { a_{ k} ^2} +\frac{ 1} { a_j ^ 2}\right)\Delta x_{ { k},j} }\f]
+        /// </summary>
+        /// <param name="myCell"></param> this is the <c>NeuronCell</c> that contains all the information about the cell geometry
+        /// <param name="res"></param> this is the axial resistance
+        /// <param name="cap"></param> this is the membrane capacitance
+        /// <param name="k"></param> this is the fixed time step size
+        /// <returns>LHS,RHS</returns> the function returns the LHS, RHS stencil matrices for the diffusion solve in sparse format, it is compressed in the main solver routine.
+        public static List<CoordinateStorage<double>> makeSparseStencils(NeuronCell myCell, double res, double cap, double k)
         {
-            int size = b.Count;
-            double f;
-
-            // Loop in thomas algorithm
-            for (int j = size - 1; j-- > 1;)
-            {
-                f = u[j - 1] / D[j];
-                D[j - 1] = D[j - 1] - f * u[j - 1];
-                b[j - 1] = b[j - 1] - f * b[j];
-            }
-            b[0] = b[0] / D[0];
-
-            //typo in paper
-            for (int j = 1; j < size - 1; j++)
-            {
-                b[j] = (b[j] - u[j] * b[j - 1]) / D[j];
-            }
-
-            return b;
-        }
-
-        // This prints the general cell and simulation information
-        // average edge lengths, spatial step size, time step size, number of time steps
-        // the cfl number, time to setup cholesky solver, soma indices
-        public void printCell(NeuronCell myCell, double h, double k, double nT, double endTime, double cfl, string strPath, int kSim)
-        {
-            var cellinfo = new StreamWriter(strPath + @"\cellinfo_" + kSim + ".txt", true);
-            var neigbors = new StreamWriter(strPath + @"\nodeNeigbors_" + kSim + ".txt", true);
-            var radii = new StreamWriter(strPath + @"\radii_" + kSim + ".txt", true);
-            var somapoints = new StreamWriter(strPath + @"\somapoints_" + kSim + ".txt", true);
-            var vertexinfo = new StreamWriter(strPath + @"\vertexinfo_" + kSim + ".txt", true);
-            //var brchpoints = new StreamWriter(strPath + @"\brch1_" + kSim + ".txt", true);
-
-            cellinfo.Write("aver edgelength = " + myCell.edgeLengths.Average() + "\n");
-            cellinfo.Write("max edgelength = " + myCell.edgeLengths.Max() + "\n");
-            cellinfo.Write("min edgelength = " + myCell.edgeLengths.Min() + "\n");
-            cellinfo.Write("This cell has = " + myCell.vertCount + " nodes." + "\n");
-            cellinfo.Write("Time step k = " + k + "\n");
-            cellinfo.Write("Spatial step size = " + h + "\n");
-            cellinfo.Write("Number of Time steps = " + nT + "\n");
-            cellinfo.Write("Soma Indices = " + String.Join(", ", myCell.somaID) + "\n");
-            cellinfo.Write("cfl = " + cfl + "\n");
-            cellinfo.Close();
-
-            // Print the node neighbors to output file
-            for (int p = 0; p < myCell.vertCount; p++)
-            {
-                for (int q = 0; q < myCell.nodeData[p].neighborIDs.Count; q++)
-                {
-                    neigbors.Write(myCell.nodeData[p].neighborIDs[q] + ", ");
-                }
-                neigbors.Write("\n");
-
-                radii.Write(myCell.nodeData[p].nodeRadius + Environment.NewLine);
-                vertexinfo.Write(myCell.nodeData[p].id + " " + myCell.nodeData[p].xcoords + " " + myCell.nodeData[p].ycoords + " " + myCell.nodeData[p].zcoords + " " + Environment.NewLine);
-            }
-
-            int sID;
-
-            for (int p = 0; p < myCell.somaID.Count; p++)
-            {
-                sID = myCell.somaID[p];
-                somapoints.Write(sID + " " + myCell.nodeData[sID].xcoords + " " + myCell.nodeData[sID].ycoords + " " + myCell.nodeData[sID].zcoords + Environment.NewLine);
-            }
-
-            /*
-            int bID;
-            for (int p = 0; p < myCell.brchID.Count; p++)
-            {
-                bID = myCell.brchID[p];
-                brchpoints.Write(bID + Environment.NewLine);
-            }
-            */
-            neigbors.Close();
-            radii.Close();
-            somapoints.Close();
-            //brchpoints.Close();
-            vertexinfo.Close();
-        }
-
-        // this prints the right hand side and left hand side system stencil matrices
-        public void printMatrix(CompressedColumnStorage<double> Id_csc, CompressedColumnStorage<double> rhsMarray, CompressedColumnStorage<double> lhsMarray, CompressedColumnStorage<double> chlR, string strPath, int kSim)
-        {
-            var rhsMatrix = new StreamWriter(strPath + @"\rhsMatrix_" + kSim + ".txt", true);
-            var lhsMatrix = new StreamWriter(strPath + @"\lhsMatrix_" + kSim + ".txt", true);
-            var permId = new StreamWriter(strPath + @"\permIdMatrix_" + kSim + ".txt", true);
-            var chlMatrix = new StreamWriter(strPath + @"\chlLmat_" + kSim + ".txt", true);
-
-            for (int q = 0; q < NeuronCell.vertCount; q++)
-            {
-                for (int j = 0; j < NeuronCell.vertCount; j++)
-                {
-                    rhsMatrix.Write(rhsMarray.At(q, j) + " ");
-                    lhsMatrix.Write(lhsMarray.At(q, j) + " ");
-                    permId.Write(Id_csc.At(q, j) + " ");
-                    chlMatrix.Write(chlR.At(q, j) + " ");
-                }
-                rhsMatrix.Write(Environment.NewLine);
-                lhsMatrix.Write(Environment.NewLine);
-                permId.Write(Environment.NewLine);
-                chlMatrix.Write(Environment.NewLine);
-            }
-            rhsMatrix.Close();
-            lhsMatrix.Close();
-            permId.Close();
-            chlMatrix.Close();
-        }
-
-        // This is for constructing the lhs and rhs of system matrix
-        // This will construct a HINES matrix (symmetric), it should be tridiagonal with some off
-        // diagonal entries corresponding to a branch location in the neuron graph
-        public static List<CoordinateStorage<double>> makeSparseStencils(NeuronCell myCell, double h, double k, double diffConst)
-        {
+            /// send output matrices as a list {rhs, lhs}\n
+            /// <c>List<CoordinateStorage<double>> stencils = new List<CoordinateStorage<double>>();</c> initializes empty list storage for the stencil matrices \n
+            /// in this case they are of type <c>CoordinateStorage</c> \n
             List<CoordinateStorage<double>> stencils = new List<CoordinateStorage<double>>();
 
+            /// initialize new coordinate storage \n
+            /// <c>var rhs = new CoordinateStorage<double>(myCell.vertCount, myCell.vertCount, myCell.vertCount * myCell.vertCount);</c> this initializes our empty coordinate storage matrices <c>rhs</c> and <c>lhs</c>
             var rhs = new CoordinateStorage<double>(myCell.vertCount, myCell.vertCount, myCell.vertCount * myCell.vertCount);
             var lhs = new CoordinateStorage<double>(myCell.vertCount, myCell.vertCount, myCell.vertCount * myCell.vertCount);
 
-            // for keeping track of the neighbors of a node
-            int nghbrCount;
-            int nghbrInd;
+            /// for keeping track of the neighbors of a node \n
+            /// <c>List<int> nghbrlist;</c> this is for collecting the neighbor indices of the current node 
+            List<int> nghbrlist;
+            int nghbrLen;
 
-            // need cfl coefficient
-            double cfl = diffConst * k / h;
-            double vRad = 0.14;
-            for (int p = 0; p < myCell.vertCount; p++)
+            /// make an empty list to collect edgelengths \n
+            /// <c>List<double> edgelengths = new List<double>();</c> initialize empty list for collecting edgelengths
+            List<double> edgelengths = new List<double>();
+            double tempEdgeLen, tempRadius, aveEdgeLengths;
+            /// <c>double sumRecip = 0;</c> this is for adding the sum of reciprocals which is in our stencil scheme \n
+            double sumRecip = 0;
+            double scf = 1E-6;  /// 1e-6 scale factor to convert to micrometers for radii and edge length \n
+
+            for (int j = 0; j < myCell.vertCount; j++)
             {
-                nghbrCount = myCell.nodeData[p].neighborIDs.Count;
-                //vRad = myCell.nodeData[p].nodeRadius;
-                //if (vRad >= 1) { vRad = 1; }
+                /// <c>nghbrlist = myCell.nodeData[j].neighborIDs;</c> this gets the current neighbor list for node j \n
+                nghbrlist = myCell.nodeData[j].neighborIDs;
+                /// <c>nghbrLen = nghbrlist.Count();</c> this is the length of the neighbor list \n
+                nghbrLen = nghbrlist.Count();
+                edgelengths.Clear();
+                sumRecip = 0;
+                /// <c>tempRadius = myCell.nodeData[j].nodeRadius*scf;</c> get the current radius at node j \n
+                tempRadius = myCell.nodeData[j].nodeRadius*scf;
 
-                // set main diagonal entries
-                rhs.At(p, p, 1 - (((double)nghbrCount) * vRad * cfl / (2 * h)));
-                lhs.At(p, p, 1 + (((double)nghbrCount) * vRad * cfl / (2 * h)));
-                
-
-                // this inner loop is for setting the off diagonal entries which correspond
-                // to the neighbors of each node in the branch structure
-                for (int q = 0; q < nghbrCount; q++)
+                /// in this loop we collect the edgelengths that go to node j, and we compute the coefficient given in our paper \n
+                for (int p = 0; p < nghbrLen; p++)
                 {
-                    nghbrInd = myCell.nodeData[p].neighborIDs[q];
-
-                    // should I be using the neighbor radii here or same as main node?
-                    //vRad = myCell.nodeData[myCell.nodeData[p].neighborIDs[q]].nodeRadius;
-
-                    // for off diagonal entries
-                    rhs.At(p, nghbrInd, vRad * cfl / (4 * h));
-                    rhs.At(nghbrInd, p, vRad * cfl / (4 * h));
-
-                    // for off diagonal entries
-                    lhs.At(p, nghbrInd, -vRad * cfl / (4 * h));
-                    lhs.At(nghbrInd, p, -vRad * cfl / (4 * h));
+                    /// <c>tempEdgeLen = myCell.GetEdgeLength(j, nghbrlist[p])*scf;</c> get the edge length at current node j, to node neighbor p, scale to micro meters \n
+                    tempEdgeLen = myCell.GetEdgeLength(j, nghbrlist[p])*scf;
+                    /// <c>edgelengths.Add(tempEdgeLen);</c> put the edge length in the list, this list of edges will have length equal to length of neighbor list \n
+                    edgelengths.Add(tempEdgeLen);
+                    sumRecip = sumRecip + 1 / (tempEdgeLen * tempRadius * ((1 / (myCell.nodeData[nghbrlist[p]].nodeRadius*scf* myCell.nodeData[nghbrlist[p]].nodeRadius*scf)) + (1 / (tempRadius * tempRadius))));
                 }
-
+                /// get the average edge lengths of neighbors \n
+                /// <c>foreach {... aveEdgeLengths = aveEdgeLengths + val;} aveEdgeLengths = aveEdgeLengths / edgelengths.Count;</c>
+                aveEdgeLengths = 0;
+                foreach (double val in edgelengths)
+                {
+                    aveEdgeLengths = aveEdgeLengths + val;
+                }
+                aveEdgeLengths = aveEdgeLengths / edgelengths.Count;
+                /// set main diagonal entries using <c>rhs.At()</c>
+                rhs.At(j, j, 1 - (k * sumRecip) / (2.0 * res * cap * aveEdgeLengths));
+                lhs.At(j, j, 1 + (k * sumRecip) / (2.0 * res * cap * aveEdgeLengths));
+                /// set off diagonal entries by going through the neighbor list, and using <c>rhs.At()</c>
+                for (int p = 0; p < nghbrLen; p++)
+                {
+                    rhs.At(j, nghbrlist[p], k / (2 * res * cap * tempRadius* aveEdgeLengths * edgelengths[p] * ((1 / (myCell.nodeData[nghbrlist[p]].nodeRadius*scf * myCell.nodeData[nghbrlist[p]].nodeRadius*scf)) + (1 / (tempRadius * tempRadius)))));
+                    lhs.At(j, nghbrlist[p], -1.0 * k / (2 * res * cap * tempRadius * aveEdgeLengths * edgelengths[p] * ((1 / (myCell.nodeData[nghbrlist[p]].nodeRadius*scf * myCell.nodeData[nghbrlist[p]].nodeRadius*scf)) + (1 / (tempRadius * tempRadius)))));
+                }
             }
+            //rhs.At(0, 0, 1);
+            //lhs.At(0, 0, 1);
 
-            //
-            int bcInd;
-            for(int p=0;p<myCell.boundaryID.Count;p++)
-            {
-                bcInd = myCell.boundaryID[p];
-                rhs.At(bcInd, bcInd, 1-(1*vRad * cfl / (2 * h)));
-                lhs.At(bcInd, bcInd, 1+(1*vRad * cfl / (2 * h)));
-            }
-             
-            //
-
+            /// <c>stencil.Add()</c> this adds the completed stencil matrices to the output list
             stencils.Add(rhs);
             stencils.Add(lhs);
             return stencils;
         }
 
-        // this sets the soma voltage for testing
-        // the soma maybe a set of indices, not just one.
-        public static Vector setSoma(Vector V, List<int> somaID, double voltage)
+        /// <summary>
+        /// This is the reaction term of the HH equation which is defined by
+        /// \f[ r(V):=-\frac{\bar{g}_{K}}{C}n^4(V-V_k)-\frac{\bar{g}_{Na}}{C}m^3h(V-V_{Na})-\frac{\bar{g}_l}{C}(V-V_l) \f]
+        /// </summary>
+        /// <param name="reactConst"></param> these are the conductances and reversal potentials defined by <c>List<double> reactConst = new List<double> { gk, gna, gl, ek, ena, el };</c>
+        /// <param name="V"></param> this is the voltage vector
+        /// <param name="NN"></param> this is the state vector n
+        /// <param name="MM"></param> this is the state vector m
+        /// <param name="HH"></param> this is the state vector h
+        /// <param name="cap"></param> this is the capacitance
+        /// <returns></returns>
+        private static Vector reactF(List<double> reactConst, Vector V, Vector NN, Vector MM, Vector HH, double cap)
         {
-            /*
-            for (int ind = 0; ind < somaID.Count; ind++)
-            {
-                V[somaID[ind]] = voltage;
-            }
-            */
-            V[0] = voltage;
-            return V;
-        }
-
-        //Function for initializes voltage on cell
-        public static Vector initialConditions(Vector V, List<int> bcIndices)
-        {
-            // only set boundary conditions
-            V.SetSubVector(0, V.Count, boundaryConditions(V, bcIndices));
-
-            return V;
-        }
-
-        // initialize the ends of dendrites to be clamped at 0 mV
-        public static Vector boundaryConditions(Vector V, List<int> bcIndices)
-        {   
-            /*
-            for (int ind = 0; ind < bcIndices.Count; ind++)
-            {
-                V[bcIndices[ind]] = 0;
-            }
-            */
-            return V;
-
-        }
-
-        // this is the reaction term of the HH equation
-        private static Vector reactF(List<double> reactConst, Vector V, Vector NN, Vector MM, Vector HH, List<bool> channels, List<int> bcIndices)
-        {
-            Vector output = Vector.Build.Dense(V.Count);
-            Vector prod = Vector.Build.Dense(V.Count);
+            /// initialize the output vector and prod vector these will be used to assemble the different parts of the reaction calculation \n
+            /// <c>Vector output = Vector.Build.Dense(V.Count, 0.0);</c> initializes the output vector of length equation to number of entries in voltage vector, initialized to 0 \n
+            /// <c>Vector prod = Vector.Build.Dense(V.Count, 0.0);</c> initializes the product vector of length equation to number of entries in voltage vector, initialized to 0 \n
+            /// <c>double ek, ena, el, gk, gna, gl; </c> these are the conductances and reversal potentials that we need to assign using <c>reactConst</c> parameter that is sent \n
+            Vector output = Vector.Build.Dense(V.Count, 0.0);
+            Vector prod = Vector.Build.Dense(V.Count, 0.0);
             double ek, ena, el, gk, gna, gl;
-
-            // set constants for voltage
+            /// this sets the constants for the conductances \n
+            /// <c>gk = reactConst[0]; gna = reactConst[1]; gl = reactConst[2];</c>
             gk = reactConst[0]; gna = reactConst[1]; gl = reactConst[2];
-            // set constants for conductances
+            /// this sets constants for reversal potentials \n
+            /// <c>ek = reactConst[3]; ena = reactConst[4]; el = reactConst[5];</c>
             ek = reactConst[3]; ena = reactConst[4]; el = reactConst[5];
+            /// <c>output.Add(prod.Multiply(gk), output);</c> this adds current due to potassium
+            prod.SetSubVector(0, V.Count, NN.PointwisePower(4.0));
+            prod.SetSubVector(0, V.Count, (V.Subtract(ek)).PointwiseMultiply(prod));
+            output.Add(prod.Multiply(gk), output);
+            /// <c>output.Add(prod.Multiply(gna), output);</c> this adds current due to sodium
+            prod.SetSubVector(0, V.Count, MM.PointwisePower(3.0));
+            prod.SetSubVector(0, V.Count, HH.PointwiseMultiply(prod)); prod.SetSubVector(0, V.Count, (V.Subtract(ena)).PointwiseMultiply(prod));
+            output.Add(prod.Multiply(gna), output);
+            /// <c>output.Add((V.Subtract(el)).Multiply(gl), output);</c> this adds leak current
+            output.Add((V.Subtract(el)).Multiply(gl), output);
+            /// Return the negative of the total
+            output.Multiply(-1.0 / cap, output);
 
-            // Add current due to potassium
-            if (channels[0]) { prod = NN.PointwisePower(4); prod = (V - ek).PointwiseMultiply(prod); output = gk * prod; }
-            // Add current due to sodium
-            if (channels[1]) { prod = MM.PointwisePower(3); prod = HH.PointwiseMultiply(prod); prod = (V - ena).PointwiseMultiply(prod); output = output + gna * prod; }
-            // Add leak current
-            if (channels[2]) { output = output + gl * (V - el); }
-            // Return the negative of the total
-            output.Multiply(-1, output);
-            output.SetSubVector(0, V.Count, boundaryConditions(output, bcIndices));
             return output;
         }
-        // The following functions are for the state variable ODEs on M,N,H
+        /// <summary>
+        /// This is the function for the right hand side of the ODE on state N, which is given by:
+        /// \f[\frac{dn}{dt}=\alpha_n(V)(1-n)-\beta_n(V)n\f]
+        /// </summary>
+        /// <param name="V"></param> this is the current input voltage for the geometry
+        /// <param name="N"></param> this is the current vector of state N for the geometry
+        /// <returns>f(V,N)</returns> the function returns the right hand side of the state N ODE.
         private static Vector fN(Vector V, Vector N) { return an(V).PointwiseMultiply(1 - N) - bn(V).PointwiseMultiply(N); }
+        /// <summary>
+        /// This is the function for the right hand side of the ODE on state M, which is given by:
+        /// \f[\frac{dm}{dt}=\alpha_m(V)(1-m)-\beta_m(V)m\f]
+        /// </summary>
+        /// <param name="V"></param> this is the current input voltage for the geometry
+        /// <param name="M"></param> this is the current vector of state M for the geometry
+        /// <returns>f(V,M)</returns> the function returns the right hand side of the state M ODE.
         private static Vector fM(Vector V, Vector M) { return am(V).PointwiseMultiply(1 - M) - bm(V).PointwiseMultiply(M); }
+        /// <summary>
+        /// This is the function for the right hand side of the ODE on state H, which is given by:
+        /// \f[\frac{dh}{dt}=\alpha_h(V)(1-h)-\beta_h(V)h\f]
+        /// </summary>
+        /// <param name="V"></param> this is the current input voltage for the geometry
+        /// <param name="H"></param> this is the current vector of state H for the geometry
+        /// <returns>f(V,H)</returns> the function returns the right hand side of the state H ODE.
         private static Vector fH(Vector V, Vector H) { return ah(V).PointwiseMultiply(1 - H) - bh(V).PointwiseMultiply(H); }
-        //The following functions are for the state variable ODEs on M,N,H
-        
-        
-        private static Vector an(Vector V) { return 0.01 * (10 - V).PointwiseDivide(((10 - V) / 10).PointwiseExp() - 1); }
-        private static Vector bn(Vector V) { return 0.125 * (-1 * V / 80).PointwiseExp(); }
-        private static Vector am(Vector V) { return 0.1 * (25 - V).PointwiseDivide(((25 - V) / 10).PointwiseExp() - 1); }
-        private static Vector bm(Vector V) { return 4 * (-1 * V / 18).PointwiseExp(); }
-        private static Vector ah(Vector V) { return 0.07 * (-1 * V / 20).PointwiseExp(); }
-        private static Vector bh(Vector V) { return 1 / (((30 - V) / 10).PointwiseExp() + 1); }
-        
-
-            /*
-        private static Vector an(Vector V) { return 0.01 * (55 + V).PointwiseDivide(1-((55+V) / (-10)).PointwiseExp()); }
-        private static Vector bn(Vector V) { return 0.125 * (-1 * (V+65) / 80).PointwiseExp(); }
-        private static Vector am(Vector V) { return 0.1 * (40 + V).PointwiseDivide(1-((40 + V) / (-10)).PointwiseExp()); }
-        private static Vector bm(Vector V) { return 4 * (-1 * (V+65) / 18).PointwiseExp(); }
-        private static Vector ah(Vector V) { return 0.07 * (-1 * (V+65) / 20).PointwiseExp(); }
-        private static Vector bh(Vector V) { return 1 / (((35+ V) / (-10)).PointwiseExp() + 1); }
-        */
+       
+        /// <summary>
+        /// This is \f$\alpha_n\f$ rate function, the rate functions take the form of
+        /// \f[
+        /// \frac{a_p(V-B_p)}{\exp(\frac{V-B_p}{C_p})-D_p}
+        /// \f]
+        /// the constants \f$a_p,B_p,C_p,D_p\f$ are manually coded in for this version of the simulation\n
+        /// TODO: come up with an implementation where the user can enter in their own parameters (Yale Neuron has this capability)
+        /// </summary>
+        /// <param name="V"></param> this is the input voltage
+        /// <returns>an</returns> this function returns the rate at the given voltage
+        private static Vector an(Vector V)
+        {
+            Vector Vin = Vector.Build.DenseOfVector(V);
+            Vin.Multiply(1.0E3, Vin);
+            return (1.0E3) * (0.032) * (15.0 - Vin).PointwiseDivide(((15.0 - Vin) / 5.0).PointwiseExp() - 1.0);
+        }
+        /// <summary>
+        /// This is \f$\beta_n\f$ rate function, the rate functions take the form of
+        /// \f[
+        /// \frac{a_p(V-B_p)}{\exp(\frac{V-B_p}{C_p})-D_p}
+        /// \f]
+        /// the constants \f$a_p,B_p,C_p,D_p\f$ are manually coded in for this version of the simulation\n
+        /// TODO: come up with an implementation where the user can enter in their own parameters (Yale Neuron has this capability)
+        /// </summary>
+        /// <param name="V"></param> this is the input voltage
+        /// <returns>bn</returns> this function returns the rate at the given voltage
+        private static Vector bn(Vector V)
+        {
+            Vector Vin = Vector.Build.DenseOfVector(V);
+            Vin.Multiply(1.0E3, Vin);
+            return (1.0E3) * (0.5) * ((10.0 - Vin) / 40.0).PointwiseExp();
+        }
+        /// <summary>
+        /// This is \f$\alpha_m\f$ rate function, the rate functions take the form of
+        /// \f[
+        /// \frac{a_p(V-B_p)}{\exp(\frac{V-B_p}{C_p})-D_p}
+        /// \f]
+        /// the constants \f$a_p,B_p,C_p,D_p\f$ are manually coded in for this version of the simulation\n
+        /// TODO: come up with an implementation where the user can enter in their own parameters (Yale Neuron has this capability)
+        /// </summary>
+        /// <param name="V"></param> this is the input voltage
+        /// <returns>am</returns> this function returns the rate at the given voltage
+        private static Vector am(Vector V)
+        {
+            Vector Vin = Vector.Build.DenseOfVector(V);
+            Vin.Multiply(1.0E3, Vin);
+            return (1.0E3) * (0.32) * (13.0 - Vin).PointwiseDivide(((13.0 - Vin) / 4.0).PointwiseExp() - 1.0);
+        }
+        /// <summary>
+        /// This is \f$\beta_m\f$ rate function, the rate functions take the form of
+        /// \f[
+        /// \frac{a_p(V-B_p)}{\exp(\frac{V-B_p}{C_p})-D_p}
+        /// \f]
+        /// the constants \f$a_p,B_p,C_p,D_p\f$ are manually coded in for this version of the simulation\n
+        /// TODO: come up with an implementation where the user can enter in their own parameters (Yale Neuron has this capability)
+        /// </summary>
+        /// <param name="V"></param> this is the input voltage
+        /// <returns>bm</returns> this function returns the rate at the given voltage
+        private static Vector bm(Vector V)
+        {
+            Vector Vin = Vector.Build.DenseOfVector(V);
+            Vin.Multiply(1.0E3, Vin);
+            return (1.0E3) * (0.28) * (Vin - 40.0).PointwiseDivide(((Vin - 40.0) / 5.0).PointwiseExp() - 1.0);
+        }
+        /// <summary>
+        /// This is \f$\alpha_h\f$ rate function, the rate functions take the form of
+        /// \f[
+        /// \frac{a_p(V-B_p)}{\exp(\frac{V-B_p}{C_p})-D_p}
+        /// \f]
+        /// the constants \f$a_p,B_p,C_p,D_p\f$ are manually coded in for this version of the simulation\n
+        /// TODO: come up with an implementation where the user can enter in their own parameters (Yale Neuron has this capability)
+        /// </summary>
+        /// <param name="V"></param> this is the input voltage
+        /// <returns>ah</returns> this function returns the rate at the given voltage
+        private static Vector ah(Vector V)
+        {
+            Vector Vin = Vector.Build.DenseOfVector(V);
+            Vin.Multiply(1.0E3, Vin);
+            return (1.0E3) * (0.128) * ((17.0 - Vin) / 18.0).PointwiseExp();
+        }
+        /// <summary>
+        /// This is \f$\beta_h\f$ rate function, the rate functions take the form of
+        /// \f[
+        /// \frac{a_p(V-B_p)}{\exp(\frac{V-B_p}{C_p})-D_p}
+        /// \f]
+        /// the constants \f$a_p,B_p,C_p,D_p\f$ are manually coded in for this version of the simulation\n
+        /// TODO: come up with an implementation where the user can enter in their own parameters (Yale Neuron has this capability)
+        /// </summary>
+        /// <param name="V"></param> this is the input voltage
+        /// <returns>bh</returns> this function returns the rate at the given voltage
+        private static Vector bh(Vector V)
+        {
+            Vector Vin = Vector.Build.DenseOfVector(V);
+            Vin.Multiply(1.0E3, Vin);
+            return (1.0E3) * 4.0 / (((40.0 - Vin) / 5.0).PointwiseExp() + 1.0);
+        }
         #endregion
     }
 }

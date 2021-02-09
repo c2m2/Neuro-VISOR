@@ -35,7 +35,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 180, y: -90, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: -0.51, y: 0}
+  m_AnchoredPosition: {x: -0.55, y: 0}
   m_SizeDelta: {x: 1, y: 0.135}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &899021641628970695
@@ -133,7 +133,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0.51, y: 0}
+  m_AnchoredPosition: {x: 0.55, y: 0}
   m_SizeDelta: {x: 1, y: 0.135}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &6978054425490887901
@@ -228,7 +228,7 @@ Transform:
   m_GameObject: {fileID: 4174845952812593659}
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
   m_LocalPosition: {x: -0.5, y: 0.443, z: -0.322}
-  m_LocalScale: {x: 0.01, y: 0.1, z: 1}
+  m_LocalScale: {x: 0.005, y: 0.05, z: 0.5}
   m_Children:
   - {fileID: 9001017224966188945}
   - {fileID: 7115084430896683159}
@@ -345,16 +345,8 @@ MonoBehaviour:
   measurementDisplays:
   - {fileID: 6978054425490887901}
   - {fileID: 899021641628970695}
-  numbers:
-  - 1
-  - 2
-  - 5
-  - 10
-  - 20
-  - 50
-  - 100
-  - 200
-  - 500
+  topEndcap: {fileID: 4924299292279712794}
+  bottomEndCap: {fileID: 8953187477037818776}
 --- !u!114 &9098607124181544640
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -368,8 +360,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scaler: 0.2
-  minPercentage: 0.25
-  maxPercentage: 4
+  minPercentage: 0.5
+  maxPercentage: 2
   xScale: 0
   yScale: 0
   zScale: 1

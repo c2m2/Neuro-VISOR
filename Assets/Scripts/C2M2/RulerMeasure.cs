@@ -10,21 +10,22 @@ public class RulerMeasure : MonoBehaviour
 {
     public MeshSimulation sim = null;
     public List<Canvas> measurementDisplays;
-    public List<float> numbers;
+    public GameObject topEndcap;
+    public GameObject bottomEndCap;
+    private readonly List<int> numbers = new List<int> { 1, 2, 5, 10, 20, 50, 100, 200, 500 };
     private List<MarkedDisplay> markedDisplays = new List<MarkedDisplay>();
-    private int markerCount = 25; //Maximum number of markers
-    private float firstMarkerLength;
+    private readonly int markerCount = 100; //Maximum number of markers
+    private float initialTopEndCapLength;
+    private float initialBottomEndCapLength;
     private float initialRulerLength;
-    private float rulerLength;
     private float scaledRulerLength;
-    private float markerSpacing = 0.05f; //minimum spacing between each marker and beginning and end of ruler
-    private float markerSpacingPercent; //minimum spacing between each marker and beginning and end of ruler in percent of rulers length
+    private string units;
 
     // Start is called before the first frame update
     void Start()
     {
-        numbers.Sort();
-        firstMarkerLength = 0;
+        initialTopEndCapLength = topEndcap.transform.localScale.y;
+        initialBottomEndCapLength = bottomEndCap.transform.localScale.y;
         initialRulerLength = transform.lossyScale.z;
         CreateMarkers();
     }
@@ -32,27 +33,28 @@ public class RulerMeasure : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        markerSpacingPercent = markerSpacing * initialRulerLength / transform.lossyScale.z;
+        float markerSpacing = 0.03f; //minimum spacing between each marker and beginning and end of ruler
+        float markerSpacingPercent = markerSpacing * initialRulerLength / transform.lossyScale.z; //minimum spacing between each marker and beginning and end of ruler in percent of ruler's length
         if (sim != null)
         {
-            rulerLength = transform.lossyScale.z / sim.transform.localScale.z;
-            firstMarkerLength = markerSpacingPercent * rulerLength;
+            float rulerLength = transform.lossyScale.z / sim.transform.lossyScale.z; //in terms of simulation
+            float firstMarkerLength = markerSpacingPercent * rulerLength;
 
             int magnitude = GetMagnitude(firstMarkerLength); //number of zeros after first digit
-            string siPrefixGroupText = GetUnit(magnitude);
+            units = GetUnit(magnitude);
 
             int siPrefixGroup = (int)Math.Floor(magnitude / 3.0);
-            // scaledFirstMarkerLength is a scaled version of firstMarkerLength so it is between 1 and 1000
+            // scaledFirstMarkerLength is a scaled version of firstMarkerLength so it is between .5 and 500
             float scaledFirstMarkerLength = (float)(firstMarkerLength / Math.Pow(10, siPrefixGroup * 3));
             scaledRulerLength = (float)(rulerLength / Math.Pow(10, siPrefixGroup * 3));
             UpdateMarkers(scaledFirstMarkerLength);
-            //TODO Put Units somewhere
+            UpdateEndCaps();
         }
     }
 
     private int GetMagnitude(float length)
     {
-        double lengthLog10 = Math.Log10(length);
+        double lengthLog10 = Math.Log10(length*2); //multiplication by 2 ensures that markers above 500 get treated as the next unit up
         return Convert.ToInt32(Math.Floor(lengthLog10));
     }
 
@@ -107,14 +109,14 @@ public class RulerMeasure : MonoBehaviour
 
     private void UpdateMarkers(float scaledFirstMarkerLength)
     {
-        float interval = 0;
+        int interval = 0;
         int currentNumber = 0;
         while(interval == 0)
         {
             if (currentNumber >= numbers.Count)
             {
                 Debug.LogError("No Ruler Marker Large Enough");
-                interval = float.NaN;
+                interval = -1;
             }
             else if (numbers[currentNumber] > scaledFirstMarkerLength)
                 {
@@ -126,7 +128,7 @@ public class RulerMeasure : MonoBehaviour
         foreach (MarkedDisplay markedDisplay in markedDisplays)
         {
             int markerNumber = 0;
-            for (float i = 0; i <= scaledRulerLength; i+=interval)
+            for (int i = 0; i <= scaledRulerLength; i+=interval)
             {
                 float rulerPoint = (i/scaledRulerLength) - 0.5f;
             
@@ -135,7 +137,16 @@ public class RulerMeasure : MonoBehaviour
                     //Occurs when there are more markers then the preset limit
                     break;
                 }
-                markedDisplay.markers[markerNumber].text = "‒ " + i + " ‒";
+
+                if (i == 0)
+                {
+                    markedDisplay.markers[markerNumber].text = "‒ " + i + " " + units + " ‒";
+                }
+                else
+                {
+                    markedDisplay.markers[markerNumber].text = "‒ " + i + " ‒";
+                }
+                
                 markedDisplay.markers[markerNumber].rectTransform.localPosition = new Vector3(rulerPoint, 0, 0);
                 markedDisplay.markers[markerNumber].transform.localScale = new Vector3(markedDisplay.markers[markerNumber].transform.localScale.x, initialRulerLength / transform.lossyScale.z, markedDisplay.markers[markerNumber].transform.localScale.z);
 
@@ -148,6 +159,21 @@ public class RulerMeasure : MonoBehaviour
                 markerNumber++;
             }
             
+        }
+    }
+
+    private void UpdateEndCaps()
+    {
+        if (topEndcap != null)
+        {
+            topEndcap.transform.localScale = new Vector3(topEndcap.transform.localScale.x, initialTopEndCapLength*(initialRulerLength / transform.lossyScale.z), topEndcap.transform.localScale.z);
+            topEndcap.transform.localPosition = new Vector3(0, 0, -(0.5f + topEndcap.transform.localScale.y/2));
+        }
+
+        if (bottomEndCap != null)
+        {
+            bottomEndCap.transform.localScale = new Vector3(bottomEndCap.transform.localScale.x, initialBottomEndCapLength * (initialRulerLength / transform.lossyScale.z), bottomEndCap.transform.localScale.z);
+            bottomEndCap.transform.localPosition = new Vector3(0, 0, 0.5f + bottomEndCap.transform.localScale.y/2);
         }
     }
 
