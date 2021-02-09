@@ -5,7 +5,7 @@ namespace C2M2.NeuronalDynamics.Interaction
 {
     public class SimulationLoader : MonoBehaviour
     {
-        public string vrnFileName = "10-dkvm2_1d";
+        public string vrnFileName = "null";
         public Gradient gradient;
         public float globalMin = float.PositiveInfinity;
         public float globalMax = float.NegativeInfinity;
