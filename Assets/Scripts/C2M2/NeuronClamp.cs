@@ -275,8 +275,10 @@ namespace C2M2.NeuronalDynamics.Interaction
         private bool VertIsAvailable(int clampIndex, NDSimulation simulation)
         {
             bool validLocation = true;
+            // minimum distance between clamps 
             float distanceBetweenClamps = simulation.AverageDendriteRadius * heightRatio * 2;
 
+           
             foreach (NeuronClamp clamp in simulation.clamps)
             {
                 // If there is a clamp on that 1D vertex, the spot is not open
@@ -285,11 +287,21 @@ namespace C2M2.NeuronalDynamics.Interaction
                     Debug.LogWarning("Clamp already exists on focus vert [" + clampIndex + "]");
                     validLocation = false;
                 }
-                // If there is a clamp within distance of 2, the spot is not open
-                else if ((clamp.transform.parent.localPosition - transform.parent.localPosition).magnitude < distanceBetweenClamps)
+                // If there is a clamp within 2*clamp height, the spot is not open
+                else
                 {
-                    Debug.LogWarning("Clamp too close to clamp located on focus vert [" + clamp.focusVert + "].");
-                    validLocation = false;
+                    Vector3[] verts = simulation.Verts1D; //expensive?
+                    float dist = (verts[clamp.focusVert] - verts[clampIndex]).magnitude;
+                    if (dist < distanceBetweenClamps)
+                    {
+                        Debug.LogWarning("Clamp too close to clamp located on vert [" + clamp.focusVert + "].");
+                        string s = "clamp position: " + clamp.transform.parent.localPosition + "\nnew clamp position: " + transform.parent.localPosition +
+                            "\nDistance between clamps: " + (clamp.transform.parent.localPosition - transform.parent.localPosition).magnitude +
+                            "\nMax distance allowed: " + distanceBetweenClamps +
+                            "\nClamp index: " + clampIndex;
+                        Debug.Log(s);
+                        validLocation = false;
+                    }
                 }
             }
             return validLocation;
