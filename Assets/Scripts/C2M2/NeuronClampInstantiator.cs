@@ -12,7 +12,7 @@ namespace C2M2.NeuronalDynamics.Interaction
     {
         public GameObject clampPrefab = null;
         public bool allActive = false;
-        public NDSimulation simulation { get; private set; } = null;
+        public NDSimulation simulation { get; private set; } = null; //warning only 1 simulation can be used in a scene!!!! --> redesign this
         public List<NeuronClamp> Clamps {
             get
             {
@@ -23,6 +23,10 @@ namespace C2M2.NeuronalDynamics.Interaction
         public Color32 inactiveCol = Color.black;
         public float highlightSphereScale = 3f;
 
+        /// <summary>
+        /// Looks for NDSimulation instance and adds neuronClamp object if possible
+        /// </summary>
+        /// <param name="hit"></param>
         public void InstantiateClamp(RaycastHit hit)
         {
             // Make sure we have a valid prefab and simulation
@@ -32,8 +36,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             if (simulation == null) simulation = sim;
             // Only allow one simulation
             if (sim != simulation) return;
-
-
+            
             var clampObj = Instantiate(clampPrefab, sim.transform);
             NeuronClamp clamp = clampObj.GetComponentInChildren<NeuronClamp>();
 
@@ -162,11 +165,14 @@ namespace C2M2.NeuronalDynamics.Interaction
         {
             if (Clamps.Count > 0)
             {
+                simulation.clampMutex.WaitOne();
                 foreach (NeuronClamp clamp in Clamps)
                 {
                     if (clamp != null && clamp.focusVert != -1)
                         Destroy(clamp.transform.parent.gameObject);
                 }
+                Clamps.Clear();
+                simulation.clampMutex.ReleaseMutex();
             }
         }
         public void HighlightAll(bool highlight)

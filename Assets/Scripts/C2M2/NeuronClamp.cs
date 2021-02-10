@@ -90,7 +90,9 @@ namespace C2M2.NeuronalDynamics.Interaction
         }
         private void OnDestroy()
         {
+            simulation.clampMutex.WaitOne();
             simulation.clamps.Remove(this);
+            simulation.clampMutex.ReleaseMutex();
         }
         #endregion
 
@@ -225,7 +227,10 @@ namespace C2M2.NeuronalDynamics.Interaction
 
                 gradientLUT = this.simulation.GetComponent<LUTGradient>();
 
+                // clamp can be added to simulation, wait for list access, add to list
+                simulation.clampMutex.WaitOne();
                 this.simulation.clamps.Add(this);
+                simulation.clampMutex.ReleaseMutex();
 
                 transform.parent.localPosition = focusPos;
             }
@@ -235,7 +240,6 @@ namespace C2M2.NeuronalDynamics.Interaction
         private int GetNearestPoint(NDSimulation simulation, RaycastHit hit)
         {
             // Translate contact point to local space
-
             MeshFilter mf = simulation.transform.GetComponentInParent<MeshFilter>();
             if (mf == null) return -1;
 

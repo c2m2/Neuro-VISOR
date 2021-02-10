@@ -197,7 +197,7 @@ MonoBehaviour:
     m_NumAlphaKeys: 2
   globalMin: -0.005
   globalMax: 0.05
-  refinementLevel: 1
+  refinementLevel: 0
   solverType: SparseSolverTestv1
 --- !u!114 &99744260
 MonoBehaviour:
@@ -1385,7 +1385,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 1246904545894575464}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 475776573}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0950df82e7936c84983497630bde5b54, type: 3}
   m_Name: 
@@ -1429,7 +1429,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 475776573}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 597233ff510da7843934b28b865314c0, type: 3}
   m_Name: 
@@ -4284,7 +4284,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1494866335
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4936,7 +4936,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1763904073
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5213,6 +5213,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dryRun: 0
   startOnAwake: 1
+  k: 0.000002
+  endTime: 1
   pdbPath: PE/pe_cg.pdb
   psfPath: PE/octatetracontane_128.cg.psf
   radius: 1
@@ -5280,6 +5282,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dryRun: 0
   startOnAwake: 1
+  k: 0.0027
+  endTime: 10000
   gradient:
     serializedVersion: 2
     key0: {r: 0, g: 0, b: 1, a: 1}
@@ -5323,8 +5327,6 @@ MonoBehaviour:
   hitValue: 55
   clamps: []
   vstart: 55
-  endTime: 10000
-  k: 0.0027
   SomaOn: 1
 --- !u!23 &1818162881
 MeshRenderer:

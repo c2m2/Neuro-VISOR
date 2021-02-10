@@ -118,7 +118,7 @@ namespace C2M2.Simulation.Samples
         /// Simply degrades the value at each point by the time change times its current value
         /// </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        protected override void Solve()
+        protected override void SolveStep(int t)
         {
             DateTime t0 = DateTime.Now;
             while (true)

@@ -75,19 +75,6 @@ namespace C2M2.NeuronalDynamics.Simulation
         ///</summary>
         public double vstart = 0.050;     
         /// <summary>
-        /// [s] endTime of the simulation. This is the endtime of the simulation which is measured in seconds, this is a parameter that the user can set for now
-        /// 
-        /// TODO: we would like the simulation to run without an endtime and the use clicks an 'end button' to terminate the vr-simulation
-        /// </summary>
-        public double endTime = 0.5;      
-        /// <summary>
-        /// User enters the time step size [s], this is the time step size of the simulation, this needs to be chosen carefully as too large of 
-        /// a time step size may cause numerical instability for the solver. Notice that that this is in [s] therefore 0.0025[ms] = 0.0025e-3 [s]
-        /// 
-        /// TODO: need to formulate a default time step size given a refinement level of geometry
-        /// </summary>
-        public double k = 0.0025 * 1.0E-3;    
-        /// <summary>
         /// This is for turning the soma on/off, this option is primarily used for testing purposes for the convergence analysis, for a soma clamp experiment
         /// </summary>
         public bool SomaOn = false;            
@@ -101,7 +88,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// [ohm.m] resistance.length, this is the axial resistence of the neuron, increasing this value has the effect of making the AP waves more localized and slower conduction speed
         /// decreasing this value has the effect of make the AP waves larger and have a faster conduction speed
         /// </summary>
-        private double res = 250.0 * 1.0E-2;
+        private double res = 2500.0 * 1.0E-2;
         /// <summary>
         /// [F/m2] capacitance per unit area, this is the plasma membrane capacitance, this a standard value for the capacitance
         /// </summary>
@@ -171,18 +158,12 @@ namespace C2M2.NeuronalDynamics.Simulation
         private Vector H;
 
         /// <summary>
-        /// This keeps track of which simulation frame to send to the other scripts
-        /// <c>i</c> gets track of the time step number
-        /// </summary>
-        private int i = -1;
-
-        /// <summary>
         /// This sends the current time to the simulation timer
         /// Note that the solver is in MKS, right now the simulation timer uses MKS, no need to multiply by 1000
         /// and the simulation timer object uses [ms]!
         /// </summary>
         /// <returns>i*(float)1000*(float) k</returns>
-        public override float GetSimulationTime() => i*(float) k;
+        public override float GetSimulationTime() => time*(float) k;
 
         /// <summary>
         /// Send simulation 1D values, this send the current voltage after the solve runs 1 iteration
@@ -197,7 +178,7 @@ namespace C2M2.NeuronalDynamics.Simulation
             {
                 mutex.WaitOne();
                 /// check if this beginning of the simulation
-                if (i > -1)
+                if (time > -1)
                 {
                     /// define the current time slice to send and initialize it to the correct size which is the number of vertices in the geometry
                     /// initialize it to the current state of the voltage, this is the voltage we are sending back to vr simulation
@@ -233,7 +214,10 @@ namespace C2M2.NeuronalDynamics.Simulation
                     int j = newVal.Item1;
                     double val = newVal.Item2;
                     /// here we set the voltage at the location, notice that we multiply by 0.0001 to convert to volts [V] 
-                    U[j] = val * (1E-3);
+                    if (j >= 0 && j < NeuronCell.vertCount)
+                    {
+                        U[j] = val * (1E-3);
+                    }
                 }
                 mutex.ReleaseMutex();
             }
@@ -244,6 +228,14 @@ namespace C2M2.NeuronalDynamics.Simulation
             }
         }
 
+        private Vector R;
+        private double[] b;
+        List<double> reactConst;
+        List<CoordinateStorage<double>> sparse_stencils;
+        CompressedColumnStorage<double> r_csc;
+        CompressedColumnStorage<double> l_csc;
+        private SparseLU lu;
+
         /// <summary>
         /// This is a small routine call to initialize the Neuron Cell
         /// this will initialize the solution vectors which are <c>U</c>, <c>M</c>, <c>N</c>, and <c>H</c>
@@ -251,6 +243,20 @@ namespace C2M2.NeuronalDynamics.Simulation
         protected override void PreSolve()
         {
             InitializeNeuronCell();
+            ///<c>R</c> this is the reaction vector for the reaction solve
+            R = Vector.Build.Dense(NeuronCell.vertCount);
+            ///<c>reactConst</c> this is a small list for collecting the conductances and reversal potential which is sent to the reaction solve routine
+            reactConst = new List<double> { gk, gna, gl, ek, ena, el };
+            ///<c>List<CoordinateStorage<double>> sparse_stencils = makeSparseStencils(NeuronCell, res, cap, k);</c> Construct sparse RHS and LHS in coordinate storage format, no zeros are stored \n
+            /// <c>sparse_stencils</c> this is a list which contains only two matrices the LHS and RHS matrices for the Crank-Nicolson solve
+            sparse_stencils = makeSparseStencils(NeuronCell, res, cap, k);
+            ///<c>CompressedColumnStorage</c> call Compresses the sparse matrices which are stored in <c>sparse_stencils[0]</c> and <c>sparse_stencils[1]</c>
+            r_csc = CompressedColumnStorage<double>.OfIndexed(sparse_stencils[0]); //null;
+            l_csc = CompressedColumnStorage<double>.OfIndexed(sparse_stencils[1]); //null;
+            ///<c>double [] b</c> we define storage for the diffusion solve part
+            b = new double[NeuronCell.vertCount];
+            ///<c>var lu = SparseLU.Create(l_csc, ColumnOrdering.MinimumDegreeAtA, 0.1);</c> this creates the LU decomposition of the HINES matrix which is defined by <c>l_csc</c>
+            lu = SparseLU.Create(l_csc, ColumnOrdering.MinimumDegreeAtA, 0.1);
         }
 
         /// <summary>
@@ -282,78 +288,33 @@ namespace C2M2.NeuronalDynamics.Simulation
         //with initial condition $V_0^*=V(t_n)= V_n$ at the beginning of the time step to get the intermediate solution $V^*$. Then we solve
         //$\frac{dV^{**}}{dt}=r(V^{**})$ with initial condition $V_0^{**}=V^*$ to get $V^{**}$, and $V_{n+1}=V(t_{n+1})=V^{**}$ the voltage at the end of the time step.
         //For equation the diffusion we use a Crank-Nicolson scheme
-
-        protected override void Solve()
-        {                                                                          
-            ///<c>int nT</c> is the Number of time steps
-            int nT = (int)System.Math.Floor(endTime / k);
-            ///<c>R</c> this is the reaction vector for the reaction solve
-            Vector R = Vector.Build.Dense(NeuronCell.vertCount);
-            ///<c>reactConst</c> this is a small list for collecting the conductances and reversal potential which is sent to the reaction solve routine
-            List<double> reactConst = new List<double> { gk, gna, gl, ek, ena, el };
-            ///<c>List<CoordinateStorage<double>> sparse_stencils = makeSparseStencils(NeuronCell, res, cap, k);</c> Construct sparse RHS and LHS in coordinate storage format, no zeros are stored \n
-            /// <c>sparse_stencils</c> this is a list which contains only two matrices the LHS and RHS matrices for the Crank-Nicolson solve
-            List<CoordinateStorage<double>> sparse_stencils = makeSparseStencils(NeuronCell, res, cap, k);
-            ///<c>CompressedColumnStorage</c> call Compresses the sparse matrices which are stored in <c>sparse_stencils[0]</c> and <c>sparse_stencils[1]</c>
-            CompressedColumnStorage<double> r_csc = CompressedColumnStorage<double>.OfIndexed(sparse_stencils[0]); //null;
-            CompressedColumnStorage<double> l_csc = CompressedColumnStorage<double>.OfIndexed(sparse_stencils[1]); //null;
-            ///<c>double [] b</c> we define storage for the diffusion solve part
-            double[] b = new double[NeuronCell.vertCount];
-            ///<c>var lu = SparseLU.Create(l_csc, ColumnOrdering.MinimumDegreeAtA, 0.1);</c> this creates the LU decomposition of the HINES matrix which is defined by <c>l_csc</c>
-            var lu = SparseLU.Create(l_csc, ColumnOrdering.MinimumDegreeAtA, 0.1);
-
-            try
-            {
-                for (i = 0; i < nT; i++)
-                {                       
-                    mutex.WaitOne();
-                    ///<c>if ((i * k >= 0.015) && SomaOn) { U[0] = vstart; }</c> this checks of the somaclamp is on and sets the soma location to <c>vstart</c>
-                    if ((i * k >= 0.015) && SomaOn) { U[0] = vstart; }
-                    ///This part does the diffusion solve \n
-                    /// <c>r_csc.Multiply(U.ToArray(), b);</c> the performs the RHS*Ucurr and stores it in <c>b</c> \n
-                    /// <c>lu.Solve(b, b);</c> this does the forward/backward substitution of the LU solve and sovles LHS = b \n
-                    /// <c>U.SetSubVector(0, NeuronCell.vertCount, Vector.Build.DenseOfArray(b));</c> this sets the U vector to the voltage at the end of the diffusion solve
-                    r_csc.Multiply(U.ToArray(), b);
-                    lu.Solve(b, b);
-                    U.SetSubVector(0, NeuronCell.vertCount, Vector.Build.DenseOfArray(b));
-                    /// this part solves the reaction portion of the operator splitting \n
-                    /// <c>R.SetSubVector(0, NeuronCell.vertCount, reactF(reactConst, U, N, M, H, cap));</c> this first evaluates at the reaction function \f$r(V)\f$ \n
-                    /// <c>R.Multiply(k, R); </c> this multiplies by the time step size \n
-                    /// <c>U.add(R,U)</c> adds it back to U to finish off the operator splitting
-                    /// For the reaction solve we are solving
-                    /// \f[\frac{U_{next}-U_{curr}}{k} = R(U_{curr})\f]
-                    R.SetSubVector(0, NeuronCell.vertCount, reactF(reactConst, U, N, M, H, cap));
-                    R.Multiply(k, R);
-                    U.Add(R, U);
-                    /// this part solve the state variables using Forward Euler
-                    /// the general rule is \f$N_{next} = N_{curr}+k\cdot f_N(U_{curr},N_{curr})\f$
-                    N.Add(fN(U, N).Multiply(k), N);
-                    M.Add(fM(U, M).Multiply(k), M);
-                    H.Add(fH(U, H).Multiply(k), H);
-                    ///<c>if ((i * k >= 0.015) && SomaOn) { U[0] = vstart; }</c> this checks of the somaclamp is on and sets the soma location to <c>vstart</c>
-                    if ((i * k >= 0.015) && SomaOn) { U[0] = vstart; }
-
-                    ///<c>if (clamps != null && clamps.Count > 0)</c> this if statement is where we apply voltage clamps
-                    if (clamps != null && clamps.Count > 0)
-                    {
-                        foreach (NeuronClamp clamp in clamps)
-                        {
-                            if (clamp != null && clamp.focusVert != -1 && clamp.clampLive)
-                            {
-                                ///<c>U[clamp.focusVert] = (1E-03)*clamp.clampPower;</c> notice we multiply by 1e-3 since the hit value is in [mV] we need to convert to [V], volts.
-                                U[clamp.focusVert] = (1E-03)*clamp.clampPower;
-                            }
-                        }
-                    }
-                    mutex.ReleaseMutex();
-                }     
-            }
-            catch (Exception e)
-            {
-                GameManager.instance.DebugLogErrorThreadSafe(e);
-                mutex.ReleaseMutex();
-            }
-            GameManager.instance.DebugLogSafe("Simulation Over.");
+        protected override void SolveStep(int t)
+        {                                                                                             
+            ///<c>if ((i * k >= 0.015) && SomaOn) { U[0] = vstart; }</c> this checks of the somaclamp is on and sets the soma location to <c>vstart</c>
+            if ((t * k >= 0.015) && SomaOn) { U[0] = vstart; }
+            ///This part does the diffusion solve \n
+            /// <c>r_csc.Multiply(U.ToArray(), b);</c> the performs the RHS*Ucurr and stores it in <c>b</c> \n
+            /// <c>lu.Solve(b, b);</c> this does the forward/backward substitution of the LU solve and sovles LHS = b \n
+            /// <c>U.SetSubVector(0, NeuronCell.vertCount, Vector.Build.DenseOfArray(b));</c> this sets the U vector to the voltage at the end of the diffusion solve
+            r_csc.Multiply(U.ToArray(), b);
+            lu.Solve(b, b);
+            U.SetSubVector(0, NeuronCell.vertCount, Vector.Build.DenseOfArray(b));
+            /// this part solves the reaction portion of the operator splitting \n
+            /// <c>R.SetSubVector(0, NeuronCell.vertCount, reactF(reactConst, U, N, M, H, cap));</c> this first evaluates at the reaction function \f$r(V)\f$ \n
+            /// <c>R.Multiply(k, R); </c> this multiplies by the time step size \n
+            /// <c>U.add(R,U)</c> adds it back to U to finish off the operator splitting
+            /// For the reaction solve we are solving
+            /// \f[\frac{U_{next}-U_{curr}}{k} = R(U_{curr})\f]
+            R.SetSubVector(0, NeuronCell.vertCount, reactF(reactConst, U, N, M, H, cap));
+            R.Multiply(k, R);
+            U.Add(R, U);
+            /// this part solve the state variables using Forward Euler
+            /// the general rule is \f$N_{next} = N_{curr}+k\cdot f_N(U_{curr},N_{curr})\f$
+            N.Add(fN(U, N).Multiply(k), N);
+            M.Add(fM(U, M).Multiply(k), M);
+            H.Add(fH(U, H).Multiply(k), H);
+            ///<c>if ((i * k >= 0.015) && SomaOn) { U[0] = vstart; }</c> this checks of the somaclamp is on and sets the soma location to <c>vstart</c>
+            if ((t * k >= 0.015) && SomaOn) { U[0] = vstart; }      
         }
 
         #region Local Functions

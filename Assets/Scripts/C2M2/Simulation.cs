@@ -20,7 +20,7 @@ namespace C2M2.Simulation
         /// <summary>
         /// Should the simulation start itself in Awake?
         /// </summary>
-        public bool startOnAwake = true;
+        public bool startOnAwake = true; //get rid of me!
 
         /// <summary>
         /// Provide mutual exclusion to derived classes
@@ -62,7 +62,7 @@ namespace C2M2.Simulation
         /// <remarks>
         /// Launches in its own thread
         /// </remarks>
-        protected abstract void Solve();
+        protected abstract void SolveStep(int t);
 
         /// <summary>
         /// Called on the main thread before the Solve thread is launched
@@ -76,7 +76,7 @@ namespace C2M2.Simulation
         #region Unity Methods
         public void Initialize()
         {
-            OnAwakePre();
+            OnAwakePre(); //this is a mess!! :(
 
             if (!dryRun)
             {
@@ -159,18 +159,59 @@ namespace C2M2.Simulation
         protected virtual void OnQuit() { }
         #endregion
 
+        public double k = 0.002 * 1e-3;
+        public double endTime = 1.0;
         /// <summary>
         /// Launch Solve thread
         /// </summary>
         public void StartSimulation()
         {
             StopSimulation();
-            Debug.Log("Running PreSolve...");
-            PreSolve();
             solveThread = new Thread(Solve);
             solveThread.Start();
             Debug.Log("Solve() launched on thread " + solveThread.ManagedThreadId);
         }
+
+        /// <summary>
+        /// This keeps track of which simulation frame to send to the other scripts
+        /// <c>time</c> gets track of the time step number
+        /// </summary>
+        public int time { get; protected set; } = -1;
+
+        private void Solve()
+        {
+            PreSolve();
+            int nT = (int)(endTime / k);
+            
+            try
+            {
+                for (time = 0; time < nT; time++)
+                {
+                    mutex.WaitOne();
+                    PreSolveStep();
+                    // call user solve code 
+                    SolveStep(time);
+                    PostSolveStep();
+                    mutex.ReleaseMutex();
+                }
+            }
+            catch (Exception e)
+            {
+                GameManager.instance.DebugLogErrorThreadSafe(e);
+                mutex.ReleaseMutex();
+            }
+            GameManager.instance.DebugLogSafe("Simulation Over.");
+        }
+        
+        /// <summary>
+        /// ...
+        /// </summary>
+        protected virtual void PreSolveStep() { }
+
+        /// <summary>
+        ///  Method which is called once per time step after SolveStep() 
+        /// </summary>
+        protected virtual void PostSolveStep() { }
 
         /// <summary>
         /// Stop current Solve thread

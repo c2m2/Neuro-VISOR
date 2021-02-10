@@ -5,6 +5,7 @@ using System.IO;
 using C2M2.NeuronalDynamics.UGX;
 using UnityEditor;
 using UnityEngine;
+using System.Threading;
 using DiameterAttachment = C2M2.NeuronalDynamics.UGX.IAttachment<C2M2.NeuronalDynamics.UGX.DiameterData>;
 using MappingAttachment = C2M2.NeuronalDynamics.UGX.IAttachment<C2M2.NeuronalDynamics.UGX.MappingData>;
 
@@ -238,6 +239,36 @@ namespace C2M2.NeuronalDynamics.Simulation {
 
         public List<NeuronClamp> clamps = new List<NeuronClamp>();
 
+
+        public Mutex clampMutex { get;  private set; } = new Mutex();
+        private static Tuple<int, double> nullClamp = new Tuple<int, double>(-1, 0);
+        /// <summary>
+        /// Add clamp values once per simulation frame
+        /// </summary>
+        protected override void PreSolveStep()
+        {
+            base.PreSolveStep();            
+            ///<c>if (clamps != null && clamps.Count > 0)</c> this if statement is where we apply voltage clamps   
+            if (clamps != null && clamps.Count > 0)
+            {
+                Tuple<int, double>[] clampValues = new Tuple<int, double>[clamps.Count];
+                clampMutex.WaitOne();
+                for (int i=0; i< clamps.Count; i++)
+                {
+                    if (clamps[i] != null && clamps[i].focusVert != -1 && clamps[i].clampLive)
+                    {
+                        clampValues[i] = new Tuple<int, double>(clamps[i].focusVert,clamps[i].clampPower);
+                    }
+                    else
+                    {
+                        clampValues[i] = nullClamp;
+                    }
+                }
+
+                clampMutex.ReleaseMutex();
+                Set1DValues(clampValues);
+            }
+        }
         /// <summary>
         /// Translate 1D vertex values to 3D values and pass them upwards for visualization
         /// </summary>

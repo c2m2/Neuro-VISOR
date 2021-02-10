@@ -32,7 +32,7 @@ namespace C2M2.Simulation.Samples
 
         #endregion
 
-        protected override void Solve()
+        protected override void SolveStep(int t)
         { // Do nothing, essentially
             while (true)
             {

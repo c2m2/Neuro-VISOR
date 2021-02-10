@@ -113,7 +113,7 @@ namespace C2M2.MolecularDynamics.Simulation
         /// Molecular dynamics simulation code
         /// </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        protected override void Solve()
+        protected override void SolveStep(int t)
         {
             int nT = timestepCount;
             dt = timestepSize;

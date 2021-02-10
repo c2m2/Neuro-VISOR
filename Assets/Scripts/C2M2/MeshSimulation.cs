@@ -86,7 +86,7 @@ namespace C2M2.Simulation
         }
         protected override void UpdateVisualization(in double[] newValues) => UpdateVisualization(newValues.ToFloat());
 
-        protected override void OnAwakePost(Mesh viz)
+        protected override void OnAwakePost(Mesh viz) //refactor
         {
             if (!dryRun)
             {
