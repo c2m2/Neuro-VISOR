@@ -277,8 +277,8 @@ namespace C2M2.NeuronalDynamics.Interaction
             bool validLocation = true;
             // minimum distance between clamps 
             float distanceBetweenClamps = simulation.AverageDendriteRadius * heightRatio * 2;
+            Vector3[] verts = simulation.Verts1D; //expensive?
 
-           
             foreach (NeuronClamp clamp in simulation.clamps)
             {
                 // If there is a clamp on that 1D vertex, the spot is not open
@@ -290,16 +290,11 @@ namespace C2M2.NeuronalDynamics.Interaction
                 // If there is a clamp within 2*clamp height, the spot is not open
                 else
                 {
-                    Vector3[] verts = simulation.Verts1D; //expensive?
+                    
                     float dist = (verts[clamp.focusVert] - verts[clampIndex]).magnitude;
                     if (dist < distanceBetweenClamps)
                     {
                         Debug.LogWarning("Clamp too close to clamp located on vert [" + clamp.focusVert + "].");
-                        string s = "clamp position: " + clamp.transform.parent.localPosition + "\nnew clamp position: " + transform.parent.localPosition +
-                            "\nDistance between clamps: " + (clamp.transform.parent.localPosition - transform.parent.localPosition).magnitude +
-                            "\nMax distance allowed: " + distanceBetweenClamps +
-                            "\nClamp index: " + clampIndex;
-                        Debug.Log(s);
                         validLocation = false;
                     }
                 }
