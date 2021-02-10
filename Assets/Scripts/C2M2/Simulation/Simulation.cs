@@ -2,6 +2,7 @@
 using System.Threading;
 using System;
 using C2M2.Interaction;
+using C2M2.Visualization;
 
 namespace C2M2.Simulation
 {
@@ -159,6 +160,7 @@ namespace C2M2.Simulation
         protected virtual void OnQuit() { }
         #endregion
 
+        public int time { get; protected set; } = -1;
         public double k = 0.002 * 1e-3;
         public double endTime = 1.0;
         /// <summary>
@@ -171,12 +173,6 @@ namespace C2M2.Simulation
             solveThread.Start();
             Debug.Log("Solve() launched on thread " + solveThread.ManagedThreadId);
         }
-
-        /// <summary>
-        /// This keeps track of which simulation frame to send to the other scripts
-        /// <c>time</c> gets track of the time step number
-        /// </summary>
-        public int time { get; protected set; } = -1;
 
         private void Solve()
         {

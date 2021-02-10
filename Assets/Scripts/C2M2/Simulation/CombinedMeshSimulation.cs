@@ -16,7 +16,6 @@ namespace C2M2.Simulation.Samples
     public class CombinedMeshSimulation : Simulation.MeshSimulation
     {
         private double[] values;
-        public override float GetSimulationTime() { return 0; }
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
         /// Send values upwards for visualization
@@ -26,6 +25,7 @@ namespace C2M2.Simulation.Samples
         {
             return values;
         }
+        
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
         /// Incorporate a raycast hit interaction into simulation values
@@ -40,7 +40,10 @@ namespace C2M2.Simulation.Samples
                 values[value.Item1] = value.Item2;
             }
         }
-
+        public override float GetSimulationTime()
+        {
+            return 0;
+        }
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary> Get every child mesh and combine into one mesh </summary>
         /// <returns> Combined mesh </returns>

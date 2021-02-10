@@ -11,6 +11,7 @@ namespace C2M2
     using Interaction.VR;
     using NeuronalDynamics.Interaction;
     using Simulation;
+    using Visualization;
     /// <summary>
     /// Stores many global variables, handles pregame initializations
     /// </summary>

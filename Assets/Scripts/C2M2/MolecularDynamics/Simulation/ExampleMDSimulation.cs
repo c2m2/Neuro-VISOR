@@ -15,9 +15,6 @@ namespace C2M2.MolecularDynamics.Simulation
 
         private Vector3[] force = null;
 
-
-        public override float GetSimulationTime() => t * (float)dt;
-
         // OPTION 2:
         //RaycastHit lastHit = new RaycastHit();
         public override Vector3[] GetValues()
@@ -25,6 +22,10 @@ namespace C2M2.MolecularDynamics.Simulation
             return coord;
         }
 
+        public override float GetSimulationTime()
+        {
+            return 0;
+        }
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
         /// Receive an interaction request, and translate it onto the proper sphere

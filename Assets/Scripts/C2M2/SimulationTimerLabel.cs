@@ -4,46 +4,50 @@ using UnityEngine;
 using System.Runtime.Serialization;
 using C2M2.Simulation;
 
-[RequireComponent(typeof(Simulation<,,,>))]
-public class SimulationTimerLabel : MonoBehaviour
+namespace C2M2.Visualization
 {
-    public Interactable sim = null;
-    public TextMeshProUGUI timerText;
-
-    /// <summary>
-    /// Current time in simulation
-    /// </summary>
-    public double time;
-
-    private void Start()
+    [RequireComponent(typeof(Simulation<,,,>))]
+    public class SimulationTimerLabel : MonoBehaviour
     {
-        if (timerText == null) throw new LabelNotFoundException();
-        timerText.text = time.ToString();
-    }
+        public Interactable sim = null;
+        public TextMeshProUGUI timerText;
 
-    private void FixedUpdate()
-    {
-        if (sim != null)
+        /// <summary>
+        /// Current time in simulation
+        /// </summary>
+        public double time;
+
+        private void Start()
         {
-            time = sim.GetSimulationTime();
-            timerText.text = ToString();
+            if (timerText == null) throw new LabelNotFoundException();
+            timerText.text = time.ToString();
         }
-        else {
-            timerText.text = "";
+
+        private void FixedUpdate()
+        {
+            if (sim != null)
+            {
+                time = sim.GetSimulationTime();
+                timerText.text = ToString();
+            }
+            else
+            {
+                timerText.text = "";
+            }
         }
-    }
 
-    public override string ToString()
-    {
-        if (time > 1) return String.Format("{0:f0} s     {1:f0} ms", (int)time, (int)((time-(int)time)*1000));
-        else return String.Format("{0:f0} ms", (int)(time*1000));
-    }
+        public override string ToString()
+        {
+            if (time > 1) return String.Format("{0:f0} s     {1:f0} ms", (int)time, (int)((time - (int)time) * 1000));
+            else return String.Format("{0:f0} ms", (int)(time * 1000));
+        }
 
-    public class LabelNotFoundException : Exception
-    {
-        public LabelNotFoundException() { }
-        public LabelNotFoundException(string message) : base(message) { }
-        public LabelNotFoundException(string message, Exception inner) : base(message, inner) { }
-        protected LabelNotFoundException(SerializationInfo info, StreamingContext ctxt) : base (info, ctxt) { }
+        public class LabelNotFoundException : Exception
+        {
+            public LabelNotFoundException() { }
+            public LabelNotFoundException(string message) : base(message) { }
+            public LabelNotFoundException(string message, Exception inner) : base(message, inner) { }
+            protected LabelNotFoundException(SerializationInfo info, StreamingContext ctxt) : base(info, ctxt) { }
+        }
     }
 }

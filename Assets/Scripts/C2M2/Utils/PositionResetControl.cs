@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace C2M2.Interaction
+namespace C2M2.Utils
 {
     public class PositionResetControl : MonoBehaviour
     {

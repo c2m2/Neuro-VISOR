@@ -41,5 +41,6 @@ namespace C2M2.Simulation
         /// </summary>
         /// <returns></returns>
         public abstract float GetSimulationTime();
+
     }
 }
