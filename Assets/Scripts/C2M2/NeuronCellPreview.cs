@@ -62,8 +62,6 @@ namespace C2M2.NeuronalDynamics.Visualization
             // Read the cell
             vrnReader.ReadUGX(meshName1D, ref grid);
 
-            Debug.Log("1D cell info:\n\tcenter: " + grid.Mesh.bounds.center + "\n\tsize:" + grid.Mesh.bounds.size);
-
             // Scale the parent object by 1 / max scale to make the cell fit within size (1,1,1)
             float scale = 1 / Math.Max(grid.Mesh.bounds.size);
             transform.localScale = new Vector3(scale, scale, scale);

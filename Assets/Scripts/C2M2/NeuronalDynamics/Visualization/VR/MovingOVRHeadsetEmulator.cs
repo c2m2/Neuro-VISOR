@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using C2M2.Interaction.UI;
+using C2M2.Utils;
 namespace C2M2.Interaction.VR
 {
     ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -18,7 +19,7 @@ namespace C2M2.Interaction.VR
 
         public float speed = 0.1f;
         public float slowSpeed = 0.025f;
-        private MovementController controller = null;
+        private MovementController controls = null;
         private bool SlowMoving
         {
             get
@@ -35,8 +36,8 @@ namespace C2M2.Interaction.VR
 
         private void Awake()
         {
-            controller = GetComponent<MovementController>() ?? gameObject.AddComponent<MovementController>();
-            controller.speed = speed;
+            controls = GetComponent<MovementController>() ?? gameObject.AddComponent<MovementController>();
+            controls.speed = speed;
         }
 
         private void Start()
@@ -45,18 +46,17 @@ namespace C2M2.Interaction.VR
             InitUI();
             StartCoroutine(CheckSpeed());
         }
+
         private IEnumerator CheckSpeed()
         {
             while (true)
             {
-                controller.speed = SlowMoving ? slowSpeed : speed;
+                controls.speed = SlowMoving ? slowSpeed : speed;
                 yield return null;
             }
         }
 
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Disables OVRAvatar body, head, and hand rendering </summary>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        // Disables OVRAvatar body, head, and hand rendering
         private void DisableAvatar()
         {
             OvrAvatar avatar = GetComponentInChildren<OvrAvatar>();
@@ -77,15 +77,17 @@ namespace C2M2.Interaction.VR
             keys.AddRange(pitchKeys);
             controlUI.GetComponent<ControlOverlay>().SetActivationKeys(keys.ToArray());
         }
+
+        // Don't use the movement controller if the emulator isn't enabled
         private void OnEnable()
         {
-            if(controller != null)
-                controller.enabled = true;
+            if(controls != null)
+                controls.enabled = true;
         }
         private void OnDisable()
         {
-            if (controller != null)
-                controller.enabled = false;
+            if (controls != null)
+                controls.enabled = false;
         }
     }
 }

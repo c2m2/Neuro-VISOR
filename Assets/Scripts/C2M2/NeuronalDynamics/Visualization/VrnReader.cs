@@ -84,8 +84,6 @@ namespace C2M2.NeuronalDynamics.Visualization.VRN
             // Helper function to do the actual loading
             void DoLoad()
             {
-                //using (ZipArchive archive = ZipFile.OpenRead ("/home/stephan/testNew.vrn")) {
-                Debug.Log("fileName: " + this.fileName);
                 using (ZipArchive archive = ZipFile.OpenRead($"{this.fileName}"))
                 {
                     var file = archive.GetEntry("MetaInfo.json");

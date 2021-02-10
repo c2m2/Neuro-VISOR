@@ -99,7 +99,6 @@ public static class NonConvexMeshCollider
                 bc.center = mergedBoxes[i].Center;
                 boxColliders[i] = bc;
             }
-            Debug.Log("NonConvexMeshCollider: " + mergedBoxes.Length + " box colliders created");
             collidersGo.name = "NonConvexMeshCollider@" + mergedBoxes.Length + "cols";
 
             //cleanup stuff not needed anymore on collider child obj

@@ -6,7 +6,7 @@ using UnityEngine;
 namespace C2M2.NeuronalDynamics.UGX
 {
     using DiameterAttachment = IAttachment<DiameterData>;
-        
+    
     public class NeuronCell
     {
         public List<NodeData> nodeData = new List<NodeData>();
@@ -31,7 +31,6 @@ namespace C2M2.NeuronalDynamics.UGX
 
         public NeuronCell(Grid grid)
         {
-            Debug.Log("grid.Edges.Count: " + grid.Edges.Count + "\nvertexCount: " + grid.Mesh.vertexCount);
             AttachmentHandler.Available();
             NodeData tempNode = new NodeData();
             VertexAttachementAccessor<DiameterData> accessor = new VertexAttachementAccessor<DiameterData>(grid);
@@ -70,39 +69,29 @@ namespace C2M2.NeuronalDynamics.UGX
                 edges.Add((Tuple.Create(grid.Edges[i].From.Id, grid.Edges[i].To.Id)));
                 edgeLengths.Add(GetEdgeLength(grid.Edges[i].From.Id, grid.Edges[i].To.Id));
             }
-            this.edgeCount = this.edges.Count();
 
+            this.edgeCount = this.edges.Count();
             this.somaID = grid.Subsets["soma"].Indices.ToList();
         }
 
-        static string nodeFormatString =
-            "ID = {0}\n" +
-            "Coordinates =  ({1}, {2}, {3})\n" +
-            "{4}";
-        public string NodeToString(int nodeId) => String.Format(nodeFormatString, nodeData[nodeId].id, nodeData[nodeId].xcoords, nodeData[nodeId].ycoords, nodeData[nodeId].zcoords, NodeNeighborsToString(nodeId));
-        private string NodeNeighborsToString(int nodeId)
-        {
-            string s = "Node " + nodeId + ": " + nodeData[nodeId].neighborIDs.Count + " Neighbors:";
-            for (int i = 0; i < nodeData[nodeId].neighborIDs.Count; i++)
-            {
-                s += "\n\t" + nodeData[nodeId].neighborIDs[i];
-            }
-            return s;
-        }
-
-        static string edgeFormatString =
-            "Start ID = {0}\n" +
-            "End ID = {1}\n" +
-            "Length = {2}";
-        public void EdgeToString(int edgeId) => String.Format(edgeFormatString, edges[edgeId].Item1, edges[edgeId].Item2, GetEdgeLength(edges[edgeId].Item1, edges[edgeId].Item2));
 
         static string cellFormatString = 
-            "Vert count = {0}\n" +
+            "1D Vert count = {0}\n" +
             "Edge count = {1}\n" +
             "Max edge length = {2}\n" +
             "Avg edge length = {3}\n" +
-            "Min edge length = {4}";
-        public override string ToString() => String.Format(cellFormatString, vertCount, edgeCount, edgeLengths.Max(), edgeLengths.Average(), edgeLengths.Min());
+            "Min edge length = {4}\n" + 
+            "Soma ID(s) = ({5})\n" + 
+            "Boundary ID(s) = ({6})";
+        public override string ToString() => String.Format(
+            cellFormatString, 
+            vertCount,
+            edgeCount, 
+            edgeLengths.Max(), 
+            edgeLengths.Average(), 
+            edgeLengths.Min(),
+            String.Join(", ", somaID.Select(c => "'" + c + "'")),
+            String.Join(", ", boundaryID.Select(c => "'" + c + "'")));
 
         public double GetEdgeLength(int startId, int endId)
         {

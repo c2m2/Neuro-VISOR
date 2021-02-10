@@ -42,6 +42,7 @@ namespace C2M2.NeuronalDynamics.Interaction
                     Debug.LogWarning("Refinement level " + refinementLevel + " not found. Reverting to 0 refinement.");
                     refinementLevel = 0;
                     solver.RefinementLevel = 0;
+                    Debug.LogError(e);
                 }
 
                 solver.Initialize();

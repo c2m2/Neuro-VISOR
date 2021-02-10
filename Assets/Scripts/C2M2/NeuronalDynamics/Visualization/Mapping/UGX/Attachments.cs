@@ -152,11 +152,9 @@ namespace C2M2.NeuronalDynamics.UGX
         {
             if (attachments.ContainsKey(name))
             {
-                Debug.LogError($"Trying to re-register an attachment " +
-                    $"with name >>{name}<< which is not meaningful");
+                Debug.LogError($">>{name}<< attachment is not meaningful");
             }
 
-            Debug.Log($"Registering attachment with name >>{name}<< now");
             attachments[name] = typeof(T);
         }
 
@@ -166,12 +164,12 @@ namespace C2M2.NeuronalDynamics.UGX
         /// </summary>
         public static void Available()
         {
-            Debug.Log("Available attachments (Name/Type): ");
+            string s = "Available attachments (Name/Type): ";
             foreach (var pair in attachments)
             {
-                Debug.Log($"\t{pair.Key} => {pair.Value}");
+                s += $"\n\t{pair.Key} => {pair.Value}";
             }
-            Debug.Log("------------------------------------");
+            Debug.Log(s);
         }
 
         /// Attachment Registry

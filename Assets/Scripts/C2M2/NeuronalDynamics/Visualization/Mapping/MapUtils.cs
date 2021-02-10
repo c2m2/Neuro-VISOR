@@ -96,7 +96,6 @@ namespace C2M2.NeuronalDynamics.UGX {
             Dictionary<int, Tuple<int, int, double>> map2d1d = new Dictionary<int, Tuple<int, int, double>> ();
             int size1d = grid1d.Mesh.vertices.Length;
             int size3d = grid2d.Mesh.vertices.Length;
-            Debug.Log ("size1d: " + size1d + Environment.NewLine + "size3d: " + size3d);
             if (size1d == 0) {
                 throw new MapNotBuildException ($"1D mesh ({grid1d.Mesh.name}) has size 0 - how to build a mapping?");
             }

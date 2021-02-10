@@ -62,8 +62,11 @@ namespace C2M2.NeuronalDynamics.UGX {
         /// <param name="filename"> Name of mesh file on disk </param>
         /// <param name="grid"> Grid to populate with UGX data </param>
         public static void ReadUGX (in string filename, ref Grid grid) {
+            Debug.Log("Reading UGX (" + filename + ")...");
+
             Stream stream = File.OpenRead (filename);
             ReadUGX (in stream, ref grid);
+
         }
 
         /// ReadUGX
@@ -78,7 +81,6 @@ namespace C2M2.NeuronalDynamics.UGX {
                 grid.Attach (new DiameterAttachment ());
             }
 
-            Debug.Log ("Reading UGX...");
             Vector3[] vertices;
             int[] triangles;
 
@@ -100,7 +102,8 @@ namespace C2M2.NeuronalDynamics.UGX {
                 while (reader.Read ()) {
                     if (reader.NodeType == XmlNodeType.Element) {
                         XElement element = XNode.ReadFrom (reader) as XElement;
-                        if (element != null) {
+                        if (element != null)
+                        {
                             //////////////////////////////////////////////////////////////////////////////////////////////
                             /// VERTICES
                             //////////////////////////////////////////////////////////////////////////////////////////////
@@ -299,9 +302,6 @@ namespace C2M2.NeuronalDynamics.UGX {
 
                                         /// All other subsets are okay
                                         grid.Subsets[subsetName] = new Subset (subsetName, GetIndices (subsetName, el));
-                                        if (subsetName.Equals ("soma")) {
-                                            UnityEngine.Debug.Log ("soma indices: " + grid.Subsets["soma"]);
-                                        }
                                     }
                                 } else {
                                     Debug.LogWarning ("No subsets contained in input grid provided to UGXReader.");
@@ -311,9 +311,6 @@ namespace C2M2.NeuronalDynamics.UGX {
                     }
                 }
             }
-
-            /// GridUtils.AvailableSubsets(grid);
-            Debug.Log ("done!");
         }
     }
 }

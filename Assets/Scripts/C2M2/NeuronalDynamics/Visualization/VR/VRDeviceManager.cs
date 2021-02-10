@@ -1,12 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.XR;
-using C2M2.Interaction;
+using C2M2.Utils;
 namespace C2M2.Interaction.VR
 {
     using Interaction.Signaling;
-    using Visualization.VR;
     /// <summary>
     /// Make sure that a VR device is loaded before using OVRPlayerController.
     /// If none is loaded, add VR emulation tools
@@ -31,7 +28,10 @@ namespace C2M2.Interaction.VR
         private void Awake()
         {
             // Get VR device (or lack of one)
-            if (UnityEngine.XR.XRDevice.model.Equals(string.Empty)) vrDevice = "null";
+            // Note: in Unity 2019.4 XRDevice.model is obsolete but still works.
+            InputDevice inputDevice = new InputDevice();
+            Debug.Log("inputDevice.name: " + inputDevice.name);
+            if (XRDevice.model.Equals(string.Empty)) vrDevice = "null";
             else vrDevice = XRDevice.model;
 
             emulator = GetComponent<MovingOVRHeadsetEmulator>();
