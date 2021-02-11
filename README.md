@@ -1,5 +1,5 @@
 # virtual-reality
-Repository for Temple University's Center for Computational Mathematics and Modeling's virtual reality project. This project provides a prototype for visualizing and interacting with computational simulations in virtual reality, with a particular emphasis placed on neuronal dynamics (ND) simulations.
+Repository for Temple University's Center for Computational Mathematics and Modeling (C2M2)'s virtual reality project. This project provides a prototype for visualizing and interacting with computational simulations in virtual reality, with a particular emphasis placed on neuronal dynamics (ND) simulations.
 
 ## Code quality
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/ac2c4122b3174e4a8209ef2e791792b3)](https://www.codacy.com?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=c2m2/virtual-reality&amp;utm_campaign=Badge_Grade)
