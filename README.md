@@ -8,7 +8,7 @@ Repository for Temple University's Center for Computational Mathematics and Mode
 1. Clone project to any location
 2. Ensure the correct version of the Unity Editor is installed
 3. Open project in Unity and open Assets/Scenes/MainScene. 
-4. Hodgkin-Huxley simulation code is provided locally within the project along with one example neuron geometry to run on. These should run automatically upon pressing play. Additional sample geometries can be downloaded from [INSERT LINK]. If using the Unity Editor, these geometries should be placed within 'Assets/StreamingAssets/NeuronalDynamics/Geometries'. If using a standalone build, the application will look for cell archives within `virtual-reality_Data\StreamingAssets\NeuronalDynamics\Geometries`.
+4. Hodgkin-Huxley simulation code is provided locally within the project along with one example neuron geometry to run on. These should run automatically upon pressing play. Additional sample geometries can be downloaded from [INSERT LINK]. If using the Unity Editor, these geometries should be placed within `Assets/StreamingAssets/NeuronalDynamics/Geometries`. If using a standalone build, the application will look for cell archives within `virtual-reality_Data\StreamingAssets\NeuronalDynamics\Geometries`.
 
 ## Documentation
 Our code is documented [here](https://c2m2.github.io/doxyhtml/index.html)
