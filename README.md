@@ -1,8 +1,14 @@
 # virtual-reality
-Repository for Temple University's Center for Computational Mathematics and Modeling's virtual reality project
+Repository for Temple University's Center for Computational Mathematics and Modeling's virtual reality project. This project provides a prototype for visualizing and interacting with computational simulations in virtual reality, with a particular emphasis placed on neuronal dynamics (ND) simulations.
 
 ## Code quality
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/ac2c4122b3174e4a8209ef2e791792b3)](https://www.codacy.com?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=c2m2/virtual-reality&amp;utm_campaign=Badge_Grade)
+
+## Quick Start Guide
+1. Clone project to any location
+2. Ensure the correct version of the Unity Editor is installed
+3. Open project in Unity and open Assets/Scenes/MainScene. 
+4. Hodgkin-Huxley simulation code is provided locally within the project along with one example neuron geometry to run on. These should run automatically upon pressing play. Additional sample geometries can be downloaded from [INSERT LINK]. If using the Unity Editor, these geometries should be placed within 'Assets/StreamingAssets/NeuronalDynamics/Geometries'. If using a standalone build, the application will look for cell archives within `virtual-reality_Data\StreamingAssets\NeuronalDynamics\Geometries`.
 
 ## Documentation
 Our code is documented [here](https://c2m2.github.io/doxyhtml/index.html)
@@ -20,7 +26,7 @@ Git users (versions < 2.23.0) should clone the repository by using
 
 For users of older git versions this remedies the problem that every LFS versioned file will ask the user for their password.
 
-## Requirements before contributing
+## Software Requirements
 - Unity 2019.4.19f1 (LTS). This project has been tested using 2019.1, but commits can not be made without using version 2019.4.19f1.
 
 - Git version >= 2.7.0
@@ -30,17 +36,11 @@ For users of older git versions this remedies the problem that every LFS version
 *Note*: A git pre-commit hook will ensure version consistency.
 The user should install the hooks by calling `./install_git_hooks.sh` after clone from the root directory.
 
-### Make sure appropriate versions are used
+### Version Consistency
 A pre-commit hook will block commits made with inappropriate versions of Git, Git LFS, or Unity
 - git lfs: `git lfs env` in a terminal/console.
 - git: `git --version`
 - Unity: see UnityEditor
-
-## Quick Start Guide
-1. Clone project to any location
-2. Ensure the correct version of the Unity Editor is installed
-3. Open project in Unity and open Assets/Scenes/MainScene. 
-4. Hodgkin-Huxley simulation code is provided locally within the project along with one example neuron geometry to run on. These should run automatically upon pressing play. Additional sample geometries can be downloaded from [INSERT LINK]. If using the Unity Editor, these geometries should be placed within 'Assets/StreamingAssets/NeuronalDynamics/Geometries'. If using a standalone build, the application will look for cell archives within `virtual-reality_Data\StreamingAssets\NeuronalDynamics\Geometries`.
 
 ## Custom Simulation Code Guide
 
