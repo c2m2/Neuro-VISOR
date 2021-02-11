@@ -8,7 +8,7 @@ Repository for Temple University's Center for Computational Mathematics and Mode
 Our code is documented [here](https://c2m2.github.io/doxyhtml/index.html)
 
 ## Build
-A standalone build of this project is maintained [here](https://github.com/c2m2/virtual-reality-build). This can be run independently from the Unity editor and will improve performance.
+Standalone builds for Windows, Mac, and Linux can be downloaded from the "Releases" section. Standalone builds can be run as executable files without the need for the Unity editor and will improve time performance. Within a static build, custom .vrn cell archives can be placed within `virtual-reality_Data\StreamingAssets\NeuronalDynamics\Geometries` to be run within the application.
 
 ## Connect with us
 We have a [blog](https://c2m2vr.wordpress.com/) where we write up project updates, as well as a [trello board](https://trello.com/b/iQ9aepTn/virtual-reality)
