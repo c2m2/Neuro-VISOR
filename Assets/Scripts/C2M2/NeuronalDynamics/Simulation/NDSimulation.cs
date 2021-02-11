@@ -245,7 +245,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
 
 
         public Mutex clampMutex { get;  private set; } = new Mutex();
-        private static Tuple<int, double> nullClamp = new Tuple<int, double>(-1, 0);
+        private static Tuple<int, double> nullClamp = new Tuple<int, double>(-1, -1);
         /// <summary>
         /// Add clamp values once per simulation frame
         /// </summary>
