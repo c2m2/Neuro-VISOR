@@ -14,10 +14,8 @@ using C2M2.Interaction;
 using C2M2.Simulation;
 using C2M2.Utils;
 using C2M2.Utils.DebugUtils;
-using C2M2.Utils.Exceptions;
 using C2M2.Utils.MeshUtils;
 using Grid = C2M2.NeuronalDynamics.UGX.Grid;
-using System.Text;
 using C2M2.NeuronalDynamics.Visualization.VRN;
 using C2M2.NeuronalDynamics.Interaction;
 

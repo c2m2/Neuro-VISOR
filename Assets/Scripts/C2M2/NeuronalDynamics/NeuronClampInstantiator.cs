@@ -22,6 +22,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         }
         public Color32 inactiveCol = Color.black;
         public float highlightSphereScale = 3f;
+        public double clampDefaultPower = 55;
 
         /// <summary>
         /// Looks for NDSimulation instance and adds neuronClamp object if possible
@@ -42,6 +43,8 @@ namespace C2M2.NeuronalDynamics.Interaction
 
             clamp.InactiveCol = inactiveCol;
             clamp.highlightSphereScale = highlightSphereScale;
+
+            clamp.clampPower = clampDefaultPower;
 
             clamp.ReportSimulation(sim, hit);
         }

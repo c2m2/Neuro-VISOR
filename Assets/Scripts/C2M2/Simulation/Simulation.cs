@@ -21,7 +21,11 @@ namespace C2M2.Simulation
         /// <summary>
         /// Should the simulation start itself in Awake?
         /// </summary>
-        public bool startOnAwake = true; //get rid of me!
+        public bool startOnAwake = true; // TODO: Move away from using this
+
+        public double raycastHitValue = 55;
+
+
 
         /// <summary>
         /// Provide mutual exclusion to derived classes
@@ -77,6 +81,7 @@ namespace C2M2.Simulation
         #region Unity Methods
         public void Initialize()
         {
+            // We should move away from using OnAwakePre, OnAwakePost
             OnAwakePre(); //this is a mess!! :(
 
             if (!dryRun)
@@ -94,7 +99,10 @@ namespace C2M2.Simulation
             {
                 switch (interactionType)
                 {
-                    case (InteractionType.Discrete): Heater = gameObject.AddComponent<RaycastSimHeaterDiscrete>(); break;
+                    case (InteractionType.Discrete):
+                        Heater = gameObject.AddComponent<RaycastSimHeaterDiscrete>();
+                        ((RaycastSimHeaterDiscrete)Heater).value = raycastHitValue;
+                        break;
                     case (InteractionType.Continuous): Heater = gameObject.AddComponent<RaycastSimHeaterContinuous>(); break;
                 }
 
@@ -183,11 +191,14 @@ namespace C2M2.Simulation
             {
                 for (time = 0; time < nT; time++)
                 {
+                    // mutex guarantees mutual exclusion over simulation values
                     mutex.WaitOne();
-                    PreSolveStep();
+                    
                     // call user solve code 
+                    PreSolveStep();
                     SolveStep(time);
                     PostSolveStep();
+
                     mutex.ReleaseMutex();
                 }
             }
@@ -198,14 +209,14 @@ namespace C2M2.Simulation
             }
             GameManager.instance.DebugLogSafe("Simulation Over.");
         }
-        
+
         /// <summary>
-        /// ...
+        /// PreSolveStep is called once per simulation frame, before SolveStep() 
         /// </summary>
         protected virtual void PreSolveStep() { }
 
         /// <summary>
-        ///  Method which is called once per time step after SolveStep() 
+        /// PostSolveStep is called once per simulation frame, after SolveStep() 
         /// </summary>
         protected virtual void PostSolveStep() { }
 

@@ -199,6 +199,10 @@ MonoBehaviour:
   globalMin: -0.005
   globalMax: 0.05
   refinementLevel: 0
+  timestepSize: 0.000002
+  endTime: 1
+  raycastHitValue: 55
+  clampDefaultPower: 55
   solverType: SparseSolverTestv1
 --- !u!114 &99744260
 MonoBehaviour:
@@ -3109,6 +3113,10 @@ MonoBehaviour:
   globalMin: Infinity
   globalMax: -Infinity
   refinementLevel: 0
+  timestepSize: 0.000002
+  endTime: 1
+  raycastHitValue: 55
+  clampDefaultPower: 55
   solverType: SparseSolverTestv1
 --- !u!114 &887169813
 MonoBehaviour:
@@ -5025,6 +5033,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dryRun: 0
   startOnAwake: 1
+  raycastHitValue: 55
   k: 0.000002
   endTime: 1
   pdbPath: PE/pe_cg.pdb
@@ -6515,6 +6524,7 @@ MonoBehaviour:
     serializedVersion: 2
     rgba: 4291348680
   highlightSphereScale: 3
+  clampDefaultPower: 55
   toggleDestroyOVR: 2
   toggleDestroyOVRS: 8
   powerModifierPlusKey: 273

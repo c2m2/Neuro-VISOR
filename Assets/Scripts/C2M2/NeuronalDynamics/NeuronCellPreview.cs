@@ -21,7 +21,7 @@ namespace C2M2.NeuronalDynamics.Visualization
     {
         public string vrnFileName = "null";
         public Color32 color;
-        public SimulationLoader loader = null;
+        public NDSimulationLoader loader = null;
         public TextMeshProUGUI fileNameDisplay;
         private VrnReader vrnReader = null;
 
