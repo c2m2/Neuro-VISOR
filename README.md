@@ -21,7 +21,7 @@ Git users (versions < 2.23.0) should clone the repository by using
 For users of older git versions this remedies the problem that every LFS versioned file will ask the user for their password.
 
 ## Requirements before contributing
-- Unity 2019.1.0f2
+- Unity 2019.4.19f1 (LTS). This project has been tested using 2019.1, but commits can not be made without using version 2019.4.19f1.
 
 - Git version >= 2.7.0
 
@@ -39,8 +39,12 @@ A pre-commit hook will block commits made with inappropriate versions of Git, Gi
 ## Quick Start Guide
 1. Clone project to any location
 2. Ensure the correct version of the Unity Editor is installed
-3. Open project in Unity. 
-4. Open "MainScene", and ensure that "HHSolver" is enabled in the hierarchy. Hodgkin-Huxley simulation code is provided locally within the project along with example 1D and 3D neuron geometries to run on. These should run automatically upon pressing play.
+3. Open project in Unity and open Assets/Scenes/MainScene. 
+4. Hodgkin-Huxley simulation code is provided locally within the project along with one example neuron geometry to run on. These should run automatically upon pressing play. Additional sample geometries can be downloaded from [INSERT LINK].
+
+## Custom Simulation Code Guide
+
+## Custom Cell Generation Guide
 
 ## Previously developed code
 Code was previously hosted on Gitlab [here](https://gitlab.com/vr-lab-repos). This repo still contains useful code for CUDA, compute shaders, Burst examples, OBJ and VTK handling. The code on Bitbucket [here](https://bitbucket.org/c2m2vr/workspace/projects/VIR) is now fully obsolete and replaced by this Github repository. VR grids are maintained [over here](https://github.com/stephanmg/vr-grids). Custom attributes which proved useful during development are maintained [here](https://github.com/stephanmg/vr-utils).
