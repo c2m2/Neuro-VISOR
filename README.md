@@ -31,7 +31,7 @@ For users of older git versions this remedies the problem that every LFS version
 - Git version >= 2.7.0
 - Git LFS version >= 2.10.0
 ### Version Consistency
-A pre-commit hook will block commits made with inappropriate versions of Git, Git LFS, or Unity. Users should install the hooks by calling `./install_git_hooks.sh` after clone from the root directory.
+A pre-commit hook will block commits made with inappropriate versions of Git, Git LFS, or Unity. Users should install the hooks by calling `./install_git_hooks.sh` from the root directory after cloning.
 - git lfs: `git lfs env` in a terminal/console.
 - git: `git --version`
 - Unity: see UnityEditor
