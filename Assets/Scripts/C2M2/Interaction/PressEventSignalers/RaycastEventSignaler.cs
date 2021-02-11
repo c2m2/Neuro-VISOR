@@ -3,6 +3,9 @@
 namespace C2M2.Interaction.Signaling
 {
     using Utils;
+    /// <summary>
+    /// Abstract class 
+    /// </summary>
     public abstract class RaycastEventSignaler : PressEventSignaler
     {
         public bool rightHand = true;

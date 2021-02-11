@@ -92,6 +92,9 @@ namespace C2M2.NeuronalDynamics.Simulation {
             set
             {
                 clampMode = value;
+
+                // TODO: Using GameManager here is bad design
+                // If clampmode is set to true, find ClampMode raycast event and focus on it. Otherwise find default raycast event
                 RaycastPressEvents newEvents = clampMode ?
                     GameManager.instance.gameObject.GetComponent<RaycastPressEvents>()
                     : GetComponentInChildren<RaycastPressEvents>();
@@ -99,12 +102,15 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 raycastManager.leftTrigger = newEvents;
                 raycastManager.rightTrigger = newEvents;
 
+
                 foreach (GameObject clamp in GameManager.instance.clampControllers)
                 {
                     MeshRenderChild renderControls = clamp.GetComponentInParent<MeshRenderChild>();
                     if (renderControls != null) renderControls.enabled = clampMode;
                     clamp.SetActive(clampMode);
                 }
+
+                Debug.Log("ClampMode set to " + clampMode);
             }
         }
 
@@ -390,17 +396,24 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 GameObject lines1D = gameObject.AddComponent<LinesRenderer> ().Draw (geom1D, color1D, lineWidth1D);
             }
             void InitUI () {
-                // Instantiate neuron diameter control panel, announce active simulation to each button
-                GameObject diameterControlPanel = Resources.Load ("Prefabs/NDControls") as GameObject;
-                NDControlButton[] buttons = diameterControlPanel.GetComponentsInChildren<NDControlButton> ();
-                foreach (NDControlButton button in buttons) {
-                    button.ndSimulation = this;
-                }
+                // Instantiate control panel prefab, announce active simulation to buttons
+                GameObject controlPanel = Resources.Load ("Prefabs/NDControls") as GameObject;
+               
+                controlPanel = GameObject.Instantiate(controlPanel);
 
-                GameObject.Instantiate (diameterControlPanel, GameManager.instance.whiteboard);
+                NDClampModeButtonController clampModeCont = controlPanel.GetComponentInChildren<NDClampModeButtonController>();
+                if(clampModeCont != null)
+                {
+                    clampModeCont.sim = this;
+                }
+                else
+                {
+                    Debug.LogError("No clamp mode button controller found!");
+                }
             }
         }
 
+        // TODO: Obsolete
         private Mesh CheckMeshCache(double inflation)
         {
             if (!meshCache.ContainsKey(inflation) || meshCache[inflation] == null)
