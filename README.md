@@ -28,16 +28,10 @@ For users of older git versions this remedies the problem that every LFS version
 
 ## Software Requirements
 - Unity 2019.4.19f1 (LTS). This project has been tested using 2019.1, but commits can not be made without using version 2019.4.19f1.
-
 - Git version >= 2.7.0
-
 - Git LFS version >= 2.10.0
-
-*Note*: A git pre-commit hook will ensure version consistency.
-The user should install the hooks by calling `./install_git_hooks.sh` after clone from the root directory.
-
 ### Version Consistency
-A pre-commit hook will block commits made with inappropriate versions of Git, Git LFS, or Unity
+A pre-commit hook will block commits made with inappropriate versions of Git, Git LFS, or Unity. Users should install the hooks by calling `./install_git_hooks.sh` after clone from the root directory.
 - git lfs: `git lfs env` in a terminal/console.
 - git: `git --version`
 - Unity: see UnityEditor
