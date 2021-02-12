@@ -97,6 +97,11 @@ namespace C2M2.NeuronalDynamics.Interaction
         #endregion
 
         #region Orientation
+
+
+        /// <summary>
+        /// Sets the radius and height of the clamp
+        /// </summary>
         private void SetScale(NDSimulation simulation, NeuronCell.NodeData cellNodeData)
         {
             currentVisualizationScale = (float)simulation.VisualInflation;
@@ -110,6 +115,10 @@ namespace C2M2.NeuronalDynamics.Interaction
             transform.parent.localScale = new Vector3(radiusLength, radiusLength, heightScalingValue);
             UpdateHighLightScale(transform.parent.localScale);
         }
+
+        /// <summary>
+        /// Scales the clamp by a scalar value
+        /// </summary>
         public void UpdateScale(float newScale)
         {
             if (this != null)
@@ -154,6 +163,10 @@ namespace C2M2.NeuronalDynamics.Interaction
 
             Debug.Log("highlight global scale: " + highlightObj.transform.lossyScale.ToString("F5") + "\nlocal scale: " + highlightObj.transform.localScale.ToString("F5"));
         }
+
+        /// <summary>
+        /// Sets the orientation of the clamp based on the surrounding neighbors
+        /// </summary>
         public void SetRotation(NDSimulation simulation, NeuronCell.NodeData cellNodeData)
         {
             List<int> neighbors = cellNodeData.neighborIDs;
@@ -187,7 +200,7 @@ namespace C2M2.NeuronalDynamics.Interaction
 
         #region Simulation Checks
         /// <summary>
-        /// Attempt to latcha  clamp onto a simulation object
+        /// Attempt to latch a clamp onto a simulation object
         /// </summary>
         public NDSimulation ReportSimulation(RaycastHit hit)
         {
@@ -275,7 +288,8 @@ namespace C2M2.NeuronalDynamics.Interaction
 
             return nearestVert1D;
         }
-        // Returns true if the that 1D index is available, otherwise returns false
+
+        /// <returns> True if the 1D index is available, otherwise returns false</returns>
         private bool VertIsAvailable(int clampIndex, NDSimulation simulation)
         {
             bool validLocation = true;
