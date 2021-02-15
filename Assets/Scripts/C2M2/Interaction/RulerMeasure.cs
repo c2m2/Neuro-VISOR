@@ -13,7 +13,7 @@ namespace C2M2.Interaction
         public List<Canvas> measurementDisplays;
         public GameObject topEndcap;
         public GameObject bottomEndCap;
-        private readonly List<int> numbers = new List<int> { 1, 2, 5, 10, 20, 50, 100, 200, 500 };
+        private readonly List<int> potentialIntervals = new List<int> { 1, 2, 5, 10, 20, 50, 100, 200, 500 };
         private List<MarkedDisplay> markedDisplays = new List<MarkedDisplay>();
         private readonly int markerCount = 100; //Maximum number of markers
         private float initialTopEndCapLength;
@@ -111,20 +111,19 @@ namespace C2M2.Interaction
             }
         }
 
-        private void UpdateMarkers(float scaledFirstMarkerLength)
+        /// <summary>
+        /// Updates the locations of the markers on the ruler
+        /// </summary>
+        /// <param name="minimumMarkerNumber">Minimum valid number for a marker to be placed on the ruler, needs to be between the lowest and the highest number in potentialIntervals</param>
+        private void UpdateMarkers(float minimumMarkerNumber)
         {
             int interval = 0;
             int currentNumber = 0;
-            while (interval == 0)
+            while (interval == 0 && currentNumber < potentialIntervals.Count)
             {
-                if (currentNumber >= numbers.Count)
+                if (potentialIntervals[currentNumber] > minimumMarkerNumber)
                 {
-                    Debug.LogError("No Ruler Marker Large Enough");
-                    interval = -1;
-                }
-                else if (numbers[currentNumber] > scaledFirstMarkerLength)
-                {
-                    interval = numbers[currentNumber];
+                    interval = potentialIntervals[currentNumber];
                 }
                 currentNumber++;
             }
