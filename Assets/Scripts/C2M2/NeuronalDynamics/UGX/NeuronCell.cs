@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 using System;
 using UnityEngine;
 
@@ -20,7 +21,8 @@ namespace C2M2.NeuronalDynamics.UGX
         public struct NodeData
         {
             public int id { get; set; }
-            public int pid { get; set; }    // pid not use
+            public int pid { get; set; }    // is set somewhere ? this is being used by clamps somewhere and I am not sure how to fix this
+            public int pidAlternate { get; set; } // need to fix this at some point!
             public int nodeType { get; set; } // node type
             public double nodeRadius { get; set; }
             public double xcoords { get; set; }
@@ -41,6 +43,19 @@ namespace C2M2.NeuronalDynamics.UGX
                 tempNode.nodeRadius = diam.Diameter / 2;
                 tempNode.id = grid.Vertices[count].Id;
 
+                for (int i = 0; i < grid.Edges.Count(); i++)
+                {
+                    if (tempNode.id == grid.Edges[i].To.Id)
+                    {
+                        tempNode.pidAlternate = grid.Edges[i].From.Id;
+                    }
+                    if (tempNode.id == 0)
+                    {
+                        tempNode.pidAlternate = -1;
+                    }
+                }
+
+
                 tempNode.xcoords = grid.Mesh.vertices[count].x;
                 tempNode.ycoords = grid.Mesh.vertices[count].y;
                 tempNode.zcoords = grid.Mesh.vertices[count].z;
@@ -48,10 +63,8 @@ namespace C2M2.NeuronalDynamics.UGX
                 tempNode.neighborIDs = new List<int>();
 
                 if (grid.Vertices[count].Neighbors.Count == 1)
-                {
-			
-                    boundaryID.Add(grid.Vertices[count].Id);
-                      
+                {			
+                    boundaryID.Add(grid.Vertices[count].Id);                      
                 }
 
                 for (int i = 0; i < grid.Vertices[count].Neighbors.Count; i++)
@@ -73,7 +86,16 @@ namespace C2M2.NeuronalDynamics.UGX
             this.edgeCount = this.edges.Count();
             this.somaID = grid.Subsets["soma"].Indices.ToList();
         }
+        public void writeSWC(string outFile)
+        {
+            StreamWriter file = File.AppendText(outFile);
+            for (int i = 0; i < this.vertCount; i++)
+            {
+                file.WriteLine(nodeData[i].id.ToString() + " " + 1.ToString() + " " + nodeData[i].xcoords.ToString() + " " + nodeData[i].ycoords.ToString() + " " + nodeData[i].zcoords.ToString() + " " + nodeData[i].nodeRadius.ToString() + " " + nodeData[i].pidAlternate.ToString());
+            }
 
+            file.Close();
+        }
 
         static string cellFormatString = 
             "1D Vert count = {0}\n" +
