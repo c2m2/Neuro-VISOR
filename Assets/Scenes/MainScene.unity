@@ -200,7 +200,7 @@ MonoBehaviour:
   globalMax: 0.05
   refinementLevel: 0
   timestepSize: 0.000002
-  endTime: 1
+  endTime: 100
   raycastHitValue: 55
   clampDefaultPower: 55
   solverType: SparseSolverTestv1
