@@ -10,11 +10,13 @@ namespace C2M2.NeuronalDynamics.Interaction {
     using NeuronalDynamics.Visualization;
     public class CellPreviewer : MonoBehaviour
     {
+        public string cellsPath = Application.streamingAssetsPath + Path.DirectorySeparatorChar + "NeuronalDynamics" + Path.DirectorySeparatorChar + "Geometries";
         public GameObject previewWindowPrefab = null;
         public NDSimulationLoader loader = null;
         public bool renderOutline = true;
         public bool renderWalls = true;
         public Color32 windowColor = Color.black;
+        
         /// <summary>
         /// Colors ot use for the 1D cell renderings. More than cellColors.Length cells will repeat these colors
         /// </summary>
@@ -50,14 +52,21 @@ namespace C2M2.NeuronalDynamics.Interaction {
             FindSimulationLoader();
 
             // Get possible geometries from given direcrory
-            string[] geoms = GetGeometryNames();
+            string[] geoms = GetGeometryNames(cellsPath);
 
-            // Make a preview window for each found geometry
-            Vector3[] windowPositions = GetWindowPositions(geoms.Length);
-            Color32[] previewColors = GetWindowColors(geoms.Length);
-            for(int i = 0; i < geoms.Length; i++)
+            if (geoms.Length > 0)
             {
-                InstantiatePreviewWindow(geoms[i], windowPositions[i], previewColors[i]);
+                // Make a preview window for each found geometry
+                Vector3[] windowPositions = GetWindowPositions(geoms.Length);
+                Color32[] previewColors = GetWindowColors(geoms.Length);
+                for (int i = 0; i < geoms.Length; i++)
+                {
+                    InstantiatePreviewWindow(geoms[i], windowPositions[i], previewColors[i]);
+                }
+            }
+            else
+            {
+                Debug.LogWarning("No cells found in " + cellsPath);
             }
 
             void FindWindowPrefab()
@@ -85,10 +94,8 @@ namespace C2M2.NeuronalDynamics.Interaction {
                     }
                 }
             }
-            string[] GetGeometryNames()
+            string[] GetGeometryNames(string targetDir)
             {
-                char sl = Path.DirectorySeparatorChar; ;
-                string targetDir = Application.streamingAssetsPath + sl + "NeuronalDynamics" + sl + "Geometries";
                 DirectoryInfo d = new DirectoryInfo(targetDir);
 
                 FileInfo[] files = d.GetFiles("*.vrn");
