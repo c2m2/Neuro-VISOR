@@ -156,16 +156,23 @@ namespace C2M2.Simulation
         private void OnApplicationPause(bool pause)
         {
             OnPause();
-            if (pause && solveThread != null) solveThread.Abort();
+            if (pause) StopSimulation();
         }
         private void OnApplicationQuit()
         {
             OnQuit();
-            if (solveThread != null) solveThread.Abort();
+            StopSimulation();
+        }
+
+        private void OnDestroy()
+        {
+            OnDest();
+            StopSimulation();
         }
         // Use OnPause and OnQuit to wrap up I/O or other processes if the application pauses or quits during solve code.
         protected virtual void OnPause() { }
         protected virtual void OnQuit() { }
+        protected virtual void OnDest() { }
         #endregion
 
         public int time { get; protected set; } = -1;
@@ -205,7 +212,6 @@ namespace C2M2.Simulation
             catch (Exception e)
             {
                 GameManager.instance.DebugLogErrorThreadSafe(e);
-                mutex.ReleaseMutex();
             }
             GameManager.instance.DebugLogSafe("Simulation Over.");
         }
@@ -223,7 +229,16 @@ namespace C2M2.Simulation
         /// <summary>
         /// Stop current Solve thread
         /// </summary>
-        public void StopSimulation() { if (solveThread != null) solveThread.Abort(); }
+        public void StopSimulation()
+        {
+            if (solveThread != null)
+            {
+                mutex.WaitOne();
+                solveThread.Abort();
+                mutex.ReleaseMutex();
+                solveThread = null;             
+            }
+        }
     }
     public class SimulationNotFoundException : Exception
     {

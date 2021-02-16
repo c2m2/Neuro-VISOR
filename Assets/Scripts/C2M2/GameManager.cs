@@ -31,6 +31,8 @@ namespace C2M2
                 return vrDeviceManager.VrIsActive;
             }
         }
+
+        public GameObject cellPreviewer = null;
         public Interactable simulation = null;
         public List<SimulationTimerLabel> timerLabels = new List<SimulationTimerLabel>();
 

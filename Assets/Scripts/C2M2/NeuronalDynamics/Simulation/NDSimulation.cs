@@ -410,6 +410,13 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 {
                     Debug.LogError("No clamp mode button controller found!");
                 }
+
+                // Find the close button, report this simulation
+                CloseNDSimulation closeButton = controlPanel.GetComponentInChildren<CloseNDSimulation>();
+                if(closeButton != null)
+                {
+                    closeButton.sim = this;
+                }
             }
         }
 
