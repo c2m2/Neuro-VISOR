@@ -43,3 +43,6 @@ A pre-commit hook will block commits made with inappropriate versions of Git, Gi
 ## Previously developed code
 Code was previously hosted on Gitlab [here](https://gitlab.com/vr-lab-repos). This repo still contains useful code for CUDA, compute shaders, Burst examples, OBJ and VTK handling. The code on Bitbucket [here](https://bitbucket.org/c2m2vr/workspace/projects/VIR) is now fully obsolete and replaced by this Github repository. VR grids are maintained [over here](https://github.com/stephanmg/vr-grids). Custom attributes which proved useful during development are maintained [here](https://github.com/stephanmg/vr-utils).
 
+## Cell Generation Disclaimer
+[Disclaimer ab cell artifacts from Dr. Queisser]
+
