@@ -8,12 +8,12 @@ Repository for Temple University's Center for Computational Mathematics and Mode
 1. Clone project to any location
 2. Ensure the correct version of the Unity Editor is installed
 3. Open project in Unity and open Assets/Scenes/MainScene. 
-4. Hodgkin-Huxley simulation code is provided locally within the project along with one example neuron geometry to run on. These should run automatically upon pressing play. Additional sample geometries can be downloaded from [INSERT LINK]. If using the Unity Editor, these geometries should be placed within `Assets/StreamingAssets/NeuronalDynamics/Geometries`. If using a standalone build, the application will look for cell archives within `virtual-reality_Data\StreamingAssets\NeuronalDynamics\Geometries`.
+4. Hodgkin-Huxley simulation code is provided locally within the project along with one example neuron geometry to run on. These should run automatically upon pressing play. Additional sample geometries can be downloaded from [INSERT LINK]. If using the Unity Editor, these geometries can be run by placing their .vrn archives within `Assets/StreamingAssets/NeuronalDynamics/Geometries`. If using a standalone build, the application will look for cell archives within `virtual-reality_Data\StreamingAssets\NeuronalDynamics\Geometries`. The cell previewer will select the first 12 cells that it finds in these directories for previewing.
 
 ## Documentation
 Our code is documented [here](https://c2m2.github.io/doxyhtml/index.html)
 
-## Build
+## Builds
 Standalone builds for Windows, Mac, and Linux can be downloaded from the "Releases" section. Standalone builds can be run as executable files without the need for the Unity editor and will improve time performance. Within a static build, custom .vrn cell archives can be placed within `virtual-reality_Data\StreamingAssets\NeuronalDynamics\Geometries` to be run within the application.
 
 ## Connect with us
@@ -42,4 +42,7 @@ A pre-commit hook will block commits made with inappropriate versions of Git, Gi
 
 ## Previously developed code
 Code was previously hosted on Gitlab [here](https://gitlab.com/vr-lab-repos). This repo still contains useful code for CUDA, compute shaders, Burst examples, OBJ and VTK handling. The code on Bitbucket [here](https://bitbucket.org/c2m2vr/workspace/projects/VIR) is now fully obsolete and replaced by this Github repository. VR grids are maintained [over here](https://github.com/stephanmg/vr-grids). Custom attributes which proved useful during development are maintained [here](https://github.com/stephanmg/vr-utils).
+
+## Cell Generation Disclaimer
+[Disclaimer ab cell artifacts from Dr. Queisser]
 
