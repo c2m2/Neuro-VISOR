@@ -7,14 +7,13 @@ using UnityEngine;
 namespace C2M2.Interaction
 {
     [RequireComponent(typeof(List<Canvas>))]
-    [RequireComponent(typeof(List<float>))]
     public class RulerMeasure : MonoBehaviour
     {
         public MeshSimulation sim = null;
         public List<Canvas> measurementDisplays;
         public GameObject topEndcap;
         public GameObject bottomEndCap;
-        private readonly List<int> numbers = new List<int> { 1, 2, 5, 10, 20, 50, 100, 200, 500 };
+        private readonly List<int> potentialIntervals = new List<int> { 1, 2, 5, 10, 20, 50, 100, 200, 500 };
         private List<MarkedDisplay> markedDisplays = new List<MarkedDisplay>();
         private readonly int markerCount = 100; //Maximum number of markers
         private float initialTopEndCapLength;
@@ -35,14 +34,14 @@ namespace C2M2.Interaction
         // Update is called once per frame
         void Update()
         {
-            float markerSpacing = 0.03f; //minimum spacing between each marker and beginning and end of ruler
-            float markerSpacingPercent = markerSpacing * initialRulerLength / transform.lossyScale.z; //minimum spacing between each marker and beginning and end of ruler in percent of ruler's length
+            float markerSpacing = 0.03f; ///< minimum spacing between each marker and beginning and end of ruler
+            float markerSpacingPercent = markerSpacing * initialRulerLength / transform.lossyScale.z; ///< minimum spacing between each marker and beginning and end of ruler in percent of ruler's length
             if (sim != null)
             {
-                float rulerLength = transform.lossyScale.z / sim.transform.lossyScale.z; //in terms of simulation
+                float rulerLength = transform.lossyScale.z / sim.transform.lossyScale.z;
                 float firstMarkerLength = markerSpacingPercent * rulerLength;
 
-                int magnitude = GetMagnitude(firstMarkerLength); //number of zeros after first digit
+                int magnitude = GetMagnitude(firstMarkerLength*2); //multiplication by 2 ensures that markers above 500 get treated as the next unit up
                 units = GetUnit(magnitude);
 
                 int siPrefixGroup = (int)Math.Floor(magnitude / 3.0);
@@ -54,12 +53,15 @@ namespace C2M2.Interaction
             }
         }
 
-        private int GetMagnitude(float length)
+        /// <returns>Integer of number of zeros of base 10 magnitude of number</returns>
+        private int GetMagnitude(float number)
         {
-            double lengthLog10 = Math.Log10(length * 2); //multiplication by 2 ensures that markers above 500 get treated as the next unit up
+            double lengthLog10 = Math.Log10(number);
             return Convert.ToInt32(Math.Floor(lengthLog10));
         }
 
+        /// <param name="magnitude">Integer of number of zeros of base 10 magnitude of number</param>
+        /// <returns>String of the SI unit and prefix</returns>
         private string GetUnit(int magnitude)
         {
             if (magnitude < -3)
@@ -109,20 +111,19 @@ namespace C2M2.Interaction
             }
         }
 
-        private void UpdateMarkers(float scaledFirstMarkerLength)
+        /// <summary>
+        /// Updates the locations of the markers on the ruler
+        /// </summary>
+        /// <param name="minimumMarkerNumber">Minimum valid number for a marker to be placed on the ruler, needs to be between the lowest and the highest number in potentialIntervals</param>
+        private void UpdateMarkers(float minimumMarkerNumber)
         {
             int interval = 0;
             int currentNumber = 0;
-            while (interval == 0)
+            while (interval == 0 && currentNumber < potentialIntervals.Count)
             {
-                if (currentNumber >= numbers.Count)
+                if (potentialIntervals[currentNumber] > minimumMarkerNumber)
                 {
-                    Debug.LogError("No Ruler Marker Large Enough");
-                    interval = -1;
-                }
-                else if (numbers[currentNumber] > scaledFirstMarkerLength)
-                {
-                    interval = numbers[currentNumber];
+                    interval = potentialIntervals[currentNumber];
                 }
                 currentNumber++;
             }
@@ -164,6 +165,10 @@ namespace C2M2.Interaction
             }
         }
 
+
+        /// <summary>
+        /// Ensures the EndCaps stay their initial size when the ruler is extended or shrunk
+        /// </summary>
         private void UpdateEndCaps()
         {
             if (topEndcap != null)

@@ -4,7 +4,7 @@ using C2M2.Interaction.VR;
 namespace C2M2.Interaction
 {
     /// <summary>
-    /// Adds some percentage of a transform's original scale at runtime
+    /// Controls the scaling of a transform
     /// </summary>
     [RequireComponent(typeof(OVRGrabbable))]
     public class GrabRescaler : MonoBehaviour
@@ -21,22 +21,21 @@ namespace C2M2.Interaction
         public bool zScale = true;
         private PublicOVRGrabber grabber;
 
-        // Returns a value between -1 and 1, where -1 implies the thumbstick is all the way down and 1 implies it is all the way up
+        ///<returns>A float between -1 and 1, where -1 means the thumbstick y axis is completely down and 1 implies it is all the way up</returns>
         private float ThumbstickScaler
         {
             get
             {
-                // Uses joystick y axis value
-                grabber = (PublicOVRGrabber)grabbable.grabbedBy;
                 return OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick, grabber.Controller).y;
             }
         }
 
+        ///<returns>A boolean of whether the joystick is pressed</returns>
         private bool ThumbstickPressed
         {
             get
             {
-                return OVRInput.Get(OVRInput.Button.PrimaryThumbstick);
+                return OVRInput.Get(OVRInput.Button.PrimaryThumbstick, grabber.Controller);
             }
         }
 
@@ -54,6 +53,7 @@ namespace C2M2.Interaction
 
         void Update()
         {
+            grabber = (PublicOVRGrabber)grabbable.grabbedBy;
             if (grabbable.isGrabbed)
             {
                 // if joystick is pressed in, it resets the scale to the original scale
@@ -70,7 +70,7 @@ namespace C2M2.Interaction
                     if (newLocalScale.x < minScale.x || newLocalScale.y < minScale.y || newLocalScale.z < minScale.z) newLocalScale = minScale;
                     if (newLocalScale.x > maxScale.x || newLocalScale.y > maxScale.y || newLocalScale.z > maxScale.z) newLocalScale = maxScale;
                     
-                    // Which dimensions are actually getting scaled
+                    // Only scales the proper dimensions
                     if (!xScale) newLocalScale.x = transform.localScale.x;
                     if (!yScale) newLocalScale.y = transform.localScale.y;
                     if (!zScale) newLocalScale.z = transform.localScale.z;

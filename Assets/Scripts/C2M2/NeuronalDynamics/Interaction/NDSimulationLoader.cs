@@ -14,7 +14,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         public float globalMax = float.NegativeInfinity;
         public int refinementLevel = 0;
         public double timestepSize = 0.002 * 1e-3;
-        public double endTime = 1.0;
+        public double endTime = 100.0;
         public double raycastHitValue = 55;
         public double clampDefaultPower = 55;
 
