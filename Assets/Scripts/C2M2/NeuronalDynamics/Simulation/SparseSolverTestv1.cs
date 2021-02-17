@@ -216,7 +216,7 @@ namespace C2M2.NeuronalDynamics.Simulation
                     /// here we set the voltage at the location, notice that we multiply by 0.0001 to convert to volts [V] 
                     if (j >= 0 && j < NeuronCell.vertCount)
                     {
-                        U[j] = val * (1E-3);
+                        U[j] = System.Math.Max(0.055, val * (1E-3));
                     }
                 }
                 mutex.ReleaseMutex();
@@ -291,7 +291,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         protected override void SolveStep(int t)
         {                                                                                             
             ///<c>if ((i * k >= 0.015) && SomaOn) { U[0] = vstart; }</c> this checks of the somaclamp is on and sets the soma location to <c>vstart</c>
-            if ((t * k >= 0.015) && SomaOn) { U[0] = vstart; }
+            ///if ((t * k >= 0.015) && SomaOn) { U[0] = vstart; }
             ///This part does the diffusion solve \n
             /// <c>r_csc.Multiply(U.ToArray(), b);</c> the performs the RHS*Ucurr and stores it in <c>b</c> \n
             /// <c>lu.Solve(b, b);</c> this does the forward/backward substitution of the LU solve and sovles LHS = b \n
@@ -314,7 +314,7 @@ namespace C2M2.NeuronalDynamics.Simulation
             M.Add(fM(U, M).Multiply(k), M);
             H.Add(fH(U, H).Multiply(k), H);
             ///<c>if ((i * k >= 0.015) && SomaOn) { U[0] = vstart; }</c> this checks of the somaclamp is on and sets the soma location to <c>vstart</c>
-            if ((t * k >= 0.015) && SomaOn) { U[0] = vstart; }      
+            ///if ((t * k >= 0.015) && SomaOn) { U[0] = vstart; }      
         }
 
         #region Local Functions
