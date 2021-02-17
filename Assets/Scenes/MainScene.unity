@@ -216,6 +216,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28573a79f42799142903b3950c29251a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  cellsPath: C:/Users/jacob/Desktop/C2M2/virtual-reality/Assets/StreamingAssets\NeuronalDynamics\Geometries
   previewWindowPrefab: {fileID: 3442635864417745502, guid: 74fbe5514a368c44daac8627240e0553,
     type: 3}
   loader: {fileID: 99744259}
@@ -956,7 +957,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f95217df61b1f1143bd6f8a36afd8b9a, type: 2}
+  - {fileID: 2100000, guid: b5682c8bb520e8a46bbeab52c1a74097, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -3465,7 +3466,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f95217df61b1f1143bd6f8a36afd8b9a, type: 2}
+  - {fileID: 2100000, guid: b5682c8bb520e8a46bbeab52c1a74097, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -7892,7 +7893,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   clampPrefab: {fileID: 7051469727396962550, guid: 4565241fccd266147a078e252b27d27f,
     type: 3}
-  allActive: 0
+  allActive: 1
   inactiveCol:
     serializedVersion: 2
     rgba: 4291348680

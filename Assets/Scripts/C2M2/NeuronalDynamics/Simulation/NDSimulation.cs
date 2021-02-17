@@ -18,6 +18,7 @@ using C2M2.Utils.MeshUtils;
 using Grid = C2M2.NeuronalDynamics.UGX.Grid;
 using C2M2.NeuronalDynamics.Visualization.VRN;
 using C2M2.NeuronalDynamics.Interaction;
+using C2M2.Visualization;
 
 namespace C2M2.NeuronalDynamics.Simulation {
 
@@ -118,6 +119,8 @@ namespace C2M2.NeuronalDynamics.Simulation {
         public bool visualize1D = false;
         public Color32 color1D = Color.yellow;
         public float lineWidth1D = 0.005f;
+
+        public GameObject controlPanel = null;
 
         // Need mesh options for each refinement, diameter level
         [Tooltip("Name of the vrn file within Assets/StreamingAssets/NeuronalDynamics/Geometries")]
@@ -397,8 +400,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
             }
             void InitUI () {
                 // Instantiate control panel prefab, announce active simulation to buttons
-                GameObject controlPanel = Resources.Load ("Prefabs/NDControls") as GameObject;
-               
+                controlPanel = Resources.Load ("Prefabs/NeuronalDynamics/ControlPanel/NDControls") as GameObject;        
                 controlPanel = GameObject.Instantiate(controlPanel);
 
                 NDClampModeButtonController clampModeCont = controlPanel.GetComponentInChildren<NDClampModeButtonController>();
@@ -417,6 +419,19 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 {
                     closeButton.sim = this;
                 }
+
+                // Find gradient display and attach our values
+                GradientDisplay gradientDisplay = controlPanel.GetComponentInChildren<GradientDisplay>();
+                if (gradientDisplay != null)
+                {
+                    gradientDisplay.sim = this;
+                    if (colorLUT != null)
+                    {
+                        gradientDisplay.gradient = colorLUT.Gradient;
+                    }
+                    else if (colorLUT == null) { Debug.LogWarning("No ColorLUT found on MeshSimulation"); }
+                }
+                else if (gradientDisplay == null) { Debug.LogWarning("No GradientDisplay found on NDControls"); }
             }
         }
 

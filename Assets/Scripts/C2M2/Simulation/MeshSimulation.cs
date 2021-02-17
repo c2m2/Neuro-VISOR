@@ -117,8 +117,8 @@ namespace C2M2.Simulation
                 colorLUT.extremaMethod = extremaMethod;
                 if (extremaMethod == LUTGradient.ExtremaMethod.GlobalExtrema)
                 {
-                    colorLUT.globalMax = globalMax;
-                    colorLUT.globalMin = globalMin;
+                    colorLUT.GlobalMax = globalMax;
+                    colorLUT.GlobalMin = globalMin;
                 }
             }
             void InitInteraction()

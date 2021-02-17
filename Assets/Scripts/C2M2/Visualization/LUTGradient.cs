@@ -21,10 +21,40 @@ namespace C2M2.Visualization
         /// </summary>
         public enum ExtremaMethod { LocalExtrema, GlobalExtrema, RollingExtrema }
         public ExtremaMethod extremaMethod = ExtremaMethod.RollingExtrema;
-        public float globalMax = Mathf.NegativeInfinity;
-        public float globalMin = Mathf.Infinity;
-        public float curMax { get; private set; } = -1;
-        public float curMix { get; private set; } = -1;
+        private float globalMax = Mathf.NegativeInfinity;
+        public float GlobalMax
+        {
+            get
+            {
+                return globalMax;
+            }
+            set
+            {
+                globalMax = value;
+                hasChanged = true;
+            }
+        }
+        private float globalMin = Mathf.Infinity;
+        public float GlobalMin
+        {
+            get
+            {
+                return globalMin;
+            }
+            set
+            {
+                globalMin = value;
+                hasChanged = true;
+            }
+        }
+
+        /// <summary>
+        /// Flag is set true when globalMin, globalMax, or gradient have changed.
+        /// </summary>
+        /// <remarks>
+        /// Flag must be manually reset to false. See C2M2.Visualization.GradientDisplay for example.
+        /// </remarks>
+        public bool hasChanged { get; set; } = false;
 
         /// <summary>
         /// Resolution of the lookup table. Increase for finer-grained color evaluations
@@ -48,6 +78,7 @@ namespace C2M2.Visualization
             {
                 gradient = value;
                 gradientLUT = BuildLUT(gradient, lutRes);
+                hasChanged = true;
             }
         }
         // Gradient look-up-table greatly reduces time expense and memory
@@ -132,21 +163,21 @@ namespace C2M2.Visualization
                 case (ExtremaMethod.GlobalExtrema):
 
                     // The user requested a custom global max, but didn't set one.
-                    if (globalMax == Mathf.NegativeInfinity || globalMin == Mathf.Infinity)
+                    if (GlobalMax == Mathf.NegativeInfinity || GlobalMin == Mathf.Infinity)
                     {
                         Debug.LogWarning("Global extrema requested but not preset. Local extrema used instead");
-                        globalMin = scalars.Min();
-                        globalMax = scalars.Max();
+                        GlobalMin = scalars.Min();
+                        GlobalMax = scalars.Max();
                     }
-                    oldMin = globalMin;
-                    oldMax = globalMax;
+                    oldMin = GlobalMin;
+                    oldMax = GlobalMax;
                     break;
                 case (ExtremaMethod.RollingExtrema):
                     // If localMax > globalMax, replace globalMax
-                    globalMax = Max(globalMax, scalars.Max());
-                    globalMin = Min(globalMin, scalars.Min());
-                    oldMin = globalMin;
-                    oldMax = globalMax;
+                    GlobalMax = Max(GlobalMax, scalars.Max());
+                    GlobalMin = Min(GlobalMin, scalars.Min());
+                    oldMin = GlobalMin;
+                    oldMax = GlobalMax;
                     break;
             }
         }
