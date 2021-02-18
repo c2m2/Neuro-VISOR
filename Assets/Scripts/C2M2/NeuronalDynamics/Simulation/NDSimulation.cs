@@ -103,12 +103,21 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 raycastManager.leftTrigger = newEvents;
                 raycastManager.rightTrigger = newEvents;
 
-
+                /*
                 foreach (GameObject clamp in GameManager.instance.clampControllers)
                 {
                     MeshRenderChild renderControls = clamp.GetComponentInParent<MeshRenderChild>();
                     if (renderControls != null) renderControls.enabled = clampMode;
                     clamp.SetActive(clampMode);
+                }*/
+
+                if (GameManager.instance.clampInstantiator.clampControllerL != null)
+                {
+                    GameManager.instance.clampInstantiator.clampControllerL.SetActive(clampMode);
+                }
+                if (GameManager.instance.clampInstantiator.clampControllerR != null)
+                {
+                    GameManager.instance.clampInstantiator.clampControllerR.SetActive(clampMode);
                 }
 
                 Debug.Log("ClampMode set to " + clampMode);

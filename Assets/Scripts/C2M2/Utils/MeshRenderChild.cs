@@ -6,18 +6,18 @@ using TMPro;
 namespace C2M2.Utils
 {
     /// <summary>
-    /// If a given MeshRenderer is disabled, this gameobject will disable.
+    /// Only allow this MeshRenderer (and collider) to be enabled if a parent's is
     /// </summary>
     /// <remarks>
-    /// This is useful in the situation where we have the static pointing finger
-    /// for raycasting mode, and we have a feature that relies on being in raycasting mode.
-    /// This way, when the static finger model is disabled, this object and its scripts/colliders will also disable
+    /// It is useful to allow this gameobject to remain enabled while not allowing it to be interactable.
     /// </remarks>
-    [ExecuteInEditMode]
+    [RequireComponent(typeof(MeshRenderer))]
     public class MeshRenderChild : MonoBehaviour
     {
+        // If disabled, children are always set to off
         public MeshRenderer parent = null;
-        public GameObject[] children = new GameObject[0];
+        public Collider optionalCollider = null;
+        private MeshRenderer mr = null;
 
         private void Awake()
         {
@@ -27,25 +27,18 @@ namespace C2M2.Utils
                 if(parent == null)
                     Debug.LogError("No MeshRenderer given to MeshRenderChild");
             }
+            mr = GetComponent<MeshRenderer>();
+           
         }
 
         // Update is called once per frame
         void Update()
         {
-            if (parent.enabled) Toggle(true);
-            else Toggle(false);
-        }
-
-        private void Toggle(bool toggleTo)
-        {
-            if (children.Length > 0)
+            mr.enabled = parent.enabled;
+            if (optionalCollider != null)
             {
-                foreach (GameObject child in children) child.SetActive(toggleTo);
-            }else if (Application.isPlaying)
-            {
-                Destroy(this);
+                optionalCollider.enabled = parent.enabled;
             }
-
         }
     }
 }

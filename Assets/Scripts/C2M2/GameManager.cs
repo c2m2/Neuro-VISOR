@@ -37,7 +37,7 @@ namespace C2M2
         public List<SimulationTimerLabel> timerLabels = new List<SimulationTimerLabel>();
 
         public NeuronClampInstantiator clampInstantiator = null;
-        public GameObject[] clampControllers = new GameObject[0];
+      //  public GameObject[] clampControllers = new GameObject[0];
 
         [Header("Environment")]
         public MeshRenderer[] walls;

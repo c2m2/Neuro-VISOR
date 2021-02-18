@@ -11,6 +11,8 @@ namespace C2M2.NeuronalDynamics.Interaction
     public class NeuronClampInstantiator : MonoBehaviour
     {
         public GameObject clampPrefab = null;
+        public GameObject clampControllerR = null;
+        public GameObject clampControllerL = null;
         public bool allActive = false;
         public NDSimulation simulation { get; private set; } = null; //warning only 1 simulation can be used in a scene!!!! --> redesign this
         public List<NeuronClamp> Clamps {

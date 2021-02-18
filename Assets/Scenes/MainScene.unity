@@ -856,6 +856,7 @@ GameObject:
   - component: {fileID: 320645340}
   - component: {fileID: 320645343}
   - component: {fileID: 320645338}
+  - component: {fileID: 320645339}
   m_Layer: 8
   m_Name: ClampControllerR
   m_TagString: Untagged
@@ -926,6 +927,20 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &320645339
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 320645336}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbc8be6eb56076a499c6617efcbc6be4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  parent: {fileID: 1246904545894575466}
+  optionalCollider: {fileID: 320645340}
 --- !u!65 &320645340
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3365,6 +3380,7 @@ GameObject:
   - component: {fileID: 835806275}
   - component: {fileID: 835806279}
   - component: {fileID: 835806274}
+  - component: {fileID: 835806278}
   m_Layer: 8
   m_Name: ClampControllerL
   m_TagString: Untagged
@@ -3495,6 +3511,20 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 835806272}
   m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &835806278
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 835806272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbc8be6eb56076a499c6617efcbc6be4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  parent: {fileID: 1246904545894575467}
+  optionalCollider: {fileID: 835806275}
 --- !u!114 &835806279
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7112,15 +7142,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 1246904545894575467}
-  children:
-  - {fileID: 835806272}
+  optionalCollider: {fileID: 0}
 --- !u!1 &2071456537 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1246904545522868941, guid: 3cd62f4122818be4585249f5083a977d,
     type: 3}
   m_PrefabInstance: {fileID: 1246904545894575464}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &2071456539
+--- !u!114 &2071456538
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -7133,8 +7162,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 1246904545894575466}
-  children:
-  - {fileID: 320645336}
+  optionalCollider: {fileID: 0}
 --- !u!1 &2128362492
 GameObject:
   m_ObjectHideFlags: 0
@@ -7893,6 +7921,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   clampPrefab: {fileID: 7051469727396962550, guid: 4565241fccd266147a078e252b27d27f,
     type: 3}
+  clampControllerR: {fileID: 320645336}
+  clampControllerL: {fileID: 835806272}
   allActive: 1
   inactiveCol:
     serializedVersion: 2
