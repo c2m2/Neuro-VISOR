@@ -216,7 +216,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28573a79f42799142903b3950c29251a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cellsPath: C:/Users/jacob/Desktop/C2M2/virtual-reality/Assets/StreamingAssets\NeuronalDynamics\Geometries
+  cellsPath: NeuronalDynamics\Geometries
   previewWindowPrefab: {fileID: 3442635864417745502, guid: 74fbe5514a368c44daac8627240e0553,
     type: 3}
   loader: {fileID: 99744259}

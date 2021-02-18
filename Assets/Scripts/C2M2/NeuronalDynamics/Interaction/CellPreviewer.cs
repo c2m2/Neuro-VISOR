@@ -10,7 +10,11 @@ namespace C2M2.NeuronalDynamics.Interaction {
     using NeuronalDynamics.Visualization;
     public class CellPreviewer : MonoBehaviour
     {
-        public string cellsPath = Application.streamingAssetsPath + Path.DirectorySeparatorChar + "NeuronalDynamics" + Path.DirectorySeparatorChar + "Geometries";
+        [Tooltip("Cell path relative to StreamingAssets")]
+        /// <summary>
+        /// Cell path relative to StreamingAssets
+        /// </summary>
+        public string cellsPath = "NeuronalDynamics" + Path.DirectorySeparatorChar + "Geometries";
         public GameObject previewWindowPrefab = null;
         public NDSimulationLoader loader = null;
         public bool renderOutline = true;
@@ -52,7 +56,7 @@ namespace C2M2.NeuronalDynamics.Interaction {
             FindSimulationLoader();
 
             // Get possible geometries from given direcrory
-            string[] geoms = GetGeometryNames(cellsPath);
+            string[] geoms = GetGeometryNames(Application.streamingAssetsPath + Path.DirectorySeparatorChar + cellsPath);
 
             if (geoms.Length > 0)
             {
