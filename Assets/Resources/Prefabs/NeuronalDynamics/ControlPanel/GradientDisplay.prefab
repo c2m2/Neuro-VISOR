@@ -347,7 +347,7 @@ MonoBehaviour:
   textMarkerHolder: {fileID: 5689999806043774411}
   unitText: {fileID: 4315962634380045234}
   titleText: {fileID: 0}
-  unit: mV
+  unit: V
   precision: F4
 --- !u!1 &4654951396634574297
 GameObject:

@@ -19,7 +19,7 @@ using Grid = C2M2.NeuronalDynamics.UGX.Grid;
 using C2M2.NeuronalDynamics.Visualization.VRN;
 using C2M2.NeuronalDynamics.Interaction;
 using C2M2.Visualization;
-
+using C2M2.Utils;
 namespace C2M2.NeuronalDynamics.Simulation {
 
     /// <summary>
@@ -246,7 +246,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
 
         public List<NeuronClamp> clamps = new List<NeuronClamp>();
 
-
         public Mutex clampMutex { get;  private set; } = new Mutex();
         private static Tuple<int, double> nullClamp = new Tuple<int, double>(-1, -1);
         /// <summary>
@@ -319,29 +318,27 @@ namespace C2M2.NeuronalDynamics.Simulation {
         /// <summary>
         /// Translate 3D vertex values to 1D values, and pass them downwards for interaction
         /// </summary>
-        /// <returns>
-        /// Either the same set of values given, or values translated
-        /// </returns>
         public void SetValues (Tuple<int, double>[] newValues) {
-            // Each 3D index will have TWO associated 1D vertices
-            Tuple<int, double>[] new1DValues = new Tuple<int, double>[2 * newValues.Length];
-            int j = 0;
-            for (int i = 0; i < newValues.Length; i++) {
-                // Get 3D vertex index
+            // Reserve space for new1DValuess
+            Tuple<int, double>[] new1Dvalues = new Tuple<int, double>[newValues.Length];
+            // Receive values given to 3D vertices, translate them onto 1D vertices and apply values there
+            for (int i = 0; i < newValues.Length; i++)
+            {    
                 int vert3D = newValues[i].Item1;
                 double val3D = newValues[i].Item2;
-                // TODO: What if a 1D vert belongs to multiple 3D verts in this list?
-                // Translate into two 1D vert indices and a lambda weight
-                double val1D = (1 - Map[vert3D].lambda) * val3D;
-                new1DValues[j] = new Tuple<int, double> (map[vert3D].v1, val1D);
-                // Weight newVal by (lambda) for second 1D vert
-                val1D = map[vert3D].lambda * val3D;
-                new1DValues[j + 1] = new Tuple<int, double> (map[vert3D].v2, val1D);
-                // Move up two spots in 1D array
-                j += 2;
+
+                // If lambda > 0.5, the vert is closer to v2 so apply val3D there
+                if(map[vert3D].lambda > 0.5)
+                { // then val3D belongs to vert1DB
+                    new1Dvalues[i] = new Tuple<int, double>(map[vert3D].v2, val3D);
+                }
+                else
+                {
+                    new1Dvalues[i] = new Tuple<int, double>(map[vert3D].v1, val3D);
+                }
             }
-            // Send 1D-translated scalars to simulation
-            Set1DValues (new1DValues);
+            // Send 1D-translated scalars to simulation code
+            Set1DValues (new1Dvalues);
         }
 
         /// <summary>

@@ -25,8 +25,6 @@ namespace C2M2.Simulation
 
         public double raycastHitValue = 55;
 
-
-
         /// <summary>
         /// Provide mutual exclusion to derived classes
         /// </summary>
