@@ -200,8 +200,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
             }
         }
 
-        public double hitValue = 55;
-
         // Stores the information from mapping in an array of structs.
         // Performs much better than using mapping directly.
         private Vert3D1DPair[] map = null;
@@ -317,9 +315,9 @@ namespace C2M2.NeuronalDynamics.Simulation {
             int v2 = mf.mesh.triangles[triInd + 1];
             int v3 = mf.mesh.triangles[triInd + 2];
             // Attach new values to new vertices
-            newValues[0] = new Tuple<int, double>(v1, hitValue);
-            newValues[1] = new Tuple<int, double>(v2, hitValue);
-            newValues[2] = new Tuple<int, double>(v3, hitValue);
+            newValues[0] = new Tuple<int, double>(v1, raycastHitValue);
+            newValues[1] = new Tuple<int, double>(v2, raycastHitValue);
+            newValues[2] = new Tuple<int, double>(v3, raycastHitValue);
 
             SetValues (newValues);
         }

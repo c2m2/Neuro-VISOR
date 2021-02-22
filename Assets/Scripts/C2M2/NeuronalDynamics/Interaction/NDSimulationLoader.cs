@@ -15,8 +15,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         public int refinementLevel = 0;
         public double timestepSize = 0.002 * 1e-3;
         public double endTime = 100.0;
-        public double raycastHitValue = 55;
-        public double clampDefaultPower = 55;
+        public double raycastHitValue = 0.05;
 
         private bool loaded = false;
         public string solverType = "SparseSolverTestv1";
@@ -39,7 +38,6 @@ namespace C2M2.NeuronalDynamics.Interaction
                 solver.k = timestepSize;
                 solver.endTime = endTime;
                 solver.raycastHitValue = raycastHitValue;
-                GameManager.instance.clampInstantiator.clampDefaultPower = clampDefaultPower;
 
                 try
                 {

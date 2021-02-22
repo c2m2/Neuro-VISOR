@@ -7,6 +7,7 @@ using Math = C2M2.Utils.Math;
 
 namespace C2M2.NeuronalDynamics.Interaction
 {
+    [RequireComponent(typeof(MeshRenderer))]
     public class NeuronClamp : MonoBehaviour
     {
         public float radiusRatio = 3f;
@@ -16,7 +17,21 @@ namespace C2M2.NeuronalDynamics.Interaction
 
         public bool clampLive { get; private set; } = false;
 
-        public double clampPower = 55;
+        public double clampPower { get; set; } = double.PositiveInfinity;
+        public double MinPower
+        {
+            get
+            {
+                return gradientLUT.GlobalMin;
+            }
+        }
+        public double MaxPower
+        {
+            get
+            {
+                return gradientLUT.GlobalMax;
+            }
+        }
 
         public int focusVert { get; private set; } = -1;
         public Vector3 focusPos;
@@ -40,7 +55,8 @@ namespace C2M2.NeuronalDynamics.Interaction
             set
             {
                 inactiveCol = value;
-                inactiveMaterial.SetColor("_Color", inactiveCol);
+               // inactiveMaterial.SetColor("_Color", inactiveCol);
+                inactiveMaterial.color = inactiveCol;
             }
         }
         private Color32 activeCol = Color.white;
@@ -50,7 +66,9 @@ namespace C2M2.NeuronalDynamics.Interaction
             private set
             {
                 activeCol = value;
-                activeMaterial.SetColor("_Color", activeCol);
+                //activeMaterial.SetColor("_Color", activeCol);
+                //activeMaterial.color = activeCol;
+                mr.material.color = activeCol;
             }
         }
         private LUTGradient gradientLUT = null;
@@ -70,21 +88,18 @@ namespace C2M2.NeuronalDynamics.Interaction
             mr = GetComponent<MeshRenderer>();
         }
 
-        private void Update()
+        private void Start()
         {
-            OVRInput.Update();
+            clampPower = (MaxPower - MinPower) / 2;
         }
         private void FixedUpdate()
         {
-            OVRInput.FixedUpdate();
-
             if(simulation != null)
             {
                 if (clampLive)
                 {
-                    //activeTarget.Set1DValues(newValues);
-
-                    ActiveColor = gradientLUT.EvaluateUnscaled((float)clampPower);
+                    Color newCol = gradientLUT.EvaluateUnscaled((float)clampPower);
+                    ActiveColor = newCol;
                 }
             }
         }
@@ -346,7 +361,13 @@ namespace C2M2.NeuronalDynamics.Interaction
         [Tooltip("Hold down a raycast for this many frames in order to destroy a clamp")]
         public int destroyCount = 50;
         int holdCount = 0;
-        float thumbstickScaler = 1;
+        // Sensitivity of the clamp power control. Note this effects value once per frame. 
+        public double ThumbstickScaler {
+            get
+            {
+                return (MaxPower - MinPower) / 150;
+            }
+        }
 
         /// <summary>
         /// Pressing this button toggles clamps on/off. Holding this button down for long enough destroys the clamp
@@ -375,12 +396,12 @@ namespace C2M2.NeuronalDynamics.Interaction
                     float y2 = OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick).y;
                     float scaler = (y1 + y2);
 
-                    return thumbstickScaler * scaler;
+                    return (float)ThumbstickScaler * scaler;
                 }
                 else
                 {
-                    if (Input.GetKey(powerModifierPlusKey)) return thumbstickScaler;
-                    if (Input.GetKey(powerModifierMinusKey)) return -thumbstickScaler;
+                    if (Input.GetKey(powerModifierPlusKey)) return (float)ThumbstickScaler;
+                    if (Input.GetKey(powerModifierMinusKey)) return -(float)ThumbstickScaler;
                     else return 0;
                 }
             }
@@ -401,6 +422,8 @@ namespace C2M2.NeuronalDynamics.Interaction
             if (power != 0 && !powerClick) powerClick = true;
 
             clampPower += power;
+            if (clampPower < MinPower) clampPower = MinPower;
+            if (clampPower > MaxPower) clampPower = MaxPower;
         }
 
         public void Highlight(bool highlight)

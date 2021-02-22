@@ -21,7 +21,7 @@ namespace C2M2.Visualization
         /// </summary>
         public enum ExtremaMethod { LocalExtrema, GlobalExtrema, RollingExtrema }
         public ExtremaMethod extremaMethod = ExtremaMethod.RollingExtrema;
-        private float globalMax = Mathf.NegativeInfinity;
+        private float globalMax = float.NegativeInfinity;
         public float GlobalMax
         {
             get
@@ -34,7 +34,7 @@ namespace C2M2.Visualization
                 hasChanged = true;
             }
         }
-        private float globalMin = Mathf.Infinity;
+        private float globalMin = float.PositiveInfinity;
         public float GlobalMin
         {
             get
@@ -115,14 +115,15 @@ namespace C2M2.Visualization
         /// </summary>
         public Color32 EvaluateUnscaled(float unscaledTime)
         {
-            float[] scalars = new float[] { oldMin, unscaledTime, oldMax };
+            float[] scalars = new float[] { GlobalMin, unscaledTime, GlobalMax };
 
             // Rescale based on extrema
-            scalars.RescaleArray(0f, (lutRes - 1), oldMin, oldMax);
+            scalars.RescaleArray(0f, (lutRes - 1), GlobalMin, GlobalMax);
 
             float scaledTime = scalars[1];
+            Color32 col = gradientLUT[Clamp((int)scaledTime, 0, (lutRes - 1))];
 
-            return gradientLUT[Clamp((int)scaledTime, 0, (lutRes - 1))];
+            return col;
         }
 
         private Color32[] BuildLUT(Gradient gradient, int lutRes)
@@ -163,7 +164,7 @@ namespace C2M2.Visualization
                 case (ExtremaMethod.GlobalExtrema):
 
                     // The user requested a custom global max, but didn't set one.
-                    if (GlobalMax == Mathf.NegativeInfinity || GlobalMin == Mathf.Infinity)
+                    if (GlobalMax == float.NegativeInfinity || GlobalMin == float.PositiveInfinity)
                     {
                         Debug.LogWarning("Global extrema requested but not preset. Local extrema used instead");
                         GlobalMin = scalars.Min();
