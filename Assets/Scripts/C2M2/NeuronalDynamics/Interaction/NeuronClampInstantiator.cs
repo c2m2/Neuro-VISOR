@@ -14,7 +14,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         public GameObject clampControllerR = null;
         public GameObject clampControllerL = null;
         public bool allActive = false;
-        public NDSimulation simulation { get; private set; } = null; //warning only 1 simulation can be used in a scene!!!! --> redesign this
+        private NDSimulation simulation = null;
         public List<NeuronClamp> Clamps {
             get
             {
@@ -33,19 +33,15 @@ namespace C2M2.NeuronalDynamics.Interaction
         {
             // Make sure we have a valid prefab and simulation
             if (clampPrefab == null) Debug.LogError("No Clamp prefab found");
-            var sim = hit.collider.GetComponentInParent<NDSimulation>();
-            if (sim == null) return;
-            if (simulation == null) simulation = sim;
-            // Only allow one simulation
-            if (sim != simulation) return;
+            simulation = hit.collider.GetComponentInParent<NDSimulation>();
+            if (simulation == null) return;
             
-            var clampObj = Instantiate(clampPrefab, sim.transform);
-            NeuronClamp clamp = clampObj.GetComponentInChildren<NeuronClamp>();
+            NeuronClamp clamp = Instantiate(clampPrefab, simulation.transform).GetComponentInChildren<NeuronClamp>();
 
             clamp.InactiveCol = inactiveCol;
             clamp.highlightSphereScale = highlightSphereScale;
 
-            clamp.ReportSimulation(sim, hit);
+            clamp.ReportSimulation(simulation, hit);
         }
 
         private int destroyCount = 50;
@@ -73,7 +69,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             {
                 if (GameManager.instance.vrIsActive)
                 {
-                    // Use the value of whichever joystick is held up furthest
+                    // Uses the value of both joysticks added together
                     float y1 = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick).y;
                     float y2 = OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick).y;
                     float scaler = (y1 + y2);

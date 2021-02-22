@@ -14,6 +14,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         public float heightRatio = 1f;
         [Tooltip("The highlight sphere's radius is some real multiple of the clamp's radius")]
         public float highlightSphereScale = 3f;
+        private bool somaClamp = false;
 
         public bool clampLive { get; private set; } = false;
 
@@ -111,13 +112,33 @@ namespace C2M2.NeuronalDynamics.Interaction
         }
         #endregion
 
-        #region Orientation
+        #region Appearance
 
+        /// <summary>
+        /// Sets the design of the clamp based on whether it is on the soma
+        /// </summary>
+        private void SetAppearance(NeuronCell.NodeData cellNodeData)
+        {
+            if (somaClamp)
+            {
+                //Replaces mesh; no way to pull a primative mesh without generating its game object
+                GameObject tempSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                transform.GetComponent<MeshFilter>().sharedMesh = tempSphere.GetComponent<MeshFilter>().mesh;
+                Destroy(tempSphere);
+
+                //Scales to normal sphere
+                transform.localScale = Vector3.one;
+
+                //Removes end caps
+                Destroy(transform.GetChild(0).gameObject);
+                Destroy(transform.GetChild(1).gameObject);
+            }
+        }
 
         /// <summary>
         /// Sets the radius and height of the clamp
         /// </summary>
-        private void SetScale(NDSimulation simulation, NeuronCell.NodeData cellNodeData)
+        private void SetScale(NeuronCell.NodeData cellNodeData)
         {
             currentVisualizationScale = (float)simulation.VisualInflation;
 
@@ -127,7 +148,8 @@ namespace C2M2.NeuronalDynamics.Interaction
             //Ensures clamp is always at least as wide as tall when Visual Inflation is 1
             float radiusLength = Math.Max(radiusScalingValue, heightScalingValue) * currentVisualizationScale;
 
-            transform.parent.localScale = new Vector3(radiusLength, radiusLength, heightScalingValue);
+            if (somaClamp) transform.parent.localScale = new Vector3(radiusLength, radiusLength, radiusLength);
+            else transform.parent.localScale = new Vector3(radiusLength, radiusLength, heightScalingValue);
             UpdateHighLightScale(transform.parent.localScale);
         }
 
@@ -142,6 +164,7 @@ namespace C2M2.NeuronalDynamics.Interaction
                 Vector3 tempVector = transform.parent.localScale;
                 tempVector.x *= modifiedScale;
                 tempVector.y *= modifiedScale;
+                if (somaClamp) tempVector.z *= modifiedScale;
                 transform.parent.localScale = tempVector;
                 currentVisualizationScale = newScale;
                 UpdateHighLightScale(transform.parent.localScale);
@@ -182,7 +205,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         /// <summary>
         /// Sets the orientation of the clamp based on the surrounding neighbors
         /// </summary>
-        public void SetRotation(NDSimulation simulation, NeuronCell.NodeData cellNodeData)
+        public void SetRotation(NeuronCell.NodeData cellNodeData)
         {
             List<int> neighbors = cellNodeData.neighborIDs;
 
@@ -237,19 +260,22 @@ namespace C2M2.NeuronalDynamics.Interaction
 
                 int clampIndex = GetNearestPoint(this.simulation, hit);
 
-                NeuronCell.NodeData clampCellNodeData = simulation.NeuronCell.nodeData[clampIndex];
-
                 // Check for duplicates
                 if (!VertIsAvailable(clampIndex, simulation))
                 {
                     Destroy(transform.parent.gameObject);
                 }
 
+                NeuronCell.NodeData clampCellNodeData = simulation.NeuronCell.nodeData[clampIndex];
+
+                if (clampCellNodeData.id == 0) somaClamp = true;
+
                 focusVert = clampIndex;
                 focusPos = simulation.Verts1D[focusVert];
 
-                SetScale(this.simulation, clampCellNodeData);
-                SetRotation(this.simulation, clampCellNodeData);
+                SetAppearance(clampCellNodeData);
+                SetScale(clampCellNodeData);
+                SetRotation(clampCellNodeData);
 
                 simulation.OnVisualInflationChange += VisualInflationChangeHandler;
 
