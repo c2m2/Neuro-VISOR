@@ -129,6 +129,9 @@ namespace C2M2.NeuronalDynamics.Interaction
                 //Scales to normal sphere
                 transform.localScale = Vector3.one;
 
+                //Lowers the highlight radius
+                highlightSphereScale = 1.1f;
+
                 //Removes end caps
                 Destroy(transform.GetChild(0).gameObject);
                 Destroy(transform.GetChild(1).gameObject);
