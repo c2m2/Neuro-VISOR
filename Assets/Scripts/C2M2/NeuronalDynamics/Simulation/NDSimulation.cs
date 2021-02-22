@@ -12,14 +12,13 @@ using MappingAttachment = C2M2.NeuronalDynamics.UGX.IAttachment<C2M2.NeuronalDyn
 using Math = C2M2.Utils.Math;
 using C2M2.Interaction;
 using C2M2.Simulation;
-using C2M2.Utils;
 using C2M2.Utils.DebugUtils;
 using C2M2.Utils.MeshUtils;
 using Grid = C2M2.NeuronalDynamics.UGX.Grid;
 using C2M2.NeuronalDynamics.Visualization.VRN;
 using C2M2.NeuronalDynamics.Interaction;
 using C2M2.Visualization;
-using C2M2.Utils;
+
 namespace C2M2.NeuronalDynamics.Simulation {
 
     /// <summary>

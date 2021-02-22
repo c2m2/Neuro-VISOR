@@ -224,7 +224,7 @@ MonoBehaviour:
   renderWalls: 1
   windowColor:
     serializedVersion: 2
-    rgba: 4281479730
+    rgba: 4278190080
   cellColors:
   - serializedVersion: 2
     rgba: 4278241535
