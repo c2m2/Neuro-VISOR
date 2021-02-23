@@ -10,15 +10,14 @@ namespace C2M2.NeuronalDynamics.Interaction
     /// </summary>
     public class NeuronClampInstantiator : MonoBehaviour
     {
-        public double clampPower { get; set; } = double.PositiveInfinity;
-        public double MinPower
+        public float MinPower
         {
             get
 {
                 return Simulation.colorLUT.GlobalMin;
             }
         }
-        public double MaxPower
+        public float MaxPower
         {
             get
             {
@@ -26,8 +25,8 @@ namespace C2M2.NeuronalDynamics.Interaction
             }
         }
         // Sensitivity of the clamp power control. Lower sensitivity means clamp power changes more quickly
-        public float sensitivity = 100f;
-        public double ThumbstickScaler
+        public float sensitivity = 200f;
+        public float ThumbstickScaler
         {
             get
             {
@@ -57,7 +56,8 @@ namespace C2M2.NeuronalDynamics.Interaction
                 return Simulation.clamps;
             }
         }
-        public Color32 inactiveCol = Color.black;
+
+        public Color32 inactiveCol = Color.gray;
         public float highlightSphereScale = 3f;
 
         /// <summary>
@@ -85,7 +85,6 @@ namespace C2M2.NeuronalDynamics.Interaction
 
         private int destroyCount = 50;
         private int holdCount = 0;
-        private float thumbstickScaler = 1;
         /// <summary>
         /// Pressing this button toggles clamps on/off. Holding this button down for long enough destroys the clamp
         /// </summary>
@@ -113,12 +112,12 @@ namespace C2M2.NeuronalDynamics.Interaction
                     float y2 = OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick).y;
                     float scaler = (y1 + y2);
 
-                    return thumbstickScaler * scaler;
+                    return ThumbstickScaler * scaler;
                 }
                 else
                 {
-                    if (Input.GetKey(powerModifierPlusKey)) return thumbstickScaler;
-                    if (Input.GetKey(powerModifierMinusKey)) return -thumbstickScaler;
+                    if (Input.GetKey(powerModifierPlusKey)) return ThumbstickScaler;
+                    if (Input.GetKey(powerModifierMinusKey)) return -ThumbstickScaler;
                     else return 0;
                 }
             }
@@ -135,10 +134,6 @@ namespace C2M2.NeuronalDynamics.Interaction
                     return (OVRInput.Get(highlightOVR) || OVRInput.Get(highlightOVRS));
                 else return false; // We cannot highlight through the emulator
             }
-        }
-        private void Start()
-        {
-            clampPower = (MaxPower - MinPower) / 2;
         }
         /// <summary>
         /// If the user holds a raycast down for X seconds on a clamp, it should destroy the clamp

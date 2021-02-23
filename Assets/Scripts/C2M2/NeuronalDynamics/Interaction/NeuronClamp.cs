@@ -354,12 +354,12 @@ namespace C2M2.NeuronalDynamics.Interaction
                 CheckInput();
 
             float power = ClampManager.PowerModifier;
+            
             // If clamp power is modified while the user holds a click, don't let the click also toggle/destroy the clamp
             if (power != 0 && !powerClick) powerClick = true;
 
             clampPower += power;
-            if (clampPower < MinPower) clampPower = MinPower;
-            if (clampPower > MaxPower) clampPower = MaxPower;
+            Math.Clamp(clampPower, MinPower, MaxPower);
         }
 
         public void Highlight(bool highlight)
