@@ -4,6 +4,7 @@ using C2M2.NeuronalDynamics.Simulation;
 using C2M2.NeuronalDynamics.UGX;
 using C2M2.Visualization;
 using Math = C2M2.Utils.Math;
+using System.Linq;
 
 namespace C2M2.NeuronalDynamics.Interaction
 {
@@ -265,7 +266,7 @@ namespace C2M2.NeuronalDynamics.Interaction
 
                 NeuronCell.NodeData clampCellNodeData = simulation.NeuronCell.nodeData[clampIndex];
 
-                if (clampCellNodeData.id == 0) somaClamp = true;
+                if(simulation.Grid1D.Subsets["Soma"].Indices.Contains(clampIndex)) somaClamp = true; //full proof way to check if it is the soma. Can definitely be changed to improve performance by checking the name based on the index
 
                 focusVert = clampIndex;
                 focusPos = simulation.Verts1D[focusVert];

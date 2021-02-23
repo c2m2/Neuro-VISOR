@@ -32,8 +32,6 @@ namespace C2M2.NeuronalDynamics.Interaction
                 return Simulation.clamps;
             }
         }
-        public Color32 inactiveCol = Color.black;
-        public float highlightSphereScale = 3f;
 
         /// <summary>
         /// Looks for NDSimulation instance and adds neuronClamp object if possible
@@ -41,13 +39,10 @@ namespace C2M2.NeuronalDynamics.Interaction
         /// <param name="hit"></param>
         public void InstantiateClamp(RaycastHit hit)
         {
-            // Make sure we have a valid prefab and simulation
+            // Make sure we have a valid prefab
             if (clampPrefab == null) Debug.LogError("No Clamp prefab found");
             
             NeuronClamp clamp = Instantiate(clampPrefab, Simulation.transform).GetComponentInChildren<NeuronClamp>();
-
-            clamp.InactiveCol = inactiveCol;
-            clamp.highlightSphereScale = highlightSphereScale;
 
             clamp.ReportSimulation(Simulation, hit);
         }
