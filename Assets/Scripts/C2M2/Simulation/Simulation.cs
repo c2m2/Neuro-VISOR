@@ -67,15 +67,6 @@ namespace C2M2.Simulation
         /// </remarks>
         protected abstract void SolveStep(int t);
 
-        /// <summary>
-        /// Called on the main thread before the Solve thread is launched
-        /// </summary>
-        /// <remarks>
-        /// This is useful if you need to initialize anything that makes use of Unity calls,
-        /// which are not available to be called from secondary threads.
-        /// </remarks>
-        protected virtual void PreSolve() { }
-
         #region Unity Methods
         public void Initialize()
         {
@@ -176,6 +167,7 @@ namespace C2M2.Simulation
         public int time { get; protected set; } = -1;
         public double k = 0.002 * 1e-3;
         public double endTime = 1.0;
+        public int nT { get; private set; } = -1;
         /// <summary>
         /// Launch Solve thread
         /// </summary>
@@ -190,27 +182,21 @@ namespace C2M2.Simulation
         private void Solve()
         {
             PreSolve();
-            int nT = (int)(endTime / k);
+            nT = (int)(endTime / k);
             
-            try
-            {
-                for (time = 0; time < nT; time++)
-                {
-                    // mutex guarantees mutual exclusion over simulation values
-                    mutex.WaitOne();
-                    
-                    // call user solve code 
-                    PreSolveStep();
-                    SolveStep(time);
-                    PostSolveStep();
+            for (time = 0; time < nT; time++)
+            {                 
+                // mutex guarantees mutual exclusion over simulation values
+                mutex.WaitOne();
+                // call user solve code 
+                PreSolveStep();
+                SolveStep(time);
+                PostSolveStep();
+                mutex.ReleaseMutex();
+            }
 
-                    mutex.ReleaseMutex();
-                }
-            }
-            catch (Exception e)
-            {
-                GameManager.instance.DebugLogErrorThreadSafe(e);
-            }
+            PostSolve();
+
             GameManager.instance.DebugLogSafe("Simulation Over.");
         }
 
@@ -223,7 +209,18 @@ namespace C2M2.Simulation
         /// PostSolveStep is called once per simulation frame, after SolveStep() 
         /// </summary>
         protected virtual void PostSolveStep() { }
-
+        /// <summary>
+        /// Called on the main thread before the Solve thread is launched
+        /// </summary>
+        /// <remarks>
+        /// This is useful if you need to initialize anything that makes use of Unity calls,
+        /// which are not available to be called from secondary threads.
+        /// </remarks>
+        protected virtual void PreSolve() { Debug.Log("PreSolve"); }
+        /// <summary>
+        /// Called on the solve thread after the simulation for loop is completed
+        /// </summary>
+        protected virtual void PostSolve() { Debug.Log("PostSolve"); }
         /// <summary>
         /// Stop current Solve thread
         /// </summary>
@@ -232,7 +229,7 @@ namespace C2M2.Simulation
             if (solveThread != null)
             {
                 mutex.WaitOne();
-                solveThread.Abort();
+                time = nT;           
                 mutex.ReleaseMutex();
                 solveThread = null;             
             }

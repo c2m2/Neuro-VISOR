@@ -35,6 +35,8 @@ namespace C2M2.Simulation
         public Vector3 rulerInitPos = new Vector3(-0.5f, 0.443f, -0.322f);
         public Vector3 rulerInitRot = new Vector3(90, 0, 0);
 
+        public RulerMeasure ruler = null;
+
         private Mesh visualMesh = null;
         public Mesh VisualMesh
         {
@@ -133,11 +135,19 @@ namespace C2M2.Simulation
 
                 // Instantiate ruler
                 GameObject rulerObj = Resources.Load("Prefabs/Ruler") as GameObject;
-                RulerMeasure ruler = GameObject.Instantiate(rulerObj).GetComponent<RulerMeasure>();
+                ruler = GameObject.Instantiate(rulerObj).GetComponent<RulerMeasure>();
                 ruler.sim = this;
                 rulerObj.transform.position = rulerInitPos;
                 rulerObj.transform.eulerAngles = rulerInitRot;
                 rulerObj.name = gameObject.name + "Ruler";
+            }
+        }
+
+        public void CloseRuler()
+        {
+            if(ruler != null)
+            {
+                Destroy(ruler.gameObject);
             }
         }
     }

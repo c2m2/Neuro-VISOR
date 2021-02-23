@@ -170,10 +170,7 @@ namespace C2M2.NeuronalDynamics.Interaction
                     globalSize.z / curParent.localScale.z);
 
                 highlightObj.transform.localScale = globalSize;
-                Debug.Log("Highlight size increased to match minimum");
             }
-
-            Debug.Log("highlight global scale: " + highlightObj.transform.lossyScale.ToString("F5") + "\nlocal scale: " + highlightObj.transform.localScale.ToString("F5"));
         }
 
         /// <summary>
@@ -285,7 +282,6 @@ namespace C2M2.NeuronalDynamics.Interaction
 
             float nearestDist = float.PositiveInfinity;
             int nearestVert1D = -1;
-            string s = "Finding nearest vert for clamp based on hit (" + localHitPoint.ToString("F5") +  ":";
             foreach(int vert in verts1D)
             {
                 float dist = Vector3.Distance(localHitPoint, simulation.Verts1D[vert]);
@@ -293,10 +289,8 @@ namespace C2M2.NeuronalDynamics.Interaction
                 {
                     nearestDist = dist;
                     nearestVert1D = vert;
-                    s += "\n\tNew nearest vert: " + vert + "\n\t\tpos: " + simulation.Verts1D[nearestVert1D].ToString("F5") + "\n\t\tdist: " + nearestDist;
                 }
             }
-            Debug.Log(s);
 
             return nearestVert1D;
         }

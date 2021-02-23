@@ -12,17 +12,20 @@ namespace C2M2.NeuronalDynamics.Interaction
         {
             if(sim != null)
             {
+                // Destroy the cell's ruler
+                sim.CloseRuler();
+
                 // Destroy the cell
                 Destroy(sim.gameObject);
 
-                if(GameManager.instance.cellPreviewer != null)
+                // Destroy this control panel
+                Destroy(transform.root.gameObject);
+
+                if (GameManager.instance.cellPreviewer != null)
                 {
                     // Reenable the cell previewer
                     GameManager.instance.cellPreviewer.SetActive(true);
                 }
-
-                // Destroy this control panel
-                Destroy(transform.root.gameObject);
             }
         }
     }
