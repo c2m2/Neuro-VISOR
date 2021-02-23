@@ -14,12 +14,22 @@ namespace C2M2.NeuronalDynamics.Interaction
         public GameObject clampControllerR = null;
         public GameObject clampControllerL = null;
         public bool allActive = false;
-        public NDSimulation simulation { get; private set; } = null; //warning only 1 simulation can be used in a scene!!!! --> redesign this
+        public NDSimulation Simulation
+        {
+            get
+            {
+                if (GameManager.instance.activeSim != null)
+                {
+                    return (NDSimulation)GameManager.instance.activeSim;
+                }
+                else return null;
+            }
+        }
         public List<NeuronClamp> Clamps {
             get
             {
-                if (simulation == null) return null;
-                return simulation.clamps;
+                if (Simulation == null) return null;
+                return Simulation.clamps;
             }
         }
         public Color32 inactiveCol = Color.black;
@@ -34,12 +44,10 @@ namespace C2M2.NeuronalDynamics.Interaction
             // Make sure we have a valid prefab and simulation
             if (clampPrefab == null) Debug.LogError("No Clamp prefab found");
             var sim = hit.collider.GetComponentInParent<NDSimulation>();
-            // If there is no NDSimulation, don't instantiate a clamp
+            // If there is no NDSimulation, don't try instantiating a clamp
             if (sim == null) return;
-            // If this hasn't found a simulation before, store sim for later
-            if (simulation == null) simulation = sim;
-            // Only allow one simulation
-            if (sim != simulation) return;
+            // If we didn't hit the GameManager's active simulation, something else is wrong
+            if (sim != Simulation) return;
             
             var clampObj = Instantiate(clampPrefab, sim.transform);
             NeuronClamp clamp = clampObj.GetComponentInChildren<NeuronClamp>();
@@ -169,14 +177,14 @@ namespace C2M2.NeuronalDynamics.Interaction
         {
             if (Clamps.Count > 0)
             {
-                simulation.clampMutex.WaitOne();
+                Simulation.clampMutex.WaitOne();
                 foreach (NeuronClamp clamp in Clamps)
                 {
                     if (clamp != null && clamp.focusVert != -1)
                         Destroy(clamp.transform.parent.gameObject);
                 }
                 Clamps.Clear();
-                simulation.clampMutex.ReleaseMutex();
+                Simulation.clampMutex.ReleaseMutex();
             }
         }
         public void HighlightAll(bool highlight)
