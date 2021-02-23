@@ -32,7 +32,6 @@ namespace C2M2.Interaction.UI
         }
         private void Start()
         {
-            keyboard = GameObject.Find("GameManager").GetComponent<GameManager>().raycastKeyboard;
             GetComponentInChildren<TMPro.TextMeshProUGUI>(true).text = character;
         }
         public void Click()

@@ -63,14 +63,6 @@ namespace C2M2
         public Utils.DebugUtils.FPSCounter fpsCounter;
         private bool isRunning = false;
 
-        [Header("Obsolete")]
-        public RaycastForward rightRaycaster;
-        public RaycastForward leftRaycaster;
-        public GameObject menu = null;
-        public GameObject raycastKeyboardPrefab;
-        public RaycastKeyboard raycastKeyboard { get; set; }
-        public Transform menuSnapPosition;
-
         private void Awake()
         {
             assetsPath = Application.dataPath;
@@ -109,9 +101,6 @@ namespace C2M2
                 eLogQ.Clear();
             }
         }
-        public void RaycasterRightChangeColor(Color color) => rightRaycaster.ChangeStaticHandColor(color);
-        public void RaycasterLeftChangeColor(Color color) => leftRaycaster.ChangeStaticHandColor(color);
-
 
         private List<string> logQ = new List<string>();
         private readonly int logQCap = 100;
