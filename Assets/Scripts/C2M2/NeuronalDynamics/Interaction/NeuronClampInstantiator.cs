@@ -14,12 +14,22 @@ namespace C2M2.NeuronalDynamics.Interaction
         public GameObject clampControllerR = null;
         public GameObject clampControllerL = null;
         public bool allActive = false;
-        private NDSimulation simulation = null;
+        public NDSimulation Simulation
+        {
+            get
+            {
+                if (GameManager.instance.activeSim != null)
+                {
+                    return (NDSimulation)GameManager.instance.activeSim;
+                }
+                else return null;
+            }
+        }
         public List<NeuronClamp> Clamps {
             get
             {
-                if (simulation == null) return null;
-                return simulation.clamps;
+                if (Simulation == null) return null;
+                return Simulation.clamps;
             }
         }
         public Color32 inactiveCol = Color.black;
@@ -33,15 +43,13 @@ namespace C2M2.NeuronalDynamics.Interaction
         {
             // Make sure we have a valid prefab and simulation
             if (clampPrefab == null) Debug.LogError("No Clamp prefab found");
-            simulation = hit.collider.GetComponentInParent<NDSimulation>();
-            if (simulation == null) return;
             
-            NeuronClamp clamp = Instantiate(clampPrefab, simulation.transform).GetComponentInChildren<NeuronClamp>();
+            NeuronClamp clamp = Instantiate(clampPrefab, Simulation.transform).GetComponentInChildren<NeuronClamp>();
 
             clamp.InactiveCol = inactiveCol;
             clamp.highlightSphereScale = highlightSphereScale;
 
-            clamp.ReportSimulation(simulation, hit);
+            clamp.ReportSimulation(Simulation, hit);
         }
 
         private int destroyCount = 50;
@@ -163,14 +171,14 @@ namespace C2M2.NeuronalDynamics.Interaction
         {
             if (Clamps.Count > 0)
             {
-                simulation.clampMutex.WaitOne();
+                Simulation.clampMutex.WaitOne();
                 foreach (NeuronClamp clamp in Clamps)
                 {
                     if (clamp != null && clamp.focusVert != -1)
                         Destroy(clamp.transform.parent.gameObject);
                 }
                 Clamps.Clear();
-                simulation.clampMutex.ReleaseMutex();
+                Simulation.clampMutex.ReleaseMutex();
             }
         }
         public void HighlightAll(bool highlight)

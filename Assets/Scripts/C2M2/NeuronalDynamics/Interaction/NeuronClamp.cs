@@ -56,7 +56,6 @@ namespace C2M2.NeuronalDynamics.Interaction
             set
             {
                 inactiveCol = value;
-               // inactiveMaterial.SetColor("_Color", inactiveCol);
                 inactiveMaterial.color = inactiveCol;
             }
         }
@@ -67,8 +66,6 @@ namespace C2M2.NeuronalDynamics.Interaction
             private set
             {
                 activeCol = value;
-                //activeMaterial.SetColor("_Color", activeCol);
-                //activeMaterial.color = activeCol;
                 mr.material.color = activeCol;
             }
         }
@@ -199,10 +196,7 @@ namespace C2M2.NeuronalDynamics.Interaction
                     globalSize.z / curParent.localScale.z);
 
                 highlightObj.transform.localScale = globalSize;
-                Debug.Log("Highlight size increased to match minimum");
             }
-
-            Debug.Log("highlight global scale: " + highlightObj.transform.lossyScale.ToString("F5") + "\nlocal scale: " + highlightObj.transform.localScale.ToString("F5"));
         }
 
         /// <summary>
@@ -317,7 +311,6 @@ namespace C2M2.NeuronalDynamics.Interaction
 
             float nearestDist = float.PositiveInfinity;
             int nearestVert1D = -1;
-            string s = "Finding nearest vert for clamp based on hit (" + localHitPoint.ToString("F5") +  ":";
             foreach(int vert in verts1D)
             {
                 float dist = Vector3.Distance(localHitPoint, simulation.Verts1D[vert]);
@@ -325,10 +318,8 @@ namespace C2M2.NeuronalDynamics.Interaction
                 {
                     nearestDist = dist;
                     nearestVert1D = vert;
-                    s += "\n\tNew nearest vert: " + vert + "\n\t\tpos: " + simulation.Verts1D[nearestVert1D].ToString("F5") + "\n\t\tdist: " + nearestDist;
                 }
             }
-            Debug.Log(s);
 
             return nearestVert1D;
         }
@@ -390,11 +381,12 @@ namespace C2M2.NeuronalDynamics.Interaction
         [Tooltip("Hold down a raycast for this many frames in order to destroy a clamp")]
         public int destroyCount = 50;
         int holdCount = 0;
+        public float sensitivity = 150f;
         // Sensitivity of the clamp power control. Note this effects value once per frame. 
         public double ThumbstickScaler {
             get
             {
-                return (MaxPower - MinPower) / 150;
+                return (MaxPower - MinPower) / sensitivity;
             }
         }
 

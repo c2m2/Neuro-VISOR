@@ -22,42 +22,44 @@ namespace C2M2.NeuronalDynamics.Interaction
 
         public void Load(RaycastHit hit)
         {
-            if (!loaded)
+            GameObject solveObj = new GameObject();
+            solveObj.name = solverType + "(Solver)";
+            solveObj.AddComponent<MeshFilter>();
+            solveObj.AddComponent<MeshRenderer>();
+            NDSimulation solver = solveObj.AddComponent<SparseSolverTestv1>();
+
+            // Close current simulation, if any
+            if(GameManager.instance.activeSim != null)
             {
-                GameObject solveObj = new GameObject();
-                solveObj.name = "Solver";
-                solveObj.AddComponent<MeshFilter>();
-                solveObj.AddComponent<MeshRenderer>();
-                NDSimulation solver = solveObj.AddComponent<SparseSolverTestv1>();
-
-                // Set solver values
-                solver.vrnFileName = vrnFileName;
-                solver.gradient = gradient;
-                solver.globalMin = globalMin;
-                solver.globalMax = globalMax;
-                solver.k = timestepSize;
-                solver.endTime = endTime;
-                solver.raycastHitValue = raycastHitValue;
-
-                try
-                {
-                    solver.RefinementLevel = refinementLevel;
-                    
-                }
-                catch (Exception e)
-                {
-                    Debug.LogWarning("Refinement level " + refinementLevel + " not found. Reverting to 0 refinement.");
-                    refinementLevel = 0;
-                    solver.RefinementLevel = 0;
-                    Debug.LogError(e);
-                }
-
-                solver.Initialize();
-
-
-                loaded = true;
-                transform.gameObject.SetActive(false);
+                Destroy(GameManager.instance.activeSim);
             }
+            // Store the new active simulation
+            GameManager.instance.activeSim = solver;
+
+            // Set solver values
+            solver.vrnFileName = vrnFileName;
+            solver.gradient = gradient;
+            solver.globalMin = globalMin;
+            solver.globalMax = globalMax;
+            solver.k = timestepSize;
+            solver.endTime = endTime;
+            solver.raycastHitValue = raycastHitValue;
+
+            try
+            {
+                solver.RefinementLevel = refinementLevel;              
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning("Refinement level " + refinementLevel + " not found. Reverting to 0 refinement.");
+                refinementLevel = 0;
+                solver.RefinementLevel = 0;
+                Debug.LogError(e);
+            }
+
+            solver.Initialize();
+
+            transform.gameObject.SetActive(false);
         }
     }
 }
