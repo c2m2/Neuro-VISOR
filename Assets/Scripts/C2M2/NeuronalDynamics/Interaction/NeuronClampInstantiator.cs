@@ -10,6 +10,31 @@ namespace C2M2.NeuronalDynamics.Interaction
     /// </summary>
     public class NeuronClampInstantiator : MonoBehaviour
     {
+        public double clampPower { get; set; } = double.PositiveInfinity;
+        public double MinPower
+        {
+            get
+{
+                return Simulation.colorLUT.GlobalMin;
+            }
+        }
+        public double MaxPower
+        {
+            get
+            {
+                return Simulation.colorLUT.GlobalMax;
+            }
+        }
+        // Sensitivity of the clamp power control. Lower sensitivity means clamp power changes more quickly
+        public float sensitivity = 100f;
+        public double ThumbstickScaler
+        {
+            get
+            {
+                return (MaxPower - MinPower) / sensitivity;
+            }
+        }
+
         public GameObject clampPrefab = null;
         public GameObject clampControllerR = null;
         public GameObject clampControllerL = null;
@@ -102,17 +127,19 @@ namespace C2M2.NeuronalDynamics.Interaction
 
         public OVRInput.Button highlightOVR = OVRInput.Button.PrimaryHandTrigger;
         public OVRInput.Button highlightOVRS = OVRInput.Button.SecondaryHandTrigger;
-        public KeyCode highlightKey = KeyCode.H;
         public bool PressedHighlight
         {
             get
             {
                 if (GameManager.instance.vrIsActive)
                     return (OVRInput.Get(highlightOVR) || OVRInput.Get(highlightOVRS));
-                else return Input.GetKey(highlightKey);
+                else return false; // We cannot highlight through the emulator
             }
         }
-
+        private void Start()
+        {
+            clampPower = (MaxPower - MinPower) / 2;
+        }
         /// <summary>
         /// If the user holds a raycast down for X seconds on a clamp, it should destroy the clamp
         /// </summary>
