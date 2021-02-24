@@ -293,7 +293,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         //$\frac{dV^{**}}{dt}=r(V^{**})$ with initial condition $V_0^{**}=V^*$ to get $V^{**}$, and $V_{n+1}=V(t_{n+1})=V^{**}$ the voltage at the end of the time step.
         //For equation the diffusion we use a Crank-Nicolson scheme
         protected override void SolveStep(int t)
-        {                                                                                             
+        {              
             ///<c>if ((i * k >= 0.015) && SomaOn) { U[0] = vstart; }</c> this checks of the somaclamp is on and sets the soma location to <c>vstart</c>
             ///if ((t * k >= 0.015) && SomaOn) { U[0] = vstart; }
             ///This part does the diffusion solve \n

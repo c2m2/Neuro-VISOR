@@ -123,7 +123,7 @@ namespace C2M2.Simulation
             }
         }
 
-        public void Update()
+        public void FixedUpdate()
         {
             OnUpdate();
 
