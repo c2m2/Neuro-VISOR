@@ -98,9 +98,6 @@ namespace C2M2.Visualization
             // If we haven't built the LUT yet, and we have a gradient, build the LUT
             if (lut == null)
                 lut = BuildLUT(gradient, lutRes);
-
-            // Store a local pointer so we can manipulate scalers
-            //float[] scalars = times;
             // Rescale array based on extrema values
             unscaledTimes = RescaleArray(unscaledTimes, extremaMethod);
 
@@ -139,8 +136,6 @@ namespace C2M2.Visualization
 
             // Todo: this only rescales based on global extrema method
             scalars.RescaleArray(0f, (lutRes - 1), GlobalMin, GlobalMax);
-
-            Debug.Log("unscaledtime: " + unscaledTime + "\nGlobalMin: " + GlobalMin + "\nGlobalMax: " + GlobalMax + "\nScaledtime: " + scalars[1]);
 
             return lut[Math.Clamp((int)scalars[1], 0, lutRes-1)];
         }

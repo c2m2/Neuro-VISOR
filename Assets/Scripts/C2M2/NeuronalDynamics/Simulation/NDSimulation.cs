@@ -298,7 +298,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
 
                 Scalars3D[i] = newVal;
             }
-            // Debug.Log(sb.ToString());
             return Scalars3D;
         }
         /// <summary>
