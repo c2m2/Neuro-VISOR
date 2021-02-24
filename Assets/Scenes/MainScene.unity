@@ -6756,6 +6756,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: OVRPlayerController(C2M2)
       objectReference: {fileID: 0}
+    - target: {fileID: 1763426730904823259, guid: dba47ce578d281342b7055d4b03912a9,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1763426731366549412, guid: dba47ce578d281342b7055d4b03912a9,
         type: 3}
       propertyPath: onEndPress.m_PersistentCalls.m_Calls.Array.data[0].m_Target
@@ -7511,6 +7516,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Layer
       value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 5843646973977526757, guid: 70469a93359ee8b4e98c4c445b157af9,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5843646973993004956, guid: 70469a93359ee8b4e98c4c445b157af9,
         type: 3}
