@@ -84,7 +84,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             {
                 if (clampLive)
                 {
-                    Color newCol = gradientLUT.EvaluateUnscaled((float)clampPower);
+                    Color newCol = gradientLUT.Evaluate((float)clampPower);
                     ActiveColor = newCol;
                 }
             }
