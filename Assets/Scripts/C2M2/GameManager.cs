@@ -15,13 +15,12 @@ namespace C2M2
     /// <summary>
     /// Stores many global variables, handles pregame initializations
     /// </summary>
-    [RequireComponent(typeof(NeuronClampInstantiator))]
+    [RequireComponent(typeof(NeuronClampManager))]
     public class GameManager : MonoBehaviour
     {
         public static GameManager instance = null;
         
         public int mainThreadId { get; private set; } = -1;
-        public string assetsPath { get; private set; } = null;
 
         public VRDeviceManager vrDeviceManager = null;
         public bool vrIsActive {
@@ -36,7 +35,7 @@ namespace C2M2
         public Interactable activeSim = null;
         public List<SimulationTimerLabel> timerLabels = new List<SimulationTimerLabel>();
 
-        public NeuronClampInstantiator clampInstantiator = null;
+        public NeuronClampManager ndClampManager = null;
       //  public GameObject[] clampControllers = new GameObject[0];
 
         [Header("Environment")]
@@ -73,27 +72,23 @@ namespace C2M2
 
         private void Awake()
         {
-            assetsPath = Application.dataPath;
             mainThreadId = Thread.CurrentThread.ManagedThreadId;
+
             // Initialize the GameManager
             DontDestroyOnLoad(gameObject);
             if (instance == null) { instance = this; }
             else if (instance != this) { Destroy(this); }
 
-            clampInstantiator = GetComponent<NeuronClampInstantiator>();
+            ndClampManager = GetComponent<NeuronClampManager>();
+            if (ndClampManager == null) Debug.LogWarning("No neuron clamp manager found!");
 
             if (walls.Length > 0)
             {
                 foreach (MeshRenderer wall in walls)
                 {
-                    wall.material.SetColor("_Color", wallColor);
+                    wall.material.color = wallColor;
                 }
             }
-            // Initialize keyboard
-            //raycastKeyboardPrefab = Instantiate(raycastKeyboardPrefab, new Vector3(50, 50, 50), Quaternion.identity);
-            //raycastKeyboard = raycastKeyboardPrefab.GetComponent<RaycastKeyboard>();
-            isRunning = true;
-
         }
 
         private void Update()

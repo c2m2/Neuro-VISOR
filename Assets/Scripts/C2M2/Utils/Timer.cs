@@ -67,7 +67,7 @@ namespace C2M2
          
                 CSVBuilder csv = new CSVBuilder();
                 char separator = System.IO.Path.DirectorySeparatorChar;
-                string filePath = GameManager.instance.assetsPath + separator + "TimerResults" + separator + newFileName;
+                string filePath = Application.dataPath + separator + "TimerResults" + separator + newFileName;
                 csv.ExportCSV(timerInfo, filePath, overwrite: true);
             }
 

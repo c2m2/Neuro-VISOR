@@ -8,7 +8,7 @@ namespace C2M2.NeuronalDynamics.Interaction
     /// <summary>
     /// Provides public method for instantiating clamps. Provides controls for multiple clamps
     /// </summary>
-    public class NeuronClampInstantiator : MonoBehaviour
+    public class NeuronClampManager : MonoBehaviour
     {
         public float MinPower
         {

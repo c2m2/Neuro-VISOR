@@ -110,13 +110,13 @@ namespace C2M2.NeuronalDynamics.Simulation {
                     clamp.SetActive(clampMode);
                 }*/
 
-                if (GameManager.instance.clampInstantiator.clampControllerL != null)
+                if (GameManager.instance.ndClampManager.clampControllerL != null)
                 {
-                    GameManager.instance.clampInstantiator.clampControllerL.SetActive(clampMode);
+                    GameManager.instance.ndClampManager.clampControllerL.SetActive(clampMode);
                 }
-                if (GameManager.instance.clampInstantiator.clampControllerR != null)
+                if (GameManager.instance.ndClampManager.clampControllerR != null)
                 {
-                    GameManager.instance.clampInstantiator.clampControllerR.SetActive(clampMode);
+                    GameManager.instance.ndClampManager.clampControllerR.SetActive(clampMode);
                 }
 
                 Debug.Log("ClampMode set to " + clampMode);
