@@ -8,12 +8,19 @@ namespace C2M2.Utils
     {
         public KeyCode quitKey = KeyCode.Escape;
         public OVRInput.Button quitButton = OVRInput.Button.Start;
+        private bool OculusRequested
+        {
+            get
+            {
+                return OVRInput.Get(quitButton, OVRInput.Controller.LTouch) || OVRInput.Get(quitButton, OVRInput.Controller.RTouch);
+            }
+        }
         private bool QuitRequested
         {
             get
             {
                 return GameManager.instance.VrIsActive ?
-                    (OVRInput.Get(quitButton, OVRInput.Controller.LTouch) || OVRInput.Get(quitButton, OVRInput.Controller.RTouch))
+                    (OculusRequested || Input.GetKey(quitKey))
                     : Input.GetKey(quitKey);
             }
         }
