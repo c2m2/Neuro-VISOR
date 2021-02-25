@@ -15,7 +15,7 @@ namespace C2M2.Utils
         {
             get
             {
-                return GameManager.instance.vrIsActive ?
+                return GameManager.instance.VrIsActive ?
                     OVRInput.Get(resetButton) :
                     Input.GetKey(resetKey);
             }

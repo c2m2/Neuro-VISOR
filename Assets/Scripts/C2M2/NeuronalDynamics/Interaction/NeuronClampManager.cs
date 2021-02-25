@@ -94,7 +94,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         {
             get
             {
-                if (GameManager.instance.vrIsActive)
+                if (GameManager.instance.VrIsActive)
                     return (OVRInput.Get(toggleDestroyOVR) || OVRInput.Get(toggleDestroyOVRS));
                 else return true;
             }
@@ -105,7 +105,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         {
             get
             {
-                if (GameManager.instance.vrIsActive)
+                if (GameManager.instance.VrIsActive)
                 {
                     // Use the value of whichever joystick is held up furthest
                     float y1 = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick).y;
@@ -130,7 +130,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         {
             get
             {
-                if (GameManager.instance.vrIsActive)
+                if (GameManager.instance.VrIsActive)
                     return (OVRInput.Get(highlightOVR) || OVRInput.Get(highlightOVRS));
                 else return false; // We cannot highlight through the emulator
             }

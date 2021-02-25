@@ -23,7 +23,7 @@ namespace C2M2
         public int mainThreadId { get; private set; } = -1;
 
         public VRDeviceManager vrDeviceManager = null;
-        public bool vrIsActive {
+        public bool VrIsActive {
             get
             {
                 if (vrDeviceManager == null) Debug.LogError("No VR Device Manager Found!");
@@ -42,9 +42,10 @@ namespace C2M2
         public MeshRenderer[] walls;
         public Color wallColor = Color.white;
         [Header("Materials")]
-        public Material defaultMaterial;
-        public Material vertexColorationMaterial;
-        public Material lineRendMaterial;
+        public Material defaultMaterial = null;
+        public Material vertexColorationMaterial = null;
+        public Material lineRendMaterial = null;
+        public Material wallMaterial = null;
 
         [Tooltip("Used as an anchor point for neuron diameter control panel")]
         public Transform whiteboard = null;
@@ -72,16 +73,20 @@ namespace C2M2
 
         private void Awake()
         {
-            mainThreadId = Thread.CurrentThread.ManagedThreadId;
-
             // Initialize the GameManager
             DontDestroyOnLoad(gameObject);
             if (instance == null) { instance = this; }
             else if (instance != this) { Destroy(this); }
 
+            mainThreadId = Thread.CurrentThread.ManagedThreadId;
+
             ndClampManager = GetComponent<NeuronClampManager>();
             if (ndClampManager == null) Debug.LogWarning("No neuron clamp manager found!");
 
+            if(wallMaterial != null)
+            {
+
+            }
             if (walls.Length > 0)
             {
                 foreach (MeshRenderer wall in walls)

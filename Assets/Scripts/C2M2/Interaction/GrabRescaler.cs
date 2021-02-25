@@ -41,7 +41,7 @@ namespace C2M2.Interaction
 
         private void Start()
         {
-            if (!GameManager.instance.vrIsActive) Destroy(this);
+            if (!GameManager.instance.VrIsActive) Destroy(this);
 
             grabbable = GetComponent<OVRGrabbable>();
 
