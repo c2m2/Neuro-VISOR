@@ -205,7 +205,7 @@ MonoBehaviour:
     m_NumAlphaKeys: 2
   globalMin: -0.005
   globalMax: 0.05
-  refinementLevel: 0
+  refinementLevel: 1
   timestepSize: 0.000002
   endTime: 100
   raycastHitValue: 0.05
