@@ -36,16 +36,16 @@ namespace C2M2
         public List<SimulationTimerLabel> timerLabels = new List<SimulationTimerLabel>();
 
         public NeuronClampManager ndClampManager = null;
-      //  public GameObject[] clampControllers = new GameObject[0];
+        //  public GameObject[] clampControllers = new GameObject[0];
 
         [Header("Environment")]
-        public MeshRenderer[] walls;
+        public int roomSelected = 0;
+        public Room[] roomOptions = null;
         public Color wallColor = Color.white;
         [Header("Materials")]
         public Material defaultMaterial = null;
         public Material vertexColorationMaterial = null;
         public Material lineRendMaterial = null;
-        public Material wallMaterial = null;
 
         [Tooltip("Used as an anchor point for neuron diameter control panel")]
         public Transform whiteboard = null;
@@ -83,15 +83,22 @@ namespace C2M2
             ndClampManager = GetComponent<NeuronClampManager>();
             if (ndClampManager == null) Debug.LogWarning("No neuron clamp manager found!");
 
-            if(wallMaterial != null)
+            if(roomOptions != null && roomOptions.Length > 0)
             {
-
-            }
-            if (walls.Length > 0)
-            {
-                foreach (MeshRenderer wall in walls)
+                Mathf.Clamp(roomSelected, 0, (roomOptions.Length - 1));
+                // Only enable selected room, disable all others
+                for(int i = 0; i < roomOptions.Length; i++)
                 {
-                    wall.material.color = wallColor;
+                    bool selected = (i == roomSelected) ? true : false;
+                    roomOptions[i].gameObject.SetActive(selected);
+                }
+                // Apply wall color to selected room's walls
+                if (roomOptions[roomSelected].walls != null && roomOptions[roomSelected].walls.Length > 0)
+                {
+                    foreach (MeshRenderer wall in roomOptions[roomSelected].walls)
+                    {
+                        wall.material.color = wallColor;
+                    }
                 }
             }
         }
