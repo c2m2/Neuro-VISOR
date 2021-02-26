@@ -209,7 +209,9 @@ namespace C2M2.NeuronalDynamics.Interaction {
                     foreach (MeshRenderer r in prefabWalls)
                     {
                         r.enabled = renderWalls;
-                        r.material.SetColor("_Color", windowColor);
+                        r.material.color = windowColor;
+                        Debug.Log(r.name);
+                        //r.material.SetColor("_Color", windowColor);
                     }
                 }
 
