@@ -211,16 +211,14 @@ namespace C2M2.NeuronalDynamics.Simulation
                 mutex.WaitOne();
                 foreach (Tuple<int, double> newVal in newValues)
                 {
-                    int j = 0;
                     if (newVal != null)
                     {
-                        j = newVal.Item1;
-                    }
-                    double val = newVal.Item2;
-                    /// here we set the voltage at the location, notice that we multiply by 0.0001 to convert to volts [V] 
-                    if (j >= 0 && j < NeuronCell.vertCount)
-                    {
-                        U[j] = val;
+                        /// here we set the voltage at the location, notice that we multiply by 0.0001 to convert to volts [V] 
+                        if (newVal.Item1 >= 0 && newVal.Item1 < NeuronCell.vertCount)
+                        {
+                            //   UnityEngine.Debug.Log("U[" + newVal.Item1 + "] = " + newVal.Item2);
+                            U[newVal.Item1] = newVal.Item2;
+                        }
                     }
                 }
                 mutex.ReleaseMutex();

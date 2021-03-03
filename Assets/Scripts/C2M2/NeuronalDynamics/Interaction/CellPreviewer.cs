@@ -17,7 +17,6 @@ namespace C2M2.NeuronalDynamics.Interaction {
         public string cellsPath = "NeuronalDynamics" + Path.DirectorySeparatorChar + "Geometries";
         public GameObject previewWindowPrefab = null;
         public NDSimulationLoader loader = null;
-        public bool renderOutline = true;
         public bool renderWalls = true;
         public Color32 windowColor = Color.black;
         public GameObject ErrorWindow = null;
@@ -198,7 +197,6 @@ namespace C2M2.NeuronalDynamics.Interaction {
                     {
                         r.startColor = windowColor;
                         r.endColor = windowColor;
-                        r.enabled = renderOutline;
                     }
                 }
 
@@ -210,8 +208,6 @@ namespace C2M2.NeuronalDynamics.Interaction {
                     {
                         r.enabled = renderWalls;
                         r.material.color = windowColor;
-                        Debug.Log(r.name);
-                        //r.material.SetColor("_Color", windowColor);
                     }
                 }
 

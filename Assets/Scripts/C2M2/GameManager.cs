@@ -97,7 +97,14 @@ namespace C2M2
                 {
                     foreach (MeshRenderer wall in roomOptions[roomSelected].walls)
                     {
-                        wall.material.color = wallColor;
+                        if (wall != null)
+                        {
+                            wall.material.color = wallColor;
+                        }
+                        else
+                        {
+                            Debug.LogWarning("Wall's meshrenderer was null on " + roomOptions[roomSelected].name);
+                        }
                     }
                 }
             }

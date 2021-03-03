@@ -128,7 +128,7 @@ namespace C2M2.Simulation
                 VRRaycastableMesh raycastable = gameObject.AddComponent<VRRaycastableMesh>();
                 if (ColliderMesh != null) raycastable.SetSource(ColliderMesh);
                 else raycastable.SetSource(viz);
-
+                
                 gameObject.AddComponent<VRGrabbableMesh>();
                 gameObject.AddComponent<GrabRescaler>();
                 gameObject.AddComponent<PositionResetControl>();

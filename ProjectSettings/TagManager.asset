@@ -20,7 +20,7 @@ TagManager:
   - Environment
   - Grabbable
   - RaycastCollider
-  - 
+  - IgnoreSun
   - 
   - 
   - 

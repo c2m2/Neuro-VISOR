@@ -102,9 +102,10 @@ namespace C2M2.Simulation
                 child.transform.eulerAngles = Vector3.zero;
 
                 // Attach hit events to an event manager
-                RaycastEventManager eventManager = gameObject.AddComponent<RaycastEventManager>();
+                eventManager = gameObject.AddComponent<RaycastEventManager>();
                 // Create hit events
-                RaycastPressEvents raycastEvents = child.AddComponent<RaycastPressEvents>();
+                raycastEvents = child.AddComponent<RaycastPressEvents>();
+                // TODO: Get rid of RaycastSimHeater, just add Simulation.AddValue here
                 raycastEvents.OnHoldPress.AddListener((hit) => Heater.Hit(hit));
                 eventManager.rightTrigger = raycastEvents;
                 eventManager.leftTrigger = raycastEvents;
@@ -122,7 +123,8 @@ namespace C2M2.Simulation
                 if (startOnAwake) StartSimulation();
             }
         }
-
+        public RaycastEventManager eventManager { get; protected set; } = null;
+        public RaycastPressEvents raycastEvents { get; protected set; } = null;
         public void FixedUpdate()
         {
             OnUpdate();
@@ -164,8 +166,8 @@ namespace C2M2.Simulation
         protected virtual void OnDest() { }
         #endregion
 
-        public int time { get; protected set; } = -1;
-        public double k = 0.002 * 1e-3;
+        public int time = -1;
+        public double k = 0.008 * 1e-3;
         public double endTime = 1.0;
         public int nT { get; private set; } = -1;
         /// <summary>
@@ -185,10 +187,9 @@ namespace C2M2.Simulation
             nT = (int)(endTime / k);
             
             for (time = 0; time < nT; time++)
-            {                 
+            {
                 // mutex guarantees mutual exclusion over simulation values
                 mutex.WaitOne();
-                // call user solve code 
                 PreSolveStep();
                 SolveStep(time);
                 PostSolveStep();

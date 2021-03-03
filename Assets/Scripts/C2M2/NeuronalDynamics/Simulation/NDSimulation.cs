@@ -8,7 +8,7 @@ using UnityEngine;
 using System.Threading;
 using DiameterAttachment = C2M2.NeuronalDynamics.UGX.IAttachment<C2M2.NeuronalDynamics.UGX.DiameterData>;
 using MappingAttachment = C2M2.NeuronalDynamics.UGX.IAttachment<C2M2.NeuronalDynamics.UGX.MappingData>;
-
+using TMPro;
 using Math = C2M2.Utils.Math;
 using C2M2.Interaction;
 using C2M2.Simulation;
@@ -129,7 +129,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
         public float lineWidth1D = 0.005f;
 
         public GameObject controlPanel = null;
-
         // Need mesh options for each refinement, diameter level
         [Tooltip("Name of the vrn file within Assets/StreamingAssets/NeuronalDynamics/Geometries")]
         public string vrnFileName = "test.vrn";
@@ -250,37 +249,47 @@ namespace C2M2.NeuronalDynamics.Simulation {
             }
         }
 
+        public Tuple<int, double>[] raycastHits = new Tuple<int, double>[0];
         public List<NeuronClamp> clamps = new List<NeuronClamp>();
 
         public Mutex clampMutex { get;  private set; } = new Mutex();
         private static Tuple<int, double> nullClamp = new Tuple<int, double>(-1, -1);
-        /// <summary>
-        /// Add clamp values once per simulation frame
-        /// </summary>
-        protected override void PreSolveStep()
+
+        protected override void PostSolveStep()
         {
-            base.PreSolveStep();            
-            ///<c>if (clamps != null && clamps.Count > 0)</c> this if statement is where we apply voltage clamps   
-            if (clamps != null && clamps.Count > 0)
+            ApplyInteractionVals();
+            void ApplyInteractionVals()
             {
-                Tuple<int, double>[] clampValues = new Tuple<int, double>[clamps.Count];
-                clampMutex.WaitOne();
-                for (int i=0; i< clamps.Count; i++)
+                ///<c>if (clamps != null && clamps.Count > 0)</c> this if statement is where we apply voltage clamps   
+                // Apply clamp values, if there are any clamps
+                if (clamps.Count > 0)
                 {
-                    if (clamps[i] != null && clamps[i].focusVert != -1 && clamps[i].clampLive)
+                    Tuple<int, double>[] clampValues = new Tuple<int, double>[clamps.Count];
+                    clampMutex.WaitOne();
+                    for (int i = 0; i < clamps.Count; i++)
                     {
-                        clampValues[i] = new Tuple<int, double>(clamps[i].focusVert,clamps[i].clampPower);
+                        if (clamps[i] != null && clamps[i].focusVert != -1 && clamps[i].clampLive)
+                        {
+                            clampValues[i] = new Tuple<int, double>(clamps[i].focusVert, clamps[i].clampPower);
+                        }
+                        else
+                        {
+                            clampValues[i] = nullClamp;
+                        }
                     }
-                    else
-                    {
-                        clampValues[i] = nullClamp;
-                    }
+                    clampMutex.ReleaseMutex();
+                    Set1DValues(clampValues);
                 }
 
-                clampMutex.ReleaseMutex();
-                Set1DValues(clampValues);
+                // Apply raycast values
+                if (raycastHits.Length > 0)
+                {
+                    Set1DValues(raycastHits);
+                }
             }
         }
+
+
         /// <summary>
         /// Translate 1D vertex values to 3D values and pass them upwards for visualization
         /// </summary>
@@ -300,6 +309,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
             }
             return Scalars3D;
         }
+
         /// <summary>
         /// Translate 3D vertex values to 1D values, and pass them downwards for interaction
         /// </summary>
@@ -342,8 +352,10 @@ namespace C2M2.NeuronalDynamics.Simulation {
                     new1Dvalues[i] = new Tuple<int, double>(map[vert3D].v1, val3D);
                 }
             }
+            raycastHits = new1Dvalues;
+
             // Send 1D-translated scalars to simulation code
-            Set1DValues (new1Dvalues);
+           // Set1DValues (new1Dvalues);
         }
 
         /// <summary>
@@ -357,11 +369,16 @@ namespace C2M2.NeuronalDynamics.Simulation {
         /// </summary>
         /// <returns></returns>
         public abstract double[] Get1DValues ();
-
         protected override void OnAwakePre()
         {
             UpdateGrid1D();
             base.OnAwakePre();
+        }
+
+        protected override void OnAwakePost(Mesh viz)
+        {
+            base.OnAwakePost(viz);
+            raycastEvents.OnEndPress.AddListener((hit) => ResetRacyastHits(hit));
         }
         protected override void OnStart()
         {
@@ -481,6 +498,11 @@ namespace C2M2.NeuronalDynamics.Simulation {
             Grid2D = new Grid(new Mesh(), meshName2D);
             Grid2D.Attach(new MappingAttachment());
             VrnReader.ReadUGX(meshName2D, ref grid2D);
+        }
+
+        public void ResetRacyastHits(RaycastHit hit)
+        {
+            raycastHits = new Tuple<int, double>[0];
         }
     }
 
