@@ -60,7 +60,7 @@ namespace C2M2.Interaction.Signaling
 
             StartCoroutine(SearchForHand(100));
         }
-        protected override bool BeginRaycastingCondition()
+        protected override bool RaycastRequested()
         {
             // If we are in toggle mode, is raycasting mode toggled on?
             // Otherwise, is the Begin Raycasting Button currently being pressed down?
@@ -77,7 +77,7 @@ namespace C2M2.Interaction.Signaling
         }
         private bool distancePressed = false;
         /// <returns> True if the specified controller button is pressed OR if we are near enough to the raycast target </returns>
-        protected override bool ChildsPressCondition() => (OVRInput.Get(triggerEventsButton, controller) || distancePressed);
+        protected override bool PressCondition() => (OVRInput.Get(triggerEventsButton, controller) || distancePressed);
         // At the start of a click change the line renderer color to pressed color
         protected override void OnPressSub() => lineRend.SetEndpointColors(pressedColor);
         // We don't need any functionaliy in the hold case

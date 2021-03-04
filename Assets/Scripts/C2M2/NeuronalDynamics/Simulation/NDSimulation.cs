@@ -343,19 +343,19 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 double val3D = newValues[i].Item2;
 
                 // If lambda > 0.5, the vert is closer to v2 so apply val3D there
-                if(map[vert3D].lambda > 0.5)
+                int vert1D = (map[vert3D].lambda > 0.5) ? map[vert3D].v2 : map[vert3D].v1;
+                new1Dvalues[i] = new Tuple<int, double>(vert1D, val3D);
+                /*
+                if (map[vert3D].lambda > 0.5)
                 { // then val3D belongs to vert1DB
                     new1Dvalues[i] = new Tuple<int, double>(map[vert3D].v2, val3D);
                 }
                 else
                 {
                     new1Dvalues[i] = new Tuple<int, double>(map[vert3D].v1, val3D);
-                }
+                }*/
             }
             raycastHits = new1Dvalues;
-
-            // Send 1D-translated scalars to simulation code
-           // Set1DValues (new1Dvalues);
         }
 
         /// <summary>
