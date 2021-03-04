@@ -68,8 +68,11 @@ namespace C2M2.NeuronalDynamics.UGX
             AttachmentHandler.Available();
             NodeData tempNode = new NodeData();
             VertexAttachementAccessor<DiameterData> accessor = new VertexAttachementAccessor<DiameterData>(grid);
+            Mesh mesh = grid.Mesh;
+            Vector3[] vertices = mesh.vertices;
 
             int count = 0;
+            int edgeCount = grid.Edges.Count;
             foreach (DiameterData diam in accessor)
             {
                 /// this gets the diameter, make sure to divide by 2
@@ -78,7 +81,7 @@ namespace C2M2.NeuronalDynamics.UGX
                 tempNode.id = grid.Vertices[count].Id;
 
                 /// this for loop is for setting the pid, parent id
-                for (int i = 0; i < grid.Edges.Count(); i++)
+                for (int i = 0; i < edgeCount; i++)
                 {
                     if (tempNode.id == grid.Edges[i].To.Id){tempNode.pidAlternate = grid.Edges[i].From.Id;}
                     /// the zero-th node has parent -1 --> NOTE: is this alway true, need to check this!!
@@ -86,9 +89,9 @@ namespace C2M2.NeuronalDynamics.UGX
                 }
 
                 /// these are the actual coordinates of the geometry --> NOTE: these are in [um] already!
-                tempNode.xcoords = grid.Mesh.vertices[count].x;
-                tempNode.ycoords = grid.Mesh.vertices[count].y;
-                tempNode.zcoords = grid.Mesh.vertices[count].z;
+                tempNode.xcoords = vertices[count].x;
+                tempNode.ycoords = vertices[count].y;
+                tempNode.zcoords = vertices[count].z;
                 /// this initializes an empty list for the neighbor id nodes
                 tempNode.neighborIDs = new List<int>();
                 /// if a node has only one neighbor then it is a boundary node
@@ -107,15 +110,15 @@ namespace C2M2.NeuronalDynamics.UGX
                 /// this increments the counter for the number of vertices --> is this even used?? may need to remove!
                 count = count + 1;
             }
-            vertCount = grid.Mesh.vertexCount;
+            vertCount = mesh.vertexCount;
             /// this loop collects the edges and gets the lengths of the edges
-            for (int i = 0; i < grid.Edges.Count(); i++)
+            for (int i = 0; i < edgeCount; i++)
             {
                 edges.Add((Tuple.Create(grid.Edges[i].From.Id, grid.Edges[i].To.Id)));
                 edgeLengths.Add(GetEdgeLength(grid.Edges[i].From.Id, grid.Edges[i].To.Id));
             }
 
-            this.edgeCount = this.edges.Count();
+            this.edgeCount = edgeCount;
             this.somaID = grid.Subsets["soma"].Indices.ToList();
         }
         /// <summary>

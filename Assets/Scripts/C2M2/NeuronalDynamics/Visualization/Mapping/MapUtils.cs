@@ -62,7 +62,7 @@ namespace C2M2.NeuronalDynamics.UGX {
         /// Build the mapping from two grid objects
         /// </summary>
         /// This delegates to the (private) helper build method:
-        /// <see cref="MapUtils.build(in Grid, in Grid, in Grid)()"/>
+        /// <see cref="MapUtils.Build(in Grid, in Grid, in Grid)()"/>
         /// <param name="grid1d"> 1D mesh </param>
         /// <param name="grid2d"> 2D mesh </param>
         /// <param name="grid2dvis"> 2D mesh for visualization (Default: null)</param>
@@ -79,7 +79,7 @@ namespace C2M2.NeuronalDynamics.UGX {
             }
 
             /// otherwise can build map
-            return build (grid2d, grid1d, grid2dvis ?? grid2d);
+            return Build (grid2d, grid1d, grid2dvis ?? grid2d);
         }
 
         /// Build
@@ -90,7 +90,7 @@ namespace C2M2.NeuronalDynamics.UGX {
         /// <param name="grid1d"> 1D mesh </param>
         /// <param name="grid2dvis"> 2D mesh for visualization </param>
         /// <returns> mapping information as MappingInfo </returns>
-        private static MappingInfo build (in Grid grid2d, in Grid grid1d, in Grid grid2dvis) {
+        private static MappingInfo Build (in Grid grid2d, in Grid grid1d, in Grid grid2dvis) {
             // Accessors for attachments and map
             VertexAttachementAccessor<MappingData> accessor = new VertexAttachementAccessor<MappingData> (grid2d);
             Dictionary<int, Tuple<int, int, double>> map2d1d = new Dictionary<int, Tuple<int, int, double>> ();
@@ -126,7 +126,7 @@ namespace C2M2.NeuronalDynamics.UGX {
         /// Thus the additional geom3dtris geometry will be discarded in the future. 
         /// </summary>
         /// This delegates to the (private) helper build method:
-        /// <see cref="MapUtils.build(in Grid, in Grid, in Grid)()"/>
+        /// <see cref="MapUtils.Build(in Grid, in Grid, in Grid)()"/>
         /// <param name="geom1d"> Filename of 1d (model) geometry </param>
         /// <param name="geom2d"> Filename of 2d (surface) geometry with mapping data </param>
         /// <param name="geomTris"> Filename of 2d (surface) geometry for visualitation </param>
@@ -155,7 +155,7 @@ namespace C2M2.NeuronalDynamics.UGX {
             UGXReader.ReadUGX (geom2d, ref grid2d);
 
             /// build the mapping
-            return build (grid2d, grid1d, grid2dvis);
+            return Build (grid2d, grid1d, grid2dvis);
         }
 
         /// <summary>
