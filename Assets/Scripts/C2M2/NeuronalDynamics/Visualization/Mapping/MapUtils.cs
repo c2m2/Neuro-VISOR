@@ -111,6 +111,7 @@ namespace C2M2.NeuronalDynamics.UGX {
                 tree.Add (new float[] { vertices[i].x, vertices[i].y, vertices[i].z }, i);
             }
 
+            
             for (int i = 0; i < size3d; i++) {
                 var node1 = tree.GetNearestNeighbours (new [] { accessor[i].Start[0], accessor[i].Start[1], accessor[i].Start[2] }, 1);
                 var node2 = tree.GetNearestNeighbours (new [] { accessor[i].End[0], accessor[i].End[1], accessor[i].End[2] }, 1);

@@ -3,6 +3,7 @@ using System.Threading;
 using System;
 using C2M2.Interaction;
 using C2M2.Visualization;
+using UnityEngine.Profiling;
 
 namespace C2M2.Simulation
 {
@@ -34,6 +35,7 @@ namespace C2M2.Simulation
         /// Thread that runs simulation code
         /// </summary>
         private Thread solveThread = null;
+        protected CustomSampler solveStepSampler = null;
 
         /// <summary>
         /// Require derived classes to make simulation values available
@@ -175,29 +177,43 @@ namespace C2M2.Simulation
         /// </summary>
         public void StartSimulation()
         {
+            // Stop previous simulation, if any
             StopSimulation();
-            solveThread = new Thread(Solve);
+
+            solveStepSampler = CustomSampler.Create("SolveStep");
+            
+            solveThread = new Thread(Solve) { IsBackground = true };
             solveThread.Start();
             Debug.Log("Solve() launched on thread " + solveThread.ManagedThreadId);
         }
 
         private void Solve()
         {
+            Profiler.BeginThreadProfiling("Solve Threads", "Solve Thread");
+
             PreSolve();
+
             nT = (int)(endTime / k);
             
             for (time = 0; time < nT; time++)
             {
                 // mutex guarantees mutual exclusion over simulation values
                 mutex.WaitOne();
+
                 PreSolveStep();
+
+                solveStepSampler.Begin();
                 SolveStep(time);
+                solveStepSampler.End();
+
                 PostSolveStep();
+
                 mutex.ReleaseMutex();
             }
 
             PostSolve();
 
+            Profiler.EndThreadProfiling();
             GameManager.instance.DebugLogSafe("Simulation Over.");
         }
 
