@@ -4,12 +4,11 @@ namespace C2M2.Interaction.Signaling
 {
     using Utils;
     /// <summary>
-    /// Abstract class 
+    /// Abstract class for signalers that use raycasting to trigger events on objects.
     /// </summary>
-    /// TODOs, known issues:
-    ///     This script doesn't know how to handle quick transitions between raycastable objects.
-    ///     If the user holds a press on one raycastable target, and then moves immediately to another, 
-    ///     EndPress will not be called correctly on the previous raycast target.
+    /// <remarks>
+    /// Manages event timing and shared logic.
+    /// </remarks>
     public abstract class RaycastEventSignaler : PressEventSignaler
     {       
         public bool rightHand = true;
@@ -74,7 +73,11 @@ namespace C2M2.Interaction.Signaling
                 // TODO: If you hover over a different raycastable object immediately, this will not end the hover on the old object
                 //      This needs to track if the raycastHit object changes
             }
-            else { Pressing = false; }
+            else
+            {
+                Pressing = false;
+                Hovering = false;
+            }
         }
         /// <summary> Try to find the RaycastTriggerManager on the hit object </summary>
         private static RaycastEventManager FindRaycastTrigger(RaycastHit hit)
@@ -83,40 +86,27 @@ namespace C2M2.Interaction.Signaling
 
         }
         // TODO: remove sealed and OnSub methods, call base.OnHover in children
-        protected sealed override void OnHoverHold()
+        protected override void OnHoverHold()
         {
             if (curEvent != null) curEvent.HoverEvent(rightHand, hit);
         }
-        protected sealed override void OnHoverEnd()
+        protected override void OnHoverEnd()
         {
-            OnHoverEndSub();
             if (curEvent != null) curEvent.HoverEndEvent(rightHand, hit);
         }
-        sealed protected override void OnPressBegin()
+        protected override void OnPressBegin()
         {
-            OnPressSub();
             if (curEvent != null) curEvent.PressEvent(rightHand, hit);
         }
-        sealed protected override void OnPressHold()
+        protected override void OnPressHold()
         {
-            OnHoldPressSub();
             if (curEvent != null) curEvent.HoldEvent(rightHand, hit);
         }
-        sealed protected override void OnPressEnd()
+        protected override void OnPressEnd()
         {
-            OnEndPressSub();
             if (curEvent != null) curEvent.EndEvent(rightHand, hit);
         }
-        /// <summary> Signal children that a hover is happening </summary>
-        protected virtual void OnHoverSub() { }
-        /// <summary> Signal children that a hover is not happening </summary>
-        protected virtual void OnHoverEndSub() { }
-        /// <summary> Signal children that a press is beginning </summary>
-        protected virtual void OnPressSub() { }
-        /// <summary> Signal children that a press is being held </summary>
-        protected virtual void OnHoldPressSub() { }
-        /// <summary> Signal children that a press is ending </summary>
-        protected virtual void OnEndPressSub() { }
+
         /// <summary> Let the input type choose their own raycasting method </summary>
         /// <param name="hit"> Resulting hit of the raycast </param>
         /// <param name="layerMask"> Which layer(s) should the raycast paya attention to? </param>

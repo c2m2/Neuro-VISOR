@@ -78,27 +78,38 @@ namespace C2M2.Interaction.Signaling
         private bool distancePressed = false;
         /// <returns> True if the specified controller button is pressed OR if we are near enough to the raycast target </returns>
         protected override bool PressCondition() => (OVRInput.Get(triggerEventsButton, controller) || distancePressed);
+
         // At the start of a click change the line renderer color to pressed color
-        protected override void OnPressSub() => lineRend.SetEndpointColors(pressedColor);
-        // We don't need any functionaliy in the hold case
-        protected override void OnHoldPressSub() { }
-        // After a click return the line renderer color to default
-        protected override void OnEndPressSub() => lineRend.SetEndpointColors(unpressedColor);
+        protected override void OnPressBegin()
+        {
+            lineRend.SetEndpointColors(pressedColor);
+            base.OnPressBegin();
+        }
+
+        // After a press return the line renderer color to default
+        protected override void OnPressEnd()
+        {
+            lineRend.SetEndpointColors(unpressedColor);
+            base.OnPressEnd();
+        }
+
         /// <summary> Raycast using fingertip position/direction, handle fingertip line renderer </summary>
         protected override bool RaycastingMethod(out RaycastHit hit, float maxDistance, LayerMask layerMask)
         {
             // Turn the local forward into global forward to find the raycast direction
             Vector3 globalForward = transform.TransformDirection(Vector3.forward);
             // Try to raycast onto a valid target in the global forward direction
-            bool didHit = Physics.Raycast(transform.position, globalForward, out hit, maxDistance, layerMask);
-            if (didHit)
-            { // If we hit a valid target, render the linerender there. Othewise don't render it
+            bool raycastHit = Physics.Raycast(transform.position, globalForward, out hit, maxDistance, layerMask);
+
+            if (raycastHit)
+            {
                 distancePressed = CheckPressDistance(hit);
+                // Draw linerenderer to hit object
                 lineRend.SetEndpointPositions(transform.position, hit.point);
             }
             else lineRend.SetEndpointPositions(Vector3.zero, Vector3.zero);
 
-            return didHit;
+            return raycastHit;
         }
 
         [Tooltip("The renderer component for the static pointed hand ")]
@@ -126,7 +137,7 @@ namespace C2M2.Interaction.Signaling
             lineRend.enabled = active;
         }
         [Tooltip("Minimum distance to trigger raycast triggers")]
-        public float clickDistance = 0.01f;
+        public float pressDistance = 0.01f;
         /// <summary>
         /// Figure out if we should trigger a press based on distance
         /// </summary>
@@ -137,12 +148,11 @@ namespace C2M2.Interaction.Signaling
         /// </returns>
         private bool CheckPressDistance(RaycastHit hit)
         {
-            // If the raycast hit was within click distance, initiate a click
-            bool inClickDistance = hit.distance < clickDistance;
-            // If we are close enough to click, we are close enough to hold
-            if (inClickDistance) return true;
-            // If we have already clicked. and we are still within holding distance, keep holding
-            else if (distancePressed && hit.distance < clickDistance * 3) return true;
+            // If we are close enough to press, 
+            // or we have already pressed and we are close enough to hold a press
+            if((hit.distance < pressDistance) || 
+                (distancePressed && hit.distance < (pressDistance * 3))) return true;
+
             // We either haven't clicked yet, or we're too far. Don't trigger a hold
             else return false;
         }

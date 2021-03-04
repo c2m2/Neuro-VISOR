@@ -32,9 +32,8 @@ namespace C2M2.Interaction.Signaling
         }
 
         protected override void OnStart() { }
-        /// <summary>
-        /// This is returns true if the left mouse button is pressed down
-        /// </summary>
+        
+        // Mouse constantly raycasts
         protected override bool RaycastRequested() => true;
         /// <summary>
         /// This builds a ray from the mouse's position, and attempts a raycast using that ray
@@ -46,9 +45,7 @@ namespace C2M2.Interaction.Signaling
 
             return raycastHit;
         }
-        /// <summary>
-        /// With mouse raycasting, we only want to press the mouse button to trigger events
-        /// </summary>
+        // Left mouse button presses
         protected override bool PressCondition() => Input.GetMouseButton(0);
     }
 }
