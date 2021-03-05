@@ -104,7 +104,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         /// <summary>
         /// Sets the design of the clamp based on whether it is on the soma
         /// </summary>
-        private void SetAppearance(NeuronCell.NodeData cellNodeData)
+        private void SetAppearance(Neuron.NodeData cellNodeData)
         {
             if (somaClamp)
             {
@@ -128,7 +128,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         /// <summary>
         /// Sets the radius and height of the clamp
         /// </summary>
-        private void SetScale(NeuronCell.NodeData cellNodeData)
+        private void SetScale(Neuron.NodeData cellNodeData)
         {
             currentVisualizationScale = (float)simulation.VisualInflation;
 
@@ -192,7 +192,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         /// <summary>
         /// Sets the orientation of the clamp based on the surrounding neighbors
         /// </summary>
-        public void SetRotation(NeuronCell.NodeData cellNodeData)
+        public void SetRotation(Neuron.NodeData cellNodeData)
         {
             List<int> neighbors = cellNodeData.neighborIDs;
 
@@ -253,9 +253,9 @@ namespace C2M2.NeuronalDynamics.Interaction
                     Destroy(transform.parent.gameObject);
                 }
 
-                NeuronCell.NodeData clampCellNodeData = simulation.NeuronCell.nodeData[clampIndex];
+                Neuron.NodeData clampCellNodeData = simulation.Neuron.nodeData[clampIndex];
 
-                if(simulation.Grid1D.Subsets["Soma"].Indices.Contains(clampIndex)) somaClamp = true; //full proof way to check if it is the soma. Can definitely be changed to improve performance by checking the name based on the index
+                if(simulation.Neuron.somaIDs.Contains(clampIndex)) somaClamp = true;
 
                 focusVert = clampIndex;
                 focusPos = simulation.Verts1D[focusVert];

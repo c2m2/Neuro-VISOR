@@ -182,7 +182,7 @@ namespace C2M2.NeuronalDynamics.Simulation
                 {
                     /// define the current time slice to send and initialize it to the correct size which is the number of vertices in the geometry
                     /// initialize it to the current state of the voltage, this is the voltage we are sending back to vr simulation
-                    Vector curTimeSlice = U.SubVector(0, NeuronCell.vertCount);
+                    Vector curTimeSlice = U.SubVector(0, Neuron.vertCount);
                     curTimeSlice.Multiply(1, curTimeSlice);   
                     /// convert the time slice to an Array
                     curVals = curTimeSlice.ToArray();
@@ -214,7 +214,7 @@ namespace C2M2.NeuronalDynamics.Simulation
                     if (newVal != null)
                     {
                         /// here we set the voltage at the location, notice that we multiply by 0.0001 to convert to volts [V] 
-                        if (newVal.Item1 >= 0 && newVal.Item1 < NeuronCell.vertCount)
+                        if (newVal.Item1 >= 0 && newVal.Item1 < Neuron.vertCount)
                         {
                             //   UnityEngine.Debug.Log("U[" + newVal.Item1 + "] = " + newVal.Item2);
                             U[newVal.Item1] = newVal.Item2;
@@ -246,17 +246,17 @@ namespace C2M2.NeuronalDynamics.Simulation
         {
             InitializeNeuronCell();
             ///<c>R</c> this is the reaction vector for the reaction solve
-            R = Vector.Build.Dense(NeuronCell.vertCount);
+            R = Vector.Build.Dense(Neuron.vertCount);
             ///<c>reactConst</c> this is a small list for collecting the conductances and reversal potential which is sent to the reaction solve routine
             reactConst = new List<double> { gk, gna, gl, ek, ena, el };
-            ///<c>List<CoordinateStorage<double>> sparse_stencils = makeSparseStencils(NeuronCell, res, cap, k);</c> Construct sparse RHS and LHS in coordinate storage format, no zeros are stored \n
+            ///<c>List<CoordinateStorage<double>> sparse_stencils = makeSparseStencils(Neuron, res, cap, k);</c> Construct sparse RHS and LHS in coordinate storage format, no zeros are stored \n
             /// <c>sparse_stencils</c> this is a list which contains only two matrices the LHS and RHS matrices for the Crank-Nicolson solve
-            sparse_stencils = makeSparseStencils(NeuronCell, res, cap, k);
+            sparse_stencils = makeSparseStencils(Neuron, res, cap, k);
             ///<c>CompressedColumnStorage</c> call Compresses the sparse matrices which are stored in <c>sparse_stencils[0]</c> and <c>sparse_stencils[1]</c>
             r_csc = CompressedColumnStorage<double>.OfIndexed(sparse_stencils[0]); //null;
             l_csc = CompressedColumnStorage<double>.OfIndexed(sparse_stencils[1]); //null;
             ///<c>double [] b</c> we define storage for the diffusion solve part
-            b = new double[NeuronCell.vertCount];
+            b = new double[Neuron.vertCount];
             ///<c>var lu = SparseLU.Create(l_csc, ColumnOrdering.MinimumDegreeAtA, 0.1);</c> this creates the LU decomposition of the HINES matrix which is defined by <c>l_csc</c>
             lu = SparseLU.Create(l_csc, ColumnOrdering.MinimumDegreeAtA, 0.1);
         }
@@ -297,17 +297,17 @@ namespace C2M2.NeuronalDynamics.Simulation
             ///This part does the diffusion solve \n
             /// <c>r_csc.Multiply(U.ToArray(), b);</c> the performs the RHS*Ucurr and stores it in <c>b</c> \n
             /// <c>lu.Solve(b, b);</c> this does the forward/backward substitution of the LU solve and sovles LHS = b \n
-            /// <c>U.SetSubVector(0, NeuronCell.vertCount, Vector.Build.DenseOfArray(b));</c> this sets the U vector to the voltage at the end of the diffusion solve
+            /// <c>U.SetSubVector(0, Neuron.vertCount, Vector.Build.DenseOfArray(b));</c> this sets the U vector to the voltage at the end of the diffusion solve
             r_csc.Multiply(U.ToArray(), b);
             lu.Solve(b, b);
-            U.SetSubVector(0, NeuronCell.vertCount, Vector.Build.DenseOfArray(b));
+            U.SetSubVector(0, Neuron.vertCount, Vector.Build.DenseOfArray(b));
             /// this part solves the reaction portion of the operator splitting \n
-            /// <c>R.SetSubVector(0, NeuronCell.vertCount, reactF(reactConst, U, N, M, H, cap));</c> this first evaluates at the reaction function \f$r(V)\f$ \n
+            /// <c>R.SetSubVector(0, Neuron.vertCount, reactF(reactConst, U, N, M, H, cap));</c> this first evaluates at the reaction function \f$r(V)\f$ \n
             /// <c>R.Multiply(k, R); </c> this multiplies by the time step size \n
             /// <c>U.add(R,U)</c> adds it back to U to finish off the operator splitting
             /// For the reaction solve we are solving
             /// \f[\frac{U_{next}-U_{curr}}{k} = R(U_{curr})\f]
-            R.SetSubVector(0, NeuronCell.vertCount, reactF(reactConst, U, N, M, H, cap));
+            R.SetSubVector(0, Neuron.vertCount, reactF(reactConst, U, N, M, H, cap));
             R.Multiply(k, R);
             U.Add(R, U);
             /// this part solve the state variables using Forward Euler
@@ -323,7 +323,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// <summary>
         /// This function initializes the voltage vector <c>U</c> and the state vectors
         /// <c>M</c>, <c>N</c>, and <c>H</c> \n
-        /// The input <c>NeuronCell.vertCount</c> is the vertex count of the neuron geometry \n
+        /// The input <c>Neuron.vertCount</c> is the vertex count of the neuron geometry \n
         /// <c>U</c> is initialized to 0 [V] for the entire cell \n
         /// <c>M</c> is initialized to \f$m_i\f$ which is set by <c>mi</c> \n
         /// <c>N</c> is initialized to \f$n_i\f$ which is set by <c>ni</c> \n
@@ -331,10 +331,10 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// </summary>
         private void InitializeNeuronCell()
         {
-            U = Vector.Build.Dense(NeuronCell.vertCount, 0);
-            M = Vector.Build.Dense(NeuronCell.vertCount, mi);
-            N = Vector.Build.Dense(NeuronCell.vertCount, ni);
-            H = Vector.Build.Dense(NeuronCell.vertCount, hi);
+            U = Vector.Build.Dense(Neuron.vertCount, 0);
+            M = Vector.Build.Dense(Neuron.vertCount, mi);
+            N = Vector.Build.Dense(Neuron.vertCount, ni);
+            H = Vector.Build.Dense(Neuron.vertCount, hi);
         }
         /// <summary>
         /// This is for constructing the lhs and rhs of system matrix \n
@@ -351,12 +351,12 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// and \f$\gamma_{ k,j}\f$ is defined as
         /// \f[\gamma_{k, j}:=\frac{ 1}{ C_mR_a a_j\widetilde{\Delta x_j} }\cdot \frac{ 1}{\left(\frac{ 1} { a_{ k} ^2} +\frac{ 1} { a_j ^ 2}\right)\Delta x_{ { k},j} }\f]
         /// </summary>
-        /// <param name="myCell"></param> this is the <c>NeuronCell</c> that contains all the information about the cell geometry
+        /// <param name="myCell"></param> this is the <c>Neuron</c> that contains all the information about the cell geometry
         /// <param name="res"></param> this is the axial resistance
         /// <param name="cap"></param> this is the membrane capacitance
         /// <param name="k"></param> this is the fixed time step size
         /// <returns>LHS,RHS</returns> the function returns the LHS, RHS stencil matrices for the diffusion solve in sparse format, it is compressed in the main solver routine.
-        public static List<CoordinateStorage<double>> makeSparseStencils(NeuronCell myCell, double res, double cap, double k)
+        public static List<CoordinateStorage<double>> makeSparseStencils(Neuron myCell, double res, double cap, double k)
         {
             /// send output matrices as a list {rhs, lhs}\n
             /// <c>List<CoordinateStorage<double>> stencils = new List<CoordinateStorage<double>>();</c> initializes empty list storage for the stencil matrices \n
