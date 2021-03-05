@@ -18,11 +18,21 @@ namespace C2M2.Visualization
         public GameObject textMarkerHolder = null;
         public TextMeshProUGUI unitText = null;
         public GameObject titleText = null;
+        public LineRenderer outline = null;
         public string unit = "mV";
         public string precision = "F4";
 
+        private float LineWidth
+        {
+            get
+            {
+                return displayHeight / 20;
+            }
+        }
+
         private void Awake()
         {
+            // Init gradient display
             if(linerend == null)
             {
                 linerend = GetComponent<LineRenderer>();
@@ -32,12 +42,6 @@ namespace C2M2.Visualization
                     Destroy(this);
                 }
             }
-
-            linerend.positionCount = 2;
-            linerend.SetPosition(0, Vector3.zero);
-            linerend.SetPosition(1, new Vector3(displayLength, 0f, 0f));
-
-
 
             StartCoroutine(UpdateDisplayRoutine());
         }
@@ -60,6 +64,25 @@ namespace C2M2.Visualization
                 }
                 yield return new WaitUntil(() => sim.colorLUT.hasChanged == true);
             }
+        }
+
+        private void DrawOutline()
+        {
+            if (outline == null)
+            {
+                Debug.LogError("No outline found!");
+                return;
+            }
+
+            outline.positionCount = 4;
+            outline.SetPositions(new Vector3[] {
+                new Vector3(0f, -displayHeight/2, 0f),
+                new Vector3(displayLength, -displayHeight/2, 0f),
+                new Vector3(displayLength, displayHeight/2, 0f),
+            new Vector3(0f, displayHeight/2, 0f)});
+            outline.loop = true;
+            outline.startWidth = LineWidth;
+            outline.endWidth = LineWidth;
         }
 
         private void UpdateDisplay()
@@ -86,6 +109,8 @@ namespace C2M2.Visualization
 
                 linerend.startWidth = displayHeight;
                 linerend.endWidth = displayHeight;
+
+                DrawOutline();
 
                 UpdateText();
 
@@ -132,10 +157,15 @@ namespace C2M2.Visualization
                 LineRenderer lineMarker = newMarker.GetComponentInChildren<LineRenderer>();
                 if(lineMarker != null)
                 {
-                    lineMarker.transform.localPosition = new Vector3(0f, displayLength / 2, 0f);
+                    lineMarker.transform.localPosition = new Vector3(0f, displayHeight/newMarker.transform.localScale.y/2, 0f);
                     lineMarker.positionCount = 2;
-                    lineMarker.SetPosition(0, Vector3.zero);
-                    lineMarker.SetPosition(1, new Vector3(displayLength * 1.5f, 0f, 0f));
+                    lineMarker.SetPositions(new Vector3[] {
+                        new Vector3(0f, displayHeight, 0f),
+                        new Vector3(0f, -displayHeight/4, 0f) });
+                 //   lineMarker.SetPosition(0, Vector3.zero);
+                  //  lineMarker.SetPosition(1, new Vector3(displayLength * 1.5f, 0f, 0f));
+                    lineMarker.startWidth = LineWidth;
+                    lineMarker.endWidth = LineWidth;
                 }
                 else
                 {

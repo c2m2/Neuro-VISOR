@@ -15,16 +15,15 @@ namespace C2M2
     /// <summary>
     /// Stores many global variables, handles pregame initializations
     /// </summary>
-    [RequireComponent(typeof(NeuronClampInstantiator))]
+    [RequireComponent(typeof(NeuronClampManager))]
     public class GameManager : MonoBehaviour
     {
         public static GameManager instance = null;
         
         public int mainThreadId { get; private set; } = -1;
-        public string assetsPath { get; private set; } = null;
 
         public VRDeviceManager vrDeviceManager = null;
-        public bool vrIsActive {
+        public bool VrIsActive {
             get
             {
                 if (vrDeviceManager == null) Debug.LogError("No VR Device Manager Found!");
@@ -36,16 +35,17 @@ namespace C2M2
         public Interactable activeSim = null;
         public List<SimulationTimerLabel> timerLabels = new List<SimulationTimerLabel>();
 
-        public NeuronClampInstantiator clampInstantiator = null;
-      //  public GameObject[] clampControllers = new GameObject[0];
+        public NeuronClampManager ndClampManager = null;
+        //  public GameObject[] clampControllers = new GameObject[0];
 
         [Header("Environment")]
-        public MeshRenderer[] walls;
+        public int roomSelected = 0;
+        public Room[] roomOptions = null;
         public Color wallColor = Color.white;
         [Header("Materials")]
-        public Material defaultMaterial;
-        public Material vertexColorationMaterial;
-        public Material lineRendMaterial;
+        public Material defaultMaterial = null;
+        public Material vertexColorationMaterial = null;
+        public Material lineRendMaterial = null;
 
         [Tooltip("Used as an anchor point for neuron diameter control panel")]
         public Transform whiteboard = null;
@@ -65,27 +65,41 @@ namespace C2M2
 
         private void Awake()
         {
-            assetsPath = Application.dataPath;
-            mainThreadId = Thread.CurrentThread.ManagedThreadId;
             // Initialize the GameManager
             DontDestroyOnLoad(gameObject);
             if (instance == null) { instance = this; }
             else if (instance != this) { Destroy(this); }
 
-            clampInstantiator = GetComponent<NeuronClampInstantiator>();
+            mainThreadId = Thread.CurrentThread.ManagedThreadId;
 
-            if (walls.Length > 0)
+            ndClampManager = GetComponent<NeuronClampManager>();
+            if (ndClampManager == null) Debug.LogWarning("No neuron clamp manager found!");
+
+            if(roomOptions != null && roomOptions.Length > 0)
             {
-                foreach (MeshRenderer wall in walls)
+                Mathf.Clamp(roomSelected, 0, (roomOptions.Length - 1));
+                // Only enable selected room, disable all others
+                for(int i = 0; i < roomOptions.Length; i++)
                 {
-                    wall.material.SetColor("_Color", wallColor);
+                    bool selected = (i == roomSelected) ? true : false;
+                    roomOptions[i].gameObject.SetActive(selected);
+                }
+                // Apply wall color to selected room's walls
+                if (roomOptions[roomSelected].walls != null && roomOptions[roomSelected].walls.Length > 0)
+                {
+                    foreach (MeshRenderer wall in roomOptions[roomSelected].walls)
+                    {
+                        if (wall != null)
+                        {
+                            wall.material.color = wallColor;
+                        }
+                        else
+                        {
+                            Debug.LogWarning("Wall's meshrenderer was null on " + roomOptions[roomSelected].name);
+                        }
+                    }
                 }
             }
-            // Initialize keyboard
-            //raycastKeyboardPrefab = Instantiate(raycastKeyboardPrefab, new Vector3(50, 50, 50), Quaternion.identity);
-            //raycastKeyboard = raycastKeyboardPrefab.GetComponent<RaycastKeyboard>();
-            isRunning = true;
-
         }
 
         private void Update()

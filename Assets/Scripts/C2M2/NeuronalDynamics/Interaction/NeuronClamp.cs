@@ -20,20 +20,9 @@ namespace C2M2.NeuronalDynamics.Interaction
         public bool clampLive { get; private set; } = false;
 
         public double clampPower { get; set; } = double.PositiveInfinity;
-        public double MinPower
-        {
-            get
-            {
-                return gradientLUT.GlobalMin;
-            }
-        }
-        public double MaxPower
-        {
-            get
-            {
-                return gradientLUT.GlobalMax;
-            }
-        }
+        public NeuronClampManager ClampManager { get { return GameManager.instance.ndClampManager; } }
+        public double MinPower { get { return ClampManager.MinPower; } }
+        public double MaxPower { get { return ClampManager.MaxPower; } }
 
         public int focusVert { get; private set; } = -1;
         public Vector3 focusPos;
@@ -97,7 +86,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             {
                 if (clampLive)
                 {
-                    Color newCol = gradientLUT.EvaluateUnscaled((float)clampPower);
+                    Color newCol = gradientLUT.Evaluate((float)clampPower);
                     ActiveColor = newCol;
                 }
             }
@@ -382,70 +371,25 @@ namespace C2M2.NeuronalDynamics.Interaction
         [Tooltip("Hold down a raycast for this many frames in order to destroy a clamp")]
         public int destroyCount = 50;
         int holdCount = 0;
-        public float sensitivity = 150f;
-        // Sensitivity of the clamp power control. Note this effects value once per frame. 
-        public double ThumbstickScaler {
-            get
-            {
-                return (MaxPower - MinPower) / sensitivity;
-            }
-        }
 
-        /// <summary>
-        /// Pressing this button toggles clamps on/off. Holding this button down for long enough destroys the clamp
-        /// </summary>
-        public OVRInput.Button toggleDestroyOVR = OVRInput.Button.Two;
-        public OVRInput.Button toggleDestroyOVRS = OVRInput.Button.Four;
-        private bool PressedToggleDestroy
-        {
-            get
-            {
-                if (GameManager.instance.vrIsActive)
-                    return (OVRInput.Get(toggleDestroyOVR) || OVRInput.Get(toggleDestroyOVRS));
-                else return true;
-            }
-        }
-        public KeyCode powerModifierPlusKey = KeyCode.UpArrow;
-        public KeyCode powerModifierMinusKey = KeyCode.DownArrow;
-        private float PowerModifier
-        {
-            get
-            {
-                if (GameManager.instance.vrIsActive)
-                {
-                    // Use the value of whichever joystick is held up furthest
-                    float y1 = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick).y;
-                    float y2 = OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick).y;
-                    float scaler = (y1 + y2);
-
-                    return (float)ThumbstickScaler * scaler;
-                }
-                else
-                {
-                    if (Input.GetKey(powerModifierPlusKey)) return (float)ThumbstickScaler;
-                    if (Input.GetKey(powerModifierMinusKey)) return -(float)ThumbstickScaler;
-                    else return 0;
-                }
-            }
-        }
         private bool powerClick = false;
         /// <summary>
         /// If the user holds a raycast down for X seconds on a clamp, it should destroy the clamp
         /// </summary>
         public void MonitorInput()
         {
-            if (PressedToggleDestroy)
+            if (ClampManager.PressedToggleDestroy)
                 holdCount++;
             else
                 CheckInput();
 
-            float power = PowerModifier;
+            float power = ClampManager.PowerModifier;
+            
             // If clamp power is modified while the user holds a click, don't let the click also toggle/destroy the clamp
             if (power != 0 && !powerClick) powerClick = true;
 
             clampPower += power;
-            if (clampPower < MinPower) clampPower = MinPower;
-            if (clampPower > MaxPower) clampPower = MaxPower;
+            Math.Clamp(clampPower, MinPower, MaxPower);
         }
 
         public void Highlight(bool highlight)

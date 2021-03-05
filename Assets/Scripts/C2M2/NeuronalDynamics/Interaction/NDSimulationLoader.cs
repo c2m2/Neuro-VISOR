@@ -17,7 +17,6 @@ namespace C2M2.NeuronalDynamics.Interaction
         public double endTime = 100.0;
         public double raycastHitValue = 0.05;
 
-        private bool loaded = false;
         public string solverType = "SparseSolverTestv1";
 
         public void Load(RaycastHit hit)

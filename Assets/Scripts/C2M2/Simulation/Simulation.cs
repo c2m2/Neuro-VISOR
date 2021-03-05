@@ -3,6 +3,7 @@ using System.Threading;
 using System;
 using C2M2.Interaction;
 using C2M2.Visualization;
+using UnityEngine.Profiling;
 
 namespace C2M2.Simulation
 {
@@ -34,6 +35,7 @@ namespace C2M2.Simulation
         /// Thread that runs simulation code
         /// </summary>
         private Thread solveThread = null;
+        protected CustomSampler solveStepSampler = null;
 
         /// <summary>
         /// Require derived classes to make simulation values available
@@ -102,9 +104,10 @@ namespace C2M2.Simulation
                 child.transform.eulerAngles = Vector3.zero;
 
                 // Attach hit events to an event manager
-                RaycastEventManager eventManager = gameObject.AddComponent<RaycastEventManager>();
+                eventManager = gameObject.AddComponent<RaycastEventManager>();
                 // Create hit events
-                RaycastPressEvents raycastEvents = child.AddComponent<RaycastPressEvents>();
+                raycastEvents = child.AddComponent<RaycastPressEvents>();
+                // TODO: Get rid of RaycastSimHeater, just add Simulation.AddValue here
                 raycastEvents.OnHoldPress.AddListener((hit) => Heater.Hit(hit));
                 eventManager.rightTrigger = raycastEvents;
                 eventManager.leftTrigger = raycastEvents;
@@ -122,8 +125,9 @@ namespace C2M2.Simulation
                 if (startOnAwake) StartSimulation();
             }
         }
-
-        public void Update()
+        public RaycastEventManager eventManager { get; protected set; } = null;
+        public RaycastPressEvents raycastEvents { get; protected set; } = null;
+        public void FixedUpdate()
         {
             OnUpdate();
 
@@ -164,8 +168,8 @@ namespace C2M2.Simulation
         protected virtual void OnDest() { }
         #endregion
 
-        public int time { get; protected set; } = -1;
-        public double k = 0.002 * 1e-3;
+        public int time = -1;
+        public double k = 0.008 * 1e-3;
         public double endTime = 1.0;
         public int nT { get; private set; } = -1;
         /// <summary>
@@ -173,30 +177,43 @@ namespace C2M2.Simulation
         /// </summary>
         public void StartSimulation()
         {
+            // Stop previous simulation, if any
             StopSimulation();
-            solveThread = new Thread(Solve);
+
+            solveStepSampler = CustomSampler.Create("SolveStep");
+            
+            solveThread = new Thread(Solve) { IsBackground = true };
             solveThread.Start();
             Debug.Log("Solve() launched on thread " + solveThread.ManagedThreadId);
         }
 
         private void Solve()
         {
+            Profiler.BeginThreadProfiling("Solve Threads", "Solve Thread");
+
             PreSolve();
+
             nT = (int)(endTime / k);
             
             for (time = 0; time < nT; time++)
-            {                 
+            {
                 // mutex guarantees mutual exclusion over simulation values
                 mutex.WaitOne();
-                // call user solve code 
+
                 PreSolveStep();
+
+                solveStepSampler.Begin();
                 SolveStep(time);
+                solveStepSampler.End();
+
                 PostSolveStep();
+
                 mutex.ReleaseMutex();
             }
 
             PostSolve();
 
+            Profiler.EndThreadProfiling();
             GameManager.instance.DebugLogSafe("Simulation Over.");
         }
 

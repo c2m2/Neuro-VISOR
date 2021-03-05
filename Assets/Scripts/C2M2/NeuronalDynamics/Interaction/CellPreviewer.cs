@@ -17,9 +17,9 @@ namespace C2M2.NeuronalDynamics.Interaction {
         public string cellsPath = "NeuronalDynamics" + Path.DirectorySeparatorChar + "Geometries";
         public GameObject previewWindowPrefab = null;
         public NDSimulationLoader loader = null;
-        public bool renderOutline = true;
         public bool renderWalls = true;
         public Color32 windowColor = Color.black;
+        public GameObject ErrorWindow = null;
         
         /// <summary>
         /// Colors ot use for the 1D cell renderings. More than cellColors.Length cells will repeat these colors
@@ -56,10 +56,13 @@ namespace C2M2.NeuronalDynamics.Interaction {
             FindSimulationLoader();
 
             // Get possible geometries from given direcrory
-            string[] geoms = GetGeometryNames(Application.streamingAssetsPath + Path.DirectorySeparatorChar + cellsPath);
+            string fullPath = Application.streamingAssetsPath + Path.DirectorySeparatorChar + cellsPath;
+            string[] geoms = GetGeometryNames(fullPath);
 
             if (geoms.Length > 0)
             {
+                if(ErrorWindow != null) ErrorWindow.SetActive(false);
+
                 // Make a preview window for each found geometry
                 Vector3[] windowPositions = GetWindowPositions(geoms.Length);
                 Color32[] previewColors = GetWindowColors(geoms.Length);
@@ -70,8 +73,23 @@ namespace C2M2.NeuronalDynamics.Interaction {
             }
             else
             {
-                Debug.LogWarning("No cells found in " + cellsPath);
+                if (ErrorWindow != null)
+                {
+                    ErrorWindow.SetActive(true);
+                    var go = ErrorWindow.transform.FindChildRecursive("FileName");
+                    if (go != null)
+                    {
+                        TMPro.TextMeshProUGUI errorMsg = go.GetComponent<TMPro.TextMeshProUGUI>();
+                        if (errorMsg != null)
+                        {
+                            errorMsg.text = "No cells found in " + fullPath;
+                        }
+                    }
+                }
+                Debug.LogWarning("No cells found in " + fullPath);
             }
+
+            
 
             void FindWindowPrefab()
             {
@@ -103,7 +121,7 @@ namespace C2M2.NeuronalDynamics.Interaction {
                 DirectoryInfo d = new DirectoryInfo(targetDir);
 
                 FileInfo[] files = d.GetFiles("*.vrn");
-                if (files.Length == 0) return null;
+                if (files.Length == 0) return new string[] { };
 
                 string[] fileNames = new string[files.Length];
                 for (int i = 0; i < files.Length; i++)
@@ -179,7 +197,6 @@ namespace C2M2.NeuronalDynamics.Interaction {
                     {
                         r.startColor = windowColor;
                         r.endColor = windowColor;
-                        r.enabled = renderOutline;
                     }
                 }
 
@@ -190,7 +207,7 @@ namespace C2M2.NeuronalDynamics.Interaction {
                     foreach (MeshRenderer r in prefabWalls)
                     {
                         r.enabled = renderWalls;
-                        r.material.SetColor("_Color", windowColor);
+                        r.material.color = windowColor;
                     }
                 }
 

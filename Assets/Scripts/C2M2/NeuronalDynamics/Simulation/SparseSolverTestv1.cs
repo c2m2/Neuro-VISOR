@@ -211,16 +211,14 @@ namespace C2M2.NeuronalDynamics.Simulation
                 mutex.WaitOne();
                 foreach (Tuple<int, double> newVal in newValues)
                 {
-                    int j = 0;
                     if (newVal != null)
                     {
-                        j = newVal.Item1;
-                    }
-                    double val = newVal.Item2;
-                    /// here we set the voltage at the location, notice that we multiply by 0.0001 to convert to volts [V] 
-                    if (j >= 0 && j < NeuronCell.vertCount)
-                    {
-                        U[j] = val;
+                        /// here we set the voltage at the location, notice that we multiply by 0.0001 to convert to volts [V] 
+                        if (newVal.Item1 >= 0 && newVal.Item1 < NeuronCell.vertCount)
+                        {
+                            //   UnityEngine.Debug.Log("U[" + newVal.Item1 + "] = " + newVal.Item2);
+                            U[newVal.Item1] = newVal.Item2;
+                        }
                     }
                 }
                 mutex.ReleaseMutex();
@@ -293,7 +291,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         //$\frac{dV^{**}}{dt}=r(V^{**})$ with initial condition $V_0^{**}=V^*$ to get $V^{**}$, and $V_{n+1}=V(t_{n+1})=V^{**}$ the voltage at the end of the time step.
         //For equation the diffusion we use a Crank-Nicolson scheme
         protected override void SolveStep(int t)
-        {                                                                                             
+        {              
             ///<c>if ((i * k >= 0.015) && SomaOn) { U[0] = vstart; }</c> this checks of the somaclamp is on and sets the soma location to <c>vstart</c>
             ///if ((t * k >= 0.015) && SomaOn) { U[0] = vstart; }
             ///This part does the diffusion solve \n

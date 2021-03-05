@@ -49,6 +49,12 @@ namespace C2M2.Visualization
         }
 
         /// <summary>
+        /// If true, LUTGradient will reserve memory for the color array the first time Evaluate() is called
+        /// </summary>
+        public bool poolMemory = true;
+        private Color32[] memPool = null;
+
+        /// <summary>
         /// Flag is set true when globalMin, globalMax, or gradient have changed.
         /// </summary>
         /// <remarks>
@@ -66,7 +72,7 @@ namespace C2M2.Visualization
             set
             {
                 lutRes = value;
-                gradientLUT = BuildLUT(gradient, lutRes);
+                lut = BuildLUT(gradient, lutRes);
             }
         }
 
@@ -77,57 +83,70 @@ namespace C2M2.Visualization
             set
             {
                 gradient = value;
-                gradientLUT = BuildLUT(gradient, lutRes);
+                lut = BuildLUT(gradient, lutRes);
                 hasChanged = true;
             }
         }
         // Gradient look-up-table greatly reduces time expense and memory
-        public Color32[] gradientLUT { get; private set; } = null;
+        public Color32[] lut { get; private set; } = null;
 
         /// <summary> Given the extrema method, color an entire array of scalers using the LUT </summary>
-        public Color32[] Evaluate(in float[] times)
+        public Color32[] Evaluate(float[] unscaledTimes)
         {
-            if (times == null || times.Length == 0) return null;
+            if (unscaledTimes == null || unscaledTimes.Length == 0) return null;
 
             // If we haven't built the LUT yet, and we have a gradient, build the LUT
-            if (gradientLUT == null && gradient != null) gradientLUT = BuildLUT(gradient, lutRes);
-
-            // Store a local pointer so we can manipulate scalers
-            float[] scalarsScaled = times;
+            if (lut == null)
+                lut = BuildLUT(gradient, lutRes);
             // Rescale array based on extrema values
-            scalarsScaled = RescaleArray(scalarsScaled, extremaMethod);
+            unscaledTimes = RescaleArray(unscaledTimes, extremaMethod);
 
-            Color32[] colors32 = new Color32[scalarsScaled.Length];
-            for (int i = 0; i < scalarsScaled.Length; i++)
+            Color32[] cols;
+            if (poolMemory)
             {
-                colors32[i] = Evaluate(scalarsScaled[i]);
+                // Initialize the memory pool if necessary
+                if(memPool == null || memPool.Length != unscaledTimes.Length)
+                {
+                    memPool = new Color32[unscaledTimes.Length];
+                }
+                cols = memPool;
+            }
+            else
+            {
+                cols = new Color32[unscaledTimes.Length];
             }
 
-            return colors32;
+            for (int i = 0; i < unscaledTimes.Length; i++)
+            {
+                cols[i] = lut[Math.Clamp((int)unscaledTimes[i], 0, lutRes - 1)];
+            }
+
+            return cols;
         }
         /// <summary>
         /// Calculate color at a given time.
         /// </summary>
-        public Color32 Evaluate(float time) => gradientLUT[Clamp((int)time, 0, (lutRes - 1))];
-
-        /// <summary>
-        /// Calculate color at a given UNSCALED time. Assumes min and max have already been calculated
-        /// </summary>
-        public Color32 EvaluateUnscaled(float unscaledTime)
+        public Color32 Evaluate(float unscaledTime)
         {
+            // If we haven't built the LUT yet, and we have a gradient, build the LUT
+            if (lut == null)
+                lut = BuildLUT(gradient, lutRes);
+
             float[] scalars = new float[] { GlobalMin, unscaledTime, GlobalMax };
 
-            // Rescale based on extrema
+            // Todo: this only rescales based on global extrema method
             scalars.RescaleArray(0f, (lutRes - 1), GlobalMin, GlobalMax);
 
-            float scaledTime = scalars[1];
-            Color32 col = gradientLUT[Clamp((int)scaledTime, 0, (lutRes - 1))];
-
-            return col;
+            return lut[Math.Clamp((int)scalars[1], 0, lutRes-1)];
         }
 
         private Color32[] BuildLUT(Gradient gradient, int lutRes)
         {
+            if(gradient == null)
+            {
+                throw new NullReferenceException("gradient is null!");
+            }
+
             Color32[] gradientLUT = new Color32[lutRes];
             int maxInd = lutRes;
             // Subtract one from lutRes so we can divide across the gradient's range
