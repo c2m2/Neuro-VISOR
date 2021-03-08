@@ -189,11 +189,11 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 if (averageDendriteRadius == 0)
                 {
                     float radiusSum = 0;
-                    foreach (Neuron.NodeData node in Neuron.nodeData)
+                    foreach (Neuron.NodeData node in Neuron.nodes)
                     {
-                        radiusSum += (float) node.nodeRadius;
+                        radiusSum += (float) node.NodeRadius;
                     }
-                    averageDendriteRadius = radiusSum / Neuron.nodeData.Count;
+                    averageDendriteRadius = radiusSum / Neuron.nodes.Count;
                 }
                 return averageDendriteRadius;
             }

@@ -2,7 +2,6 @@
 using System.Linq;
 using System.IO;
 using System;
-using UnityEngine;
 
 namespace C2M2.NeuronalDynamics.UGX
 {
@@ -16,7 +15,7 @@ namespace C2M2.NeuronalDynamics.UGX
         /// <summary>
         /// This is the list of nodes and each node is information attached to it
         /// </summary>
-        public List<NodeData> nodeData = new List<NodeData>();
+        public List<NodeData> nodes = new List<NodeData>();
         /// <summary>
         /// this is the edge list, the first integer is the from index and the second index is the to index
         /// </summary>
@@ -48,14 +47,14 @@ namespace C2M2.NeuronalDynamics.UGX
         /// </summary>
         public struct NodeData
         {
-            public int id { get; set; }
-            public int pid { get; set; }    // need to check this
-            public int nodeType { get; set; }
-            public double nodeRadius { get; set; }
-            public double xcoords { get; set; }
-            public double ycoords { get; set; }
-            public double zcoords { get; set; }
-            public List<int> neighborIDs { get; set; }
+            public int Id { get; set; }
+            public int Pid { get; set; }
+            public int NodeType { get; set; }
+            public double NodeRadius { get; set; }
+            public double Xcoords { get; set; }
+            public double Ycoords { get; set; }
+            public double Zcoords { get; set; }
+            public List<int> NeighborIDs { get; set; }
         }
         /// <summary>
         /// This will initialize the Neuron, the grid parameter is read in
@@ -66,62 +65,62 @@ namespace C2M2.NeuronalDynamics.UGX
         {
             AttachmentHandler.Available();
             VertexAttachementAccessor<DiameterData> accessor = new VertexAttachementAccessor<DiameterData>(grid);
-            Mesh gridMesh = grid.Mesh;
-            List<Vertex> gridVertices = grid.Vertices;
-            Vector3[] meshVertices = gridMesh.vertices;
 
             int count = 0;
             edgeCount = grid.Edges.Count;
+            vertCount = grid.Vertices.Count;
+
             foreach (DiameterData diam in accessor)
             {
                 NodeData tempNode = new NodeData
                 {
-                    /// this gets the diameter, make sure to divide by 2
-                    nodeRadius = diam.Diameter / 2,
+                    /// this gets the radius by dividing the diameter by 2
+                    NodeRadius = diam.Diameter / 2,
 
                     /// this the node id --> these may not be consecutive
-                    id = gridVertices[count].Id,
+                    Id = grid.Vertices[count].Id,
 
                     /// these are the actual coordinates of the geometry --> NOTE: these are in [um] already!
-                    xcoords = meshVertices[count].x,
-                    ycoords = meshVertices[count].y,
-                    zcoords = meshVertices[count].z
+                    /// Currently uses Unity Mesh vertices. Should be changed to directly use geometry/Grid vertices
+                    Xcoords = grid.Mesh.vertices[count].x,
+                    Ycoords = grid.Mesh.vertices[count].y,
+                    Zcoords = grid.Mesh.vertices[count].z
                 };
 
                 /// this initializes an empty list for the neighbor id nodes
-                tempNode.neighborIDs = new List<int>();
+                tempNode.NeighborIDs = new List<int>();
 
                 /// this adds the neigbor ids to the list for this node
-                foreach (Vertex neighborVertex in gridVertices[count].Neighbors)
+                foreach (Vertex neighborVertex in grid.Vertices[count].Neighbors)
                 {
-                    tempNode.neighborIDs.Add(neighborVertex.Id);
+                    tempNode.NeighborIDs.Add(neighborVertex.Id);
                 }
 
-                /// if a node has only one neighbor then it is a boundary node
-                if (tempNode.neighborIDs.Count == 1)
-                {	
-                    /// add the boundary node id to the list
-                    boundaryID.Add(tempNode.id);                      
-                }
+
 
                 /// this for loop is for setting the pid, parent id
                 for (int i = 0; i < edgeCount; i++)
                 {
                     /// the zero-th node has parent -1 --> NOTE: is this alway true, need to check this!!
-                    if (tempNode.id == 0) tempNode.pid = -1;
-                    else if (tempNode.id == grid.Edges[i].To.Id) tempNode.pid = grid.Edges[i].From.Id;
+                    if (tempNode.Id == 0) tempNode.Pid = -1;
+                    else if (tempNode.Id == grid.Edges[i].To.Id) tempNode.Pid = grid.Edges[i].From.Id;
                 }
 
-                nodeData.Add(tempNode);
-                /// this increments the counter for the number of vertices --> is this even used?? may need to remove!
+                nodes.Add(tempNode);
                 count = count + 1;
             }
-            vertCount = gridMesh.vertexCount;
             /// this loop collects the edges and gets the lengths of the edges
             for (int i = 0; i < edgeCount; i++)
             {
                 edges.Add((Tuple.Create(grid.Edges[i].From.Id, grid.Edges[i].To.Id)));
                 edgeLengths.Add(GetEdgeLength(grid.Edges[i].From.Id, grid.Edges[i].To.Id));
+            }
+
+            /// if a node has only one neighbor then it is a boundary node
+            foreach (NodeData node in nodes)
+            {
+                /// add the boundary node id to the list
+                if (node.NeighborIDs.Count == 1) boundaryID.Add(node.Id);
             }
             somaIDs = grid.Subsets["soma"].Indices.ToList();
         }
@@ -134,7 +133,7 @@ namespace C2M2.NeuronalDynamics.UGX
             StreamWriter file = File.AppendText(outFile);
             for (int i = 0; i < this.vertCount; i++)
             {
-                file.WriteLine(nodeData[i].id.ToString() + " " + 1.ToString() + " " + nodeData[i].xcoords.ToString() + " " + nodeData[i].ycoords.ToString() + " " + nodeData[i].zcoords.ToString() + " " + nodeData[i].nodeRadius.ToString() + " " + nodeData[i].pid.ToString());
+                file.WriteLine(nodes[i].Id.ToString() + " " + 1.ToString() + " " + nodes[i].Xcoords.ToString() + " " + nodes[i].Ycoords.ToString() + " " + nodes[i].Zcoords.ToString() + " " + nodes[i].NodeRadius.ToString() + " " + nodes[i].Pid.ToString());
             }
 
             file.Close();
@@ -166,13 +165,13 @@ namespace C2M2.NeuronalDynamics.UGX
         public double GetEdgeLength(int startId, int endId)
         {
             /// get the coordinates of the start node
-            double x1 = nodeData[startId].xcoords;
-            double y1 = nodeData[startId].ycoords;
-            double z1 = nodeData[startId].zcoords;
+            double x1 = nodes[startId].Xcoords;
+            double y1 = nodes[startId].Ycoords;
+            double z1 = nodes[startId].Zcoords;
             /// get the coordinates of the end node
-            double x2 = nodeData[endId].xcoords;
-            double y2 = nodeData[endId].ycoords;
-            double z2 = nodeData[endId].zcoords;
+            double x2 = nodes[endId].Xcoords;
+            double y2 = nodes[endId].Ycoords;
+            double z2 = nodes[endId].Zcoords;
             /// calculate the square of th differences
             double dx2 = (x1 - x2) * (x1 - x2);
             double dy2 = (y1 - y2) * (y1 - y2);

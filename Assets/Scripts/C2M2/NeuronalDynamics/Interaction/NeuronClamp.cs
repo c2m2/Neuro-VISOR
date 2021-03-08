@@ -132,7 +132,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         {
             currentVisualizationScale = (float)simulation.VisualInflation;
 
-            float radiusScalingValue = radiusRatio * (float)cellNodeData.nodeRadius;
+            float radiusScalingValue = radiusRatio * (float)cellNodeData.NodeRadius;
             float heightScalingValue = heightRatio * simulation.AverageDendriteRadius;
 
             //Ensures clamp is always at least as wide as tall when Visual Inflation is 1
@@ -194,7 +194,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         /// </summary>
         public void SetRotation(Neuron.NodeData cellNodeData)
         {
-            List<int> neighbors = cellNodeData.neighborIDs;
+            List<int> neighbors = cellNodeData.NeighborIDs;
 
             // Get each neighbor's Vector3 value
             List<Vector3> neighborVectors = new List<Vector3>();
@@ -206,18 +206,18 @@ namespace C2M2.NeuronalDynamics.Interaction
             Vector3 rotationVector;
             if (neighborVectors.Count == 2)
             {
-                Vector3 clampToFirstNeighborVector = neighborVectors[0] - simulation.Verts1D[cellNodeData.id];
-                Vector3 clampToSecondNeighborVector = neighborVectors[1] - simulation.Verts1D[cellNodeData.id];
+                Vector3 clampToFirstNeighborVector = neighborVectors[0] - simulation.Verts1D[cellNodeData.Id];
+                Vector3 clampToSecondNeighborVector = neighborVectors[1] - simulation.Verts1D[cellNodeData.Id];
 
                 rotationVector = clampToFirstNeighborVector.normalized - clampToSecondNeighborVector.normalized;
             }
-            else if (neighborVectors.Count > 0)
+            else if (neighborVectors.Count > 0 && cellNodeData.Pid != -1) //Nodes with a Pid of -1 are somas
             {
-                rotationVector = simulation.Verts1D[cellNodeData.pid].normalized - transform.parent.localPosition.normalized;
+                rotationVector = simulation.Verts1D[cellNodeData.Pid].normalized - transform.parent.localPosition.normalized;
             }
             else
             {
-                rotationVector = Vector3.up; //if a clamp has no neighbors it will use a default orientation of facing up
+                rotationVector = Vector3.up; //if a clamp has no neighbors or is soma it will use a default orientation of facing up
             }
             transform.parent.localRotation = Quaternion.LookRotation(rotationVector);
         }
@@ -253,7 +253,7 @@ namespace C2M2.NeuronalDynamics.Interaction
                     Destroy(transform.parent.gameObject);
                 }
 
-                Neuron.NodeData clampCellNodeData = simulation.Neuron.nodeData[clampIndex];
+                Neuron.NodeData clampCellNodeData = simulation.Neuron.nodes[clampIndex];
 
                 if(simulation.Neuron.somaIDs.Contains(clampIndex)) somaClamp = true;
 

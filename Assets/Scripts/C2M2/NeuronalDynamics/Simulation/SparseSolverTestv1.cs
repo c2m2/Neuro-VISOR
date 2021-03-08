@@ -384,13 +384,13 @@ namespace C2M2.NeuronalDynamics.Simulation
             for (int j = 0; j < myCell.vertCount; j++)
             {
                 /// <c>nghbrlist = myCell.nodeData[j].neighborIDs;</c> this gets the current neighbor list for node j \n
-                nghbrlist = myCell.nodeData[j].neighborIDs;
+                nghbrlist = myCell.nodes[j].NeighborIDs;
                 /// <c>nghbrLen = nghbrlist.Count();</c> this is the length of the neighbor list \n
                 nghbrLen = nghbrlist.Count();
                 edgelengths.Clear();
                 sumRecip = 0;
                 /// <c>tempRadius = myCell.nodeData[j].nodeRadius*scf;</c> get the current radius at node j \n
-                tempRadius = myCell.nodeData[j].nodeRadius*scf;
+                tempRadius = myCell.nodes[j].NodeRadius*scf;
 
                 /// in this loop we collect the edgelengths that go to node j, and we compute the coefficient given in our paper \n
                 for (int p = 0; p < nghbrLen; p++)
@@ -399,7 +399,7 @@ namespace C2M2.NeuronalDynamics.Simulation
                     tempEdgeLen = myCell.GetEdgeLength(j, nghbrlist[p])*scf;
                     /// <c>edgelengths.Add(tempEdgeLen);</c> put the edge length in the list, this list of edges will have length equal to length of neighbor list \n
                     edgelengths.Add(tempEdgeLen);
-                    sumRecip = sumRecip + 1 / (tempEdgeLen * tempRadius * ((1 / (myCell.nodeData[nghbrlist[p]].nodeRadius*scf* myCell.nodeData[nghbrlist[p]].nodeRadius*scf)) + (1 / (tempRadius * tempRadius))));
+                    sumRecip = sumRecip + 1 / (tempEdgeLen * tempRadius * ((1 / (myCell.nodes[nghbrlist[p]].NodeRadius*scf* myCell.nodes[nghbrlist[p]].NodeRadius*scf)) + (1 / (tempRadius * tempRadius))));
                 }
                 /// get the average edge lengths of neighbors \n
                 /// <c>foreach {... aveEdgeLengths = aveEdgeLengths + val;} aveEdgeLengths = aveEdgeLengths / edgelengths.Count;</c>
@@ -415,8 +415,8 @@ namespace C2M2.NeuronalDynamics.Simulation
                 /// set off diagonal entries by going through the neighbor list, and using <c>rhs.At()</c>
                 for (int p = 0; p < nghbrLen; p++)
                 {
-                    rhs.At(j, nghbrlist[p], k / (2 * res * cap * tempRadius* aveEdgeLengths * edgelengths[p] * ((1 / (myCell.nodeData[nghbrlist[p]].nodeRadius*scf * myCell.nodeData[nghbrlist[p]].nodeRadius*scf)) + (1 / (tempRadius * tempRadius)))));
-                    lhs.At(j, nghbrlist[p], -1.0 * k / (2 * res * cap * tempRadius * aveEdgeLengths * edgelengths[p] * ((1 / (myCell.nodeData[nghbrlist[p]].nodeRadius*scf * myCell.nodeData[nghbrlist[p]].nodeRadius*scf)) + (1 / (tempRadius * tempRadius)))));
+                    rhs.At(j, nghbrlist[p], k / (2 * res * cap * tempRadius* aveEdgeLengths * edgelengths[p] * ((1 / (myCell.nodes[nghbrlist[p]].NodeRadius*scf * myCell.nodes[nghbrlist[p]].NodeRadius*scf)) + (1 / (tempRadius * tempRadius)))));
+                    lhs.At(j, nghbrlist[p], -1.0 * k / (2 * res * cap * tempRadius * aveEdgeLengths * edgelengths[p] * ((1 / (myCell.nodes[nghbrlist[p]].NodeRadius*scf * myCell.nodes[nghbrlist[p]].NodeRadius*scf)) + (1 / (tempRadius * tempRadius)))));
                 }
             }
             //rhs.At(0, 0, 1);
