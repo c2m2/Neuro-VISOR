@@ -349,7 +349,7 @@ MonoBehaviour:
   unitText: {fileID: 4315962634380045234}
   titleText: {fileID: 343783307095394089}
   outline: {fileID: 9084418040506120669}
-  unit: V
+  unit: mV
   precision: F4
 --- !u!1 &5453933664328044471
 GameObject:
