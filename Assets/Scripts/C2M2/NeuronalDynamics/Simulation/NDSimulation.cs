@@ -129,6 +129,22 @@ namespace C2M2.NeuronalDynamics.Simulation {
         public float lineWidth1D = 0.005f;
 
         public GameObject controlPanel = null;
+        /// <summary>
+        /// Unit display string that can be manually set by the user
+        /// </summary>
+        [Tooltip("Unit display string that can be manually set by the user")]
+        public string unit = "mV";
+        /// <summary>
+        /// Can be used to manually convert Gradient Display values to match unit string
+        /// </summary>
+        [Tooltip("Can be used to manually convert Gradient Display values to match unit string")]
+        public float unitScaler = 1000f;
+        /// <summary>
+        /// Alter the precision of the color scale display
+        /// </summary>
+        [Tooltip("Alter the precision of the color scale display")]
+        public int colorScalePrecision = 3;
+
         // Need mesh options for each refinement, diameter level
         [Tooltip("Name of the vrn file within Assets/StreamingAssets/NeuronalDynamics/Geometries")]
         public string vrnFileName = "test.vrn";
@@ -440,6 +456,9 @@ namespace C2M2.NeuronalDynamics.Simulation {
                         gradientDisplay.gradient = colorLUT.Gradient;
                     }
                     else if (colorLUT == null) { Debug.LogWarning("No ColorLUT found on MeshSimulation"); }
+                    gradientDisplay.unit = unit;
+                    gradientDisplay.scaler = unitScaler;
+                    gradientDisplay.precision = "F" + colorScalePrecision.ToString();
                 }
                 else if (gradientDisplay == null) { Debug.LogWarning("No GradientDisplay found on NDControls"); }
             }

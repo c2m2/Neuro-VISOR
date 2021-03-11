@@ -30,7 +30,7 @@ namespace C2M2.Interaction.VR
             // Get VR device (or lack of one)
             // Note: in Unity 2019.4 XRDevice.model is obsolete but still works.
             InputDevice inputDevice = new InputDevice();
-            Debug.Log("inputDevice.name: " + inputDevice.name);
+            Debug.Log("VR Device Name: " + inputDevice.name);
             if (XRDevice.model.Equals(string.Empty)) vrDevice = "null";
             else vrDevice = XRDevice.model;
 

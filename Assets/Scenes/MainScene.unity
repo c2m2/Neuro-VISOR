@@ -210,6 +210,9 @@ MonoBehaviour:
   endTime: 100
   raycastHitValue: 0.05
   solverType: SparseSolverTestv1
+  unit: mV
+  unitScaler: 1000
+  colorScalePrecision: 1
 --- !u!114 &99744260
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -244,7 +247,6 @@ MonoBehaviour:
   - {x: 0, y: 0, z: 0}
   - {x: 0, y: 0, z: -1}
   - {x: 0, y: 0, z: 1}
-  - {x: 0, y: 0, z: -2}
   stackPos: 1
 --- !u!4 &162213797 stripped
 Transform:

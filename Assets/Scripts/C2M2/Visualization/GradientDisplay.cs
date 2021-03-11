@@ -19,7 +19,8 @@ namespace C2M2.Visualization
         public TextMeshProUGUI unitText = null;
         public GameObject titleText = null;
         public LineRenderer outline = null;
-        public string unit = "mV";
+        public float scaler = 1;
+        public string unit = "unit";
         public string precision = "F4";
 
         private float LineWidth
@@ -136,42 +137,44 @@ namespace C2M2.Visualization
             {
                 Destroy(marker.gameObject);
             }
+
             BuildNewMarkers();
 
-            if(unitText != null)
+            if (unitText != null)
             {
                 unitText.text = unit;
             }
-        }
-        private void BuildNewMarkers()
-        {
-            float max = sim.colorLUT.GlobalMax;
-            float min = sim.colorLUT.GlobalMin;
-            float valueStep = (max - min) / (numTextMarkers - 1);
-            float placementStep = displayLength / (numTextMarkers - 1);
-            for (int i = 0; i < numTextMarkers; i++)
+
+            void BuildNewMarkers()
             {
-                GameObject newMarker = Instantiate(textMarkerPrefab, textMarkerHolder.transform);
-                newMarker.transform.localPosition = new Vector3(i * placementStep, -displayHeight, 0f);
-                newMarker.GetComponent<TextMeshProUGUI>().text = (min + (i * valueStep)).ToString(precision);
-                LineRenderer lineMarker = newMarker.GetComponentInChildren<LineRenderer>();
-                if(lineMarker != null)
+                float max = scaler * sim.colorLUT.GlobalMax;
+                float min = scaler * sim.colorLUT.GlobalMin;
+                float valueStep = (max - min) / (numTextMarkers - 1);
+                float placementStep = displayLength / (numTextMarkers - 1);
+                for (int i = 0; i < numTextMarkers; i++)
                 {
-                    lineMarker.transform.localPosition = new Vector3(0f, displayHeight/newMarker.transform.localScale.y/2, 0f);
-                    lineMarker.positionCount = 2;
-                    lineMarker.SetPositions(new Vector3[] {
+                    GameObject newMarker = Instantiate(textMarkerPrefab, textMarkerHolder.transform);
+                    newMarker.transform.localPosition = new Vector3(i * placementStep, -displayHeight, 0f);
+                    newMarker.GetComponent<TextMeshProUGUI>().text = (min + (i * valueStep)).ToString(precision);
+                    LineRenderer lineMarker = newMarker.GetComponentInChildren<LineRenderer>();
+                    if (lineMarker != null)
+                    {
+                        lineMarker.transform.localPosition = new Vector3(0f, displayHeight / newMarker.transform.localScale.y / 2, 0f);
+                        lineMarker.positionCount = 2;
+                        lineMarker.SetPositions(new Vector3[] {
                         new Vector3(0f, displayHeight, 0f),
                         new Vector3(0f, -displayHeight/4, 0f) });
-                 //   lineMarker.SetPosition(0, Vector3.zero);
-                  //  lineMarker.SetPosition(1, new Vector3(displayLength * 1.5f, 0f, 0f));
-                    lineMarker.startWidth = LineWidth;
-                    lineMarker.endWidth = LineWidth;
+                        //   lineMarker.SetPosition(0, Vector3.zero);
+                        //  lineMarker.SetPosition(1, new Vector3(displayLength * 1.5f, 0f, 0f));
+                        lineMarker.startWidth = LineWidth;
+                        lineMarker.endWidth = LineWidth;
+                    }
+                    else
+                    {
+                        Debug.LogWarning("No line marker found on text marker prefab!");
+                    }
                 }
-                else
-                {
-                    Debug.LogWarning("No line marker found on text marker prefab!");
-                }
-            }        
+            }
         }
     }
 }
