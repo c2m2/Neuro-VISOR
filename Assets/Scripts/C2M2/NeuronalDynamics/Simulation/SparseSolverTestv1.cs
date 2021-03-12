@@ -182,7 +182,7 @@ namespace C2M2.NeuronalDynamics.Simulation
                 {
                     /// define the current time slice to send and initialize it to the correct size which is the number of vertices in the geometry
                     /// initialize it to the current state of the voltage, this is the voltage we are sending back to vr simulation
-                    Vector curTimeSlice = U.SubVector(0, Neuron.vertCount);
+                    Vector curTimeSlice = U.SubVector(0, Neuron.nodes.Count);
                     curTimeSlice.Multiply(1, curTimeSlice);   
                     /// convert the time slice to an Array
                     curVals = curTimeSlice.ToArray();
@@ -214,7 +214,7 @@ namespace C2M2.NeuronalDynamics.Simulation
                     if (newVal != null)
                     {
                         /// here we set the voltage at the location, notice that we multiply by 0.0001 to convert to volts [V] 
-                        if (newVal.Item1 >= 0 && newVal.Item1 < Neuron.vertCount)
+                        if (newVal.Item1 >= 0 && newVal.Item1 < Neuron.nodes.Count)
                         {
                             //   UnityEngine.Debug.Log("U[" + newVal.Item1 + "] = " + newVal.Item2);
                             U[newVal.Item1] = newVal.Item2;
@@ -246,7 +246,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         {
             InitializeNeuronCell();
             ///<c>R</c> this is the reaction vector for the reaction solve
-            R = Vector.Build.Dense(Neuron.vertCount);
+            R = Vector.Build.Dense(Neuron.nodes.Count);
             ///<c>reactConst</c> this is a small list for collecting the conductances and reversal potential which is sent to the reaction solve routine
             reactConst = new List<double> { gk, gna, gl, ek, ena, el };
             ///<c>List<CoordinateStorage<double>> sparse_stencils = makeSparseStencils(Neuron, res, cap, k);</c> Construct sparse RHS and LHS in coordinate storage format, no zeros are stored \n
@@ -256,7 +256,7 @@ namespace C2M2.NeuronalDynamics.Simulation
             r_csc = CompressedColumnStorage<double>.OfIndexed(sparse_stencils[0]); //null;
             l_csc = CompressedColumnStorage<double>.OfIndexed(sparse_stencils[1]); //null;
             ///<c>double [] b</c> we define storage for the diffusion solve part
-            b = new double[Neuron.vertCount];
+            b = new double[Neuron.nodes.Count];
             ///<c>var lu = SparseLU.Create(l_csc, ColumnOrdering.MinimumDegreeAtA, 0.1);</c> this creates the LU decomposition of the HINES matrix which is defined by <c>l_csc</c>
             lu = SparseLU.Create(l_csc, ColumnOrdering.MinimumDegreeAtA, 0.1);
         }
@@ -300,14 +300,14 @@ namespace C2M2.NeuronalDynamics.Simulation
             /// <c>U.SetSubVector(0, Neuron.vertCount, Vector.Build.DenseOfArray(b));</c> this sets the U vector to the voltage at the end of the diffusion solve
             r_csc.Multiply(U.ToArray(), b);
             lu.Solve(b, b);
-            U.SetSubVector(0, Neuron.vertCount, Vector.Build.DenseOfArray(b));
+            U.SetSubVector(0, Neuron.nodes.Count, Vector.Build.DenseOfArray(b));
             /// this part solves the reaction portion of the operator splitting \n
             /// <c>R.SetSubVector(0, Neuron.vertCount, reactF(reactConst, U, N, M, H, cap));</c> this first evaluates at the reaction function \f$r(V)\f$ \n
             /// <c>R.Multiply(k, R); </c> this multiplies by the time step size \n
             /// <c>U.add(R,U)</c> adds it back to U to finish off the operator splitting
             /// For the reaction solve we are solving
             /// \f[\frac{U_{next}-U_{curr}}{k} = R(U_{curr})\f]
-            R.SetSubVector(0, Neuron.vertCount, reactF(reactConst, U, N, M, H, cap));
+            R.SetSubVector(0, Neuron.nodes.Count, reactF(reactConst, U, N, M, H, cap));
             R.Multiply(k, R);
             U.Add(R, U);
             /// this part solve the state variables using Forward Euler
@@ -331,10 +331,10 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// </summary>
         private void InitializeNeuronCell()
         {
-            U = Vector.Build.Dense(Neuron.vertCount, 0);
-            M = Vector.Build.Dense(Neuron.vertCount, mi);
-            N = Vector.Build.Dense(Neuron.vertCount, ni);
-            H = Vector.Build.Dense(Neuron.vertCount, hi);
+            U = Vector.Build.Dense(Neuron.nodes.Count, 0);
+            M = Vector.Build.Dense(Neuron.nodes.Count, mi);
+            N = Vector.Build.Dense(Neuron.nodes.Count, ni);
+            H = Vector.Build.Dense(Neuron.nodes.Count, hi);
         }
         /// <summary>
         /// This is for constructing the lhs and rhs of system matrix \n
@@ -365,8 +365,8 @@ namespace C2M2.NeuronalDynamics.Simulation
 
             /// initialize new coordinate storage \n
             /// <c>var rhs = new CoordinateStorage<double>(myCell.vertCount, myCell.vertCount, myCell.vertCount * myCell.vertCount);</c> this initializes our empty coordinate storage matrices <c>rhs</c> and <c>lhs</c>
-            var rhs = new CoordinateStorage<double>(myCell.vertCount, myCell.vertCount, myCell.vertCount * myCell.vertCount);
-            var lhs = new CoordinateStorage<double>(myCell.vertCount, myCell.vertCount, myCell.vertCount * myCell.vertCount);
+            var rhs = new CoordinateStorage<double>(myCell.nodes.Count, myCell.nodes.Count, myCell.nodes.Count * myCell.nodes.Count);
+            var lhs = new CoordinateStorage<double>(myCell.nodes.Count, myCell.nodes.Count, myCell.nodes.Count * myCell.nodes.Count);
 
             /// for keeping track of the neighbors of a node \n
             /// <c>List<int> nghbrlist;</c> this is for collecting the neighbor indices of the current node 
@@ -381,7 +381,7 @@ namespace C2M2.NeuronalDynamics.Simulation
             double sumRecip = 0;
             double scf = 1E-6;  /// 1e-6 scale factor to convert to micrometers for radii and edge length \n
 
-            for (int j = 0; j < myCell.vertCount; j++)
+            for (int j = 0; j < myCell.nodes.Count; j++)
             {
                 /// <c>nghbrlist = myCell.nodeData[j].neighborIDs;</c> this gets the current neighbor list for node j \n
                 nghbrlist = myCell.nodes[j].NeighborIDs;
@@ -396,7 +396,7 @@ namespace C2M2.NeuronalDynamics.Simulation
                 for (int p = 0; p < nghbrLen; p++)
                 {
                     /// <c>tempEdgeLen = myCell.GetEdgeLength(j, nghbrlist[p])*scf;</c> get the edge length at current node j, to node neighbor p, scale to micro meters \n
-                    tempEdgeLen = myCell.GetEdgeLength(j, nghbrlist[p])*scf;
+                    tempEdgeLen = myCell.GetEdgeLength(myCell.nodes[j], myCell.nodes[nghbrlist[p]])*scf;
                     /// <c>edgelengths.Add(tempEdgeLen);</c> put the edge length in the list, this list of edges will have length equal to length of neighbor list \n
                     edgelengths.Add(tempEdgeLen);
                     sumRecip = sumRecip + 1 / (tempEdgeLen * tempRadius * ((1 / (myCell.nodes[nghbrlist[p]].NodeRadius*scf* myCell.nodes[nghbrlist[p]].NodeRadius*scf)) + (1 / (tempRadius * tempRadius))));

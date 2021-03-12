@@ -5,7 +5,6 @@ using System;
 
 namespace C2M2.NeuronalDynamics.UGX
 {
-    using DiameterAttachment = IAttachment<DiameterData>;
     /// <summary>
     /// This is the Neuron Class, it allows the user to initialize the different quantities of the geometry
     /// and gives some ease of access to the the components of the geometry
@@ -13,34 +12,22 @@ namespace C2M2.NeuronalDynamics.UGX
     public class Neuron
     {
         /// <summary>
-        /// This is the list of nodes and each node is information attached to it
+        /// This is the list of nodes that the 1d graph geometry has
         /// </summary>
         public List<NodeData> nodes = new List<NodeData>();
         /// <summary>
-        /// this is the edge list, the first integer is the from index and the second index is the to index
+        /// this is the list of edges in the 1d graph geometry
         /// </summary>
-        public List<Tuple<int, int>> edges = new List<Tuple<int, int>>();
+        public List<Edge> edges = new List<Edge>();
         /// <summary>
-        /// this is a list of all the edgelengths, there is a built in routine that computes the edge length
+        /// this is the a list of the nodes that are the ends of the dendrites, they only have one neighbor
         /// </summary>
-        public List<double> edgeLengths = new List<double>();
-        /// <summary>
-        /// this is the a list of the indices that are the ends of the denrites, they only have one neighbor
-        /// </summary>
-        public List<int> boundaryID = new List<int>();
+        public List<NodeData> boundaryID = new List<NodeData>();
         /// <summary>
         /// this is the soma index, this is good know, it is a list because in possible cases
         /// a soma maybe a segment of points, not a singular point
         /// </summary>
         public List<int> somaIDs = new List<int>();
-        /// <summary>
-        /// this is the vertiex count, the number of vertices that the 1d graph geometry has
-        /// </summary>
-        public int vertCount = new int();
-        /// <summary>
-        /// this is the number of edges in the 1d graph geometry
-        /// </summary>
-        public int edgeCount = new int();
         /// <summary>
         /// This is the NodeData structure, it will group information together corresponding to each node in the 1D graph geometry
         /// the information stored is analogous to what would be found in the 1D .swc file of the neuron geometry
@@ -56,6 +43,16 @@ namespace C2M2.NeuronalDynamics.UGX
             public double Zcoords { get; set; }
             public List<int> NeighborIDs { get; set; }
         }
+
+        /// <summary>
+        /// The Edge Structure represents an edge in the 1D graph geometry. It contains properties for the from node, to node, and length.
+        /// </summary>
+        public struct Edge
+        {
+            public NodeData From { get; set; }
+            public NodeData To { get; set; }
+            public double Length { get; set; }
+        }
         /// <summary>
         /// This will initialize the Neuron, the grid parameter is read in
         /// the grid parameter contains the geometric information from the .vrn files
@@ -67,8 +64,6 @@ namespace C2M2.NeuronalDynamics.UGX
             VertexAttachementAccessor<DiameterData> accessor = new VertexAttachementAccessor<DiameterData>(grid);
 
             int count = 0;
-            edgeCount = grid.Edges.Count;
-            vertCount = grid.Vertices.Count;
 
             foreach (DiameterData diam in accessor)
             {
@@ -96,10 +91,8 @@ namespace C2M2.NeuronalDynamics.UGX
                     tempNode.NeighborIDs.Add(neighborVertex.Id);
                 }
 
-
-
                 /// this for loop is for setting the pid, parent id
-                for (int i = 0; i < edgeCount; i++)
+                for (int i = 0; i < grid.Edges.Count; i++)
                 {
                     /// the zero-th node has parent -1 --> NOTE: is this alway true, need to check this!!
                     if (tempNode.Id == 0) tempNode.Pid = -1;
@@ -109,18 +102,25 @@ namespace C2M2.NeuronalDynamics.UGX
                 nodes.Add(tempNode);
                 count = count + 1;
             }
-            /// this loop collects the edges and gets the lengths of the edges
-            for (int i = 0; i < edgeCount; i++)
+
+            /// this loop collects the edges
+            for (int i = 0; i < grid.Edges.Count; i++)
             {
-                edges.Add((Tuple.Create(grid.Edges[i].From.Id, grid.Edges[i].To.Id)));
-                edgeLengths.Add(GetEdgeLength(grid.Edges[i].From.Id, grid.Edges[i].To.Id));
+                NodeData fromNode = nodes[grid.Edges[i].From.Id];
+                NodeData toNode = nodes[grid.Edges[i].To.Id];
+                edges.Add(new Edge {
+                    From = fromNode,
+                    To = toNode,
+                    Length = GetEdgeLength(fromNode, toNode)
+                }
+                );
             }
 
             /// if a node has only one neighbor then it is a boundary node
             foreach (NodeData node in nodes)
             {
-                /// add the boundary node id to the list
-                if (node.NeighborIDs.Count == 1) boundaryID.Add(node.Id);
+                /// add the boundary node to the list
+                if (node.NeighborIDs.Count == 1) boundaryID.Add(node);
             }
             somaIDs = grid.Subsets["soma"].Indices.ToList();
         }
@@ -131,7 +131,7 @@ namespace C2M2.NeuronalDynamics.UGX
         public void writeSWC(string outFile)
         {
             StreamWriter file = File.AppendText(outFile);
-            for (int i = 0; i < this.vertCount; i++)
+            for (int i = 0; i < nodes.Count; i++)
             {
                 file.WriteLine(nodes[i].Id.ToString() + " " + 1.ToString() + " " + nodes[i].Xcoords.ToString() + " " + nodes[i].Ycoords.ToString() + " " + nodes[i].Zcoords.ToString() + " " + nodes[i].NodeRadius.ToString() + " " + nodes[i].Pid.ToString());
             }
@@ -147,36 +147,40 @@ namespace C2M2.NeuronalDynamics.UGX
             "Min edge length = {4}\n" + 
             "Soma ID(s) = ({5})\n" + 
             "Boundary ID(s) = ({6})";
-        public override string ToString() => String.Format(
-            cellFormatString, 
-            vertCount,
-            edgeCount, 
-            edgeLengths.Max(), 
-            edgeLengths.Average(), 
+        public override string ToString()
+        {
+            IEnumerable<double> edgeLengths = edges.Select(edge => edge.Length);
+            return String.Format(
+            cellFormatString,
+            nodes.Count,
+            edges.Count,
+            edgeLengths.Max(),
+            edgeLengths.Average(),
             edgeLengths.Min(),
             String.Join(", ", somaIDs.Select(c => "'" + c + "'")),
             String.Join(", ", boundaryID.Select(c => "'" + c + "'")));
+        }
         /// <summary>
         /// this calculates the euclidean distance between node Start and node End
         /// </summary>
-        /// <param name="startId"></param> start node index
-        /// <param name="endId"></param> end node index
+        /// <param name="startNode"></param> start node
+        /// <param name="endNode"></param> end node
         /// <returns></returns>
-        public double GetEdgeLength(int startId, int endId)
+        public double GetEdgeLength(NodeData startNode, NodeData endNode)
         {
             /// get the coordinates of the start node
-            double x1 = nodes[startId].Xcoords;
-            double y1 = nodes[startId].Ycoords;
-            double z1 = nodes[startId].Zcoords;
+            double x1 = startNode.Xcoords;
+            double y1 = startNode.Ycoords;
+            double z1 = startNode.Zcoords;
             /// get the coordinates of the end node
-            double x2 = nodes[endId].Xcoords;
-            double y2 = nodes[endId].Ycoords;
-            double z2 = nodes[endId].Zcoords;
-            /// calculate the square of th differences
+            double x2 = endNode.Xcoords;
+            double y2 = endNode.Ycoords;
+            double z2 = endNode.Zcoords;
+            /// calculate the square of the differences
             double dx2 = (x1 - x2) * (x1 - x2);
             double dy2 = (y1 - y2) * (y1 - y2);
             double dz2 = (z1 - z2) * (z1 - z2);
-            ///return the squareroot
+            /// return the square root
             return Math.Sqrt(dx2 + dy2 + dz2);
         }
 
