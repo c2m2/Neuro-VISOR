@@ -463,7 +463,10 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 else if (gradientDisplay == null) { Debug.LogWarning("No GradientDisplay found on NDControls"); }
 
                 SimulationTimerLabel timeLabel = controlPanel.GetComponentInChildren<SimulationTimerLabel>();
-                timeLabel.sim = this;
+                if (timeLabel != null)
+                {
+                    timeLabel.sim = this;
+                }
             }
         }
 
