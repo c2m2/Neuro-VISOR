@@ -461,6 +461,9 @@ namespace C2M2.NeuronalDynamics.Simulation {
                     gradientDisplay.precision = "F" + colorScalePrecision.ToString();
                 }
                 else if (gradientDisplay == null) { Debug.LogWarning("No GradientDisplay found on NDControls"); }
+
+                SimulationTimerLabel timeLabel = controlPanel.GetComponentInChildren<SimulationTimerLabel>();
+                timeLabel.sim = this;
             }
         }
 
