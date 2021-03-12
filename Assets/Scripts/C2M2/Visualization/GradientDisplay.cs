@@ -17,7 +17,6 @@ namespace C2M2.Visualization
         public GameObject textMarkerPrefab = null;
         public GameObject textMarkerHolder = null;
         public TextMeshProUGUI unitText = null;
-        public GameObject titleText = null;
         public LineRenderer outline = null;
         public float scaler = 1;
         public string unit = "unit";
@@ -116,15 +115,6 @@ namespace C2M2.Visualization
                 UpdateText();
 
                 sim.colorLUT.hasChanged = false;
-
-                if(titleText != null)
-                {
-                    titleText.transform.localPosition = new Vector3(displayLength / 2, displayHeight, 0f);
-                }
-                else
-                {
-                    Debug.LogWarning("No title text found!");
-                }
             }
         }
         private void UpdateText()
