@@ -213,7 +213,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             }
             else if (neighborVectors.Count > 0 && cellNodeData.Pid != -1) //Nodes with a Pid of -1 are somas
             {
-                rotationVector = simulation.Verts1D[cellNodeData.Pid].normalized - transform.parent.localPosition.normalized;
+                rotationVector = simulation.Verts1D[cellNodeData.Pid] - simulation.Verts1D[cellNodeData.Id];
             }
             else
             {
@@ -272,6 +272,7 @@ namespace C2M2.NeuronalDynamics.Interaction
                 simulation.clampMutex.WaitOne();
                 this.simulation.clamps.Add(this);
                 simulation.clampMutex.ReleaseMutex();
+
 
                 transform.parent.localPosition = focusPos;
             }
