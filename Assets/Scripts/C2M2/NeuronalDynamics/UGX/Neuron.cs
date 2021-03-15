@@ -140,7 +140,7 @@ namespace C2M2.NeuronalDynamics.UGX
             edgeLengths.Average(),
             edgeLengths.Min(),
             String.Join(", ", somaIDs.Select(c => "'" + c + "'")),
-            String.Join(", ", boundaryNode.Select(c => "'" + c + "'")));
+            String.Join(", ", boundaryNode.Select(c => "'" + c.Id + "'")));
         }
         /// <summary>
         /// this calculates the euclidean distance between node Start and node End

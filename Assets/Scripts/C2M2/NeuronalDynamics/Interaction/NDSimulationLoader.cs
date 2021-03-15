@@ -18,6 +18,21 @@ namespace C2M2.NeuronalDynamics.Interaction
         public double raycastHitValue = 0.05;
 
         public string solverType = "SparseSolverTestv1";
+        /// <summary>
+        /// Unit display string that can be manually set by the user
+        /// </summary>
+        [Tooltip("Unit display string that can be manually set by the user")]
+        public string unit = "mV";
+        /// <summary>
+        /// Can be used to manually convert Gradient Display values to match unit string
+        /// </summary>
+        [Tooltip("Can be used to manually convert Gradient Display values to match unit string")]
+        public float unitScaler = 1000f;
+        /// <summary>
+        /// Alter the precision of the color scale display
+        /// </summary>
+        [Tooltip("Alter the precision of the color scale display")]
+        public int colorScalePrecision = 3;
 
         public void Load(RaycastHit hit)
         {
@@ -43,6 +58,9 @@ namespace C2M2.NeuronalDynamics.Interaction
             solver.k = timestepSize;
             solver.endTime = endTime;
             solver.raycastHitValue = raycastHitValue;
+            solver.unit = unit;
+            solver.unitScaler = unitScaler;
+            solver.colorScalePrecision = colorScalePrecision;
 
             try
             {

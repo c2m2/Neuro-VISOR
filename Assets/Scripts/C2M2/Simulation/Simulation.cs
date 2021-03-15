@@ -115,11 +115,6 @@ namespace C2M2.Simulation
                 // Some scripts change transform position for some reason, reset the position/rotation at the first frame
                 gameObject.AddComponent<Utils.DebugUtils.Actions.TransformResetter>();
 
-                foreach (SimulationTimerLabel simulationTimerLabel in GameManager.instance.timerLabels)
-                {
-                   simulationTimerLabel.sim = this;
-                }
-
                 OnStart();
 
                 if (startOnAwake) StartSimulation();
