@@ -1,24 +1,50 @@
-# virtual-reality
-Repository for Temple University's Center for Computational Mathematics and Modeling (C2M2)'s virtual reality project. This project provides a prototype for visualizing and interacting with computational simulations in virtual reality, with a particular emphasis placed on neuronal dynamics (ND) simulations.
+# C2M2-VR
+
+## Neuroscience project
+
+C2M2-VR is a project from Temple University's Center for Computational Mathematics and Modeling (C2M2). The overarching long-term vision is to produce novel concepts and software that enable efficient immersed virtual reality (VR) visualization and real-time interaction with simulations of real-world processes described via principled mathematical equations.
+
+This specific product [yet to be named] considers an application in neuroscience: a wire-frame neuron geometry file is retrieved from [NeuroMorpho](http://neuromorpho.org/) and a surface mesh is generated from it. This mesh is then visualized in VR, while an efficient numerical method solves (approximately) the Hodgkin-Huxley model on the given wire-frame neuron geometry. The simulation, as it is running, is provided to the VR environment in real time, and moreover, the user can interact with and affect the simulation while it is running via several methods outlined [below](#controls).
+
+# Research Team
+This project is produced at the Center for Computational Mathematics and Modeling (C2M2) at Temple University.
+
+Project lead: Dr. Benjamin Seibold, Dr. Gillian Queisser
+
+Researchers and developers: Craig Fox, Stephan Grein, Bogdan Nagirniak, James Rosado, Jacob Wells, Noah Williams.
+
+# License
+
+We use a modified version of the GNU LPGL v3. Our license can be found in LICENSE.txt
 
 ## Code quality
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/ac2c4122b3174e4a8209ef2e791792b3)](https://www.codacy.com?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=c2m2/virtual-reality&amp;utm_campaign=Badge_Grade)
 
-## Quick Start Guide
-1. Clone project to any location
-2. Ensure the correct version of the Unity Editor is installed
-3. Open project in Unity and open Assets/Scenes/MainScene. 
-4. Hodgkin-Huxley simulation code is provided locally within the project along with one example neuron geometry to run on. These should run automatically upon pressing play. Additional sample geometries can be downloaded from [INSERT LINK]. If using the Unity Editor, these geometries can be run by placing their .vrn archives within `Assets/StreamingAssets/NeuronalDynamics/Geometries`. If using a standalone build, the application will look for cell archives within `virtual-reality_Data\StreamingAssets\NeuronalDynamics\Geometries`. The cell previewer will select the first 12 cells that it finds in these directories for previewing.
+# Recommended hardware
 
-## Documentation
-Our code is documented [here](https://c2m2.github.io/doxyhtml/index.html)
+* **Oculus Rift, Rift S, or Quest Head Mounted Display (HMD)** - This project is currently tested on the Oculus Rift S and the Oculus Quest. It was previously developed on the original Rift headset. This project was developed using the Oculus SDK and may or may not work using other HMDs. A list of Oculus-approved computers can be found [here](https://www.oculus.com/rift-s/oculus-ready-pcs/).
 
-## Builds
-Standalone builds for Windows, Mac, and Linux can be downloaded from the "Releases" section. Standalone builds can be run as executable files without the need for the Unity editor and will improve time performance. Within a static build, custom .vrn cell archives can be placed within `virtual-reality_Data\StreamingAssets\NeuronalDynamics\Geometries` to be run within the application.
+* We do not have rigorously tested minimum computer specs. Our lab computer's hardware is listed below, but this program has been tested on several lower-end computers. With this hardware running this standalone build on the example cells included, the application performed "ideally": i.e. at around an average of 80 FPS. The Oculus has a hardware-side VSync of 80 FPS; this is the refresh rate of the Rift S HMD. This means that our performance of 80 FPS was "capped" at 80. It may be possible to replicate this performance using these same cells on lower-end computers, or using more complex neuron geometries on an identical computer. An FPS estimator can be seen at runtime on the lab model's TV screen.
 
-## Connect with us
-We have a [blog](https://c2m2vr.wordpress.com/) where we write up project updates, as well as a [trello board](https://trello.com/b/iQ9aepTn/virtual-reality).
-Other inquiries can be made to seibold@temple.edu.
+| Dell Precision 5820 Tower | |
+| :------------- | :---------- |
+| CPU | Intel Xeon W-2125 |
+| GPU | NVIDIA GeForce GTX 1080 |
+| RAM | 32 GB |
+
+# Recommended software
+
+- Unity 2019.4.19f1 (LTS)
+
+- Windows 10 64-bit - This program may be functional on other operating systems, but its performance is not guaranteed. The emulator functions have been tested on Ubuntu 16.04 LTS.
+
+- Relevant HMD software and drivers
+
+- We use the Oculus Desktop 2.38.4 package, but are planning to move to Unity's XR Plugin system soon.
+
+- Git version >= 2.7.0
+
+- Git LFS version >= 2.10.0
 
 ## Cloning this repository
 Git users (versions < 2.23.0) should clone the repository by using
@@ -26,23 +52,120 @@ Git users (versions < 2.23.0) should clone the repository by using
 
 For users of older git versions this remedies the problem that every LFS versioned file will ask the user for their password.
 
-## Software Requirements
-- Unity 2019.4.19f1 (LTS). This project has been tested using 2019.1, but commits can not be made without using version 2019.4.19f1.
-- Git version >= 2.7.0
-- Git LFS version >= 2.10.0
 ### Version Consistency
 A pre-commit hook will block commits made with inappropriate versions of Git, Git LFS, or Unity. Users should install the hooks by calling `./install_git_hooks.sh` from the root directory after cloning.
 - git lfs: `git lfs env` in a terminal/console.
 - git: `git --version`
 - Unity: see UnityEditor
 
-## Custom Simulation Code Guide
+## Quick Start Guide
 
-## Custom Cell Generation Guide
+
+# Use Guide
+
+## Starting the program
+
+Make sure that your HMD is set up and that you have gone through the first-time setup. Ideally you have tested several other programs on your headset before using this software.
+
+1. Clone project to any location
+
+2. Ensure the correct version of the Unity Editor is installed
+
+3. Open project in Unity and open Assets/Scenes/MainScene
+
+4. Place desired neuron cell files in `Assets/StreamingAssets/NeuronalDynamics/Geometries`. Any cells found in this directory will be available at runtime.
+
+5. Start the application by pressing play in the editor.
+
+6. Upon startup, the user is placed in a model of C2M2's lab. The application will detect a VR headset and launch in VR/keyboard emulator mode automatically.
+
+7. Our control scheme is outlined [below](#controls). Try moving around and looking at your hands.
+
+## Controls
+Oculus touch controller naming conventions can be found [here](https://docs.unity3d.com/2019.2/Documentation/Manual/OculusControllers.html). An instructional video demonstrating the controls can be found [here](https://drive.google.com/file/d/1tWS7FYvMIaawStV07K7PyEg2EZRHR93h/view?usp=sharing). The term 'Hand Trigger' and 'Grip Trigger'
+are used analogously throughout the project, as are the terms 'Index Trigger' and
+'Front Trigger'.
+
+| Action      | Rift Touch Controllers    | Keyboard/Mouse   |
+| :------------- | :---------- | :----------- |
+|  Toggle raycasting | (P) Button one (A/X)   | Always on   |
+| Grab | (H) Hand trigger | Not supported |
+| Interact   | Raycasting + (P/H) Index trigger  | (P/H) Left mouse button |
+Scale Object | Grab + Thumbstick up/down | N/A |
+Move camera | Walk around! | WASD |
+Rotate camera | Look around! | (H) Left-Ctrl + move mouse cursor |
+
+|  |  |
+| :----: | :-----: |
+| (P) | Press button once |
+| (H) | Hold button down |
+
+## Selecting a cell
+
+1.  A cell previewer stands against the whiteboard near the window. It attempts to render the 1D mesh of any neuron `.vrn` cell file archives found in `Assets/StreamingAssets/NeuronalDynamics/Geometries`. Three example cells are included with this repo. Several more cells can be found [here](https://drive.google.com/drive/folders/1kyz8S-txISfarPegJSMzABrF_UprH3Y-?usp=sharing).
+
+2.  Enable raycast mode in VR. The hand with raycast mode enabled should be constantly pointing forward.
+
+3.  With raycast mode enabled, hover over a cell preview window by pointing at it. A blue guide line should be drawn between your pointer finger and the preview window. Continue hovering to see the preview rotate, or press the Interact button to load the cell and launch solve code. The guide line should turn orange while pressing/holding. The geometry should render in the middle of the room, scaled to fit within the room and appearing in a uniform color. A color scale should now be displayed on the whiteboard.
+
+## Simple cell interaction
+
+#### Grabbing
+The cell can be grabbed by hovering your hand over the 3D geometry and pressing the hand trigger on that hand's controller. Once grabbed, you can  move and rotate cells freely.
+
+#### Resizing
+While grabbing a cell, hold the thumbstick up or down on the hand that is being used to grab the cell to resize the cell in world space. Note: this does not affect the environment of the solver code: the cell can be scaled freely in world space without affecting the stored vertex positions of the 1D or 3D meshes.
+
+## Ruler controls
+A ruler is spawned with every cell geometry. The ruler can be used to understand the length scale of the cell in its local space. While grabbing the ruler, resize it by moving the thumbstick up or down on the hand that is being used to grab the ruler.
+
+The measurements on the ruler will adapt to the world-space size of the geometry so that it can always act as a translator between the size of the cell in the user's space and the local length scales of the neuron.
+
+## Direct cell interaction
+With raycast mode enabled, point at the surface of the geometry. A blue line should be drawn between your pointer finger and the surface of the geometry. Tap the geometry from up close, or press the Interact button from a distance to directly alter simulation value at the nearest 1D vertex to the point of interaction. The guide line should turn orange upon pressing, and the surface of the geometry should change color to reflect the affected potential at the nearest 1D vertex on the geometry.
+
+## Clamp cell interaction
+Clamps can be used to continuously alter the value of a single vertex on the 1D mesh.
+
+#### Enable Clamp Mode
+With the cell loaded and raycast mode enabled, press the `Clamp Mode` button on the whiteboard. "Finger clamps" should appear on both of the user's pointer fingers whilst raycasting. The finger clamps should appear as cylinders on the user's pointer finger.
+
+With clamp mode enabled, interacting with the surface of the cell should place a cylindrical potential clamp on the cell near the point of interaction. The clamp will snap to the nearest 1D vertex to the 3D point of interaction, and will effect that 1D vertex on the 1D mesh.
+
+#### Toggling a clamp
+Enable or disable the clamp by tapping it from up close or pressing the Interact button while pointing at it from a distance. The clamp is gray when it is disabled. It's color when enabled should reflect the clamp's current potential value.
+
+#### Changing a clamp's power
+While the clamp is enabled, the clamp's power can be changed by pointing at it, holding the Interact button, and moving the controller's joystick up or down.
+
+#### Destroying a clamp
+Clamps can be destroyed by holding the Interact button briefly while pointing at the clamp, and then releasing the Interact button.
+
+#### Group clamp controls, clamp highlighting
+Users can place many clamps on the geometry. Clamps cannot be placed too near to each other, but there is no set limit to the number of clamps that can be placed.
+
+In addition to each clamp being individually interactable, the "finger clamps" mentioned in [Enable Clamp Mode](#enable-clamp-mode) are also interactable, and act as controllers for all existing clamps. Any control that can be done to a single clamp (toggle, alter power, destroy), can be done to all existing clamps at once by interacting with the finger clamp in the same manner.
+
+The user can highlight all clamps with a red sphere to clarify their position to the user. This is particularly useful on complicated geometries with many clamps attached. While pointing at the finger clamp and holding the Interact button, hold down the hand trigger to highlight all existing spheres.
+
+## Builds
+A standalone build for Windows 64-bit can be downloaded from the "Releases" section. Standalone builds can be run as executable files without the need for the Unity editor and will improve performance. Builds can be made by anybody with the Unity project, but we have made "approved" builds with relevant build information.
+
+Within a static build, custom .vrn cell archives can be placed within `virtual-reality_Data\StreamingAssets\NeuronalDynamics\Geometries` to be run within the application.
+
+## Documentation
+Our code is documented [here](https://c2m2.github.io/doxyhtml/index.html)
 
 ## Previously developed code
-Code was previously hosted on Gitlab [here](https://gitlab.com/vr-lab-repos). This repo still contains useful code for CUDA, compute shaders, Burst examples, OBJ and VTK handling. The code on Bitbucket [here](https://bitbucket.org/c2m2vr/workspace/projects/VIR) is now fully obsolete and replaced by this Github repository. VR grids are maintained [over here](https://github.com/stephanmg/vr-grids). Custom attributes which proved useful during development are maintained [here](https://github.com/stephanmg/vr-utils).
+VR grids are maintained [over here](https://github.com/stephanmg/vr-grids).
 
-## Cell Generation Disclaimer
-[Disclaimer ab cell artifacts from Dr. Queisser]
+Custom attributes which proved useful during development are maintained [here](https://github.com/stephanmg/vr-utils).
 
+Code was previously hosted on [Gitlab](https://gitlab.com/vr-lab-repos). This repo still contains useful code for CUDA, compute shaders, Burst examples, OBJ and VTK handling.
+
+## Connect with us
+We have a [blog](https://c2m2vr.wordpress.com/) where we sometimes write about our implementations.
+
+Inquiries about the project can be made to seibold@temple.edu.
+
+Performance issues or code-related questions can be sent to jacob.wells@temple.edu
