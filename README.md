@@ -11,7 +11,7 @@ This project is produced at the Center for Computational Mathematics and Modelin
 
 Project lead: Dr. Benjamin Seibold, Dr. Gillian Queisser
 
-Researchers and developers: Craig Fox, Stephan Grein, Bogdan Nagirniak, James Rosado, Jacob Wells, Noah Williams.
+Researchers and developers: [Craig Fox](https://github.com/CraigFox0), [Stephan Grein](https://github.com/stephanmg), Bogdan Nagirniak, [James Rosado](https://github.com/jarosado0911), [Jacob Wells](https://github.com/jacobwells97), Noah Williams.
 
 # License
 
