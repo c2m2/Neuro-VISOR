@@ -8,6 +8,16 @@ namespace C2M2.Visualization
 {
     public class LineGrapher : MonoBehaviour
     {
+        public RectTransform backgroundPanel = null;
+        public LineRenderer pointsRenderer;
+
+        public int numSamples = 20;
+
+        public float graphWidth = 500f;
+        public float localOriginX = 50f;
+        public float localOriginY = 50f;
+        public float globalLineWidth = 4f;
+
         #region GraphText
         public TextMeshProUGUI title;
         private string titleStr = "";
@@ -98,16 +108,6 @@ namespace C2M2.Visualization
         private string YMaxStr { set { if (yMaxLabel != null) yMaxLabel.text = value; } }
         #endregion
 
-        public RectTransform backgroundPanel = null;
-        public LineRenderer pointsRenderer;
-
-        public int numSamples = 20;
-
-        public float graphWidth = 500f;
-        public float localOriginX = 50f;
-        public float localOriginY = 50f;
-        public float globalLineWidth = 4f;
-
         // Keeping one list of Vector3's saves list operation time over storing a separate x and y list
         public List<Vector3> positions;
         // Used to convert list to array for LineRenderer
@@ -158,7 +158,7 @@ namespace C2M2.Visualization
 
             pointsRenderer.SetPositions(posArr);
         }
-        //private float 
+
         private void UpdateScale()
         {
             // Instead of rescaling the entire array of values each frame, 

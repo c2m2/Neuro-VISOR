@@ -122,11 +122,13 @@ MonoBehaviour:
   yMinLabel: {fileID: 94810161970429431}
   yMaxLabel: {fileID: 94810163329060118}
   backgroundPanel: {fileID: 94810163548613250}
-  graphWidth: 500
   pointsRenderer: {fileID: 94810163269178207}
   numSamples: 20
-  xValues: []
-  yValues: []
+  graphWidth: 500
+  localOriginX: 50
+  localOriginY: 50
+  globalLineWidth: 4
+  positions: []
 --- !u!65 &94810161931108650
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1830,7 +1832,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e6eef2fb2c067747b08a81eac6aa55a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  anchors: []
+  anchors:
+  - {fileID: 94810161949531445}
+  - {fileID: 94810162482611175}
+  - {fileID: 94810163845834331}
+  - {fileID: 94810162443872079}
   targetPos: {x: 0, y: 0, z: 0}
 --- !u!1 &94810163069149914
 GameObject:
