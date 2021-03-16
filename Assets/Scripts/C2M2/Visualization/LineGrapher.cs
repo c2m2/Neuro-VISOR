@@ -155,10 +155,15 @@ namespace C2M2.Visualization
         }
         private void UpdateRender()
         {
-            if (pointsRenderer == null) return;
+            if (pointsRenderer == null)
+            {
+                Debug.LogError("No LineRenderer found on " + pointsRenderer.name + "!");
+                return;
+            }
 
             // TODO: Can speed this up by checking new values to resolve rolling max/min
-           /* List<float> y = yValues.Rescale(0, graphWidth, YMin, YMax);
+            // Rescale from (Min, Max) to (0, graphWidth)
+            List<float> y = yValues.Rescale(0, graphWidth, YMin, YMax);
             List<float> x = xValues.Rescale(0, graphWidth, XMin, XMax);
             Vector3[] points = new Vector3[numSamples];
 
@@ -167,8 +172,9 @@ namespace C2M2.Visualization
                 points[i] = new Vector3(x[i], y[i], 0f);
             }
 
+            Debug.Log("Updating positions on " + name);
             pointsRenderer.SetPositions(points);
-            */
+            
         }
 
         public void SetLabels(string title = "", string xLabel = "", string yLabel = "")

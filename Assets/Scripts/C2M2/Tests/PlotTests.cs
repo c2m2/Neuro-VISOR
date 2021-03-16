@@ -24,13 +24,18 @@ namespace C2M2.Tests {
             if (runConstantTest) ConstantTest(constantTestPosition);
         }
 
-        private void SinTest(Vector3 position)
+        private LineGrapher InstantiateGraph(Vector3 position)
         {
             GameObject go = (GameObject)Instantiate(graphPrefab, transform);
             go.transform.localPosition = position;
             LineGrapher graph = go.GetComponent<LineGrapher>();
-
             if (graph == null) Debug.LogError("No LineGrapher found on " + go);
+            return graph;
+        }
+        private void SinTest(Vector3 position)
+        {
+            LineGrapher graph = InstantiateGraph(position);
+            graph.name = "SinPlotTest";
             graph.numSamples = 250;
             graph.SetLabels("Sin vs. Time", "Time", "Sin(Time)");
 
@@ -41,6 +46,7 @@ namespace C2M2.Tests {
 
             IEnumerator SinTest(LineGrapher sinGraph)
             {
+                yield return new WaitUntil(() => Time.time > 0);
                 while (true)
                 {
                     yield return new WaitForFixedUpdate();
@@ -50,12 +56,8 @@ namespace C2M2.Tests {
         }
         private void CosTest(Vector3 position)
         {
-            GameObject go = (GameObject)Instantiate(graphPrefab, transform);
-            go.transform.localPosition = position;
-
-            LineGrapher graph = go.GetComponent<LineGrapher>();
-            if (graph == null) Debug.LogError("No LineGrapher found on " + go);
-
+            LineGrapher graph = InstantiateGraph(position);
+            graph.name = "CosPlotTest";
             graph.numSamples = 250;
             graph.SetLabels("Cos vs. Time", "Time", "Cos(Time)");
 
@@ -66,6 +68,7 @@ namespace C2M2.Tests {
 
             IEnumerator CosTest(LineGrapher cosGraph)
             {
+                yield return new WaitUntil(() => Time.time > 0);
                 while (true)
                 {
                     yield return new WaitForFixedUpdate();
@@ -76,22 +79,18 @@ namespace C2M2.Tests {
 
         private void ConstantTest(Vector3 position)
         {
-            GameObject go = (GameObject)Instantiate(graphPrefab, transform);
-            go.transform.localPosition = position;
-
-            LineGrapher graph = go.GetComponent<LineGrapher>();
-            if (graph == null) Debug.LogError("No LineGrapher found on " + go);
-
+            LineGrapher graph = InstantiateGraph(position);
+            graph.name = "ConstPlotTest";
             graph.numSamples = 250;
-            graph.SetLabels("", "", "");
+            graph.SetLabels("Constant", "Time", "Y");
 
             graph.YMax = constant * 2;
             graph.YMin = 0;
 
             StartCoroutine(ConstantTest(graph));
-
             IEnumerator ConstantTest(LineGrapher constantGraph)
             {
+                yield return new WaitUntil(() => Time.time > 0);
                 while (true)
                 {
                     yield return new WaitForFixedUpdate();

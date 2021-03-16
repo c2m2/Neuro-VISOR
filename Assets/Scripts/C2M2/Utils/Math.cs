@@ -411,7 +411,44 @@ namespace C2M2
                 return list;
             }
             #endregion
+            #region Rescale
+            // when you have value c between a and b and you want a value x between y and z
+            // newVal = (oldVal - oldMin) * (newMax - newMin) / (oldMax - oldMin) + oldMin
+            // newVal = (oldVal - oldMin) * (newRange) / (oldRange) + oldMin
+            public static float[] Rescale(this float[] array, float newMin, float newMax, float oldMin, float oldMax)
+            {
+                float oldRange = oldMax - oldMin;
+                float newRange = newMax - newMin;
+                for(int i = 0; i < array.Length; i++)
+                {
+                    array[i] = (array[i] - oldMin) * (newRange) / (oldRange) + oldMin;
+                }
+                return array;
+            }
+
+            // when you have value c between a and b and you want a value x between y and z
+            // newVal = (oldVal - oldMin) * (newMax - newMin) / (oldMax - oldMin) + oldMin
+            // newVal = (oldVal - oldMin) * (newRange) / (oldRange) + oldMin
+            public static List<float> Rescale(this List<float> array, float newMin, float newMax, float oldMin, float oldMax)
+            {
+                float oldRange = oldMax - oldMin;
+                float newRange = newMax - newMin;
+                Debug.Log("Rescaling from (" + oldMin + ", " + oldMax + ") to (" + newMin + ", " + newMax + ")...");
+                List<float> newVals = new List<float>(array.Count);
+                if (oldRange == 0) Debug.LogError("Old Range is 0, cannot divide by 0!");
+                else
+                {
+                    for (int i = 0; i < array.Count; i++)
+                    {
+                        newVals.Add((array[i] - oldMin) * newRange / oldRange + oldMin);
+                    }
+                }
+                return newVals;
+            }
             #endregion
+            #endregion
+
+
 
             public static Vector3 Dot(this Vector3 a, Vector3 b)
             {
