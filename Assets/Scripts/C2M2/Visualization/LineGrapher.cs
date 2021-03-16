@@ -99,12 +99,19 @@ namespace C2M2.Visualization
         #endregion
 
         public RectTransform backgroundPanel = null;
+        public LineRenderer pointsRenderer;
+
+        public int numSamples = 20;
 
         public float graphWidth = 500f;
-        public LineRenderer pointsRenderer;
-        public int numSamples = 20;
-        public List<float> xValues;
-        public List<float> yValues;
+        public float localOriginX = 50f;
+        public float localOriginY = 50f;
+        public float globalLineWidth = 4f;
+
+        // Keeping one list of Vector3's saves list operation time over storing a separate x and y list
+        public List<Vector3> positions;
+        // Used to convert list to array for LineRenderer
+        private Vector3[] posArr;
 
         private void Start()
         {
@@ -113,68 +120,59 @@ namespace C2M2.Visualization
                 Debug.LogError("No renderer given for plot points!");
                 Destroy(this);
             }
-            xValues = new List<float>(numSamples);
-            yValues = new List<float>(numSamples);
+
+            positions = new List<Vector3>(numSamples);
+            posArr = new Vector3[numSamples];
 
             for (int i = 0; i < numSamples; i++)
             {
-                xValues.Add(0);
-                yValues.Add(0);
+                positions.Add(Vector3.zero);
             }
 
             pointsRenderer.positionCount = numSamples;
 
-            XMin = xValues[0];
-            XMax = xValues[xValues.Count - 1];
+            XMin = positions[0].x;
+            XMax = positions[numSamples - 1].x;
         }
-
-        public float ChangeMax(float newMax) => YMax = newMax;
-        public void ChangeMin(float newMin) => YMin = newMin;
-
-        public void AddValue(float y, float x = -1f)
+        
+        public void AddValue(float y, float x)
         {
-            if(x == -1f)
-            {
-                x = numSamples;
-                xValues[xValues.Count - 2] -= (graphWidth / (numSamples - 1));
-            }
+            // RemoveAt(0) is an O(n) operation and should be removed if possible
+            positions.RemoveAt(0);
+            positions.Add(new Vector3(x, y));
 
-            xValues.RemoveAt(0);
-            xValues.Add(x);
-
-            XMin = xValues[0];
-            XMax = xValues[xValues.Count - 1];
-
-            yValues.RemoveAt(0);
-            yValues.Add(y);
-
+            // Update max and min
+            XMin = positions[0].x;
+            XMax = positions[numSamples - 1].x;
             if (y < YMin) YMin = y;
-            else if (y > YMax) YMax = y;
+            else if(y > YMax) YMax = y;
 
-            UpdateRender();
-        }
-        private void UpdateRender()
-        {
-            if (pointsRenderer == null)
-            {
-                Debug.LogError("No LineRenderer found on " + pointsRenderer.name + "!");
-                return;
-            }
+            UpdateScale();
 
-            // TODO: Can speed this up by checking new values to resolve rolling max/min
-            // Rescale from (Min, Max) to (0, graphWidth)
-            List<float> y = yValues.Rescale(0, graphWidth, YMin, YMax);
-            List<float> x = xValues.Rescale(0, graphWidth, XMin, XMax);
-            Vector3[] points = new Vector3[numSamples];
-
+            // By using posArr, we only need to make a new Vector3 once in AddValue,
+            // instead of creating numSamples new Vector3 structs here
             for (int i = 0; i < numSamples; i++)
             {
-                points[i] = new Vector3(x[i], y[i], 0f);
+                posArr[i] = positions[i];
             }
 
-            Debug.Log("Updating positions on " + name);
-            pointsRenderer.SetPositions(points);
-            
+            pointsRenderer.SetPositions(posArr);
+        }
+        //private float 
+        private void UpdateScale()
+        {
+            // Instead of rescaling the entire array of values each frame, 
+            // this scales the line renderer's transform, saving tons of performance
+            float xScaler = (graphWidth - 0) / (XMax - XMin);
+            float yScaler = (graphWidth - 0) / (YMax - YMin);
+            float xOrigin = localOriginX - (XMin * xScaler);
+            float yOrigin = localOriginY - (YMin * yScaler);
+
+            pointsRenderer.transform.localScale = new Vector3(xScaler, yScaler, 1f);
+            pointsRenderer.transform.localPosition = new Vector3(xOrigin, yOrigin, 0f);
+
+            float lineWidth = globalLineWidth / Math.Max(xScaler, yScaler);
+            pointsRenderer.startWidth = lineWidth;      
         }
 
         public void SetLabels(string title = "", string xLabel = "", string yLabel = "")
@@ -182,8 +180,6 @@ namespace C2M2.Visualization
             if (title != "") TitleStr = title;
             if (xLabel != "") XLabelStr = xLabel;
             if (yLabel != "") YLabelStr = yLabel;
-
-
         }
 
         public void DestroyPlot()
