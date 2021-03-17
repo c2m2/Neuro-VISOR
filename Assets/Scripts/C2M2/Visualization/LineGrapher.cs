@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using C2M2.Utils;
+using UnityEngine.UI;
 
 namespace C2M2.Visualization
 {
@@ -10,6 +11,11 @@ namespace C2M2.Visualization
     {
         public RectTransform backgroundPanel = null;
         public LineRenderer pointsRenderer;
+
+        public float cursorWidth = 15;
+        public LineRenderer xCursor = null;
+        public LineRenderer yCursor = null;
+        public Image cursor = null;
 
         public int numSamples = 20;
 
@@ -159,14 +165,18 @@ namespace C2M2.Visualization
             pointsRenderer.SetPositions(posArr);
         }
 
+        float xScaler = 1;
+        float yScaler = 1;
+        float xOrigin = 0;
+        float yOrigin = 0;
         private void UpdateScale()
         {
             // Instead of rescaling the entire array of values each frame, 
             // this scales the line renderer's transform, saving tons of performance
-            float xScaler = (graphWidth - 0) / (XMax - XMin);
-            float yScaler = (graphWidth - 0) / (YMax - YMin);
-            float xOrigin = localOriginX - (XMin * xScaler);
-            float yOrigin = localOriginY - (YMin * yScaler);
+            xScaler = graphWidth / (XMax - XMin);
+            yScaler = graphWidth / (YMax - YMin);
+            xOrigin = localOriginX - (XMin * xScaler);
+            yOrigin = localOriginY - (YMin * yScaler);
 
             pointsRenderer.transform.localScale = new Vector3(xScaler, yScaler, 1f);
             pointsRenderer.transform.localPosition = new Vector3(xOrigin, yOrigin, 0f);
@@ -185,6 +195,47 @@ namespace C2M2.Visualization
         public void DestroyPlot()
         {
             Destroy(gameObject);
+        }
+
+        public void AlignCursor(RaycastHit hit)
+        {
+            if(xCursor == null || yCursor == null || cursor == null)
+            {
+                Debug.LogError("No cursor found.");
+            }
+
+            xCursor.enabled = true;
+            yCursor.enabled = true;
+            cursor.enabled = true;
+
+            float xScaler = (graphWidth - 0) / (XMax - XMin);
+            float yScaler = (graphWidth - 0) / (YMax - YMin);
+            float xOrigin = localOriginX - (XMin * xScaler);
+            float yOrigin = localOriginY - (YMin * yScaler);
+
+            Vector3 posAdj = pointsRenderer.transform.localPosition;
+
+            Vector3 localHit = pointsRenderer.transform.InverseTransformPoint(hit.point);
+            localHit = new Vector3((localHit.x * xScaler) + posAdj.x - localOriginX, (localHit.y * yScaler) + posAdj.y - localOriginY);
+
+            Debug.Log("hit: " + hit.point + "\nlocalHit: " + localHit);
+            // Update positions of cursor parts based on hit info
+            xCursor.SetPositions(new Vector3[] {
+                new Vector3(0, localHit.y),
+                new Vector3(localHit.x - cursorWidth, localHit.y) });
+            yCursor.SetPositions(new Vector3[] {
+                new Vector3(localHit.x, 0),
+                new Vector3(localHit.x, localHit.y - cursorWidth) });
+
+            cursor.transform.localPosition = new Vector3(localHit.x - (graphWidth/2), localHit.y - (graphWidth/2));
+
+        }
+
+        public void CloseCursor(RaycastHit hit)
+        {
+            xCursor.enabled = false;
+            yCursor.enabled = false;
+            cursor.enabled = false;
         }
     }
 }
