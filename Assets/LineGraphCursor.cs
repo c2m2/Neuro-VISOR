@@ -14,7 +14,11 @@ namespace C2M2.Visualization
         public LineRenderer yCursor = null;
         public Image cursor = null;
         public TextMeshProUGUI cursorLabel = null;
-        public bool showText = true;
+        public bool showLabel = true;
+        public int xLabelPrecision = 2;
+        public int yLabelPrecision = 2;
+        private RectTransform labelBackground = null;
+        private string formatString = "({0}, {1})";
 
         private float XMin
         {
@@ -80,6 +84,8 @@ namespace C2M2.Visualization
             }
         }
 
+
+
         private void Awake()
         {
             if(lineGraph == null)
@@ -97,55 +103,104 @@ namespace C2M2.Visualization
                 Destroy(this);
             }
 
-            if(cursorLabel == null && showText)
+            if(cursorLabel == null && showLabel)
             {
                 Debug.LogError("No text label found for cursor. Attach text or disable showLabel");
                 Destroy(this);
             }
+            labelBackground = (RectTransform)cursorLabel.GetComponentInChildren<Image>().transform;
+
+            ToggleCursor(false);
+
+            formatString = "({0:F" + xLabelPrecision + "}, {1:F" + yLabelPrecision + "})";
         }
         public void AlignCursor(RaycastHit hit)
         {
-            xCursor.enabled = true;
-            yCursor.enabled = true;
-            cursor.enabled = true;
-
-            Vector3 localHit = lineGraph.pointsRenderer.transform.InverseTransformPoint(hit.point);
+            // Make sure cursor parts are enabled
+            ToggleCursor(true);
 
             Vector3 scaler = new Vector3(
                 GraphWidth / (XMax - XMin),
                 GraphWidth / (YMax - YMin));
 
-            localHit = new Vector3(localHit.x * scaler.x, localHit.y * scaler.y);
-            Vector3 localHitShifted = new Vector3(localHit.x + PosAdj.x - Xorigin, localHit.y + PosAdj.y - Xorigin);
+            // Get the cursor's position on the graph
+            Vector3 truePos = GetTruePosition(hit.point);
 
-            // Our cursor is x% of the way along the graph
-            int xInd = Mathf.RoundToInt((localHitShifted.x / GraphWidth) * NumSamples);
-            // int yInd = Mathf.RoundToInt((localHitShifted.y / GraphWidth) * NumSamples);
+            // Get the cursor's nearest value in the graph
+            int ind = Mathf.RoundToInt((truePos.x / GraphWidth) * NumSamples);
+            Vector3 value = lineGraph.positions[ind];
 
-            Vector3 latchedPos = lineGraph.positions[xInd];
+            // Latch the cursor to a value on the graph
+            Vector3 latchedPos = GetLatchedPosition(value);
 
-            // Readjust and shift for cursor positions
-            latchedPos = new Vector3(latchedPos.x * scaler.x, latchedPos.y * scaler.y);
-            latchedPos = new Vector3(latchedPos.x + PosAdj.x - Xorigin, latchedPos.y + PosAdj.y - Xorigin);
+            // Set the cursor's position
+            SetCursorPosition(latchedPos);
 
-            // Update positions of cursor parts based on hit info
-            xCursor.SetPositions(new Vector3[] {
-                new Vector3(0, latchedPos.y),
-                new Vector3(latchedPos.x - cursorWidth, latchedPos.y) });
-            yCursor.SetPositions(new Vector3[] {
-                new Vector3(latchedPos.x, 0),
-                new Vector3(latchedPos.x, latchedPos.y - cursorWidth) });
+            // Update the label position and its displayed value
+            UpdateLabel(cursor.transform.localPosition, value);       
 
-            cursor.transform.localPosition = new Vector3(latchedPos.x - (GraphWidth / 2), latchedPos.y - (GraphWidth / 2));
+            Vector3 GetTruePosition(Vector3 hitPoint)
+            {
+                // Scale hit position to graph space
+                Vector3 localHit = lineGraph.pointsRenderer.transform.InverseTransformPoint(hitPoint);
+            
+                localHit = new Vector3(localHit.x * scaler.x, localHit.y * scaler.y);
 
-            // Update cursor text and its position
+                // Shift position and return
+                return new Vector3(localHit.x + PosAdj.x - Xorigin, localHit.y + PosAdj.y - Xorigin);
+            }
+            Vector3 GetLatchedPosition(Vector3 pos)
+            {
+                // Readjust and shift for cursor positions
+                return new Vector3((pos.x * scaler.x) + PosAdj.x - Xorigin,
+                    (pos.y * scaler.y) + PosAdj.y - Yorigin); 
+            }
+            void SetCursorPosition(Vector3 pos)
+            {
+                // Update positions of cursor parts based on hit info
+                xCursor.SetPositions(new Vector3[] {
+                new Vector3(0, pos.y),
+                new Vector3(pos.x - cursorWidth, pos.y) });
+
+                yCursor.SetPositions(new Vector3[] {
+                new Vector3(pos.x, 0),
+                new Vector3(pos.x, pos.y - cursorWidth) });
+
+                cursor.transform.localPosition = new Vector3(pos.x - (GraphWidth / 2), pos.y - (GraphWidth / 2));
+            }
+            void UpdateLabel(Vector3 cursorPos, Vector3 val)
+            {
+                cursorLabel.text = string.Format(formatString, val.x, val.y);
+                Vector3 borderSize = new Vector3(cursorLabel.textBounds.size.x * 1.25f, cursorLabel.textBounds.size.y * 1.25f);
+
+                // If we have a background, match its size to the border size
+                if(labelBackground != null) labelBackground.sizeDelta = borderSize;
+
+                // Resolve where to place label relative to the cursor
+                float shiftAmtX = cursorWidth + (borderSize.x / 2);
+                float shiftAmtY = cursorWidth + (borderSize.y / 2);
+                
+                // We are in the right side of the graph, put label to the left of cursor
+                if (cursorPos.x > 0) shiftAmtX = -shiftAmtX;
+                
+                // we are in the top of the graph, put label below cursor
+                if(cursorPos.y > 0) shiftAmtY = -shiftAmtY;
+
+                cursorLabel.transform.localPosition = new Vector3(cursorPos.x + shiftAmtX, cursorPos.y + shiftAmtY);
+            }
         }
 
         public void CloseCursor(RaycastHit hit)
         {
-            xCursor.enabled = false;
-            yCursor.enabled = false;
-            cursor.enabled = false;
+            ToggleCursor(false);
+        }
+
+        public void ToggleCursor(bool enabled)
+        {
+            xCursor.enabled = enabled;
+            yCursor.enabled = enabled;
+            cursor.enabled = enabled;
+            if (showLabel) cursorLabel.gameObject.SetActive(enabled);
         }
     }
 }
