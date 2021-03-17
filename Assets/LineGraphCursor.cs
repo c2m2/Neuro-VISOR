@@ -20,6 +20,9 @@ namespace C2M2.Visualization
         private RectTransform labelBackground = null;
         private string formatString = "({0}, {1})";
 
+        private RaycastHit lastHit;
+
+
         private float XMin
         {
             get
@@ -84,7 +87,7 @@ namespace C2M2.Visualization
             }
         }
 
-
+        private bool locked = false;
 
         private void Awake()
         {
@@ -119,6 +122,15 @@ namespace C2M2.Visualization
             // Make sure cursor parts are enabled
             ToggleCursor(true);
 
+            if (locked) return;
+
+            lastHit = hit;
+
+            UpdateCursor(lastHit);
+        }
+
+        private void UpdateCursor(RaycastHit hit)
+        {
             Vector3 scaler = new Vector3(
                 GraphWidth / (XMax - XMin),
                 GraphWidth / (YMax - YMin));
@@ -128,22 +140,22 @@ namespace C2M2.Visualization
 
             // Get the cursor's nearest value in the graph
             int ind = Mathf.RoundToInt((truePos.x / GraphWidth) * NumSamples);
-            Vector3 value = lineGraph.positions[ind];
+            Vector3 labelValue = lineGraph.positions[ind];
 
             // Latch the cursor to a value on the graph
-            Vector3 latchedPos = GetLatchedPosition(value);
+            Vector3 latchedPos = GetLatchedPosition(labelValue);
 
             // Set the cursor's position
             SetCursorPosition(latchedPos);
 
             // Update the label position and its displayed value
-            UpdateLabel(cursor.transform.localPosition, value);       
+            UpdateLabel(cursor.transform.localPosition, labelValue);
 
             Vector3 GetTruePosition(Vector3 hitPoint)
             {
                 // Scale hit position to graph space
                 Vector3 localHit = lineGraph.pointsRenderer.transform.InverseTransformPoint(hitPoint);
-            
+
                 localHit = new Vector3(localHit.x * scaler.x, localHit.y * scaler.y);
 
                 // Shift position and return
@@ -153,7 +165,7 @@ namespace C2M2.Visualization
             {
                 // Readjust and shift for cursor positions
                 return new Vector3((pos.x * scaler.x) + PosAdj.x - Xorigin,
-                    (pos.y * scaler.y) + PosAdj.y - Yorigin); 
+                    (pos.y * scaler.y) + PosAdj.y - Yorigin);
             }
             void SetCursorPosition(Vector3 pos)
             {
@@ -174,17 +186,17 @@ namespace C2M2.Visualization
                 Vector3 borderSize = new Vector3(cursorLabel.textBounds.size.x * 1.25f, cursorLabel.textBounds.size.y * 1.25f);
 
                 // If we have a background, match its size to the border size
-                if(labelBackground != null) labelBackground.sizeDelta = borderSize;
+                if (labelBackground != null) labelBackground.sizeDelta = borderSize;
 
                 // Resolve where to place label relative to the cursor
                 float shiftAmtX = cursorWidth + (borderSize.x / 2);
                 float shiftAmtY = cursorWidth + (borderSize.y / 2);
-                
+
                 // We are in the right side of the graph, put label to the left of cursor
                 if (cursorPos.x > 0) shiftAmtX = -shiftAmtX;
-                
+
                 // we are in the top of the graph, put label below cursor
-                if(cursorPos.y > 0) shiftAmtY = -shiftAmtY;
+                if (cursorPos.y > 0) shiftAmtY = -shiftAmtY;
 
                 cursorLabel.transform.localPosition = new Vector3(cursorPos.x + shiftAmtX, cursorPos.y + shiftAmtY);
             }
@@ -192,6 +204,7 @@ namespace C2M2.Visualization
 
         public void CloseCursor(RaycastHit hit)
         {
+            if (locked) return;
             ToggleCursor(false);
         }
 
@@ -201,6 +214,36 @@ namespace C2M2.Visualization
             yCursor.enabled = enabled;
             cursor.enabled = enabled;
             if (showLabel) cursorLabel.gameObject.SetActive(enabled);
+        }
+
+        private Coroutine lockRoutine = null;
+        public void ToggleCursorLock()
+        {
+            // Toggle lock on/off on a press
+            locked = !locked;
+
+            // If we are entering a new lock,
+            if (locked)
+            {
+                // Lock the cursor on and start the LockedState routine
+                ToggleCursor(true);
+                lockRoutine = StartCoroutine(LockedState());
+            }
+            else
+            {
+                StopCoroutine(lockRoutine);
+                ToggleCursor(false);
+            }
+        }
+
+        // While locked, continue to update the cursor to match the last known hit position
+        private IEnumerator LockedState()
+        {
+            while (true)
+            {
+                UpdateCursor(lastHit);
+                yield return new WaitForFixedUpdate();
+            }
         }
     }
 }
