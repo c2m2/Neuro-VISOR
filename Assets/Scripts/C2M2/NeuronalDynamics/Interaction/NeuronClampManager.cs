@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using C2M2.NeuronalDynamics.Simulation;
+using C2M2.Interaction;
 
 namespace C2M2.NeuronalDynamics.Interaction
 {
@@ -59,6 +60,8 @@ namespace C2M2.NeuronalDynamics.Interaction
 
         public Color32 inactiveCol = Color.gray;
         public float highlightSphereScale = 3f;
+
+        public RaycastPressEvents hitEvent = null;
 
         /// <summary>
         /// Looks for NDSimulation instance and adds neuronClamp object if possible

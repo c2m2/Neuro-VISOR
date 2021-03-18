@@ -84,42 +84,11 @@ namespace C2M2.NeuronalDynamics.Simulation {
         //public abstract float GetTime();
 
         private Dictionary<double, Mesh> meshCache = new Dictionary<double, Mesh>();
-
-        private bool clampMode = false;
-        public bool ClampMode
+        public NeuronClampManager ClampManager
         {
-            get { return clampMode; }
-            set
+            get
             {
-                clampMode = value;
-
-                // TODO: Using GameManager here is bad design
-                // If clampmode is set to true, find ClampMode raycast event and focus on it. Otherwise find default raycast event
-                RaycastPressEvents newEvents = clampMode ?
-                    GameManager.instance.gameObject.GetComponent<RaycastPressEvents>()
-                    : GetComponentInChildren<RaycastPressEvents>();
-                if (newEvents == null) return;
-                raycastManager.leftTrigger = newEvents;
-                raycastManager.rightTrigger = newEvents;
-
-                /*
-                foreach (GameObject clamp in GameManager.instance.clampControllers)
-                {
-                    MeshRenderChild renderControls = clamp.GetComponentInParent<MeshRenderChild>();
-                    if (renderControls != null) renderControls.enabled = clampMode;
-                    clamp.SetActive(clampMode);
-                }*/
-
-                if (GameManager.instance.ndClampManager.clampControllerL != null)
-                {
-                    GameManager.instance.ndClampManager.clampControllerL.SetActive(clampMode);
-                }
-                if (GameManager.instance.ndClampManager.clampControllerR != null)
-                {
-                    GameManager.instance.ndClampManager.clampControllerR.SetActive(clampMode);
-                }
-
-                Debug.Log("ClampMode set to " + clampMode);
+                return GameManager.instance.ndClampManager;
             }
         }
 
@@ -265,7 +234,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
             }
         }
 
-        public Tuple<int, double>[] raycastHits = new Tuple<int, double>[0];
         public List<NeuronClamp> clamps = new List<NeuronClamp>();
 
         public Mutex clampMutex { get;  private set; } = new Mutex();
@@ -385,14 +353,11 @@ namespace C2M2.NeuronalDynamics.Simulation {
         protected override void OnAwakePost(Mesh viz)
         {
             base.OnAwakePost(viz);
-            raycastEvents.OnEndPress.AddListener((hit) => ResetRacyastHits(hit));
         }
         protected override void OnStart()
         {
             base.OnStart();
             raycastManager = GetComponent<RaycastEventManager>();
-
-            ClampMode = clampMode;
         }
         /// <summary>
         /// Read in the cell and initialize 3D/1D visualization/interaction infrastructure
@@ -429,14 +394,10 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 controlPanel = Resources.Load ("Prefabs/NeuronalDynamics/ControlPanel/NDControls") as GameObject;        
                 controlPanel = GameObject.Instantiate(controlPanel);
 
-                NDClampModeButtonController clampModeCont = controlPanel.GetComponentInChildren<NDClampModeButtonController>();
-                if(clampModeCont != null)
+                NDToggle[] toggles = controlPanel.GetComponentsInChildren<NDToggle>();
+                foreach(NDToggle toggle in toggles)
                 {
-                    clampModeCont.sim = this;
-                }
-                else
-                {
-                    Debug.LogError("No clamp mode button controller found!");
+                    toggle.sim = this;
                 }
 
                 // Find the close button, report this simulation
@@ -514,11 +475,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
             Grid2D = new Grid(new Mesh(), meshName2D);
             Grid2D.Attach(new MappingAttachment());
             VrnReader.ReadUGX(meshName2D, ref grid2D);
-        }
-
-        public void ResetRacyastHits(RaycastHit hit)
-        {
-            raycastHits = new Tuple<int, double>[0];
         }
     }
 

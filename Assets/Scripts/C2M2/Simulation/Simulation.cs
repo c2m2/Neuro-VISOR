@@ -25,6 +25,7 @@ namespace C2M2.Simulation
         public bool startOnAwake = true; // TODO: Move away from using this
 
         public double raycastHitValue = 55;
+        public Tuple<int, double>[] raycastHits = new Tuple<int, double>[0];
 
         /// <summary>
         /// Provide mutual exclusion to derived classes
@@ -36,6 +37,8 @@ namespace C2M2.Simulation
         /// </summary>
         private Thread solveThread = null;
         protected CustomSampler solveStepSampler = null;
+        public RaycastEventManager raycastEventManager = null;
+        public RaycastPressEvents defaultRaycastEvent = null;
 
         /// <summary>
         /// Require derived classes to make simulation values available
@@ -98,19 +101,17 @@ namespace C2M2.Simulation
                 }
 
                 /// Add event child object for interaction scripts to find
-                GameObject child = new GameObject("HitInteractionEvent");
-                child.transform.parent = transform;
-                child.transform.position = Vector3.zero;
-                child.transform.eulerAngles = Vector3.zero;
+                GameObject child = new GameObject("DirectRaycastInteractionEvent");
 
                 // Attach hit events to an event manager
-                eventManager = gameObject.AddComponent<RaycastEventManager>();
+                raycastEventManager = gameObject.AddComponent<RaycastEventManager>();
                 // Create hit events
-                raycastEvents = child.AddComponent<RaycastPressEvents>();
+                defaultRaycastEvent = child.AddComponent<RaycastPressEvents>();
                 // TODO: Get rid of RaycastSimHeater, just add Simulation.AddValue here
-                raycastEvents.OnHoldPress.AddListener((hit) => Heater.Hit(hit));
-                eventManager.rightTrigger = raycastEvents;
-                eventManager.leftTrigger = raycastEvents;
+                defaultRaycastEvent.OnHoldPress.AddListener((hit) => Heater.Hit(hit));
+                defaultRaycastEvent.OnEndPress.AddListener((hit) => ResetRacyastHits(hit));
+
+                raycastEventManager.LRTrigger = defaultRaycastEvent;
 
                 // Some scripts change transform position for some reason, reset the position/rotation at the first frame
                 gameObject.AddComponent<Utils.DebugUtils.Actions.TransformResetter>();
@@ -120,8 +121,6 @@ namespace C2M2.Simulation
                 if (startOnAwake) StartSimulation();
             }
         }
-        public RaycastEventManager eventManager { get; protected set; } = null;
-        public RaycastPressEvents raycastEvents { get; protected set; } = null;
         public void FixedUpdate()
         {
             OnUpdate();
@@ -245,6 +244,11 @@ namespace C2M2.Simulation
                 mutex.ReleaseMutex();
                 solveThread = null;             
             }
+        }
+
+        public void ResetRacyastHits(RaycastHit hit)
+        {
+            raycastHits = new Tuple<int, double>[0];
         }
     }
     public class SimulationNotFoundException : Exception

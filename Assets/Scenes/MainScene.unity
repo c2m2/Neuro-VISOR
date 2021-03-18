@@ -146,7 +146,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &99744258
 Transform:
   m_ObjectHideFlags: 0
@@ -2900,6 +2900,75 @@ Transform:
   m_Father: {fileID: 1103864542}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1157977724
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1157977725}
+  - component: {fileID: 1157977726}
+  m_Layer: 0
+  m_Name: NeuronClampEvent
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1157977725
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1157977724}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 3671467347388522961}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1157977726
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1157977724}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2066920c5141f0e4ca235394b5f8bd4a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  onHover:
+    m_PersistentCalls:
+      m_Calls: []
+  onHoverEnd:
+    m_PersistentCalls:
+      m_Calls: []
+  onPress:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 3671467347388522959}
+        m_MethodName: InstantiateClamp
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onHoldPress:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndPress:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1231859774
 GameObject:
   m_ObjectHideFlags: 0
@@ -4657,6 +4726,8 @@ MonoBehaviour:
   dryRun: 0
   startOnAwake: 1
   raycastHitValue: 55
+  raycastEventManager: {fileID: 0}
+  defaultRaycastEvent: {fileID: 0}
   time: -1
   k: 0.000002
   endTime: 1
@@ -5104,11 +5175,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   graphPrefab: {fileID: 1008494685111210480, guid: 41356d8d4faf1aa4e969f831419ac9bd,
     type: 3}
-  runSinTest: 1
+  runSinTest: 0
   sinTestPosition: {x: 0, y: 0, z: 0}
-  runCosTest: 1
+  runCosTest: 0
   cosTestPosition: {x: 0.6, y: 0, z: 0}
-  runConstantTest: 1
+  runConstantTest: 0
   constant: 4
   constantTestPosition: {x: -0.6, y: 0, z: 0}
 --- !u!4 &2027337386
@@ -5878,50 +5949,13 @@ MonoBehaviour:
     serializedVersion: 2
     rgba: 4291348680
   highlightSphereScale: 3
+  hitEvent: {fileID: 1157977726}
   toggleDestroyOVR: 2
   toggleDestroyOVRS: 8
   powerModifierPlusKey: 273
   powerModifierMinusKey: 274
   highlightOVR: 16384
   highlightOVRS: 4194304
---- !u!114 &3671467347388522960
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3671467347388522958}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2066920c5141f0e4ca235394b5f8bd4a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  onHover:
-    m_PersistentCalls:
-      m_Calls: []
-  onHoverEnd:
-    m_PersistentCalls:
-      m_Calls: []
-  onPress:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 3671467347388522959}
-        m_MethodName: InstantiateClamp
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  onHoldPress:
-    m_PersistentCalls:
-      m_Calls: []
-  onEndPress:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!4 &3671467347388522961 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3671467348768610593, guid: f49e57d0c1b71c4418326894ace9a9b5,

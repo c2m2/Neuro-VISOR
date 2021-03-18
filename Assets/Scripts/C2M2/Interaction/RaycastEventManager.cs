@@ -7,6 +7,14 @@ namespace C2M2.Interaction
     /// <summary> Attach this script to parent gameObject, create one child with one raycast trigger per child. Switch between triggers by index or switch the active trigger to any custom RaycastTrigger instance. </summary>
     public class RaycastEventManager : MonoBehaviour
     {
+        public RaycastPressEvents LRTrigger
+        {
+            set
+            {
+                rightTrigger = value;
+                leftTrigger = value;
+            }
+        }
         public RaycastPressEvents rightTrigger = null;
         public RaycastPressEvents leftTrigger = null;
         private RaycastPressEvents emptyTrigger = null;
