@@ -91,6 +91,10 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 return GameManager.instance.ndClampManager;
             }
         }
+        public List<NeuronClamp> clamps = new List<NeuronClamp>();
+        public Mutex clampMutex { get; private set; } = new Mutex();
+        private static Tuple<int, double> nullClamp = new Tuple<int, double>(-1, -1);
+
 
         [Header ("1D Visualization")]
         public bool visualize1D = false;
@@ -233,11 +237,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 return scalars3D;
             }
         }
-
-        public List<NeuronClamp> clamps = new List<NeuronClamp>();
-
-        public Mutex clampMutex { get;  private set; } = new Mutex();
-        private static Tuple<int, double> nullClamp = new Tuple<int, double>(-1, -1);
 
         protected override void PostSolveStep()
         {

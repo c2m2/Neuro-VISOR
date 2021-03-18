@@ -74,8 +74,6 @@ namespace C2M2.NeuronalDynamics.Interaction
             var sim = hit.collider.GetComponentInParent<NDSimulation>();
             // If there is no NDSimulation, don't try instantiating a clamp
             if (sim == null) return;
-            // If we didn't hit the GameManager's active simulation, something else is wrong
-            if (sim != Simulation) return;
             
             var clampObj = Instantiate(clampPrefab, sim.transform);
             NeuronClamp clamp = clampObj.GetComponentInChildren<NeuronClamp>();

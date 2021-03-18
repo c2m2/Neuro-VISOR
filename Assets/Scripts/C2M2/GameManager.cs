@@ -15,7 +15,6 @@ namespace C2M2
     /// <summary>
     /// Stores many global variables, handles pregame initializations
     /// </summary>
-    [RequireComponent(typeof(NeuronClampManager))]
     public class GameManager : MonoBehaviour
     {
         public static GameManager instance = null;
