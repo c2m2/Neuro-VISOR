@@ -62,7 +62,7 @@ namespace C2M2.Visualization
         {
             get
             {
-                return lineGraph.numSamples;
+                return lineGraph.NumSamples;
             }
         }
         private float Xorigin

@@ -198,6 +198,8 @@ namespace C2M2.NeuronalDynamics.Simulation
             return curVals;
         }
 
+        public override double Get1DValue(int index1D) => U[index1D];
+
         /// <summary>
         /// Receive new simulation 1D index/value pairings
         /// Carefully, notice that <c>val</c> needs to be multiplied by 0.001 this is because

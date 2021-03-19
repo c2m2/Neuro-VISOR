@@ -36,7 +36,7 @@ namespace C2M2.Tests {
         {
             LineGrapher graph = InstantiateGraph(position);
             graph.name = "SinPlotTest";
-            graph.numSamples = 250;
+            graph.NumSamples = 250;
             graph.SetLabels("Sin vs. Time", "Time", "Sin(Time)");
 
             graph.YMax = 1;
@@ -58,7 +58,7 @@ namespace C2M2.Tests {
         {
             LineGrapher graph = InstantiateGraph(position);
             graph.name = "CosPlotTest";
-            graph.numSamples = 250;
+            graph.NumSamples = 250;
             graph.SetLabels("Cos vs. Time", "Time", "Cos(Time)");
 
             graph.YMax = 1;
@@ -81,7 +81,7 @@ namespace C2M2.Tests {
         {
             LineGrapher graph = InstantiateGraph(position);
             graph.name = "ConstPlotTest";
-            graph.numSamples = 250;
+            graph.NumSamples = 250;
             graph.SetLabels("Constant", "Time", "Y");
 
             graph.YMax = constant * 2;

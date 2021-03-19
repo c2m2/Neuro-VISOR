@@ -10,8 +10,10 @@ namespace C2M2
     using Interaction.UI;
     using Interaction.VR;
     using NeuronalDynamics.Interaction;
+    using NeuronalDynamics.Visualization;
     using Simulation;
     using Visualization;
+
     /// <summary>
     /// Stores many global variables, handles pregame initializations
     /// </summary>
@@ -35,7 +37,8 @@ namespace C2M2
         public List<SimulationTimerLabel> timerLabels = new List<SimulationTimerLabel>();
 
         public NeuronClampManager ndClampManager = null;
-        //  public GameObject[] clampControllers = new GameObject[0];
+        public NDGraphManager ndGraphManager = null;
+        public GameObject[] clampControllers = new GameObject[0];
 
         [Header("Environment")]
         public int roomSelected = 0;
@@ -78,9 +81,6 @@ namespace C2M2
             else if (instance != this) { Destroy(this); }
 
             mainThreadId = Thread.CurrentThread.ManagedThreadId;
-
-            ndClampManager = GetComponent<NeuronClampManager>();
-            if (ndClampManager == null) Debug.LogWarning("No neuron clamp manager found!");
 
             if(roomOptions != null && roomOptions.Length > 0)
             {

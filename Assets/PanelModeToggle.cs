@@ -1,19 +1,26 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using C2M2.NeuronalDynamics.Visualization;
 namespace C2M2.NeuronalDynamics.Interaction
 {
-    public class PanelModeToggle : NDToggle
+    public class PanelModeToggle : NDFeatureToggle
     {
+        public NDGraphManager Manager
+        {
+            get
+            {
+                return GameManager.instance.ndGraphManager;
+            }
+        }
+
         public override void OnToggle(RaycastHit hit, bool toggled)
         {
-            // Get panel event from panel manager
-
             if (toggled)
             {
                 // Set NDSimulation's event to that event
-
+                sim.raycastEventManager.LRTrigger = Manager.hitEvent;
+                Debug.Log("Panel interaction turned on.");
             }
         }
     }

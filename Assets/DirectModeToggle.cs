@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace C2M2.NeuronalDynamics.Interaction {
-    public class DirectModeToggle : NDToggle
+    public class DirectModeToggle : NDFeatureToggle
     {
         public override void OnToggle(RaycastHit hit, bool toggled)
         {

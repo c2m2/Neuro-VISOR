@@ -11,7 +11,36 @@ namespace C2M2.Visualization
         public RectTransform backgroundPanel = null;
         public LineRenderer pointsRenderer;
 
-        public int numSamples = 20;
+        private int numSamples = 20;
+        public int NumSamples
+        {
+            get
+            {
+                return numSamples;
+            }
+            set
+            {
+                if(numSamples <= 0)
+                {
+                    Debug.LogError("Cannot have fewer than 1 point on graph");
+                    return;
+                }
+
+                numSamples = value;
+                positions = new List<Vector3>(numSamples);
+                posArr = new Vector3[NumSamples];
+
+                for (int i = 0; i < NumSamples; i++)
+                {
+                    positions.Add(Vector3.zero);
+                }
+
+                pointsRenderer.positionCount = NumSamples;
+
+                XMin = positions[0].x;
+                XMax = positions[NumSamples - 1].x;
+            }
+        }
 
         public float graphWidth = 500f;
         public float localOriginX = 50f;
@@ -121,21 +150,10 @@ namespace C2M2.Visualization
                 Destroy(this);
             }
 
-            positions = new List<Vector3>(numSamples);
-            posArr = new Vector3[numSamples];
-
-            for (int i = 0; i < numSamples; i++)
-            {
-                positions.Add(Vector3.zero);
-            }
-
-            pointsRenderer.positionCount = numSamples;
-
-            XMin = positions[0].x;
-            XMax = positions[numSamples - 1].x;
+            NumSamples = numSamples;
         }
         
-        public void AddValue(float y, float x)
+        public void AddValue(float x, float y)
         {
             // RemoveAt(0) is an O(n) operation and should be removed if possible
             positions.RemoveAt(0);
@@ -143,7 +161,7 @@ namespace C2M2.Visualization
 
             // Update max and min
             XMin = positions[0].x;
-            XMax = positions[numSamples - 1].x;
+            XMax = positions[NumSamples - 1].x;
             if (y < YMin) YMin = y;
             else if(y > YMax) YMax = y;
 
@@ -151,7 +169,7 @@ namespace C2M2.Visualization
 
             // By using posArr, we only need to make a new Vector3 once in AddValue,
             // instead of creating numSamples new Vector3 structs here
-            for (int i = 0; i < numSamples; i++)
+            for (int i = 0; i < NumSamples; i++)
             {
                 posArr[i] = positions[i];
             }

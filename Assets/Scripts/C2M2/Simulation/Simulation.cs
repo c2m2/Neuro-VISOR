@@ -102,6 +102,7 @@ namespace C2M2.Simulation
 
                 /// Add event child object for interaction scripts to find
                 GameObject child = new GameObject("DirectRaycastInteractionEvent");
+                child.transform.parent = transform;
 
                 // Attach hit events to an event manager
                 raycastEventManager = gameObject.AddComponent<RaycastEventManager>();

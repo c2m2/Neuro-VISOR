@@ -5,7 +5,7 @@ using C2M2.Interaction.UI;
 using C2M2.NeuronalDynamics.Simulation;
 namespace C2M2.NeuronalDynamics.Interaction
 {
-    public abstract class NDToggle : RaycastToggle
+    public abstract class NDFeatureToggle : RaycastToggle
     {
         public NDSimulation sim = null;
     }

@@ -71,8 +71,8 @@ namespace C2M2.Simulation
             }
         }
 
-        private MeshFilter mf;
-        private MeshRenderer mr;
+        protected MeshFilter mf;
+        protected MeshRenderer mr;
         #endregion
 
         /// <summary>
@@ -125,7 +125,9 @@ namespace C2M2.Simulation
             }
             void InitInteraction()
             {
-                VRRaycastableMesh raycastable = gameObject.AddComponent<VRRaycastableMesh>();
+                VRRaycastableMesh raycastable = gameObject.GetComponent<VRRaycastableMesh>();
+                if(raycastable == null) raycastable = gameObject.AddComponent<VRRaycastableMesh>();
+
                 if (ColliderMesh != null) raycastable.SetSource(ColliderMesh);
                 else raycastable.SetSource(viz);
                 

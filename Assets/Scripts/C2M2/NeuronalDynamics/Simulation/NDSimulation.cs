@@ -148,6 +148,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 grid1D = value;
             }
         }
+
         public Vector3[] Verts1D { get { return grid1D.Mesh.vertices; } }
 
         private Grid grid2D = null;
@@ -223,8 +224,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
             }
         }
 
-        private RaycastEventManager raycastManager = null;
-
         private double[] scalars3D = new double[0];
         private double[] Scalars3D
         {
@@ -271,7 +270,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 }
             }
         }
-
 
         /// <summary>
         /// Translate 1D vertex values to 3D values and pass them upwards for visualization
@@ -343,21 +341,14 @@ namespace C2M2.NeuronalDynamics.Simulation {
         /// </summary>
         /// <returns></returns>
         public abstract double[] Get1DValues ();
+
+        public abstract double Get1DValue(int index1D);
         protected override void OnAwakePre()
         {
             UpdateGrid1D();
             base.OnAwakePre();
         }
 
-        protected override void OnAwakePost(Mesh viz)
-        {
-            base.OnAwakePost(viz);
-        }
-        protected override void OnStart()
-        {
-            base.OnStart();
-            raycastManager = GetComponent<RaycastEventManager>();
-        }
         /// <summary>
         /// Read in the cell and initialize 3D/1D visualization/interaction infrastructure
         /// </summary>
@@ -393,8 +384,8 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 controlPanel = Resources.Load ("Prefabs/NeuronalDynamics/ControlPanel/NDControls") as GameObject;        
                 controlPanel = GameObject.Instantiate(controlPanel);
 
-                NDToggle[] toggles = controlPanel.GetComponentsInChildren<NDToggle>();
-                foreach(NDToggle toggle in toggles)
+                NDFeatureToggle[] toggles = controlPanel.GetComponentsInChildren<NDFeatureToggle>();
+                foreach(NDFeatureToggle toggle in toggles)
                 {
                     toggle.sim = this;
                 }
@@ -474,6 +465,40 @@ namespace C2M2.NeuronalDynamics.Simulation {
             Grid2D = new Grid(new Mesh(), meshName2D);
             Grid2D.Attach(new MappingAttachment());
             VrnReader.ReadUGX(meshName2D, ref grid2D);
+        }
+
+        public int GetNearestPoint(RaycastHit hit)
+        {
+            if (mf == null) return -1;
+
+            // Get 3D mesh vertices from hit triangle
+            int triInd = hit.triangleIndex * 3;
+            int v1 = mf.mesh.triangles[triInd];
+            int v2 = mf.mesh.triangles[triInd + 1];
+            int v3 = mf.mesh.triangles[triInd + 2];
+
+            // Find 1D verts belonging to these 3D verts
+            int[] verts1D = new int[]
+            {
+                Map[v1].v1, Map[v1].v2,
+                Map[v2].v1, Map[v2].v2,
+                Map[v3].v1, Map[v3].v2
+            };
+            Vector3 localHitPoint = transform.InverseTransformPoint(hit.point);
+
+            float nearestDist = float.PositiveInfinity;
+            int nearestVert1D = -1;
+            foreach (int vert in verts1D)
+            {
+                float dist = Vector3.Distance(localHitPoint, Verts1D[vert]);
+                if (dist < nearestDist)
+                {
+                    nearestDist = dist;
+                    nearestVert1D = vert;
+                }
+            }
+
+            return nearestVert1D;
         }
     }
 

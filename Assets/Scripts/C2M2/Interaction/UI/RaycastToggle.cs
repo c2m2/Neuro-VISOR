@@ -12,9 +12,9 @@ namespace C2M2.Interaction.UI
         public Image disabledImg = null;
 
         public RaycastToggleGroup group = null;
-        public int groupId = -1;
+        public int groupId { get; set; } = -1;
 
-        public virtual void Toggle(RaycastHit hit)
+        public void Toggle(RaycastHit hit)
         {
             // If there is no group, toggle on/off normally
             if(group == null)
@@ -26,7 +26,7 @@ namespace C2M2.Interaction.UI
                 group.RequestToggle(hit, groupId, !toggled);
             }
         }
-        public virtual void Toggle(RaycastHit hit, bool toggle)
+        public void Toggle(RaycastHit hit, bool toggle)
         {
             toggled = toggle;
             if (enabledImg == null || disabledImg == null)

@@ -218,7 +218,7 @@ namespace C2M2.NeuronalDynamics.Interaction
 
                 transform.parent.parent = simulation.transform;
 
-                int clampIndex = GetNearestPoint(this.simulation, hit);
+                int clampIndex = simulation.GetNearestPoint(hit);
 
                 NeuronCell.NodeData clampCellNodeData = simulation.NeuronCell.nodeData[clampIndex];
 
@@ -247,41 +247,6 @@ namespace C2M2.NeuronalDynamics.Interaction
             }
 
             return this.simulation;
-        }
-        private int GetNearestPoint(NDSimulation simulation, RaycastHit hit)
-        {
-            // Translate contact point to local space
-            MeshFilter mf = simulation.transform.GetComponentInParent<MeshFilter>();
-            if (mf == null) return -1;
-
-            // Get 3D mesh vertices from hit triangle
-            int triInd = hit.triangleIndex * 3;
-            int v1 = mf.mesh.triangles[triInd];
-            int v2 = mf.mesh.triangles[triInd + 1];
-            int v3 = mf.mesh.triangles[triInd + 2];
-
-            // Find 1D verts belonging to these 3D verts
-            int[] verts1D = new int[]
-            {
-                simulation.Map[v1].v1, simulation.Map[v1].v2,
-                simulation.Map[v2].v1, simulation.Map[v2].v2,
-                simulation.Map[v3].v1, simulation.Map[v3].v2
-            };
-            Vector3 localHitPoint = simulation.transform.InverseTransformPoint(hit.point); 
-
-            float nearestDist = float.PositiveInfinity;
-            int nearestVert1D = -1;
-            foreach(int vert in verts1D)
-            {
-                float dist = Vector3.Distance(localHitPoint, simulation.Verts1D[vert]);
-                if (dist < nearestDist)
-                {
-                    nearestDist = dist;
-                    nearestVert1D = vert;
-                }
-            }
-
-            return nearestVert1D;
         }
 
         /// <returns> True if the 1D index is available, otherwise returns false</returns>
