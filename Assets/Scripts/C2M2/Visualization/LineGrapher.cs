@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 using C2M2.Utils;
 
 namespace C2M2.Visualization
@@ -12,6 +13,11 @@ namespace C2M2.Visualization
         public LineRenderer pointsRenderer;
         public GraphCursor cursor = null;
         public GraphPointer pointerLines = null;
+        public RectTransform closeButton = null;
+
+        public RectTransform infoPanel = null;
+        public RectTransform infoPanelButton = null;
+
 
         private int numSamples = 20;
         public int NumSamples
@@ -144,8 +150,11 @@ namespace C2M2.Visualization
         // Used to convert list to array for LineRenderer
         private Vector3[] posArr;
 
+        public RectTransform rt { get; private set; }
+
         private void Awake()
         {
+            rt = (RectTransform)transform;
             if (pointsRenderer == null)
             {
                 Debug.LogError("No renderer given for plot points!");
@@ -166,6 +175,49 @@ namespace C2M2.Visualization
                 if (pointerLines == null)
                 {
                     Debug.LogWarning("No pointer lines found for LineGrapher.");
+                }
+            }
+
+            if(closeButton != null)
+            {
+                float buttonWidth = graphWidth / 10;
+                float margin = buttonWidth / 2.5f;
+                closeButton.sizeDelta = new Vector2(buttonWidth - margin, buttonWidth - margin);
+                closeButton.anchoredPosition = new Vector3(-(graphWidth / 2) - (buttonWidth / 2), (graphWidth / 2) + (buttonWidth / 2));
+                closeButton.GetComponent<BoxCollider>().size = new Vector3(buttonWidth, buttonWidth);
+            }
+
+            if(infoPanel != null)
+            {
+                infoPanel.sizeDelta = new Vector2(graphWidth / 2, rt.sizeDelta.y);
+
+                Vector3 lwh = infoPanel.sizeDelta;
+
+                infoPanel.anchoredPosition = new Vector2((rt.sizeDelta.x +lwh.x) / 2, 0f);
+
+                Image backgroundImg = infoPanel.GetComponentInChildren<Image>();
+                backgroundImg.rectTransform.sizeDelta = lwh;
+
+                LineRenderer lr = infoPanel.GetComponent<LineRenderer>();
+                
+                lr.positionCount = 4;
+                lr.SetPositions(new Vector3[] {
+                    new Vector3(-lwh.x / 2, -lwh.y / 2),
+                    new Vector3(-lwh.x / 2, lwh.y / 2),
+                    new Vector3(lwh.x / 2, lwh.y / 2),
+                    new Vector3(lwh.x / 2, -lwh.y / 2) } );
+                lr.loop = true;
+            }
+
+            if(infoPanelButton != null)
+            {
+                float buttonWidth = graphWidth / 10;
+                float margin = buttonWidth / 2.5f;
+                infoPanelButton.sizeDelta = new Vector2(buttonWidth - margin, buttonWidth - margin);
+                infoPanelButton.anchoredPosition = new Vector3((graphWidth / 2) + (buttonWidth / 2), (graphWidth / 2) + (buttonWidth / 2));
+                foreach(BoxCollider receiver in infoPanel.GetComponentsInChildren<BoxCollider>())
+                {
+                    receiver.size = new Vector3(buttonWidth, buttonWidth);
                 }
             }
 
