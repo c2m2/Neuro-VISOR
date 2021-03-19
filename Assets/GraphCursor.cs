@@ -6,7 +6,7 @@ using TMPro;
 
 namespace C2M2.Visualization
 {
-    public class LineGraphCursor : MonoBehaviour
+    public class GraphCursor : MonoBehaviour
     {
         public LineGrapher lineGraph = null;
         public float cursorWidth = 15;

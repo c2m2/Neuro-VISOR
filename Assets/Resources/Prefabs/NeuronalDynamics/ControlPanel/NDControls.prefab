@@ -344,7 +344,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enabledImg: {fileID: 5218886297946898984}
   disabledImg: {fileID: 5218886298023377128}
-  group: {fileID: 0}
+  group: {fileID: 5218886298338668362}
   sim: {fileID: 0}
 --- !u!65 &5218886296627592849
 BoxCollider:

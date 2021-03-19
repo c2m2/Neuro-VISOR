@@ -10,6 +10,8 @@ namespace C2M2.Visualization
     {
         public RectTransform backgroundPanel = null;
         public LineRenderer pointsRenderer;
+        public GraphCursor cursor = null;
+        public GraphPointer pointerLines = null;
 
         private int numSamples = 20;
         public int NumSamples
@@ -142,17 +144,34 @@ namespace C2M2.Visualization
         // Used to convert list to array for LineRenderer
         private Vector3[] posArr;
 
-        private void Start()
+        private void Awake()
         {
             if (pointsRenderer == null)
             {
                 Debug.LogError("No renderer given for plot points!");
                 Destroy(this);
             }
+            if (cursor == null)
+            {
+                cursor = GetComponentInChildren<GraphCursor>();
+                if (cursor == null)
+                {
+                    Debug.LogWarning("No cursor found for LineGrapher.");
+                }
+            }
+
+            if (pointerLines == null)
+            {
+                pointerLines = GetComponentInChildren<GraphPointer>();
+                if (pointerLines == null)
+                {
+                    Debug.LogWarning("No pointer lines found for LineGrapher.");
+                }
+            }
 
             NumSamples = numSamples;
         }
-        
+
         public void AddValue(float x, float y)
         {
             // RemoveAt(0) is an O(n) operation and should be removed if possible
