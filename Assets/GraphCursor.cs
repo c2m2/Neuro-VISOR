@@ -15,8 +15,6 @@ namespace C2M2.Visualization
         public Image cursor = null;
         public TextMeshProUGUI cursorLabel = null;
         public bool showLabel = true;
-        public int xLabelPrecision = 2;
-        public int yLabelPrecision = 2;
         private RectTransform labelBackground = null;
         private string formatString = "({0}, {1})";
 
@@ -115,7 +113,7 @@ namespace C2M2.Visualization
 
             ToggleCursor(false);
 
-            formatString = "({0:F" + xLabelPrecision + "}, {1:F" + yLabelPrecision + "})";
+            formatString = "({0:F" + lineGraph.XPrecision + "}, {1:F" + lineGraph.YPrecision + "})";
         }
         public void AlignCursor(RaycastHit hit)
         {
@@ -244,6 +242,12 @@ namespace C2M2.Visualization
                 UpdateCursor(lastHit);
                 yield return new WaitForFixedUpdate();
             }
+        }
+
+        public string UpdateFormatString(int xPrec, int yPrec)
+        {
+            formatString = "({0:F" + xPrec + "}, {1:F" + yPrec + "})";
+            return formatString;
         }
     }
 }

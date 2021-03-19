@@ -19,7 +19,7 @@ namespace C2M2.Visualization
         public RectTransform infoPanelButton = null;
 
 
-        private int numSamples = 20;
+        private int numSamples = 750;
         public int NumSamples
         {
             get
@@ -28,22 +28,47 @@ namespace C2M2.Visualization
             }
             set
             {
-                if(numSamples <= 0)
+                if (numSamples == positions.Count) return;
+
+                if (numSamples <= 0)
                 {
                     Debug.LogError("Cannot have fewer than 1 point on graph");
                     return;
                 }
 
                 numSamples = value;
-                positions = new List<Vector3>(numSamples);
-                posArr = new Vector3[NumSamples];
 
-                for (int i = 0; i < NumSamples; i++)
+                List<Vector3> newPosL = new List<Vector3>(numSamples);
+
+                // If we decrease the number of samples, we now have fewer graph points 
+                if(numSamples < positions.Count)
                 {
-                    positions.Add(Vector3.zero);
+                    // Take the most recent samples
+                    for(int i = 0; i < numSamples; i++)
+                    {
+                        newPosL.Add(positions[i]);
+                    }
+                }
+                // If we increase the number of samples, we now have more graph points
+                if(numSamples > positions.Count)
+                {
+                    // Copy the samples we have at the end, set the rest to 0
+                    for(int i = 0; i < numSamples - positions.Count; i++)
+                    {
+                        newPosL.Add(Vector3.zero);
+                    }
+                    int j = 0;
+                    for(int i = numSamples - positions.Count; i < numSamples; i++)
+                    {
+                        newPosL.Add(positions[j]);
+                        j++;
+                    }
                 }
 
-                pointsRenderer.positionCount = NumSamples;
+                pointsRenderer.positionCount = numSamples;
+
+                positions = newPosL;
+                posArr = new Vector3[numSamples];
 
                 XMin = positions[0].x;
                 XMax = positions[NumSamples - 1].x;
@@ -92,6 +117,26 @@ namespace C2M2.Visualization
             }
         }
 
+        private int xPrecision = 3;
+        public int XPrecision
+        {
+            get
+            {
+                return xPrecision;
+            }
+            set
+            {
+                xPrecision = value;
+                xPrecFormat = "F" + xPrecision;
+
+                if (cursor != null)
+                {
+                    cursor.UpdateFormatString(XPrecision, yPrecision);
+                }
+            }
+        }
+        private string xPrecFormat = "F3";
+
         private float xMin = float.PositiveInfinity;
         public float XMin
         {
@@ -99,7 +144,7 @@ namespace C2M2.Visualization
             set
             {
                 xMin = value;
-                XMinStr = xMin.ToString("F2");
+                XMinStr = xMin.ToString(xPrecFormat);
             }
         }
         public TextMeshProUGUI xMinLabel;
@@ -112,11 +157,31 @@ namespace C2M2.Visualization
             set
             {
                 xMax = value;
-                XMaxStr = xMax.ToString("F2");
+                XMaxStr = xMax.ToString(xPrecFormat);
             }
         }
         public TextMeshProUGUI xMaxLabel;
         private string XMaxStr { set { if (xMaxLabel != null) xMaxLabel.text = value; } }
+
+        private int yPrecision = 3;
+        public int YPrecision
+        {
+            get
+            {
+                return yPrecision;
+            }
+            set
+            {
+                yPrecision = value;
+                yPrecFormat = "F" + yPrecision;
+
+                if(cursor != null)
+                {
+                    cursor.UpdateFormatString(XPrecision, yPrecision);
+                }
+            }
+        }
+        private string yPrecFormat = "F3";
 
         private float yMin = float.PositiveInfinity;
         public float YMin
@@ -125,7 +190,7 @@ namespace C2M2.Visualization
             set
             {
                 yMin = value;
-                YMinStr = yMin.ToString();
+                YMinStr = yMin.ToString(yPrecFormat);
             }
         }
         public TextMeshProUGUI yMinLabel;
@@ -138,7 +203,7 @@ namespace C2M2.Visualization
             set
             {
                 yMax = value;
-                YMaxStr = yMax.ToString();
+                YMaxStr = yMax.ToString(yPrecFormat);
             }
         }
         public TextMeshProUGUI yMaxLabel;
