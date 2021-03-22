@@ -26,11 +26,22 @@ namespace C2M2.Simulation
         /// </summary>
         public LUTGradient colorLUT { get; private set; } = null;
 
-        public LUTGradient.ExtremaMethod extremaMethod = LUTGradient.ExtremaMethod.GlobalExtrema;
+        public LUTGradient.ExtremaMethod extremaMethod { get; set; } = LUTGradient.ExtremaMethod.GlobalExtrema;
         [Tooltip("Must be set if extremaMethod is set to GlobalExtrema")]
         public float globalMax = float.NegativeInfinity;
         [Tooltip("Must be set if extremaMethod is set to GlobalExtrema")]
         public float globalMin = float.PositiveInfinity;
+
+        /// <summary>
+        /// Unit display string that can be manually set by the user
+        /// </summary>
+        [Tooltip("Unit display string that can be manually set by the user")]
+        public string unit = "mV";
+        /// <summary>
+        /// Can be used to manually convert Gradient Display values to match unit string
+        /// </summary>
+        [Tooltip("Can be used to manually convert Gradient Display values to match unit string")]
+        public float unitScaler = 1000f;
 
         public Vector3 rulerInitPos = new Vector3(-0.5f, 0.443f, -0.322f);
         public Vector3 rulerInitRot = new Vector3(90, 0, 0);

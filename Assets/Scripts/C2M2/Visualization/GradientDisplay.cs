@@ -18,9 +18,25 @@ namespace C2M2.Visualization
         public GameObject textMarkerHolder = null;
         public TextMeshProUGUI unitText = null;
         public LineRenderer outline = null;
-        public float scaler = 1;
-        public string unit = "unit";
+        public float Scaler
+        {
+            get
+            {
+                return sim.unitScaler;
+            }
+        }
+        public string Unit
+        {
+            get
+            {
+                return sim.unit;
+            }
+        }
         public string precision = "F4";
+
+        public bool rotateX = false;
+        public bool rotateY = false;
+        public bool rotateZ = false;
 
         private float LineWidth
         {
@@ -137,8 +153,8 @@ namespace C2M2.Visualization
 
             void BuildNewMarkers()
             {
-                float max = scaler * sim.colorLUT.GlobalMax;
-                float min = scaler * sim.colorLUT.GlobalMin;
+                float max = Scaler * sim.colorLUT.GlobalMax;
+                float min = Scaler * sim.colorLUT.GlobalMin;
                 float valueStep = (max - min) / (numTextMarkers - 1);
                 float placementStep = displayLength / (numTextMarkers - 1);
                 for (int i = 0; i < numTextMarkers; i++)
