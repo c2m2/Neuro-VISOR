@@ -152,11 +152,11 @@ namespace C2M2.NeuronalDynamics.Simulation {
             }
         }
 
-        private NeuronCell neuronCell = null;
-        public NeuronCell NeuronCell
+        private Neuron neuron = null;
+        public Neuron Neuron
         {
-            get { return neuronCell; }
-            set { neuronCell = value; }
+            get { return neuron; }
+            set { neuron = value; }
         }
 
         private float averageDendriteRadius = 0;
@@ -167,11 +167,11 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 if (averageDendriteRadius == 0)
                 {
                     float radiusSum = 0;
-                    foreach (NeuronCell.NodeData node in NeuronCell.nodeData)
+                    foreach (Neuron.NodeData node in Neuron.nodes)
                     {
-                        radiusSum += (float) node.nodeRadius;
+                        radiusSum += (float) node.NodeRadius;
                     }
-                    averageDendriteRadius = radiusSum / NeuronCell.nodeData.Count;
+                    averageDendriteRadius = radiusSum / Neuron.nodes.Count;
                 }
                 return averageDendriteRadius;
             }
@@ -238,9 +238,9 @@ namespace C2M2.NeuronalDynamics.Simulation {
                     clampMutex.WaitOne();
                     for (int i = 0; i < clamps.Count; i++)
                     {
-                        if (clamps[i] != null && clamps[i].focusVert != -1 && clamps[i].clampLive)
+                        if (clamps[i] != null && clamps[i].FocusVert != -1 && clamps[i].ClampLive)
                         {
-                            clampValues[i] = new Tuple<int, double>(clamps[i].focusVert, clamps[i].clampPower);
+                            clampValues[i] = new Tuple<int, double>(clamps[i].FocusVert, clamps[i].ClampPower);
                         }
                         else
                         {
@@ -441,7 +441,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
 
             VrnReader.ReadUGX(meshName1D, ref grid1D);
 
-            NeuronCell = new NeuronCell(grid1D);
+            Neuron = new Neuron(grid1D);
         }
         private void Update2DGrid()
         {

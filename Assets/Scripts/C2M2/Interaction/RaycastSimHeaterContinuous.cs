@@ -38,17 +38,5 @@ namespace C2M2.Interaction
             }
             return valueChanges;
         }
-        public void SetWarmCoolHands()
-        {
-            //Color hotCol = colorManager.gradient.Evaluate(1);
-            // Color coolCol = colorManager.gradient.Evaluate(0);
-            //GameManager.instance.RaycasterRightChangeColor(hotCol);
-            //GameManager.instance.RaycasterRightChangeColor(coolCol);
-        }
-        public void RaycastersDefaultColor()
-        {
-            GameManager.instance.RaycasterRightChangeColor(Color.white);
-            GameManager.instance.RaycasterLeftChangeColor(Color.white);
-        }
     }
 }
