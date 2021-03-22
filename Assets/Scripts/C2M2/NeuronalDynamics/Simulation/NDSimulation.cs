@@ -80,10 +80,8 @@ namespace C2M2.NeuronalDynamics.Simulation {
             }
         }
 
-        //returns time simulation has been running in milliseconds (ms)
-        //public abstract float GetTime();
-
         private Dictionary<double, Mesh> meshCache = new Dictionary<double, Mesh>();
+
         public NeuronClampManager ClampManager
         {
             get
@@ -94,7 +92,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
         public List<NeuronClamp> clamps = new List<NeuronClamp>();
         public Mutex clampMutex { get; private set; } = new Mutex();
         private static Tuple<int, double> nullClamp = new Tuple<int, double>(-1, -1);
-
 
         [Header ("1D Visualization")]
         public bool visualize1D = false;
@@ -398,8 +395,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
                         gradientDisplay.gradient = colorLUT.Gradient;
                     }
                     else if (colorLUT == null) { Debug.LogWarning("No ColorLUT found on MeshSimulation"); }
-                    gradientDisplay.unit = unit;
-                    gradientDisplay.scaler = unitScaler;
+
                     gradientDisplay.precision = "F" + colorScalePrecision.ToString();
                 }
                 else if (gradientDisplay == null) { Debug.LogWarning("No GradientDisplay found on NDControls"); }

@@ -109,13 +109,10 @@ namespace C2M2.Simulation
                 // Create hit events
                 defaultRaycastEvent = child.AddComponent<RaycastPressEvents>();
                 // TODO: Get rid of RaycastSimHeater, just add Simulation.AddValue here
-                defaultRaycastEvent.OnHoldPress.AddListener((hit) => Heater.Hit(hit));
+                defaultRaycastEvent.OnHoldPress.AddListener((hit) => SetValues(hit));
                 defaultRaycastEvent.OnEndPress.AddListener((hit) => ResetRacyastHits(hit));
 
                 raycastEventManager.LRTrigger = defaultRaycastEvent;
-
-                // Some scripts change transform position for some reason, reset the position/rotation at the first frame
-                gameObject.AddComponent<Utils.DebugUtils.Actions.TransformResetter>();
 
                 OnStart();
 

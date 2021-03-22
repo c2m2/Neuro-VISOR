@@ -121,7 +121,6 @@ public static class NonConvexMeshCollider
                 rb.useGravity = true;
             UnityEngine.Object.Destroy(tempParent);
         }
-        gameObject.AddComponent<C2M2.Utils.DebugUtils.Actions.TransformResetter>().targetFrame = 50;
 
         return boxColliders;
     }

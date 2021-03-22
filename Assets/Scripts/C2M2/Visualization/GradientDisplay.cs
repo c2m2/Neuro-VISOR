@@ -34,10 +34,6 @@ namespace C2M2.Visualization
         }
         public string precision = "F4";
 
-        public bool rotateX = false;
-        public bool rotateY = false;
-        public bool rotateZ = false;
-
         private float LineWidth
         {
             get
@@ -148,7 +144,8 @@ namespace C2M2.Visualization
 
             if (unitText != null)
             {
-                unitText.text = unit;
+                unitText.text = Unit;
+               // unitText.transform.eulerAngles = new Vector3(0f, 0f, -transform.eulerAngles.z);
             }
 
             void BuildNewMarkers()
@@ -161,17 +158,22 @@ namespace C2M2.Visualization
                 {
                     GameObject newMarker = Instantiate(textMarkerPrefab, textMarkerHolder.transform);
                     newMarker.transform.localPosition = new Vector3(i * placementStep, -displayHeight, 0f);
-                    newMarker.GetComponent<TextMeshProUGUI>().text = (min + (i * valueStep)).ToString(precision);
+
+                    TextMeshProUGUI text = newMarker.GetComponentInChildren<TextMeshProUGUI>();
+                    text.text = (min + (i * valueStep)).ToString(precision);
+
+                    // Rotate text against the rotation of the graph
+                    text.transform.eulerAngles = new Vector3(0f, 0f, -transform.eulerAngles.z);              
+
                     LineRenderer lineMarker = newMarker.GetComponentInChildren<LineRenderer>();
                     if (lineMarker != null)
                     {
                         lineMarker.transform.localPosition = new Vector3(0f, displayHeight / newMarker.transform.localScale.y / 2, 0f);
                         lineMarker.positionCount = 2;
                         lineMarker.SetPositions(new Vector3[] {
-                        new Vector3(0f, displayHeight, 0f),
-                        new Vector3(0f, -displayHeight/4, 0f) });
-                        //   lineMarker.SetPosition(0, Vector3.zero);
-                        //  lineMarker.SetPosition(1, new Vector3(displayLength * 1.5f, 0f, 0f));
+                        new Vector3(0f, displayHeight/4, 0f),
+                        new Vector3(0f, displayHeight/4, 0f) });
+
                         lineMarker.startWidth = LineWidth;
                         lineMarker.endWidth = LineWidth;
                     }
