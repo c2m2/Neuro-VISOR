@@ -30,7 +30,7 @@ namespace C2M2.Simulation.Samples
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         public override void SetValues(RaycastHit hit)
         {
-            Tuple<int, double>[] newValues = Heater.HitToTriangles(hit);
+            Tuple<int, double>[] newValues = HitToTriangles(hit);
 
             foreach (Tuple<int, double> value in newValues)
             {

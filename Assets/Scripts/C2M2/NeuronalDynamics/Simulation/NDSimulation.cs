@@ -283,21 +283,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
         /// Translate 3D vertex values to 1D values, and pass them downwards for interaction
         /// </summary>
         public sealed override void SetValues (RaycastHit hit) {
-            // We will have 3 new index/value pairings
-            Tuple<int, double>[] newValues = new Tuple<int, double>[3];
-            // Translate hit triangle index so we can index into triangles array
-            int triInd = hit.triangleIndex * 3;
-            MeshFilter mf = hit.transform.GetComponentInParent<MeshFilter>();
-            // Get mesh vertices from hit triangle
-            int v1 = mf.mesh.triangles[triInd];
-            int v2 = mf.mesh.triangles[triInd + 1];
-            int v3 = mf.mesh.triangles[triInd + 2];
-            // Attach new values to new vertices
-            newValues[0] = new Tuple<int, double>(v1, raycastHitValue);
-            newValues[1] = new Tuple<int, double>(v2, raycastHitValue);
-            newValues[2] = new Tuple<int, double>(v3, raycastHitValue);
-
-            SetValues (newValues);
+            SetValues(HitToTriangles(hit));
         }
         /// <summary>
         /// Translate 3D vertex values to 1D values, and pass them downwards for interaction

@@ -3,6 +3,8 @@
 namespace C2M2.Simulation
 {
     using Interaction;
+    using System;
+
     /// <summary>
     /// Interface for interaction scripts
     /// </summary>
@@ -11,19 +13,6 @@ namespace C2M2.Simulation
     /// </remarks>
     public abstract class Interactable : MonoBehaviour
     {
-        private RaycastHeater heater = null;
-        /// <summary>
-        /// Interaction script that resolves player interaction and passes new values back here
-        /// </summary>
-        public RaycastHeater Heater
-        {
-            get { return heater; }
-            protected set
-            {
-                if (heater != null) Destroy(heater);
-                heater = value;
-            }
-        }
 
         /// <summary> Require derived classes to know how to receive an interaction event </summary>
         /// <remarks>
