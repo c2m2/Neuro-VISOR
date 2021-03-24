@@ -43,7 +43,7 @@ namespace C2M2.Simulation
         {
             for (int i = 0; i < simulationValues.Length; i++)
             {
-                viz[i].localPosition = simulationValues[i];
+                Viz[i].localPosition = simulationValues[i];
             }
 
             UpdateVisChild(simulationValues);

@@ -1,16 +1,12 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using C2M2.NeuronalDynamics.UGX;
-using UnityEditor;
 using UnityEngine;
 using System.Threading;
 using DiameterAttachment = C2M2.NeuronalDynamics.UGX.IAttachment<C2M2.NeuronalDynamics.UGX.DiameterData>;
 using MappingAttachment = C2M2.NeuronalDynamics.UGX.IAttachment<C2M2.NeuronalDynamics.UGX.MappingData>;
-using TMPro;
 using Math = C2M2.Utils.Math;
-using C2M2.Interaction;
 using C2M2.Simulation;
 using C2M2.Utils.DebugUtils;
 using C2M2.Utils.MeshUtils;
@@ -18,6 +14,7 @@ using Grid = C2M2.NeuronalDynamics.UGX.Grid;
 using C2M2.NeuronalDynamics.Visualization.VRN;
 using C2M2.NeuronalDynamics.Interaction;
 using C2M2.Visualization;
+using System.Linq;
 
 namespace C2M2.NeuronalDynamics.Simulation {
 
@@ -91,7 +88,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
         }
         public List<NeuronClamp> clamps = new List<NeuronClamp>();
         public Mutex clampMutex { get; private set; } = new Mutex();
-        private static Tuple<int, double> nullClamp = new Tuple<int, double>(-1, -1);
+        private static readonly Tuple<int, double> nullClamp = new Tuple<int, double>(-1, -1);
 
         [Header ("1D Visualization")]
         public bool visualize1D = false;
@@ -166,12 +163,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
             {
                 if (averageDendriteRadius == 0)
                 {
-                    float radiusSum = 0;
-                    foreach (Neuron.NodeData node in Neuron.nodes)
-                    {
-                        radiusSum += (float) node.NodeRadius;
-                    }
-                    averageDendriteRadius = radiusSum / Neuron.nodes.Count;
+                    averageDendriteRadius = (float)Neuron.nodes.Select(node => node.NodeRadius).Average();
                 }
                 return averageDendriteRadius;
             }
@@ -376,11 +368,11 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 if (gradientDisplay != null)
                 {
                     gradientDisplay.sim = this;
-                    if (colorLUT != null)
+                    if (ColorLUT != null)
                     {
-                        gradientDisplay.gradient = colorLUT.Gradient;
+                        gradientDisplay.gradient = ColorLUT.Gradient;
                     }
-                    else if (colorLUT == null) { Debug.LogWarning("No ColorLUT found on MeshSimulation"); }
+                    else if (ColorLUT == null) { Debug.LogWarning("No ColorLUT found on MeshSimulation"); }
 
                     gradientDisplay.precision = "F" + colorScalePrecision.ToString();
                 }
@@ -413,7 +405,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
             ColliderInflation = inflation;
         }
 
-        public void SwitchMesh (double inflation) {
+        public void SwitchVisualMesh (double inflation) {
             inflation = Math.Clamp (inflation, 1, 5);
             VisualInflation = inflation;
         }

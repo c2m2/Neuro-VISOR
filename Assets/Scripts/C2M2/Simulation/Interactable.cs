@@ -2,9 +2,6 @@
 
 namespace C2M2.Simulation
 {
-    using Interaction;
-    using System;
-
     /// <summary>
     /// Interface for interaction scripts
     /// </summary>

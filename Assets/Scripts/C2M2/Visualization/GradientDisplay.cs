@@ -72,9 +72,9 @@ namespace C2M2.Visualization
                 {
                     Debug.LogError(e);
                     // We set hasChanged to be true so that it tries to update the display again
-                    sim.colorLUT.hasChanged = true;
+                    sim.ColorLUT.hasChanged = true;
                 }
-                yield return new WaitUntil(() => sim.colorLUT.hasChanged == true);
+                yield return new WaitUntil(() => sim.ColorLUT.hasChanged == true);
             }
         }
 
@@ -100,11 +100,11 @@ namespace C2M2.Visualization
         private void UpdateDisplay()
         {
             // Fetch graddient from simulation's colorLUT
-            if (sim.colorLUT.hasChanged)
+            if (sim.ColorLUT.hasChanged)
             {
                 Debug.Log("Updating GradientDisplay...");
 
-                gradient = sim.colorLUT.Gradient;
+                gradient = sim.ColorLUT.Gradient;
 
                 GradientColorKey[] colorKeys = gradient.colorKeys;
 
@@ -126,7 +126,7 @@ namespace C2M2.Visualization
 
                 UpdateText();
 
-                sim.colorLUT.hasChanged = false;
+                sim.ColorLUT.hasChanged = false;
             }
         }
         private void UpdateText()
@@ -150,8 +150,8 @@ namespace C2M2.Visualization
 
             void BuildNewMarkers()
             {
-                float max = Scaler * sim.colorLUT.GlobalMax;
-                float min = Scaler * sim.colorLUT.GlobalMin;
+                float max = Scaler * sim.ColorLUT.GlobalMax;
+                float min = Scaler * sim.ColorLUT.GlobalMin;
                 float valueStep = (max - min) / (numTextMarkers - 1);
                 float placementStep = displayLength / (numTextMarkers - 1);
                 for (int i = 0; i < numTextMarkers; i++)

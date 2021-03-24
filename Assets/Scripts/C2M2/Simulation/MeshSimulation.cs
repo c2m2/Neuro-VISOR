@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using C2M2.Visualization;
-using C2M2.Utils.MeshUtils;
 using C2M2.Interaction;
 
 namespace C2M2.Simulation
@@ -24,7 +23,7 @@ namespace C2M2.Simulation
         /// <summary>
         /// Lookup table for more efficient color calculations on the gradient
         /// </summary>
-        public LUTGradient colorLUT { get; private set; } = null;
+        public LUTGradient ColorLUT { get; private set; } = null;
 
         public LUTGradient.ExtremaMethod extremaMethod { get; set; } = LUTGradient.ExtremaMethod.GlobalExtrema;
         [Tooltip("Must be set if extremaMethod is set to GlobalExtrema")]
@@ -91,7 +90,7 @@ namespace C2M2.Simulation
         /// </summary>
         private void UpdateVisualization(in float[] scalars3D)
         {
-            Color32[] newCols = colorLUT.Evaluate(scalars3D);
+            Color32[] newCols = ColorLUT.Evaluate(scalars3D);
             if(newCols != null)
             {
                 mf.mesh.colors32 = newCols;
@@ -125,13 +124,13 @@ namespace C2M2.Simulation
             void InitColors()
             {
                 // Initialize the color lookup table
-                colorLUT = gameObject.AddComponent<LUTGradient>();
-                colorLUT.Gradient = gradient;
-                colorLUT.extremaMethod = extremaMethod;
+                ColorLUT = gameObject.AddComponent<LUTGradient>();
+                ColorLUT.Gradient = gradient;
+                ColorLUT.extremaMethod = extremaMethod;
                 if (extremaMethod == LUTGradient.ExtremaMethod.GlobalExtrema)
                 {
-                    colorLUT.GlobalMax = globalMax;
-                    colorLUT.GlobalMin = globalMin;
+                    ColorLUT.GlobalMax = globalMax;
+                    ColorLUT.GlobalMin = globalMin;
                 }
             }
             void InitInteraction()
@@ -158,7 +157,7 @@ namespace C2M2.Simulation
 
         public void CloseRuler()
         {
-            if(ruler != null)
+            if (ruler != null)
             {
                 Destroy(ruler.gameObject);
             }

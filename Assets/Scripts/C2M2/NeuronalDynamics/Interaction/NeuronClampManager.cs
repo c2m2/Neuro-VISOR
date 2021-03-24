@@ -14,14 +14,14 @@ namespace C2M2.NeuronalDynamics.Interaction
         {
             get
 {
-                return Simulation.colorLUT.GlobalMin;
+                return Simulation.ColorLUT.GlobalMin;
             }
         }
         public float MaxPower
         {
             get
             {
-                return Simulation.colorLUT.GlobalMax;
+                return Simulation.ColorLUT.GlobalMax;
             }
         }
         // Sensitivity of the clamp power control. Lower sensitivity means clamp power changes more quickly

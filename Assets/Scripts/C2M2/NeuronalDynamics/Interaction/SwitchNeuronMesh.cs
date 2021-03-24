@@ -21,7 +21,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         {
             if (ndSimulation != null)
             {
-                if (changeViz) ndSimulation.SwitchMesh(inflation);
+                if (changeViz) ndSimulation.SwitchVisualMesh(inflation);
                 else ndSimulation.SwitchColliderMesh(inflation);
             }
             else Debug.LogError("No neuron simulation given");

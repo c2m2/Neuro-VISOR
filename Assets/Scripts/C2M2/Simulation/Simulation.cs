@@ -2,7 +2,6 @@
 using System.Threading;
 using System;
 using C2M2.Interaction;
-using C2M2.Visualization;
 using UnityEngine.Profiling;
 
 namespace C2M2.Simulation
@@ -22,11 +21,6 @@ namespace C2M2.Simulation
         /// Run solve code without visualization or interaction
         /// </summary>
         public bool dryRun = false;
-
-        /// <summary>
-        /// Should the simulation start itself in Awake?
-        /// </summary>
-        public bool startOnAwake = true; // TODO: Move away from using this
 
         public double raycastHitValue = 55;
         public Tuple<int, double>[] raycastHits = new Tuple<int, double>[0];
@@ -58,7 +52,7 @@ namespace C2M2.Simulation
         /// </remarks>
         protected abstract VizType BuildVisualization();
 
-        public VizType viz { get; protected set; }
+        public VizType Viz { get; protected set; }
 
         /// <summary>
         /// Update the visualization. This will be called once per Update() call
@@ -84,12 +78,12 @@ namespace C2M2.Simulation
 
             if (!dryRun)
             {
-                viz = BuildVisualization();
+                Viz = BuildVisualization();
                 BuildInteraction();
             }
 
             // Run child awake methods first
-            OnAwakePost(viz);
+            OnAwakePost(Viz);
 
             return;
 
@@ -111,7 +105,7 @@ namespace C2M2.Simulation
 
                 OnStart();
 
-                if (startOnAwake) StartSimulation();
+                StartSimulation();
             }
         }
 
@@ -244,7 +238,6 @@ namespace C2M2.Simulation
         {
             raycastHits = new Tuple<int, double>[0];
         }
-
 
         public Tuple<int, double>[] HitToTriangles(RaycastHit hit)
         {
