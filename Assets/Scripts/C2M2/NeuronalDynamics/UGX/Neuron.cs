@@ -2,6 +2,7 @@
 using System.Linq;
 using System.IO;
 using System;
+using UnityEngine;
 
 namespace C2M2.NeuronalDynamics.UGX
 {
@@ -60,6 +61,8 @@ namespace C2M2.NeuronalDynamics.UGX
         /// <param name="grid"></param>
         public Neuron(Grid grid)
         {
+            Vector3[] gridMeshVertices = grid.Mesh.vertices;
+
             VertexAttachementAccessor<DiameterData> diameterAccessor = new VertexAttachementAccessor<DiameterData>(grid);
             for (int i = 0; i < grid.Vertices.Count; i++)
             {
@@ -72,10 +75,10 @@ namespace C2M2.NeuronalDynamics.UGX
                     Id = grid.Vertices[i].Id,
 
                     /// these are the actual coordinates of the geometry --> NOTE: these are in [um] already!
-                    /// Currently uses Unity Mesh vertices. Should be changed to directly use geometry/Grid vertices
-                    Xcoords = grid.Mesh.vertices[i].x,
-                    Ycoords = grid.Mesh.vertices[i].y,
-                    Zcoords = grid.Mesh.vertices[i].z
+                    /// Currently uses Unity Mesh vertices. Should probably be changed to directly use geometry/Grid vertices?
+                    Xcoords = gridMeshVertices[i].x,
+                    Ycoords = gridMeshVertices[i].y,
+                    Zcoords = gridMeshVertices[i].z
                 };
 
                 tempNode.NeighborIDs = new List<int>();
