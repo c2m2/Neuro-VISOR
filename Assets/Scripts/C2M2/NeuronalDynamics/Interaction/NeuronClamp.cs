@@ -4,6 +4,7 @@ using C2M2.NeuronalDynamics.Simulation;
 using C2M2.NeuronalDynamics.UGX;
 using C2M2.Visualization;
 using Math = C2M2.Utils.Math;
+using System.Linq;
 
 namespace C2M2.NeuronalDynamics.Interaction
 {
@@ -193,7 +194,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         /// </summary>
         public void SetRotation(Neuron.NodeData cellNodeData)
         {
-            List<int> neighbors = cellNodeData.AdjacencyList;
+            List<int> neighbors = cellNodeData.AdjacencyList.Keys.ToList();
 
             // Get each neighbor's Vector3 value
             List<Vector3> neighborVectors = new List<Vector3>();

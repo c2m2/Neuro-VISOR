@@ -375,50 +375,41 @@ namespace C2M2.NeuronalDynamics.Simulation
             List<int> nghbrlist;
             int nghbrLen;
 
-            /// make an empty list to collect edgelengths \n
-            /// <c>List<double> edgelengths = new List<double>();</c> initialize empty list for collecting edgelengths
-            List<double> edgelengths = new List<double>();
-            double tempEdgeLen, tempRadius, aveEdgeLengths;
+            double tempEdgeLen, tempRadius, avgEdgeLengths;
             /// <c>double sumRecip = 0;</c> this is for adding the sum of reciprocals which is in our stencil scheme \n
             double sumRecip = 0;
             double scf = 1E-6;  /// 1e-6 scale factor to convert to micrometers for radii and edge length \n
 
             for (int j = 0; j < myCell.nodes.Count; j++)
             {
-                /// <c>nghbrlist = myCell.nodeData[j].neighborIDs;</c> this gets the current neighbor list for node j \n
+                List<double> edgelengths = new List<double>();
+                /// <c>nghbrlist = myCell.nodes[j].AdjacencyList.Keys.ToList();</c> this gets the current neighbor list for node j \n
                 nghbrlist = myCell.nodes[j].AdjacencyList.Keys.ToList();
-                /// <c>nghbrLen = nghbrlist.Count();</c> this is the length of the neighbor list \n
-                nghbrLen = nghbrlist.Count();
-                edgelengths.Clear();
+                /// <c>nghbrLen = nghbrlist.Count;</c> this is the length of the neighbor list \n
+                nghbrLen = nghbrlist.Count;
                 sumRecip = 0;
                 /// <c>tempRadius = myCell.nodeData[j].nodeRadius*scf;</c> get the current radius at node j \n
                 tempRadius = myCell.nodes[j].NodeRadius*scf;
 
                 /// in this loop we collect the edgelengths that go to node j, and we compute the coefficient given in our paper \n
-                for (int p = 0; p < nghbrLen; p++)
+                foreach (int nghbrIds in nghbrlist)
                 {
-                    /// <c>tempEdgeLen = myCell.nodes[j].AdjacencyList[p]*scf;</c> get the edge length at current node j, to node neighbor p, scale to micro meters \n
-                    tempEdgeLen = myCell.nodes[j].AdjacencyList[p]*scf;
+                    /// <c>tempEdgeLen = myCell.nodes[j].AdjacencyList[nghbrIds]*scf;</c> get the edge length at current node j, to node neighbor p, scale to micro meters \n
+                    tempEdgeLen = myCell.nodes[j].AdjacencyList[nghbrIds]*scf;
                     /// <c>edgelengths.Add(tempEdgeLen);</c> put the edge length in the list, this list of edges will have length equal to length of neighbor list \n
                     edgelengths.Add(tempEdgeLen);
-                    sumRecip = sumRecip + 1 / (tempEdgeLen * tempRadius * ((1 / (myCell.nodes[nghbrlist[p]].NodeRadius*scf* myCell.nodes[nghbrlist[p]].NodeRadius*scf)) + (1 / (tempRadius * tempRadius))));
+                    sumRecip = sumRecip + 1 / (tempEdgeLen * tempRadius * ((1 / (myCell.nodes[nghbrIds].NodeRadius*scf* myCell.nodes[nghbrIds].NodeRadius*scf)) + (1 / (tempRadius * tempRadius))));
                 }
                 /// get the average edge lengths of neighbors \n
-                /// <c>foreach {... aveEdgeLengths = aveEdgeLengths + val;} aveEdgeLengths = aveEdgeLengths / edgelengths.Count;</c>
-                aveEdgeLengths = 0;
-                foreach (double val in edgelengths)
-                {
-                    aveEdgeLengths = aveEdgeLengths + val;
-                }
-                aveEdgeLengths = aveEdgeLengths / edgelengths.Count;
+                avgEdgeLengths = edgelengths.Average();
                 /// set main diagonal entries using <c>rhs.At()</c>
-                rhs.At(j, j, 1 - (k * sumRecip) / (2.0 * res * cap * aveEdgeLengths));
-                lhs.At(j, j, 1 + (k * sumRecip) / (2.0 * res * cap * aveEdgeLengths));
+                rhs.At(j, j, 1 - (k * sumRecip) / (2.0 * res * cap * avgEdgeLengths));
+                lhs.At(j, j, 1 + (k * sumRecip) / (2.0 * res * cap * avgEdgeLengths));
                 /// set off diagonal entries by going through the neighbor list, and using <c>rhs.At()</c>
                 for (int p = 0; p < nghbrLen; p++)
                 {
-                    rhs.At(j, nghbrlist[p], k / (2 * res * cap * tempRadius* aveEdgeLengths * edgelengths[p] * ((1 / (myCell.nodes[nghbrlist[p]].NodeRadius*scf * myCell.nodes[nghbrlist[p]].NodeRadius*scf)) + (1 / (tempRadius * tempRadius)))));
-                    lhs.At(j, nghbrlist[p], -1.0 * k / (2 * res * cap * tempRadius * aveEdgeLengths * edgelengths[p] * ((1 / (myCell.nodes[nghbrlist[p]].NodeRadius*scf * myCell.nodes[nghbrlist[p]].NodeRadius*scf)) + (1 / (tempRadius * tempRadius)))));
+                    rhs.At(j, nghbrlist[p], k / (2 * res * cap * tempRadius* avgEdgeLengths * edgelengths[p] * ((1 / (myCell.nodes[nghbrlist[p]].NodeRadius*scf * myCell.nodes[nghbrlist[p]].NodeRadius*scf)) + (1 / (tempRadius * tempRadius)))));
+                    lhs.At(j, nghbrlist[p], -1.0 * k / (2 * res * cap * tempRadius * avgEdgeLengths * edgelengths[p] * ((1 / (myCell.nodes[nghbrlist[p]].NodeRadius*scf * myCell.nodes[nghbrlist[p]].NodeRadius*scf)) + (1 / (tempRadius * tempRadius)))));
                 }
             }
             //rhs.At(0, 0, 1);
