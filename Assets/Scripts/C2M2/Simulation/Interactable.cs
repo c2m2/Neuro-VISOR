@@ -24,11 +24,6 @@ namespace C2M2.Simulation
                 heater = value;
             }
         }
-        public enum InteractionType { Discrete, Continuous }
-        /// <summary>
-        /// Continuous interaction can interact with mesh surface regions using an adjacency list and Dijkstra search.
-        /// </summary>
-        protected InteractionType interactionType = InteractionType.Discrete;
 
         /// <summary> Require derived classes to know how to receive an interaction event </summary>
         /// <remarks>

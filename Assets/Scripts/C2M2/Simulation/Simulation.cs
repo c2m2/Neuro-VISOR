@@ -7,10 +7,14 @@ using UnityEngine.Profiling;
 
 namespace C2M2.Simulation
 {
+
     /// <summary>
     /// Provides an base interface for simulations using a general data type T
     /// </summary>
-    /// <typeparam name="ValueType"> Type of simulation values </typeparam>
+    /// <typeparam name="ValueType">Type of simulation values</typeparam>
+    /// <typeparam name="VizType"></typeparam>
+    /// <typeparam name="RaycastType"></typeparam>
+    /// <typeparam name="GrabType"></typeparam>
     public abstract class Simulation<ValueType, VizType, RaycastType, GrabType> : Interactable
     {
         [Tooltip("Run simulation code without visualization or interaction features")]
@@ -91,15 +95,6 @@ namespace C2M2.Simulation
 
             void BuildInteraction()
             {
-                switch (interactionType)
-                {
-                    case (InteractionType.Discrete):
-                        Heater = gameObject.AddComponent<RaycastSimHeaterDiscrete>();
-                        ((RaycastSimHeaterDiscrete)Heater).value = raycastHitValue;
-                        break;
-                    case (InteractionType.Continuous): Heater = gameObject.AddComponent<RaycastSimHeaterContinuous>(); break;
-                }
-
                 /// Add event child object for interaction scripts to find
                 GameObject child = new GameObject("DirectRaycastInteractionEvent");
                 child.transform.parent = transform;
@@ -108,7 +103,7 @@ namespace C2M2.Simulation
                 raycastEventManager = gameObject.AddComponent<RaycastEventManager>();
                 // Create hit events
                 defaultRaycastEvent = child.AddComponent<RaycastPressEvents>();
-                // TODO: Get rid of RaycastSimHeater, just add Simulation.AddValue here
+
                 defaultRaycastEvent.OnHoldPress.AddListener((hit) => SetValues(hit));
                 defaultRaycastEvent.OnEndPress.AddListener((hit) => ResetRacyastHits(hit));
 
@@ -119,6 +114,7 @@ namespace C2M2.Simulation
                 if (startOnAwake) StartSimulation();
             }
         }
+
         public void FixedUpdate()
         {
             OnUpdate();
