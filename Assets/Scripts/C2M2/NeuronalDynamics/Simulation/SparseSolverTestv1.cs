@@ -386,7 +386,7 @@ namespace C2M2.NeuronalDynamics.Simulation
             for (int j = 0; j < myCell.nodes.Count; j++)
             {
                 /// <c>nghbrlist = myCell.nodeData[j].neighborIDs;</c> this gets the current neighbor list for node j \n
-                nghbrlist = myCell.nodes[j].NeighborIDs;
+                nghbrlist = myCell.nodes[j].AdjacencyList.Keys.ToList();
                 /// <c>nghbrLen = nghbrlist.Count();</c> this is the length of the neighbor list \n
                 nghbrLen = nghbrlist.Count();
                 edgelengths.Clear();
@@ -397,8 +397,8 @@ namespace C2M2.NeuronalDynamics.Simulation
                 /// in this loop we collect the edgelengths that go to node j, and we compute the coefficient given in our paper \n
                 for (int p = 0; p < nghbrLen; p++)
                 {
-                    /// <c>tempEdgeLen = myCell.GetEdgeLength(j, nghbrlist[p])*scf;</c> get the edge length at current node j, to node neighbor p, scale to micro meters \n
-                    tempEdgeLen = myCell.GetEdgeLength(myCell.nodes[j], myCell.nodes[nghbrlist[p]])*scf;
+                    /// <c>tempEdgeLen = myCell.nodes[j].AdjacencyList[p]*scf;</c> get the edge length at current node j, to node neighbor p, scale to micro meters \n
+                    tempEdgeLen = myCell.nodes[j].AdjacencyList[p]*scf;
                     /// <c>edgelengths.Add(tempEdgeLen);</c> put the edge length in the list, this list of edges will have length equal to length of neighbor list \n
                     edgelengths.Add(tempEdgeLen);
                     sumRecip = sumRecip + 1 / (tempEdgeLen * tempRadius * ((1 / (myCell.nodes[nghbrlist[p]].NodeRadius*scf* myCell.nodes[nghbrlist[p]].NodeRadius*scf)) + (1 / (tempRadius * tempRadius))));

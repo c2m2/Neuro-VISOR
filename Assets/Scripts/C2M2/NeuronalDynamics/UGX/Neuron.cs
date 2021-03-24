@@ -23,7 +23,7 @@ namespace C2M2.NeuronalDynamics.UGX
         /// <summary>
         /// this is the a list of the nodes that are the ends of the dendrites, they only have one neighbor
         /// </summary>
-        public List<NodeData> boundaryNode = new List<NodeData>();
+        public List<NodeData> boundaryNodes = new List<NodeData>();
         /// <summary>
         /// this is the soma index, this is good know, it is a list because in possible cases
         /// a soma maybe a segment of points, not a singular point
@@ -42,7 +42,11 @@ namespace C2M2.NeuronalDynamics.UGX
             public double Xcoords { get; set; }
             public double Ycoords { get; set; }
             public double Zcoords { get; set; }
-            public List<int> NeighborIDs { get; set; }
+
+            /// <summary>
+            /// Dictionary with NeighborId as key and edge weight as value
+            /// </summary>
+            public Dictionary<int, double> AdjacencyList { get; set; }
         }
 
         /// <summary>
@@ -81,14 +85,7 @@ namespace C2M2.NeuronalDynamics.UGX
                     Zcoords = gridMeshVertices[i].z
                 };
 
-                tempNode.NeighborIDs = new List<int>();
-                /// this adds the neigbor ids to the list for this node
-                foreach (Vertex neighborVertex in grid.Vertices[i].Neighbors)
-                {
-                    tempNode.NeighborIDs.Add(neighborVertex.Id);
-                }
-                /// if a node has only one neighbor then it is a boundary node
-                if (tempNode.NeighborIDs.Count == 1) boundaryNode.Add(tempNode);
+                tempNode.AdjacencyList = new Dictionary<int, double>();
 
                 nodes.Add(tempNode);
             }
@@ -98,14 +95,23 @@ namespace C2M2.NeuronalDynamics.UGX
             {
                 NodeData fromNode = nodes[grid.Edges[i].From.Id];
                 NodeData toNode = nodes[grid.Edges[i].To.Id];
+                double edgeLength = GetEdgeLength(fromNode, toNode);
                 edges.Add(new Edge {
                     From = fromNode,
                     To = toNode,
-                    Length = GetEdgeLength(fromNode, toNode)
+                    Length = edgeLength
                 }
                 );
+
                 toNode.Pid = fromNode.Id;
+
+                /// makes an adjacency list with edge weights
+                toNode.AdjacencyList.Add(fromNode.Id, edgeLength);
+                fromNode.AdjacencyList.Add(toNode.Id, edgeLength);
             }
+
+            /// if a node has only one neighbor then it is a boundary node
+            boundaryNodes.AddRange(nodes.FindAll(node => node.AdjacencyList.Count == 1));
 
             somaIDs = grid.Subsets["soma"].Indices.ToList();
         }
@@ -143,7 +149,7 @@ namespace C2M2.NeuronalDynamics.UGX
             edgeLengths.Average(),
             edgeLengths.Min(),
             String.Join(", ", somaIDs.Select(c => "'" + c + "'")),
-            String.Join(", ", boundaryNode.Select(c => "'" + c.Id + "'")));
+            String.Join(", ", boundaryNodes.Select(c => "'" + c.Id + "'")));
         }
         /// <summary>
         /// this calculates the euclidean distance between node Start and node End
@@ -151,7 +157,7 @@ namespace C2M2.NeuronalDynamics.UGX
         /// <param name="startNode"></param> start node
         /// <param name="endNode"></param> end node
         /// <returns></returns>
-        public double GetEdgeLength(NodeData startNode, NodeData endNode)
+        private double GetEdgeLength(NodeData startNode, NodeData endNode)
         {
             /// get the coordinates of the start node
             double x1 = startNode.Xcoords;

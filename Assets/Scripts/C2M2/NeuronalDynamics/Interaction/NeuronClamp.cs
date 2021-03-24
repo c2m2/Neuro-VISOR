@@ -193,7 +193,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         /// </summary>
         public void SetRotation(Neuron.NodeData cellNodeData)
         {
-            List<int> neighbors = cellNodeData.NeighborIDs;
+            List<int> neighbors = cellNodeData.AdjacencyList;
 
             // Get each neighbor's Vector3 value
             List<Vector3> neighborVectors = new List<Vector3>();
