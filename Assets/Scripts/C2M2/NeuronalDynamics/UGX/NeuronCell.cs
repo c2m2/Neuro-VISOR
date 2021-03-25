@@ -65,7 +65,6 @@ namespace C2M2.NeuronalDynamics.UGX
         /// <param name="grid"></param>
         public NeuronCell(Grid grid)
         {
-            AttachmentHandler.Available();
             NodeData tempNode = new NodeData();
             VertexAttachementAccessor<DiameterData> accessor = new VertexAttachementAccessor<DiameterData>(grid);
             Mesh mesh = grid.Mesh;

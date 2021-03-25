@@ -8,24 +8,24 @@ namespace C2M2.Interaction.UI
     /// </summary>
     public class FPSLabel : MonoBehaviour
     {
-        public TextMeshProUGUI highFPSLabel;
-        public TextMeshProUGUI avgFPSLabel;
-        public TextMeshProUGUI lowFPSLabel;
+        public TextMeshProUGUI highFPSReading;
+        public TextMeshProUGUI avgFPSReading;
+        public TextMeshProUGUI lowFPSReading;
         private Utils.DebugUtils.FPSCounter fpsCounter;
 
         void Start()
         {
             fpsCounter = GameManager.instance.fpsCounter;
-            if (avgFPSLabel == null) throw new LabelNotFoundException();
-            if (highFPSLabel == null) throw new LabelNotFoundException();
-            if (lowFPSLabel == null) throw new LabelNotFoundException();
+            if (avgFPSReading == null) throw new LabelNotFoundException();
+            if (highFPSReading == null) throw new LabelNotFoundException();
+            if (lowFPSReading == null) throw new LabelNotFoundException();
         }
 
         void Update()
         {
-            avgFPSLabel.text = fpsCounter.avgStr;
-            highFPSLabel.text = fpsCounter.highStr;
-            lowFPSLabel.text = fpsCounter.lowStr;
+            avgFPSReading.text = fpsCounter.avgStr;
+            highFPSReading.text = fpsCounter.highStr;
+            lowFPSReading.text = fpsCounter.lowStr;
         }
         public class LabelNotFoundException : Exception
         {

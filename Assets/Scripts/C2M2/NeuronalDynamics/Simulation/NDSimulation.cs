@@ -405,6 +405,12 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 {
                     timeLabel.sim = this;
                 }
+
+                NDInfoDisplay info = controlPanel.GetComponentInChildren<NDInfoDisplay>();
+                if(info != null)
+                {
+                    info.sim = this;
+                }
             }
         }
 

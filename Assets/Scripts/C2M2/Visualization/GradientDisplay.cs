@@ -8,7 +8,7 @@ namespace C2M2.Visualization
 {
     public class GradientDisplay : MonoBehaviour
     {
-        public LineRenderer linerend = null;
+        public LineRenderer gradientLine = null;
         public Gradient gradient;
         public float displayLength = 75;
         public float displayHeight = 10;
@@ -45,10 +45,10 @@ namespace C2M2.Visualization
         private void Awake()
         {
             // Init gradient display
-            if(linerend == null)
+            if(gradientLine == null)
             {
-                linerend = GetComponent<LineRenderer>();
-                if(linerend == null)
+                gradientLine = GetComponent<LineRenderer>();
+                if(gradientLine == null)
                 {
                     Debug.LogError("No line renderer found on " + name);
                     Destroy(this);
@@ -108,19 +108,19 @@ namespace C2M2.Visualization
 
                 GradientColorKey[] colorKeys = gradient.colorKeys;
 
-                linerend.positionCount = colorKeys.Length;
+                gradientLine.positionCount = colorKeys.Length;
                 Vector3[] positions = new Vector3[colorKeys.Length];
                 for (int i = 0; i < colorKeys.Length; i++)
                 {
                     positions[i] = new Vector3(colorKeys[i].time * displayLength, 0f, 0f);
                 }
 
-                linerend.SetPositions(positions);
+                gradientLine.SetPositions(positions);
 
-                linerend.colorGradient = gradient;
+                gradientLine.colorGradient = gradient;
 
-                linerend.startWidth = displayHeight;
-                linerend.endWidth = displayHeight;
+                gradientLine.startWidth = displayHeight;
+                gradientLine.endWidth = displayHeight;
 
                 DrawOutline();
 
@@ -142,11 +142,7 @@ namespace C2M2.Visualization
 
             BuildNewMarkers();
 
-            if (unitText != null)
-            {
-                unitText.text = Unit;
-               // unitText.transform.eulerAngles = new Vector3(0f, 0f, -transform.eulerAngles.z);
-            }
+            if (unitText != null) unitText.text = Unit;
 
             void BuildNewMarkers()
             {
@@ -159,28 +155,32 @@ namespace C2M2.Visualization
                     GameObject newMarker = Instantiate(textMarkerPrefab, textMarkerHolder.transform);
                     newMarker.transform.localPosition = new Vector3(i * placementStep, -displayHeight, 0f);
 
-                    TextMeshProUGUI text = newMarker.GetComponentInChildren<TextMeshProUGUI>();
-                    text.text = (min + (i * valueStep)).ToString(precision);
+                    // Set label text
+                    TextMeshProUGUI labelText = newMarker.GetComponentInChildren<TextMeshProUGUI>();
+                    if(labelText == null) Debug.LogError("No text found on marker!");
 
-                    // Rotate text against the rotation of the graph
-                    text.transform.eulerAngles = new Vector3(0f, 0f, -transform.eulerAngles.z);              
+                    labelText.text = (min + (i * valueStep)).ToString(precision);             
 
-                    LineRenderer lineMarker = newMarker.GetComponentInChildren<LineRenderer>();
-                    if (lineMarker != null)
+                    // Draw line perpendicular to gradient
+                    LineRenderer lr = newMarker.GetComponentInChildren<LineRenderer>();
+
+                    if(lr == null)
                     {
-                        lineMarker.transform.localPosition = new Vector3(0f, displayHeight / newMarker.transform.localScale.y / 2, 0f);
-                        lineMarker.positionCount = 2;
-                        lineMarker.SetPositions(new Vector3[] {
-                        new Vector3(0f, displayHeight/4, 0f),
-                        new Vector3(0f, displayHeight/4, 0f) });
+                        Debug.LogError("No line renderer found on text marker prefab!");
+                        return;
+                    }
 
-                        lineMarker.startWidth = LineWidth;
-                        lineMarker.endWidth = LineWidth;
-                    }
-                    else
-                    {
-                        Debug.LogWarning("No line marker found on text marker prefab!");
-                    }
+                    lr.transform.localPosition = new Vector3(0f, displayHeight / newMarker.transform.localScale.y / 2, 0f);
+                    lr.positionCount = 2;
+                    lr.SetPositions(new Vector3[] {
+                    new Vector3(0f, 0f, 0f),
+                    new Vector3(0f, displayHeight, 0f) });
+
+                    // Draw marker line in front of the gradient
+                    lr.sortingOrder = gradientLine.sortingOrder + 1;
+
+                    lr.startWidth = LineWidth;
+                    lr.endWidth = LineWidth;
                 }
             }
         }

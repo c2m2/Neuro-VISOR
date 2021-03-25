@@ -109,6 +109,22 @@ namespace C2M2.NeuronalDynamics.Visualization.VRN
             return s;
         }
 
+        public int[] ListRefinements()
+        {
+            Load();
+            var geoms = geometry.geom1d.Select((x, i) => new { Value = x, Index = i });
+            int[] options = new int[geoms.Count()];
+
+            int j = 0;
+            foreach (var geom in geoms)
+            {
+                bool isParsable = Int32.TryParse(geom.Value.refinement, out options[j]);
+                j++;
+            }
+
+            return options;
+        }
+
         /// READ_UGX
         /// <summary>
         /// Read a file (UGX mesh) from the .vrn archive and creates a Grid instance from it

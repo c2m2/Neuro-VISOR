@@ -34,6 +34,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         [Tooltip("Alter the precision of the color scale display")]
         public int colorScalePrecision = 3;
 
+        // RODO: Allow SparseSolverTestv1 to be a variable script
         public void Load(RaycastHit hit)
         {
             GameObject solveObj = new GameObject();

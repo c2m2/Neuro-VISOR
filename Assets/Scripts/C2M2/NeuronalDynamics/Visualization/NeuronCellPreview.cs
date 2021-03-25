@@ -23,19 +23,10 @@ namespace C2M2.NeuronalDynamics.Visualization
         public Color32 color;
         public NDSimulationLoader loader = null;
         public TextMeshProUGUI fileNameDisplay;
+        public int refinement = 0;
+        public int[] refinements { get; private set; }
         private VrnReader vrnReader = null;
 
-        /*
-        private void Awake()
-        {
-
-            PreviewCell(vrnFileName);
-            if(loader == null)
-            {
-                loader = GetComponentInParent<LoadSimulation>();
-            }
-        }
-        */
         public void PreviewCell()
         {
             PreviewCell(vrnFileName, color);
@@ -52,6 +43,8 @@ namespace C2M2.NeuronalDynamics.Visualization
             char sl = Path.DirectorySeparatorChar;
             if (!vrnFileName.EndsWith(".vrn")) vrnFileName = vrnFileName + ".vrn";
             vrnReader = new VrnReader(Application.streamingAssetsPath + sl + "NeuronalDynamics" + sl + "Geometries" + sl + vrnFileName);
+
+            refinements = vrnReader.ListRefinements();
 
             string meshName1D = vrnReader.Retrieve1DMeshName();
 
@@ -79,6 +72,7 @@ namespace C2M2.NeuronalDynamics.Visualization
         public void LoadThisCell(RaycastHit hit)
         {
             loader.vrnFileName = vrnFileName;
+            loader.refinementLevel = refinement;
             loader.Load(hit);
         }
     }
