@@ -41,6 +41,8 @@ namespace C2M2.NeuronalDynamics.Interaction
 
         private void UpdateDisplay()
         {
+            cellPreview.PreviewCell();
+
             displayTxt.text = "Refinement: " + cellPreview.refinement.ToString();
         }
 

@@ -105,23 +105,6 @@ namespace C2M2.Simulation
             }
             if (gaussSubCond != null) { gaussSubCond = null; }
         }
-        public void RaycasterHotColor(bool rightHand)
-        {
-            Color hotCol = objectManager.gradient.Evaluate(1);
-            if (rightHand) { GameManager.instance.RaycasterRightChangeColor(hotCol); }
-            else { GameManager.instance.RaycasterLeftChangeColor(hotCol); }
-        }
-        public void RaycasterColdColor(bool rightHand)
-        {
-            Color coldCol = objectManager.gradient.Evaluate(0);
-            if (rightHand) { GameManager.instance.RaycasterRightChangeColor(coldCol); }
-            else { GameManager.instance.RaycasterLeftChangeColor(coldCol); }
-        }
-        public void RaycasterDefaultColor(bool rightHand)
-        {
-            if (rightHand) { GameManager.instance.RaycasterRightChangeColor(Color.white); }
-            else { GameManager.instance.RaycasterLeftChangeColor(Color.white); }
-        }
         #endregion
         public void PointInfoPanelInstantiate(RaycastHit hit)
         {

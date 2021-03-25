@@ -52,7 +52,6 @@ namespace C2M2.Interaction.UI
 
         private void Start()
         {
-            keyboard = GameManager.instance.raycastKeyboard;
         }
 
         public void Activate(RaycastHit hit)

@@ -30,7 +30,6 @@ namespace C2M2.Interaction.UI
         void Awake()
         {
             lineRend = GetComponent<LineRenderer>();
-            menuSnapPosition = GameManager.instance.menuSnapPosition;
         }
         void Update()
         {

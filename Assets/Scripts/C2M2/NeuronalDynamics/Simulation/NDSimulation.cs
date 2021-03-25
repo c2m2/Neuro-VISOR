@@ -1,16 +1,12 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using C2M2.NeuronalDynamics.UGX;
-using UnityEditor;
 using UnityEngine;
 using System.Threading;
 using DiameterAttachment = C2M2.NeuronalDynamics.UGX.IAttachment<C2M2.NeuronalDynamics.UGX.DiameterData>;
 using MappingAttachment = C2M2.NeuronalDynamics.UGX.IAttachment<C2M2.NeuronalDynamics.UGX.MappingData>;
-using TMPro;
 using Math = C2M2.Utils.Math;
-using C2M2.Interaction;
 using C2M2.Simulation;
 using C2M2.Utils.DebugUtils;
 using C2M2.Utils.MeshUtils;
@@ -18,6 +14,7 @@ using Grid = C2M2.NeuronalDynamics.UGX.Grid;
 using C2M2.NeuronalDynamics.Visualization.VRN;
 using C2M2.NeuronalDynamics.Interaction;
 using C2M2.Visualization;
+using System.Linq;
 
 namespace C2M2.NeuronalDynamics.Simulation {
 
@@ -91,7 +88,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
         }
         public List<NeuronClamp> clamps = new List<NeuronClamp>();
         public Mutex clampMutex { get; private set; } = new Mutex();
-        private static Tuple<int, double> nullClamp = new Tuple<int, double>(-1, -1);
+        private static readonly Tuple<int, double> nullClamp = new Tuple<int, double>(-1, -1);
 
         [Header ("1D Visualization")]
         public bool visualize1D = false;
@@ -152,11 +149,11 @@ namespace C2M2.NeuronalDynamics.Simulation {
             }
         }
 
-        private NeuronCell neuronCell = null;
-        public NeuronCell NeuronCell
+        private Neuron neuron = null;
+        public Neuron Neuron
         {
-            get { return neuronCell; }
-            set { neuronCell = value; }
+            get { return neuron; }
+            set { neuron = value; }
         }
 
         private float averageDendriteRadius = 0;
@@ -166,12 +163,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
             {
                 if (averageDendriteRadius == 0)
                 {
-                    float radiusSum = 0;
-                    foreach (NeuronCell.NodeData node in NeuronCell.nodeData)
-                    {
-                        radiusSum += (float) node.nodeRadius;
-                    }
-                    averageDendriteRadius = radiusSum / NeuronCell.nodeData.Count;
+                    averageDendriteRadius = (float)Neuron.nodes.Select(node => node.NodeRadius).Average();
                 }
                 return averageDendriteRadius;
             }
@@ -238,9 +230,9 @@ namespace C2M2.NeuronalDynamics.Simulation {
                     clampMutex.WaitOne();
                     for (int i = 0; i < clamps.Count; i++)
                     {
-                        if (clamps[i] != null && clamps[i].focusVert != -1 && clamps[i].clampLive)
+                        if (clamps[i] != null && clamps[i].FocusVert != -1 && clamps[i].ClampLive)
                         {
-                            clampValues[i] = new Tuple<int, double>(clamps[i].focusVert, clamps[i].clampPower);
+                            clampValues[i] = new Tuple<int, double>(clamps[i].FocusVert, clamps[i].ClampPower);
                         }
                         else
                         {
@@ -283,21 +275,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
         /// Translate 3D vertex values to 1D values, and pass them downwards for interaction
         /// </summary>
         public sealed override void SetValues (RaycastHit hit) {
-            // We will have 3 new index/value pairings
-            Tuple<int, double>[] newValues = new Tuple<int, double>[3];
-            // Translate hit triangle index so we can index into triangles array
-            int triInd = hit.triangleIndex * 3;
-            MeshFilter mf = hit.transform.GetComponentInParent<MeshFilter>();
-            // Get mesh vertices from hit triangle
-            int v1 = mf.mesh.triangles[triInd];
-            int v2 = mf.mesh.triangles[triInd + 1];
-            int v3 = mf.mesh.triangles[triInd + 2];
-            // Attach new values to new vertices
-            newValues[0] = new Tuple<int, double>(v1, raycastHitValue);
-            newValues[1] = new Tuple<int, double>(v2, raycastHitValue);
-            newValues[2] = new Tuple<int, double>(v3, raycastHitValue);
-
-            SetValues (newValues);
+            SetValues(HitToTriangles(hit));
         }
         /// <summary>
         /// Translate 3D vertex values to 1D values, and pass them downwards for interaction
@@ -390,11 +368,11 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 if (gradientDisplay != null)
                 {
                     gradientDisplay.sim = this;
-                    if (colorLUT != null)
+                    if (ColorLUT != null)
                     {
-                        gradientDisplay.gradient = colorLUT.Gradient;
+                        gradientDisplay.gradient = ColorLUT.Gradient;
                     }
-                    else if (colorLUT == null) { Debug.LogWarning("No ColorLUT found on MeshSimulation"); }
+                    else if (ColorLUT == null) { Debug.LogWarning("No ColorLUT found on MeshSimulation"); }
 
                     gradientDisplay.precision = "F" + colorScalePrecision.ToString();
                 }
@@ -433,7 +411,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
             ColliderInflation = inflation;
         }
 
-        public void SwitchMesh (double inflation) {
+        public void SwitchVisualMesh (double inflation) {
             inflation = Math.Clamp (inflation, 1, 5);
             VisualInflation = inflation;
         }
@@ -447,7 +425,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
 
             VrnReader.ReadUGX(meshName1D, ref grid1D);
 
-            NeuronCell = new NeuronCell(grid1D);
+            Neuron = new Neuron(grid1D);
         }
         private void Update2DGrid()
         {

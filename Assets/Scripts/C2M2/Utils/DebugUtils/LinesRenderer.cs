@@ -30,8 +30,13 @@ namespace C2M2.Utils.DebugUtils
         public void Toggle(bool on) => renderersGo.SetActive(on);
         private GameObject InitializeRenderers(List<Vertex> verts, Vector3[] vertPos, float lineWidth)
         {
+            if (renderersGo != null)
+            {
+                Destroy(renderersGo);
+            }
+
             char slash = Path.DirectorySeparatorChar;
-            GameObject renderersGo = Instantiate(Resources.Load("Prefabs" + slash + "LineRenderer"), transform) as GameObject;
+            renderersGo = Instantiate(Resources.Load("Prefabs" + slash + "LineRenderer"), transform) as GameObject;
             LineRenderer lr = renderersGo.GetComponent<LineRenderer>();
             lr.startColor = color;
             lr.endColor = color;
@@ -52,6 +57,7 @@ namespace C2M2.Utils.DebugUtils
             renderersGo.transform.parent = transform;
 
             return renderersGo;
+
             void AddVertsRecursive(Vertex vert)
             {
                 // Skip this vert if we've already visited it
@@ -72,11 +78,30 @@ namespace C2M2.Utils.DebugUtils
             }
         }
 
+        /*
         private GameObject InitializeRenderers(List<Edge> edges, Vector3[] vertices, float lineWidth)
         {
+            if(renderersGo != null)
+            {
+                Destroy(renderersGo);
+                renderersGo = null;
+            }
+            if(lineRenderers != null)
+            {
+                foreach(LineRenderer line in lineRenderers)
+                {
+                    Destroy(line.gameObject);
+                }
+                lineRenderers = null;
+            }
+
             renderersGo = InstantiateChild(transform);
 
             lineRenderers = new LineRenderer[edges.Count]; // Two points per line
+
+            
+            char slash = Path.DirectorySeparatorChar;
+            GameObject lrPrefab = Resources.Load("Prefabs" + slash + "LineRenderer") as GameObject;
 
             for (int i = 0; i < edges.Count; i++)
             {
@@ -91,8 +116,7 @@ namespace C2M2.Utils.DebugUtils
                 renderGo.transform.eulerAngles = Vector3.zero;
 
                 // Instantiate a prefab instance of our linerenderer, make the lineRenderers object its parent so it doesn't flood the editor
-                char slash = Path.DirectorySeparatorChar;
-                GameObject renderer = Instantiate(Resources.Load("Prefabs" + slash + "LineRenderer"), transform) as GameObject;
+                GameObject renderer = Instantiate(lrPrefab, transform);
 
                 // Set LineRenderer settings
                 lineRenderers[i] = renderer.GetComponent<LineRenderer>();
@@ -106,6 +130,8 @@ namespace C2M2.Utils.DebugUtils
             }
             return renderersGo;
         }
+        */
+        /*
         private GameObject InstantiateChild(Transform parent)
         {
             GameObject go = new GameObject();
@@ -116,6 +142,7 @@ namespace C2M2.Utils.DebugUtils
             go.transform.localScale = Vector3.one;
             return go;
         }
+        */
         private bool enabledPrev = true;
         private IEnumerator CheckToggle()
         {
@@ -126,6 +153,22 @@ namespace C2M2.Utils.DebugUtils
             }
             enabledPrev = enabled;
             yield return null;
+        }
+
+        private void OnDestroy()
+        {
+            if (renderersGo != null)
+            {
+                Destroy(renderersGo);
+            }
+            if (lineRenderers != null)
+            {
+                foreach (LineRenderer line in lineRenderers)
+                {
+                    Destroy(line.gameObject);
+                }
+                lineRenderers = null;
+            }
         }
     }
 }

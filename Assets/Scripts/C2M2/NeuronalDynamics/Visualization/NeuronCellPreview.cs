@@ -26,6 +26,7 @@ namespace C2M2.NeuronalDynamics.Visualization
         public int refinement = 0;
         public int[] refinements { get; private set; }
         private VrnReader vrnReader = null;
+        private LinesRenderer lines = null;
 
         public void PreviewCell()
         {
@@ -46,7 +47,7 @@ namespace C2M2.NeuronalDynamics.Visualization
 
             refinements = vrnReader.ListRefinements();
 
-            string meshName1D = vrnReader.Retrieve1DMeshName();
+            string meshName1D = vrnReader.Retrieve1DMeshName(refinement);
 
             /// Create empty grid with name of grid in archive
             Grid grid = new Grid(new Mesh(), meshName1D);
@@ -62,8 +63,18 @@ namespace C2M2.NeuronalDynamics.Visualization
             // Adjust center so cell mesh is centered at (0,0,0)
             transform.localPosition = -scale * grid.Mesh.bounds.center;
 
+            if(lines != null)
+            {
+                Destroy(lines);
+                lines = null;
+            }
+
             // Render cells
-            LinesRenderer lines = gameObject.AddComponent<LinesRenderer>();
+            if (lines == null)
+            {
+                lines = gameObject.AddComponent<LinesRenderer>();
+            }
+
             // (line width = scale)
             lines.Draw(grid, color, scale);
 

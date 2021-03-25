@@ -19,6 +19,7 @@ namespace C2M2.Interaction
         private float initialTopEndCapLength;
         private float initialBottomEndCapLength;
         private float initialRulerLength;
+        private float prevRulerLength = 0;
         private float scaledRulerLength;
         private string units;
 
@@ -34,22 +35,26 @@ namespace C2M2.Interaction
         // Update is called once per frame
         void Update()
         {
-            float markerSpacing = 0.03f; ///< minimum spacing between each marker and beginning and end of ruler
-            float markerSpacingPercent = markerSpacing * initialRulerLength / transform.lossyScale.z; ///< minimum spacing between each marker and beginning and end of ruler in percent of ruler's length
             if (sim != null)
             {
                 float rulerLength = transform.lossyScale.z / sim.transform.lossyScale.z;
-                float firstMarkerLength = markerSpacingPercent * rulerLength;
+                if (prevRulerLength != rulerLength && Math.Abs((prevRulerLength - rulerLength)/prevRulerLength) >= .005) /// length change must be greater than 0.5% to update
+                {
+                    float markerSpacing = 0.03f; ///< minimum spacing between each marker and beginning and end of ruler
+                    float markerSpacingPercent = markerSpacing * initialRulerLength / transform.lossyScale.z; ///< minimum spacing between each marker and beginning and end of ruler in percent of ruler's length
+                    float firstMarkerLength = markerSpacingPercent * rulerLength;
 
-                int magnitude = GetMagnitude(firstMarkerLength*2); //multiplication by 2 ensures that markers above 500 get treated as the next unit up
-                units = GetUnit(magnitude);
+                    int magnitude = GetMagnitude(firstMarkerLength*2); //multiplication by 2 ensures that markers above 500 get treated as the next unit up
+                    units = GetUnit(magnitude);
 
-                int siPrefixGroup = (int)Math.Floor(magnitude / 3.0);
-                // scaledFirstMarkerLength is a scaled version of firstMarkerLength so it is between .5 and 500
-                float scaledFirstMarkerLength = (float)(firstMarkerLength / Math.Pow(10, siPrefixGroup * 3));
-                scaledRulerLength = (float)(rulerLength / Math.Pow(10, siPrefixGroup * 3));
-                UpdateMarkers(scaledFirstMarkerLength);
-                UpdateEndCaps();
+                   int siPrefixGroup = (int)Math.Floor(magnitude / 3.0);
+                    // scaledFirstMarkerLength is a scaled version of firstMarkerLength so it is between .5 and 500
+                    float scaledFirstMarkerLength = (float)(firstMarkerLength / Math.Pow(10, siPrefixGroup * 3));
+                    scaledRulerLength = (float)(rulerLength / Math.Pow(10, siPrefixGroup * 3));
+                    UpdateMarkers(scaledFirstMarkerLength);
+                    UpdateEndCaps();
+                    prevRulerLength = rulerLength;
+                }
             }
         }
 

@@ -1,19 +1,16 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using C2M2;
 using System;
 
 namespace C2M2.Simulation.Samples
 {
-    using Interaction;
     using Interaction.VR;
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     /// <summary> Run a blank ScalarFieldSimulation using every MeshRenderer childed under this script  </summary>
     ///
     /// <remarks>   Jacob, 4/29/2020. </remarks>
     ////////////////////////////////////////////////////////////////////////////////////////////////////
-    public class CombinedMeshSimulation : Simulation.MeshSimulation
+    public class CombinedMeshSimulation : MeshSimulation
     {
         private double[] values;
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -33,7 +30,7 @@ namespace C2M2.Simulation.Samples
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         public override void SetValues(RaycastHit hit)
         {
-            Tuple<int, double>[] newValues = ((RaycastSimHeaterDiscrete)Heater).HitToTriangles(hit);
+            Tuple<int, double>[] newValues = HitToTriangles(hit);
 
             foreach (Tuple<int, double> value in newValues)
             {

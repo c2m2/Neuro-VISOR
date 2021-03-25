@@ -2981,10 +2981,6 @@ MonoBehaviour:
   clampControllerR: {fileID: 320645336}
   clampControllerL: {fileID: 835806272}
   allActive: 1
-  inactiveCol:
-    serializedVersion: 2
-    rgba: 4291348680
-  highlightSphereScale: 3
   hitEvent: {fileID: 1157977726}
   toggleDestroyOVR: 2
   toggleDestroyOVRS: 8
@@ -5249,9 +5245,9 @@ PrefabInstance:
       propertyPath: m_Name
       value: OVRPlayerController(C2M2)
       objectReference: {fileID: 0}
-    - target: {fileID: 1763426730904823259, guid: dba47ce578d281342b7055d4b03912a9,
+    - target: {fileID: 1763426730954066355, guid: dba47ce578d281342b7055d4b03912a9,
         type: 3}
-      propertyPath: m_IsActive
+      propertyPath: m_Enabled
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1763426731366549412, guid: dba47ce578d281342b7055d4b03912a9,

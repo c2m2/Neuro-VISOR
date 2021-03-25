@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using C2M2.NeuronalDynamics.Simulation;
 using C2M2.Interaction;
@@ -15,14 +14,14 @@ namespace C2M2.NeuronalDynamics.Interaction
         {
             get
 {
-                return Simulation.colorLUT.GlobalMin;
+                return Simulation.ColorLUT.GlobalMin;
             }
         }
         public float MaxPower
         {
             get
             {
-                return Simulation.colorLUT.GlobalMax;
+                return Simulation.ColorLUT.GlobalMax;
             }
         }
         // Sensitivity of the clamp power control. Lower sensitivity means clamp power changes more quickly
@@ -58,9 +57,6 @@ namespace C2M2.NeuronalDynamics.Interaction
             }
         }
 
-        public Color32 inactiveCol = Color.gray;
-        public float highlightSphereScale = 3f;
-
         public RaycastPressEvents hitEvent = null;
 
         /// <summary>
@@ -69,19 +65,86 @@ namespace C2M2.NeuronalDynamics.Interaction
         /// <param name="hit"></param>
         public void InstantiateClamp(RaycastHit hit)
         {
-            // Make sure we have a valid prefab and simulation
+            // Make sure we have a valid prefab
             if (clampPrefab == null) Debug.LogError("No Clamp prefab found");
+
             var sim = hit.collider.GetComponentInParent<NDSimulation>();
             // If there is no NDSimulation, don't try instantiating a clamp
             if (sim == null) return;
+
+            int clampIndex = GetNearestPoint(hit);
+            //ensures the vertex is available
+            if (VertIsAvailable(clampIndex))
+            {
+                NeuronClamp clamp = Instantiate(clampPrefab, Simulation.transform).GetComponentInChildren<NeuronClamp>();
+
+                clamp.ReportSimulation(Simulation, clampIndex);
+            }
             
-            var clampObj = Instantiate(clampPrefab, sim.transform);
-            NeuronClamp clamp = clampObj.GetComponentInChildren<NeuronClamp>();
+        }
 
-            clamp.InactiveCol = inactiveCol;
-            clamp.highlightSphereScale = highlightSphereScale;
+        private int GetNearestPoint(RaycastHit hit)
+        {
+            // Translate contact point to local space
+            MeshFilter mf = Simulation.transform.GetComponentInParent<MeshFilter>();
+            if (mf == null) return -1;
 
-            clamp.ReportSimulation(sim, hit);
+            // Get 3D mesh vertices from hit triangle
+            int triInd = hit.triangleIndex * 3;
+            int v1 = mf.mesh.triangles[triInd];
+            int v2 = mf.mesh.triangles[triInd + 1];
+            int v3 = mf.mesh.triangles[triInd + 2];
+
+            // Find 1D verts belonging to these 3D verts
+            int[] verts1D = new int[]
+            {
+                Simulation.Map[v1].v1, Simulation.Map[v1].v2,
+                Simulation.Map[v2].v1, Simulation.Map[v2].v2,
+                Simulation.Map[v3].v1, Simulation.Map[v3].v2
+            };
+            Vector3 localHitPoint = Simulation.transform.InverseTransformPoint(hit.point);
+
+            float nearestDist = float.PositiveInfinity;
+            int nearestVert1D = -1;
+            foreach (int vert in verts1D)
+            {
+                float dist = Vector3.Distance(localHitPoint, Simulation.Verts1D[vert]);
+                if (dist < nearestDist)
+                {
+                    nearestDist = dist;
+                    nearestVert1D = vert;
+                }
+            }
+
+            return nearestVert1D;
+        }
+
+        private bool VertIsAvailable(int clampIndex)
+        {
+            // minimum distance between clamps 
+            float distanceBetweenClamps = Simulation.AverageDendriteRadius * 2;
+
+            foreach (NeuronClamp clamp in Simulation.clamps)
+            {
+                // If there is a clamp on that 1D vertex, the spot is not open
+                if (clamp.FocusVert == clampIndex)
+                {
+                    Debug.LogWarning("Clamp already exists on focus vert [" + clampIndex + "]");
+                    return false;
+                }
+                // If there is a clamp within distanceBetweenClamps, the spot is not open
+                else
+                {
+
+                    float dist = (Simulation.Verts1D[clamp.FocusVert] - Simulation.Verts1D[clampIndex]).magnitude;
+                    if (dist < distanceBetweenClamps)
+                    {
+                        Debug.LogWarning("Clamp too close to clamp located on vert [" + clamp.FocusVert + "].");
+                        return false;
+                    }
+                }
+            }
+            return true;
         }
 
         private int destroyCount = 50;
@@ -108,7 +171,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             {
                 if (GameManager.instance.VrIsActive)
                 {
-                    // Use the value of whichever joystick is held up furthest
+                    // Uses the value of both joysticks added together
                     float y1 = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick).y;
                     float y2 = OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick).y;
                     float scaler = (y1 + y2);
@@ -155,7 +218,7 @@ namespace C2M2.NeuronalDynamics.Interaction
 
             foreach (NeuronClamp clamp in Clamps)
             {
-                if (clamp != null) clamp.clampPower += power;
+                if (clamp != null) clamp.ClampPower += power;
             }       
         }
 
@@ -185,7 +248,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             {
                 foreach (NeuronClamp clamp in Clamps)
                 {
-                    if (clamp != null && clamp.focusVert != -1) {
+                    if (clamp != null && clamp.FocusVert != -1) {
                         if (allActive)
                             clamp.DeactivateClamp();
                         else
@@ -203,7 +266,7 @@ namespace C2M2.NeuronalDynamics.Interaction
                 Simulation.clampMutex.WaitOne();
                 foreach (NeuronClamp clamp in Clamps)
                 {
-                    if (clamp != null && clamp.focusVert != -1)
+                    if (clamp != null && clamp.FocusVert != -1)
                         Destroy(clamp.transform.parent.gameObject);
                 }
                 Clamps.Clear();

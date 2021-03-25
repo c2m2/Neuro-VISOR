@@ -2,15 +2,18 @@
 using System.Threading;
 using System;
 using C2M2.Interaction;
-using C2M2.Visualization;
 using UnityEngine.Profiling;
 
 namespace C2M2.Simulation
 {
+
     /// <summary>
     /// Provides an base interface for simulations using a general data type T
     /// </summary>
-    /// <typeparam name="ValueType"> Type of simulation values </typeparam>
+    /// <typeparam name="ValueType">Type of simulation values</typeparam>
+    /// <typeparam name="VizType"></typeparam>
+    /// <typeparam name="RaycastType"></typeparam>
+    /// <typeparam name="GrabType"></typeparam>
     public abstract class Simulation<ValueType, VizType, RaycastType, GrabType> : Interactable
     {
         [Tooltip("Run simulation code without visualization or interaction features")]
@@ -18,11 +21,6 @@ namespace C2M2.Simulation
         /// Run solve code without visualization or interaction
         /// </summary>
         public bool dryRun = false;
-
-        /// <summary>
-        /// Should the simulation start itself in Awake?
-        /// </summary>
-        public bool startOnAwake = true; // TODO: Move away from using this
 
         public double raycastHitValue = 55;
         public Tuple<int, double>[] raycastHits = new Tuple<int, double>[0];
@@ -54,7 +52,7 @@ namespace C2M2.Simulation
         /// </remarks>
         protected abstract VizType BuildVisualization();
 
-        public VizType viz { get; protected set; }
+        public VizType Viz { get; protected set; }
 
         /// <summary>
         /// Update the visualization. This will be called once per Update() call
@@ -80,26 +78,17 @@ namespace C2M2.Simulation
 
             if (!dryRun)
             {
-                viz = BuildVisualization();
+                Viz = BuildVisualization();
                 BuildInteraction();
             }
 
             // Run child awake methods first
-            OnAwakePost(viz);
+            OnAwakePost(Viz);
 
             return;
 
             void BuildInteraction()
             {
-                switch (interactionType)
-                {
-                    case (InteractionType.Discrete):
-                        Heater = gameObject.AddComponent<RaycastSimHeaterDiscrete>();
-                        ((RaycastSimHeaterDiscrete)Heater).value = raycastHitValue;
-                        break;
-                    case (InteractionType.Continuous): Heater = gameObject.AddComponent<RaycastSimHeaterContinuous>(); break;
-                }
-
                 /// Add event child object for interaction scripts to find
                 GameObject child = new GameObject("DirectRaycastInteractionEvent");
                 child.transform.parent = transform;
@@ -108,7 +97,7 @@ namespace C2M2.Simulation
                 raycastEventManager = gameObject.AddComponent<RaycastEventManager>();
                 // Create hit events
                 defaultRaycastEvent = child.AddComponent<RaycastPressEvents>();
-                // TODO: Get rid of RaycastSimHeater, just add Simulation.AddValue here
+
                 defaultRaycastEvent.OnHoldPress.AddListener((hit) => SetValues(hit));
                 defaultRaycastEvent.OnEndPress.AddListener((hit) => ResetRacyastHits(hit));
 
@@ -116,9 +105,10 @@ namespace C2M2.Simulation
 
                 OnStart();
 
-                if (startOnAwake) StartSimulation();
+                StartSimulation();
             }
         }
+
         public void FixedUpdate()
         {
             OnUpdate();
@@ -248,11 +238,34 @@ namespace C2M2.Simulation
         {
             raycastHits = new Tuple<int, double>[0];
         }
+
+        public Tuple<int, double>[] HitToTriangles(RaycastHit hit)
+        {
+            // We will have 3 new index/value pairings
+            Tuple<int, double>[] newValues = new Tuple<int, double>[3];
+
+            // Translate hit triangle index so we can index into triangles array
+            int triInd = hit.triangleIndex * 3;
+            MeshFilter mf = hit.transform.GetComponentInParent<MeshFilter>();
+            // Get mesh vertices from hit triangle
+            int v1 = mf.mesh.triangles[triInd];
+            int v2 = mf.mesh.triangles[triInd + 1];
+            int v3 = mf.mesh.triangles[triInd + 2];
+
+            // Attach new values to new vertices
+            newValues[0] = new Tuple<int, double>(v1, raycastHitValue);
+            newValues[1] = new Tuple<int, double>(v2, raycastHitValue);
+            newValues[2] = new Tuple<int, double>(v3, raycastHitValue);
+
+            return newValues;
+        }
     }
+
     public class SimulationNotFoundException : Exception
     {
         public SimulationNotFoundException() : base() { }
         public SimulationNotFoundException(string message) : base(message) { }
         public SimulationNotFoundException(string message, Exception inner) : base(message, inner) { }
     }
+
 }

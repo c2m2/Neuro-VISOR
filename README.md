@@ -19,6 +19,7 @@ We use a modified version of the GNU LPGL v3. Our license can be found in LICENS
 
 ## Code quality
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/ac2c4122b3174e4a8209ef2e791792b3)](https://www.codacy.com?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=c2m2/virtual-reality&amp;utm_campaign=Badge_Grade)
+[![CodeQL](https://github.com/c2m2/virtual-reality/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/c2m2/virtual-reality/actions/workflows/codeql-analysis.yml)
 
 # Recommended hardware
 
