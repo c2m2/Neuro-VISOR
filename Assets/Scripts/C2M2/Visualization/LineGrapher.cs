@@ -340,5 +340,34 @@ namespace C2M2.Visualization
         {
             Destroy(gameObject);
         }
+
+        public void XPrecisionAdd(RaycastHit hit)
+        {
+            if(XPrecision < 6)
+            {
+                XPrecision++;
+            }
+        }
+        public void XPrecisionSub(RaycastHit hit)
+        {
+            if(XPrecision > 0)
+            {
+                XPrecision--;
+            }
+        }
+        public void YPrecisionAdd(RaycastHit hit)
+        {
+            if (YPrecision < 6)
+            {
+                YPrecision++;
+            }
+        }
+        public void YPrecisionSub(RaycastHit hit)
+        {
+            if (YPrecision > 0)
+            {
+                YPrecision--;
+            }
+        }
     }
 }

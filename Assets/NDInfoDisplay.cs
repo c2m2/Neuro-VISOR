@@ -47,10 +47,5 @@ namespace C2M2.Visualization
             triTxt.text = "Triangles: " + sim.Grid2D.Mesh.triangles.Length.ToString();
         }
 
-        // Update is called once per frame
-        void Update()
-        {
-
-        }
     }
 }
