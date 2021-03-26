@@ -90,7 +90,7 @@ namespace C2M2.NeuronalDynamics.Visualization
                 transform.localScale.y / sim.transform.localScale.y,
                 transform.localScale.z / sim.transform.localScale.z);
 
-            lineGraph.NumSamples = 1000;
+            lineGraph.MaxSamples = 1000;
         }
 
         private void FixedUpdate()

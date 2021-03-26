@@ -19,25 +19,30 @@ namespace C2M2.Visualization
         public RectTransform infoPanelButton = null;
 
 
-        private int numSamples = 750;
-        public int NumSamples
+        private int maxSamples = 750;
+        public int MaxSamples
         {
             get
             {
-                return numSamples;
+                return maxSamples;
             }
             set
             {
-                if (numSamples == positions.Count) return;
+                if (maxSamples == positions.Count) return;
 
-                if (numSamples <= 0)
+                if (maxSamples <= 0)
                 {
                     Debug.LogError("Cannot have fewer than 1 point on graph");
                     return;
                 }
 
-                numSamples = value;
+                maxSamples = value;
 
+                
+                positions.Capacity = maxSamples;
+
+                
+                /*
                 List<Vector3> newPosL = new List<Vector3>(numSamples);
 
                 // If we decrease the number of samples, we now have fewer graph points 
@@ -49,14 +54,17 @@ namespace C2M2.Visualization
                         newPosL.Add(positions[i]);
                     }
                 }
-                // If we increase the number of samples, we now have more graph points
+                
+                // If we increase the number of samples, we now have empty graph points
                 if(numSamples > positions.Count)
                 {
+                    
                     // Copy the samples we have at the end, set the rest to 0
                     for(int i = 0; i < numSamples - positions.Count; i++)
                     {
                         newPosL.Add(Vector3.zero);
                     }
+                    
                     int j = 0;
                     for(int i = numSamples - positions.Count; i < numSamples; i++)
                     {
@@ -64,14 +72,14 @@ namespace C2M2.Visualization
                         j++;
                     }
                 }
+                */
+                
 
-                pointsRenderer.positionCount = numSamples;
+                //positions = newPosL;
+               // posArr = new Vector3[numSamples];
 
-                positions = newPosL;
-                posArr = new Vector3[numSamples];
-
-                XMin = positions[0].x;
-                XMax = positions[NumSamples - 1].x;
+               // XMin = positions[0].x;
+                //XMax = positions[NumSamples - 1].x;
             }
         }
 
@@ -126,16 +134,20 @@ namespace C2M2.Visualization
             }
             set
             {
-                xPrecision = value;
-                xPrecFormat = "F" + xPrecision;
-
-                if (cursor != null)
+                if (value > 0 && value <= maxXPrec)
                 {
-                    cursor.UpdateFormatString(XPrecision, yPrecision);
+                    xPrecision = value;
+                    xPrecFormat = "F" + xPrecision;
+
+                    if (cursor != null)
+                    {
+                        cursor.UpdateFormatString(XPrecision, yPrecision);
+                    }
                 }
             }
         }
         private string xPrecFormat = "F3";
+        private int maxXPrec = 6;
 
         private float xMin = float.PositiveInfinity;
         public float XMin
@@ -172,16 +184,20 @@ namespace C2M2.Visualization
             }
             set
             {
-                yPrecision = value;
-                yPrecFormat = "F" + yPrecision;
-
-                if(cursor != null)
+                if (value > 0 && value <= maxYPrec)
                 {
-                    cursor.UpdateFormatString(XPrecision, yPrecision);
+                    yPrecision = value;
+                    yPrecFormat = "F" + yPrecision;
+
+                    if (cursor != null)
+                    {
+                        cursor.UpdateFormatString(XPrecision, yPrecision);
+                    }
                 }
             }
         }
         private string yPrecFormat = "F3";
+        private int maxYPrec = 6;
 
         private float yMin = float.PositiveInfinity;
         public float YMin
@@ -220,105 +236,142 @@ namespace C2M2.Visualization
         private void Awake()
         {
             rt = (RectTransform)transform;
-            if (pointsRenderer == null)
-            {
-                Debug.LogError("No renderer given for plot points!");
-                Destroy(this);
-            }
-            if (cursor == null)
-            {
-                cursor = GetComponentInChildren<GraphCursor>();
-                if (cursor == null)
-                {
-                    Debug.LogWarning("No cursor found for LineGrapher.");
-                }
-            }
 
-            if (pointerLines == null)
-            {
-                pointerLines = GetComponentInChildren<GraphPointer>();
-                if (pointerLines == null)
-                {
-                    Debug.LogWarning("No pointer lines found for LineGrapher.");
-                }
-            }
+            NullChecks();
 
-            if(closeButton != null)
+            InitInfoPanel();
+
+            InitOutline();
+
+            InitInfoPanelButton();
+        
+            MaxSamples = maxSamples;
+
+            void InitInfoPanel()
             {
                 float buttonWidth = graphWidth / 10;
                 float margin = buttonWidth / 2.5f;
                 closeButton.sizeDelta = new Vector2(buttonWidth - margin, buttonWidth - margin);
                 closeButton.anchoredPosition = new Vector3(-(graphWidth / 2) - (buttonWidth / 2), (graphWidth / 2) + (buttonWidth / 2));
                 closeButton.GetComponent<BoxCollider>().size = new Vector3(buttonWidth, buttonWidth);
-            }
 
-            if(infoPanel != null)
-            {
                 infoPanel.sizeDelta = new Vector2(graphWidth / 2, rt.sizeDelta.y);
 
                 Vector3 lwh = infoPanel.sizeDelta;
 
-                infoPanel.anchoredPosition = new Vector2((rt.sizeDelta.x +lwh.x) / 2, 0f);
+                infoPanel.anchoredPosition = new Vector2((rt.sizeDelta.x + lwh.x) / 2, 0f);
 
                 Image backgroundImg = infoPanel.GetComponentInChildren<Image>();
                 backgroundImg.rectTransform.sizeDelta = lwh;
-
-                LineRenderer lr = infoPanel.GetComponent<LineRenderer>();
-                
-                lr.positionCount = 4;
-                lr.SetPositions(new Vector3[] {
-                    new Vector3(-lwh.x / 2, -lwh.y / 2),
-                    new Vector3(-lwh.x / 2, lwh.y / 2),
-                    new Vector3(lwh.x / 2, lwh.y / 2),
-                    new Vector3(lwh.x / 2, -lwh.y / 2) } );
-                lr.loop = true;
             }
-
-            if(infoPanelButton != null)
+            void InitInfoPanelButton()
             {
                 float buttonWidth = graphWidth / 10;
                 float margin = buttonWidth / 2.5f;
                 infoPanelButton.sizeDelta = new Vector2(buttonWidth - margin, buttonWidth - margin);
                 infoPanelButton.anchoredPosition = new Vector3((graphWidth / 2) + (buttonWidth / 2), (graphWidth / 2) + (buttonWidth / 2));
-                foreach(BoxCollider receiver in infoPanel.GetComponentsInChildren<BoxCollider>())
+                foreach (BoxCollider receiver in infoPanel.GetComponentsInChildren<BoxCollider>())
                 {
                     receiver.size = new Vector3(buttonWidth, buttonWidth);
                 }
             }
-
-            NumSamples = numSamples;
+            void InitOutline()
+            {
+                LineRenderer lr = infoPanel.GetComponent<LineRenderer>();
+                Vector3 lwh = infoPanel.sizeDelta;
+                lr.positionCount = 4;
+                lr.SetPositions(new Vector3[] {
+                new Vector3(-lwh.x / 2, -lwh.y / 2),
+                new Vector3(-lwh.x / 2, lwh.y / 2),
+                new Vector3(lwh.x / 2, lwh.y / 2),
+                new Vector3(lwh.x / 2, -lwh.y / 2) });
+                lr.loop = true;
+            }
+            void NullChecks()
+            {
+                if (pointsRenderer == null)
+                {
+                    Debug.LogError("No renderer given for plot points!");
+                    Destroy(this);
+                }
+                if (cursor == null)
+                {
+                    cursor = GetComponentInChildren<GraphCursor>();
+                    if (cursor == null)
+                    {
+                        Debug.LogError("No cursor found for LineGrapher.");
+                        Destroy(this);
+                    }
+                }
+                if (pointerLines == null)
+                {
+                    pointerLines = GetComponentInChildren<GraphPointer>();
+                    if (pointerLines == null)
+                    {
+                        Debug.LogError("No pointer lines found for LineGrapher.");
+                        Destroy(this);
+                    }
+                }
+                if (closeButton == null)
+                {
+                    Debug.LogError("No Close Button found.");
+                    Destroy(this);
+                }
+                if (infoPanel == null)
+                {
+                    Debug.LogError("No info panel found.");
+                    Destroy(this);
+                }
+                if (infoPanelButton == null)
+                {
+                    Debug.LogError("No info panel open/close button found.");
+                    Destroy(this);
+                }
+            }
         }
 
         public void AddValue(float x, float y)
         {
-            // RemoveAt(0) is an O(n) operation and should be removed if possible
-            positions.RemoveAt(0);
+            if (positions.Count > MaxSamples)
+            {
+                // RemoveAt(0) is an O(n) operation and should be removed if possible
+                positions.RemoveAt(0);
+            }
+
             positions.Add(new Vector3(x, y));
 
             // Update max and min
             XMin = positions[0].x;
-            XMax = positions[NumSamples - 1].x;
+            XMax = positions[positions.Count - 1].x;
+
             if (y < YMin) YMin = y;
             else if(y > YMax) YMax = y;
 
             UpdateScale();
 
+            /*
             // By using posArr, we only need to make a new Vector3 once in AddValue,
             // instead of creating numSamples new Vector3 structs here
-            for (int i = 0; i < NumSamples; i++)
+            for (int i = 0; i < positions.Count; i++)
             {
                 posArr[i] = positions[i];
             }
+            */
 
-            pointsRenderer.SetPositions(posArr);
+
+            pointsRenderer.positionCount = positions.Count;
+            pointsRenderer.SetPositions(positions.ToArray());
         }
 
         private void UpdateScale()
         {
+            if (XMax == XMin || YMax == YMin) return;
+
             // Instead of rescaling the entire array of values each frame, 
             // this scales the line renderer's transform, saving tons of performance
             float xScaler = graphWidth / (XMax - XMin);
             float yScaler = graphWidth / (YMax - YMin);
+
             float xOrigin = localOriginX - (XMin * xScaler);
             float yOrigin = localOriginY - (YMin * yScaler);
 
@@ -339,35 +392,6 @@ namespace C2M2.Visualization
         public void DestroyPlot()
         {
             Destroy(gameObject);
-        }
-
-        public void XPrecisionAdd(RaycastHit hit)
-        {
-            if(XPrecision < 6)
-            {
-                XPrecision++;
-            }
-        }
-        public void XPrecisionSub(RaycastHit hit)
-        {
-            if(XPrecision > 0)
-            {
-                XPrecision--;
-            }
-        }
-        public void YPrecisionAdd(RaycastHit hit)
-        {
-            if (YPrecision < 6)
-            {
-                YPrecision++;
-            }
-        }
-        public void YPrecisionSub(RaycastHit hit)
-        {
-            if (YPrecision > 0)
-            {
-                YPrecision--;
-            }
         }
     }
 }

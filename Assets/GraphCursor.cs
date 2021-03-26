@@ -20,7 +20,7 @@ namespace C2M2.Visualization
 
         private RaycastHit lastHit;
 
-
+        #region Getters
         private float XMin
         {
             get
@@ -60,7 +60,7 @@ namespace C2M2.Visualization
         {
             get
             {
-                return lineGraph.NumSamples;
+                return lineGraph.positions.Count;
             }
         }
         private float Xorigin
@@ -84,39 +84,48 @@ namespace C2M2.Visualization
                 return lineGraph.pointsRenderer.transform.localPosition;
             }
         }
+        #endregion
 
         private bool locked = false;
 
         private void Awake()
         {
-            if(lineGraph == null)
-            {
-                lineGraph = GetComponentInParent<LineGrapher>();
-                if (lineGraph == null)
-                {
-                    Debug.LogError("LineGraphCursor not attached to LineGrapher");
-                    Destroy(this);
-                }
-            }
-            if (xCursor == null || yCursor == null || cursor == null)
-            {
-                Debug.LogError("No cursor(s) missing.");
-                Destroy(this);
-            }
+            NullChecks();
 
-            if(cursorLabel == null && showLabel)
-            {
-                Debug.LogError("No text label found for cursor. Attach text or disable showLabel");
-                Destroy(this);
-            }
             labelBackground = (RectTransform)cursorLabel.GetComponentInChildren<Image>().transform;
 
             ToggleCursor(false);
 
             formatString = "({0:F" + lineGraph.XPrecision + "}, {1:F" + lineGraph.YPrecision + "})";
+
+            void NullChecks()
+            {
+                if (lineGraph == null)
+                {
+                    lineGraph = GetComponentInParent<LineGrapher>();
+                    if (lineGraph == null)
+                    {
+                        Debug.LogError("LineGraphCursor not attached to LineGrapher");
+                        Destroy(this);
+                    }
+                }
+                if (xCursor == null || yCursor == null || cursor == null)
+                {
+                    Debug.LogError("No cursor(s) missing.");
+                    Destroy(this);
+                }
+
+                if (cursorLabel == null && showLabel)
+                {
+                    Debug.LogError("No text label found for cursor. Attach text or disable showLabel");
+                    Destroy(this);
+                }
+            }
         }
         public void AlignCursor(RaycastHit hit)
         {
+            if (lineGraph.positions.Count < 2) return;
+
             // Make sure cursor parts are enabled
             ToggleCursor(true);
 
@@ -129,12 +138,17 @@ namespace C2M2.Visualization
 
         private void UpdateCursor(RaycastHit hit)
         {
+            float xRange = XMax - XMin;
+            float yRange = YMax - YMin;
+
+            if (xRange == 0 || yRange == 0) return;
+
             Vector3 scaler = new Vector3(
                 GraphWidth / (XMax - XMin),
                 GraphWidth / (YMax - YMin));
 
-            // Get the cursor's position on the graph
-            Vector3 truePos = GetTruePosition(hit.point);
+            // Get the cursor's local position on the graph
+            Vector3 truePos = GetLocalPosition(hit.point);
 
             // Get the cursor's nearest value in the graph
             int ind = Mathf.RoundToInt((truePos.x / GraphWidth) * NumSamples);
@@ -149,7 +163,7 @@ namespace C2M2.Visualization
             // Update the label position and its displayed value
             UpdateLabel(cursor.transform.localPosition, labelValue);
 
-            Vector3 GetTruePosition(Vector3 hitPoint)
+            Vector3 GetLocalPosition(Vector3 hitPoint)
             {
                 // Scale hit position to graph space
                 Vector3 localHit = lineGraph.pointsRenderer.transform.InverseTransformPoint(hitPoint);
