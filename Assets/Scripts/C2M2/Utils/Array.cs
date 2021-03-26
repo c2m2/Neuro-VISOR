@@ -74,20 +74,20 @@ namespace C2M2
             public static List<int> ToList(this int[] array)
             {
                 List<int> list = new List<int>(array.Length);
-                for (int i = 0; i < array.Length; i++) { list[i] = array[i]; }
+                for (int i = 0; i < array.Length; i++) { list.Add(array[i]); }
                 return list;
             }
 
             public static List<float> ToList(this float[] array)
             {
                 List<float> list = new List<float>(array.Length);
-                for (int i = 0; i < array.Length; i++) { list[i] = array[i]; }
+                for (int i = 0; i < array.Length; i++) { list.Add(array[i]); }
                 return list;
             }
             public static List<double> ToList(this double[] array)
             {
                 List<double> list = new List<double>(array.Length);
-                for (int i = 0; i < array.Length; i++) { list[i] = array[i]; }
+                for (int i = 0; i < array.Length; i++) { list.Add(array[i]); }
                 return list;
             }
             #endregion

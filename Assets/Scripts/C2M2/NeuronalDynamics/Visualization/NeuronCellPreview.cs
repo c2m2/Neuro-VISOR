@@ -86,5 +86,29 @@ namespace C2M2.NeuronalDynamics.Visualization
             loader.refinementLevel = refinement;
             loader.Load(hit);
         }
+        public bool RemoveRefinement(int refinement)
+        {
+            bool removeSuccessful = false;
+
+            List<int> refOptions = refinements.ToList();
+            if (refOptions.Contains(refinement))
+            {
+                refOptions.Remove(refinement);
+
+                refinements = refOptions.ToArray();
+                removeSuccessful = true;
+            }
+
+            if(this.refinement == refinement)
+            {
+                if(this.refinement-1 > 0)
+                {
+                    this.refinement--;
+                    PreviewCell();
+                } 
+            }
+
+            return removeSuccessful;
+        }
     }
 }
