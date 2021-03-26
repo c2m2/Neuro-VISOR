@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System;
 using System.Text;
+using UnityEngine;
+using Random = System.Random;
 
 namespace C2M2
 {
@@ -70,6 +72,12 @@ namespace C2M2
                 for (int i = 0; i < array.Length; i++) { array[i] = list[i]; }
                 return array;
             }
+            public static Vector3[] ToArray(this List<Vector3> list)
+            {
+                Vector3[] array = new Vector3[list.Count];
+                for (int i = 0; i < array.Length; i++) { array[i] = list[i]; }
+                return array;
+            }
 
             public static List<int> ToList(this int[] array)
             {
@@ -90,6 +98,7 @@ namespace C2M2
                 for (int i = 0; i < array.Length; i++) { list.Add(array[i]); }
                 return list;
             }
+
             #endregion
             /// <summary> Cast an array of doubles into an array of floats </summary>
             public static float[] ToFloat(this double[] array)

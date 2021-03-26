@@ -5,6 +5,7 @@ using TMPro;
 using UnityEngine.UI;
 using C2M2.Utils;
 
+
 namespace C2M2.Visualization
 {
     public class LineGrapher : MonoBehaviour
@@ -37,49 +38,8 @@ namespace C2M2.Visualization
                 }
 
                 maxSamples = value;
-
                 
                 positions.Capacity = maxSamples;
-
-                
-                /*
-                List<Vector3> newPosL = new List<Vector3>(numSamples);
-
-                // If we decrease the number of samples, we now have fewer graph points 
-                if(numSamples < positions.Count)
-                {
-                    // Take the most recent samples
-                    for(int i = 0; i < numSamples; i++)
-                    {
-                        newPosL.Add(positions[i]);
-                    }
-                }
-                
-                // If we increase the number of samples, we now have empty graph points
-                if(numSamples > positions.Count)
-                {
-                    
-                    // Copy the samples we have at the end, set the rest to 0
-                    for(int i = 0; i < numSamples - positions.Count; i++)
-                    {
-                        newPosL.Add(Vector3.zero);
-                    }
-                    
-                    int j = 0;
-                    for(int i = numSamples - positions.Count; i < numSamples; i++)
-                    {
-                        newPosL.Add(positions[j]);
-                        j++;
-                    }
-                }
-                */
-                
-
-                //positions = newPosL;
-               // posArr = new Vector3[numSamples];
-
-               // XMin = positions[0].x;
-                //XMax = positions[NumSamples - 1].x;
             }
         }
 
@@ -228,8 +188,6 @@ namespace C2M2.Visualization
 
         // Keeping one list of Vector3's saves list operation time over storing a separate x and y list
         public List<Vector3> positions;
-        // Used to convert list to array for LineRenderer
-        private Vector3[] posArr;
 
         public RectTransform rt { get; private set; }
 
@@ -349,26 +307,19 @@ namespace C2M2.Visualization
 
             UpdateScale();
 
-            /*
-            // By using posArr, we only need to make a new Vector3 once in AddValue,
-            // instead of creating numSamples new Vector3 structs here
-            for (int i = 0; i < positions.Count; i++)
-            {
-                posArr[i] = positions[i];
-            }
-            */
-
-
             pointsRenderer.positionCount = positions.Count;
-            pointsRenderer.SetPositions(positions.ToArray());
+
+            // Our local ToArray function should be faster than Enumerable's default function
+            pointsRenderer.SetPositions(Array.ToArray(positions));
         }
 
         private void UpdateScale()
         {
             if (XMax == XMin || YMax == YMin) return;
 
-            // Instead of rescaling the entire array of values each frame, 
-            // this scales the line renderer's transform, saving tons of performance
+            /// Instead of rescaling the entire array of values each frame, 
+            /// this scales the line renderer's transform, 
+            /// saving tons of performance over rescaling each point individually
             float xScaler = graphWidth / (XMax - XMin);
             float yScaler = graphWidth / (YMax - YMin);
 

@@ -124,7 +124,7 @@ namespace C2M2.Visualization
         }
         public void AlignCursor(RaycastHit hit)
         {
-            if (lineGraph.positions.Count < 2) return;
+            if (XMax == XMin || YMax == YMin) return;
 
             // Make sure cursor parts are enabled
             ToggleCursor(true);
@@ -138,11 +138,6 @@ namespace C2M2.Visualization
 
         private void UpdateCursor(RaycastHit hit)
         {
-            float xRange = XMax - XMin;
-            float yRange = YMax - YMin;
-
-            if (xRange == 0 || yRange == 0) return;
-
             Vector3 scaler = new Vector3(
                 GraphWidth / (XMax - XMin),
                 GraphWidth / (YMax - YMin));
