@@ -205,6 +205,138 @@ namespace C2M2
             }
             #endregion
 
+            #region Extrema
+            /// <summary>
+            /// Returns a list of indices of the array/list's local extrema in the order in which they are found.
+            /// </summary>
+            /// <param name="includeEnds"> If true, also returns the first and last index of the array/list. </param>
+            /// <param name="onlyMaxima"> If true, only returns local maxima. </param>
+            /// <param name="onlyMinima"> If true, only returns local minima. </param>
+            /// <returns></returns>
+            public static List<int> GetExtrema(this double[] array, bool includeEnds = false, bool onlyMaxima = false, bool onlyMinima = false)
+            {
+                List<int> extrema = new List<int>();
+
+                if (includeEnds) extrema.Add(0);
+
+                for(int i = 1; i < array.Length-1; i++)
+                {
+                    if(array[i] > array[i-1] && array[i] > array[i + 1])
+                    { // Found a local maxima
+                        // If we only want to keep the minima, don't add a maxima
+                        if (onlyMinima == false)
+                        {
+                            extrema.Add(i);
+                        }
+                    }else if(array[i] < array[i-1] && array[i] < array[i + 1])
+                    { // Found a local minima                          
+                       
+                        // If we only want to keep the maxima, don't add a minima
+                        if (onlyMaxima == false)
+                        {
+                            extrema.Add(i);
+                        }
+                    }
+                }
+
+                if (includeEnds) extrema.Add(array.Length - 1);
+
+                return extrema;
+            }
+
+            /// <summary>
+            /// Returns a list of indices of the array/list's local extrema in the order in which they are found.
+            /// </summary>
+            /// <param name="includeEnds"> If true, also returns the first and last index of the array/list. </param>
+            /// <param name="onlyMaxima"> If true, only returns local maxima. </param>
+            /// <param name="onlyMinima"> If true, only returns local minima. </param>
+            /// <returns></returns>
+            public static List<int> GetExtrema(this List<double> list, bool includeEnds = false, bool onlyMaxima = false, bool onlyMinima = false)
+            {
+                List<int> extrema = new List<int>();
+
+                if (includeEnds) extrema.Add(0);
+
+                for (int i = 1; i < list.Count - 1; i++)
+                {
+                    if (list[i] > list[i - 1] && list[i] > list[i + 1])
+                    { // Found a local maxima
+                        // If we only want to keep the minima, don't add a maxima
+                        if (onlyMinima == false)
+                        {
+                            extrema.Add(i);
+                        }
+                    }
+                    else if (list[i] < list[i - 1] && list[i] < list[i + 1])
+                    { // Found a local minima                          
+
+                        // If we only want to keep the maxima, don't add a minima
+                        if (onlyMaxima == false)
+                        {
+                            extrema.Add(i);
+                        }
+                    }
+                }
+
+                if (includeEnds) extrema.Add(list.Count - 1);
+
+                return extrema;
+            }
+            #endregion
+
+            /// <summary>
+            /// Returns a list of indices of the array/list's local extrema in the order in which they are found.
+            /// </summary>
+            /// <param name="includeEnds"> If true, also returns the first and last index of the array/list. </param>
+            /// <param name="usePivots"> If true, will use the first index of a found extrema: {0, 0.25, 1, 1, 1, 0.25} would return 2 as one extrema index. </param>
+            /// <param name="onlyMaxima"> If true, only returns local maxima. </param>
+            /// <param name="onlyMinima"> If true, only returns local minima. </param>
+            /// <returns></returns>
+            public static List<int> GetExtrema(this List<float> list, bool includeEnds = false, bool usePivots = false, bool onlyMaxima = false, bool onlyMinima = false)
+            {
+                List<int> extrema = new List<int>();
+
+                if (includeEnds) extrema.Add(0);
+
+                for (int i = 1; i < list.Count - 1; i++)
+                {
+                    // true if { (i-1), maxima, (i+1) } 
+                    bool isMaxima = (list[i] > list[i - 1]) && (list[i] > list[i + 1]);
+                    // true if { (i-1), minima, (i+1) } 
+                    bool isMinima = (list[i] < list[i - 1]) && (list[i] < list[i + 1]);
+
+                    if (usePivots)
+                    {
+                        // true if a regular maxima OR { (i-1), maxima, maxima } 
+                        isMaxima = isMaxima || ((list[i] > list[i-1]) && (list[i] == list[i+1]));
+                        // true if a regular maxima OR { (i-1), minima, minima } 
+                        isMaxima = isMaxima || ((list[i] < list[i - 1]) && (list[i] == list[i + 1]));
+                    }
+
+                    if (isMaxima)
+                    { // Found a local maxima
+                        // If we only want to keep the minima, don't add a maxima
+                        if (onlyMinima == false)
+                        {
+                            extrema.Add(i);
+                        }
+                    }
+                    else if (isMinima)
+                    { // Found a local minima                          
+
+                        // If we only want to keep the maxima, don't add a minima
+                        if (onlyMaxima == false)
+                        {
+                            extrema.Add(i);
+                        }
+                    }
+                }
+
+                if (includeEnds) extrema.Add(list.Count - 1);
+
+                return extrema;
+            }
+
             public static string ToStringFull(this double[] array)
             {
                 StringBuilder sb = new StringBuilder(array.Length * 10);
