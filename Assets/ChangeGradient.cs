@@ -10,18 +10,20 @@ namespace C2M2.Visualization
     /// <summary>
     /// Can change the color scale of a simulation, as well as read in gradients from text files
     /// </summary>
+    /// <remarks>
+    /// The user can manually provide gradients and their names. This script will add any read 
+    /// gradients to the existing list of gradients/names
+    /// </remarks>
     public class ChangeGradient : MonoBehaviour
     {
         public GradientDisplay display = null;
         public Gradient[] gradients;
-
-        public bool[] readFromFile;
-        public string[] gradFileNames;
+        public string[] gradientNames;
         public string basePath = Application.streamingAssetsPath;
         public string extension = ".txt";
         public string subPath = Path.DirectorySeparatorChar + "Gradients";
-        public int defaultGrad = 0;
-        public int activeGrad = 0;
+        public string defaultGradient;
+        private int activeGrad = 0;
         public TextMeshProUGUI nameDisplay = null;
 
         public void NextGrad()
@@ -42,9 +44,9 @@ namespace C2M2.Visualization
         public void ApplyGrad()
         {
             display.sim.ColorLUT.Gradient = gradients[activeGrad];
-            if (nameDisplay != null && gradFileNames.Length == gradients.Length)
+            if (nameDisplay != null && gradientNames.Length == gradients.Length)
             {
-                nameDisplay.text = gradFileNames[activeGrad];
+                nameDisplay.text = gradientNames[activeGrad];
             }
         }
 
@@ -65,50 +67,60 @@ namespace C2M2.Visualization
 
         private void Start()
         {
-            if(defaultGrad >= 0 && defaultGrad < gradients.Length)
+            // Active gradient is 0 by default
+            activeGrad = 0;
+            for(int i = 0; i < gradientNames.Length; i++)
             {
-                activeGrad = defaultGrad;
+                if (gradientNames[i].Equals(defaultGradient))
+                {
+                    activeGrad = i;
+                }
             }
-            else
-            {
-                activeGrad = 0;
-            }
+
             ApplyGrad();
         }
 
         private void ReadGradients()
         {
-            if(gradFileNames.Length > 0)
-            {
-                Gradient[] grads = new Gradient[gradFileNames.Length];
+            // Find gradient files in gradient directory
+            DirectoryInfo d = new DirectoryInfo(basePath + subPath + Path.DirectorySeparatorChar);
+            FileInfo[] files = d.GetFiles("*" + extension);
 
-                /// Allows the user to manually override requests to read gradient in order to provide their own.
-                /// If an index is requested to be read, the name is used to read the file.
-                /// Otherwise the manual overrise is used.
-                /// If no read request is given, assumes the file is meant to be read
-                if(readFromFile.Length != gradFileNames.Length)
+            if (files.Length > 0)
+            {
+                // Get only the name of the gradient from each found file
+                string[] readNames = new string[files.Length];
+                for (int i = 0; i < files.Length; i++)
                 {
-                    bool[] readTemp = new bool[gradFileNames.Length];
-                    for(int i = 0; i < readTemp.Length; i++)
-                    {
-                        readTemp[i] = (i < readFromFile.Length) ? readFromFile[i] : true;
-                    }
-                    readFromFile = readTemp;
+                    string name = Path.GetFileName(files[i].Name);
+                    readNames[i] = name.Remove(name.Length - extension.Length);
                 }
+
+                Gradient[] readGrads = new Gradient[readNames.Length];
 
                 // Read requested gradietns
-                for(int i = 0; i < gradFileNames.Length; i++)
+                for(int i = 0; i < readNames.Length; i++)
                 {
-                    if (readFromFile[i])
-                    {
-                        grads[i] = ReadGradient.Read(basePath + subPath + Path.DirectorySeparatorChar + gradFileNames[i] + extension);
-                    }
-                    else
-                    {
-                        if (i < gradients.Length) grads[i] = gradients[i];
-                        else Debug.LogError("No manual gradient provided");
-                    }
+                    readGrads[i] = ReadGradient.Read(basePath + subPath + Path.DirectorySeparatorChar + readNames[i] + extension);
                 }
+
+                // Merge read gradients and manually given gradients
+                int totalGradients = readGrads.Length + gradients.Length;
+                Gradient[] gradsTemp = new Gradient[totalGradients];
+                string[] namesTemp = new string[totalGradients];
+                for (int i = 0; i < gradients.Length; i++)
+                {
+                    gradsTemp[i] = gradients[i];
+                    namesTemp[i] = (i < gradientNames.Length) ? gradientNames[i] : "";
+                }
+                for(int i = gradients.Length; i < totalGradients; i++)
+                {
+                    gradsTemp[i] = readGrads[i - gradients.Length];
+                    namesTemp[i] = readNames[i - gradients.Length];
+                }
+
+                gradients = gradsTemp;
+                gradientNames = namesTemp;
             }
         }
 
