@@ -4091,20 +4091,20 @@ MonoBehaviour:
     m_NumAlphaKeys: 2
   - serializedVersion: 2
     key0: {r: 0, g: 0, b: 0, a: 1}
-    key1: {r: 1, g: 0, b: 0, a: 1}
-    key2: {r: 1, g: 1, b: 0, a: 0}
-    key3: {r: 1, g: 1, b: 1, a: 0}
-    key4: {r: 0, g: 0, b: 0, a: 0}
-    key5: {r: 0, g: 0, b: 0, a: 0}
-    key6: {r: 0, g: 0, b: 0, a: 0}
+    key1: {r: 0.5, g: 0, b: 0, a: 1}
+    key2: {r: 1, g: 0, b: 0, a: 0}
+    key3: {r: 1, g: 0.5, b: 0, a: 0}
+    key4: {r: 1, g: 1, b: 0, a: 0}
+    key5: {r: 1, g: 1, b: 0.5, a: 0}
+    key6: {r: 1, g: 1, b: 1, a: 0}
     key7: {r: 0, g: 0, b: 0, a: 0}
     ctime0: 0
-    ctime1: 24576
-    ctime2: 49151
-    ctime3: 65535
-    ctime4: 0
-    ctime5: 0
-    ctime6: 0
+    ctime1: 12288
+    ctime2: 24576
+    ctime3: 36863
+    ctime4: 49151
+    ctime5: 57343
+    ctime6: 65535
     ctime7: 0
     atime0: 0
     atime1: 65535
@@ -4115,7 +4115,7 @@ MonoBehaviour:
     atime6: 0
     atime7: 0
     m_Mode: 0
-    m_NumColorKeys: 4
+    m_NumColorKeys: 7
     m_NumAlphaKeys: 2
   - serializedVersion: 2
     key0: {r: 0, g: 0, b: 0.5, a: 1}
@@ -4211,7 +4211,7 @@ MonoBehaviour:
   basePath: C:/Users/jacob/Desktop/C2M2/virtual-reality/Assets/StreamingAssets
   extension: .txt
   subPath: \Gradients
-  defaultGrad: 4
+  defaultGrad: 2
   activeGrad: 0
   nameDisplay: {fileID: 3216071954476222748}
 --- !u!1 &3216071955561065853
