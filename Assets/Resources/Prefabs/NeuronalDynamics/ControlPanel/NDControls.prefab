@@ -4201,7 +4201,7 @@ MonoBehaviour:
     m_Mode: 0
     m_NumColorKeys: 8
     m_NumAlphaKeys: 2
-  readFromFiles: 0
+  readFromFile: 0101010000
   gradFileNames:
   - cool
   - hot
