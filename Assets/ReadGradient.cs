@@ -32,9 +32,7 @@ namespace C2M2.Utils
                 ReadFile();
 
                 // Simplify color and alpha list however possible
-                //SimplifyGradient();
-                //ColorBand cb = new ColorBand();
-                
+                SimplifyGradient();
 
                 return BuildGradient(BuildCols(), aList);
 
@@ -214,50 +212,6 @@ namespace C2M2.Utils
                     }
                 }
                 
-                ColorBand BuildCB()
-                {
-                    ColorBand cb = new ColorBand();
-
-                    Keyframe[] rKeys = new Keyframe[rList.Count];
-                    float timeMax = rList.Count - 1;
-                    for(int time = 0; time < rList.Count; time++)
-                    {
-                        rKeys[time] = new Keyframe(time / timeMax, rList[time]);
-                    }
-
-                    Keyframe[] gKeys = new Keyframe[gList.Count];
-                    timeMax = gList.Count - 1;
-                    for (int time = 0; time < gList.Count; time++)
-                    {
-                        gKeys[time] = new Keyframe(time / timeMax, gList[time]);
-                    }
-
-                    Keyframe[] bKeys = new Keyframe[bList.Count];
-                    timeMax = bList.Count - 1;
-                    for (int time = 0; time < bList.Count; time++)
-                    {
-                        bKeys[time] = new Keyframe(time / timeMax, bList[time]);
-                    }
-
-                    Keyframe[] aKeys = new Keyframe[aList.Count];
-                    timeMax = aList.Count - 1;
-                    for (int time = 0; time < aList.Count; time++)
-                    {
-                        aKeys[time] = new Keyframe(time / timeMax, aList[time]);
-                    }
-
-                    AnimationCurve rCurve = new AnimationCurve();
-                    AnimationCurve gCurve = new AnimationCurve();
-                    AnimationCurve bCurve = new AnimationCurve();
-                    AnimationCurve aCurve = new AnimationCurve();
-
-                    rCurve.keys = rKeys;
-                    gCurve.keys = gKeys;
-                    bCurve.keys = bKeys;
-                    aCurve.keys = aKeys;
-
-                    return cb;
-                }
                 Color[] BuildCols()
                 {
                     Color[] colors = new Color[rList.Count];

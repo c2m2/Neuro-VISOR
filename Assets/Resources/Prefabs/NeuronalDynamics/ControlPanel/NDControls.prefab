@@ -4175,21 +4175,21 @@ MonoBehaviour:
     m_NumAlphaKeys: 2
   - serializedVersion: 2
     key0: {r: 0.18995, g: 0.07176, b: 0.23217, a: 1}
-    key1: {r: 0.4796, g: 0.01583, b: 0.01055, a: 1}
-    key2: {r: 0, g: 0, b: 0, a: 0}
-    key3: {r: 0, g: 0, b: 0, a: 0}
-    key4: {r: 0, g: 0, b: 0, a: 0}
-    key5: {r: 0, g: 0, b: 0, a: 0}
-    key6: {r: 0, g: 0, b: 0, a: 0}
-    key7: {r: 0, g: 0, b: 0, a: 0}
+    key1: {r: 0.27701, g: 0.45152, b: 0.92347, a: 1}
+    key2: {r: 0.09267, g: 0.86554, b: 0.7623, a: 0}
+    key3: {r: 0.53255, g: 0.99919, b: 0.30581, a: 0}
+    key4: {r: 0.77581, g: 0.94113, b: 0.2031, a: 0}
+    key5: {r: 0.99675, g: 0.62093, b: 0.18297, a: 0}
+    key6: {r: 0.8538, g: 0.2217, b: 0.02677, a: 0}
+    key7: {r: 0.4796, g: 0.01583, b: 0.01055, a: 0}
     ctime0: 0
-    ctime1: 65535
-    ctime2: 0
-    ctime3: 0
-    ctime4: 0
-    ctime5: 0
-    ctime6: 0
-    ctime7: 0
+    ctime1: 9216
+    ctime2: 20735
+    ctime3: 30736
+    ctime4: 36372
+    ctime5: 46595
+    ctime6: 56283
+    ctime7: 65535
     atime0: 0
     atime1: 65535
     atime2: 0
@@ -4199,7 +4199,7 @@ MonoBehaviour:
     atime6: 0
     atime7: 0
     m_Mode: 0
-    m_NumColorKeys: 2
+    m_NumColorKeys: 8
     m_NumAlphaKeys: 2
   readFromFiles: 0
   gradFileNames:
