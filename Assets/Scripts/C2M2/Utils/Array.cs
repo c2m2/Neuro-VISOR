@@ -309,8 +309,8 @@ namespace C2M2
                     {
                         // true if a regular maxima OR { (i-1), maxima, maxima } 
                         isMaxima = isMaxima || ((list[i] > list[i-1]) && (list[i] == list[i+1]));
-                        // true if a regular maxima OR { (i-1), minima, minima } 
-                        isMaxima = isMaxima || ((list[i] < list[i - 1]) && (list[i] == list[i + 1]));
+                        // true if a regular minima OR { (i-1), minima, minima } 
+                        isMinima = isMinima || ((list[i] < list[i - 1]) && (list[i] == list[i + 1]));
                     }
 
                     if (isMaxima)

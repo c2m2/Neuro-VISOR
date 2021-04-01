@@ -1,26 +1,14 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
+using System;
 
 namespace C2M2.Utils
 {
-    /// <summary>
-    /// Can read a gradient from a text file.
-    /// </summary>
-    /// <remarks>
-    /// Gradient format is assumed to be as follows by default:
-    /// r g b
-    /// 
-    /// optionally alphas can be given in the format
-    /// r g b a
-    /// </remarks>
-    public static class ReadGradient
+    public class ReadColorBand : MonoBehaviour
     {
-        const char delimiter = ' ';
-
-        public static Gradient Read(string fileName, char delimiter = delimiter)
+        public static ColorBand Read(string fileName, char delimiter = ' ')
         {
             using (var reader = new StreamReader(fileName))
             {
@@ -34,9 +22,11 @@ namespace C2M2.Utils
                 // Simplify color and alpha list however possible
                 //SimplifyGradient();
                 //ColorBand cb = new ColorBand();
-                
 
-                return BuildGradient(BuildCols(), aList);
+                return BuildCB();
+
+
+                // return BuildGradient(BuildCols(), aList);
 
                 void ReadFile()
                 {
@@ -102,7 +92,7 @@ namespace C2M2.Utils
                 void SimplifyGradient()
                 {
                     int maxSimplifications = 5;
-                    
+
                     if (rList.Count > 8)
                     {
                         string warn = "Gradients can only contain 8 keys, " + fileName + " contains " + rList.Count + ".";
@@ -135,7 +125,8 @@ namespace C2M2.Utils
                             }
                         }
                         Debug.LogWarning(warn);
-                    }else if (rList.Count < 2)
+                    }
+                    else if (rList.Count < 2)
                     {
                         Debug.LogWarning("Not enough color keys given, reverting to default colors");
                         rList = new List<float>(2);
@@ -213,14 +204,14 @@ namespace C2M2.Utils
                         bList = bTemp;
                     }
                 }
-                
+
                 ColorBand BuildCB()
                 {
                     ColorBand cb = new ColorBand();
 
                     Keyframe[] rKeys = new Keyframe[rList.Count];
                     float timeMax = rList.Count - 1;
-                    for(int time = 0; time < rList.Count; time++)
+                    for (int time = 0; time < rList.Count; time++)
                     {
                         rKeys[time] = new Keyframe(time / timeMax, rList[time]);
                     }
@@ -262,7 +253,7 @@ namespace C2M2.Utils
                 {
                     Color[] colors = new Color[rList.Count];
 
-                    for(int i = 0; i < colors.Length; i++)
+                    for (int i = 0; i < colors.Length; i++)
                     {
                         colors[i] = new Color(rList[i], gList[i], bList[i]);
                     }

@@ -18,6 +18,7 @@ namespace C2M2.Visualization
         public GameObject textMarkerHolder = null;
         public TextMeshProUGUI unitText = null;
         public LineRenderer outline = null;
+
         public float Scaler
         {
             get
