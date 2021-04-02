@@ -6,8 +6,6 @@ using System.Threading;
 
 namespace C2M2
 {
-    using Interaction;
-    using Interaction.UI;
     using Interaction.VR;
     using NeuronalDynamics.Interaction;
     using NeuronalDynamics.Visualization;
@@ -76,12 +74,11 @@ namespace C2M2
 
             if(roomOptions != null && roomOptions.Length > 0)
             {
-                Mathf.Clamp(roomSelected, 0, (roomOptions.Length - 1));
+                Mathf.Clamp(roomSelected, 0, roomOptions.Length - 1);
                 // Only enable selected room, disable all others
                 for(int i = 0; i < roomOptions.Length; i++)
                 {
-                    bool selected = (i == roomSelected) ? true : false;
-                    roomOptions[i].gameObject.SetActive(selected);
+                    roomOptions[i].gameObject.SetActive(i == roomSelected);
                 }
                 // Apply wall color to selected room's walls
                 if (roomOptions[roomSelected].walls != null && roomOptions[roomSelected].walls.Length > 0)
@@ -145,7 +142,7 @@ namespace C2M2
         /// </summary>
         /// <remarks>
         /// Making any Unity API call from another thread is not safe. This method is a quick hack
-        /// to avoid mkaing a Unity API call from another thread.
+        /// to avoid making a Unity API call from another thread.
         /// </remarks>
         public void DebugLogErrorSafe(string s)
         {
