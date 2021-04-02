@@ -1,6 +1,4 @@
 ﻿using UnityEngine;
-using C2M2.NeuronalDynamics.Simulation;
-using C2M2.Interaction.UI;
 namespace C2M2.NeuronalDynamics.Interaction {
     public class ClampModeToggle : NDFeatureToggle
     {

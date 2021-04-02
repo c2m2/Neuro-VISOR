@@ -99,7 +99,7 @@ namespace C2M2.Simulation
                 defaultRaycastEvent = child.AddComponent<RaycastPressEvents>();
 
                 defaultRaycastEvent.OnHoldPress.AddListener((hit) => SetValues(hit));
-                defaultRaycastEvent.OnEndPress.AddListener((hit) => ResetRacyastHits(hit));
+                defaultRaycastEvent.OnEndPress.AddListener((hit) => ResetRaycastHits(hit));
 
                 raycastEventManager.LRTrigger = defaultRaycastEvent;
 
@@ -234,7 +234,7 @@ namespace C2M2.Simulation
             }
         }
 
-        public void ResetRacyastHits(RaycastHit hit)
+        public void ResetRaycastHits(RaycastHit hit)
         {
             raycastHits = new Tuple<int, double>[0];
         }

@@ -36,7 +36,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 if (visualInflation != value)
                 {
                     visualInflation = value;
-                    if (ColliderInflation < visualInflation) ColliderInflation = visualInflation;
 
                     Update2DGrid();
 
@@ -48,21 +47,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
 
         public delegate void OnVisualInflationChangeDelegate(double newInflation);
         public event OnVisualInflationChangeDelegate OnVisualInflationChange;
-
-        private double colliderInflation = 1;
-        public double ColliderInflation
-        {
-            get { return colliderInflation; }
-            set
-            {
-                if (colliderInflation != value)
-                {
-                    if (value < visualInflation) return;
-                    colliderInflation = value;
-                    ColliderMesh = CheckMeshCache(colliderInflation);
-                }
-            }
-        }
 
         private int refinementLevel = 0;
         public int RefinementLevel
@@ -149,13 +133,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 grid2D = value;
             }
         }
-
-        private Neuron neuron = null;
-        public Neuron Neuron
-        {
-            get { return neuron; }
-            set { neuron = value; }
-        }
+        public Neuron Neuron { get; set; } = null;
 
         private float averageDendriteRadius = 0;
         public float AverageDendriteRadius
@@ -391,25 +369,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
                     info.sim = this;
                 }
             }
-        }
-
-        // TODO: Obsolete
-        private Mesh CheckMeshCache(double inflation)
-        {
-            if (!meshCache.ContainsKey(inflation) || meshCache[inflation] == null)
-            {
-                string meshName = VrnReader.Retrieve2DMeshName(inflation);
-
-                Grid grid = new Grid(new Mesh(), meshName);
-                VrnReader.ReadUGX(meshName, ref grid);
-                meshCache[inflation] = grid.Mesh;
-            }
-            return meshCache[inflation];
-        }
-
-        public void SwitchColliderMesh (double inflation) {
-            inflation = Math.Clamp (inflation, 1, 5);
-            ColliderInflation = inflation;
         }
 
         public void SwitchVisualMesh (double inflation) {

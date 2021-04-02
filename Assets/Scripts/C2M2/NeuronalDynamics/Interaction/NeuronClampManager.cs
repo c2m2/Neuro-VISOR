@@ -68,9 +68,8 @@ namespace C2M2.NeuronalDynamics.Interaction
             // Make sure we have a valid prefab
             if (clampPrefab == null) Debug.LogError("No Clamp prefab found");
 
-            var sim = hit.collider.GetComponentInParent<NDSimulation>();
             // If there is no NDSimulation, don't try instantiating a clamp
-            if (sim == null) return;
+            if (hit.collider.GetComponentInParent<NDSimulation>() == null) return;
 
             int clampIndex = GetNearestPoint(hit);
             //ensures the vertex is available
@@ -150,7 +149,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         private int destroyCount = 50;
         private int holdCount = 0;
         /// <summary>
-        /// Pressing this button toggles clamps on/off. Holding this button down for long enough destroys the clamp
+        /// Pressing these buttonb toggles clamps on/off. Holding these buttons down for long enough destroys the clamp
         /// </summary>
         public OVRInput.Button toggleDestroyOVR = OVRInput.Button.Two;
         public OVRInput.Button toggleDestroyOVRS = OVRInput.Button.Four;
@@ -174,7 +173,7 @@ namespace C2M2.NeuronalDynamics.Interaction
                     // Uses the value of both joysticks added together
                     float y1 = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick).y;
                     float y2 = OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick).y;
-                    float scaler = (y1 + y2);
+                    float scaler = y1 + y2;
 
                     return ThumbstickScaler * scaler;
                 }
