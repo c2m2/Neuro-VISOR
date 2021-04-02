@@ -332,66 +332,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   display: {fileID: 5701659563928142308}
   nameDisplay: {fileID: 979353318906743494}
-  gradients:
-  - serializedVersion: 2
-    key0: {r: 0.24, g: 0.15, b: 0.66, a: 1}
-    key1: {r: 0.2814, g: 0.304, b: 0.9441, a: 1}
-    key2: {r: 0.2517, g: 0.4261, b: 0.9974, a: 0}
-    key3: {r: 0.0009, g: 0.7248, b: 0.7815, a: 0}
-    key4: {r: 0.405, g: 0.8031, b: 0.4233, a: 0}
-    key5: {r: 0.8172, g: 0.7505, b: 0.1535, a: 0}
-    key6: {r: 0.9971, g: 0.7513, b: 0.2309, a: 0}
-    key7: {r: 0.9769, g: 0.9839, b: 0.0805, a: 0}
-    ctime0: 0
-    ctime1: 8704
-    ctime2: 15104
-    ctime3: 30720
-    ctime4: 41983
-    ctime5: 49919
-    ctime6: 55551
-    ctime7: 65535
-    atime0: 0
-    atime1: 65535
-    atime2: 0
-    atime3: 0
-    atime4: 0
-    atime5: 0
-    atime6: 0
-    atime7: 0
-    m_Mode: 0
-    m_NumColorKeys: 8
-    m_NumAlphaKeys: 2
-  - serializedVersion: 2
-    key0: {r: 0.18995, g: 0.07176, b: 0.23217, a: 1}
-    key1: {r: 0.27701, g: 0.45152, b: 0.92347, a: 1}
-    key2: {r: 0.09267, g: 0.86554, b: 0.7623, a: 0}
-    key3: {r: 0.53255, g: 0.99919, b: 0.30581, a: 0}
-    key4: {r: 0.77581, g: 0.94113, b: 0.2031, a: 0}
-    key5: {r: 0.99675, g: 0.62093, b: 0.18297, a: 0}
-    key6: {r: 0.8538, g: 0.2217, b: 0.02677, a: 0}
-    key7: {r: 0.4796, g: 0.01583, b: 0.01055, a: 0}
-    ctime0: 0
-    ctime1: 9216
-    ctime2: 20735
-    ctime3: 30736
-    ctime4: 36372
-    ctime5: 46595
-    ctime6: 56283
-    ctime7: 65535
-    atime0: 0
-    atime1: 65535
-    atime2: 0
-    atime3: 0
-    atime4: 0
-    atime5: 0
-    atime6: 0
-    atime7: 0
-    m_Mode: 0
-    m_NumColorKeys: 8
-    m_NumAlphaKeys: 2
-  gradientNames:
-  - parula
-  - turbo
+  gradients: []
+  gradientNames: []
   defaultGradient: jet
   extension: .txt
   subPath: \Gradients
@@ -4402,7 +4344,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 5515364628734317418}
-        m_MethodName: NextGrad
+        m_MethodName: PrevGrad
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
