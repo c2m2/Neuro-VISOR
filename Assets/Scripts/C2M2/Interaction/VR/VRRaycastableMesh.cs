@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using C2M2.Utils.Exceptions;
 
 namespace C2M2.Interaction.VR
@@ -40,7 +38,6 @@ namespace C2M2.Interaction.VR
             if (mesh == null) throw new MeshNotFoundException();
 
             BuildMeshCollider(gameObject, raycastTargetObj, mesh);
-            raycastTargetObj.AddComponent<Utils.DebugUtils.Actions.TransformResetter>().targetFrame = 2;
         }
 
         /// <summary> Add a mesh collider to the child object, and set its mesh to be the original gameobject's. </summary>
