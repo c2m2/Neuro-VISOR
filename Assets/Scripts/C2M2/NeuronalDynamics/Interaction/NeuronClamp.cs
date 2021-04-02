@@ -221,6 +221,15 @@ namespace C2M2.NeuronalDynamics.Interaction
             }
             transform.parent.localRotation = Quaternion.LookRotation(rotationVector);
         }
+
+        /// <summary>
+        /// Shows a popup of clamp voltage and clamp vertex
+        /// </summary>
+        public void ShowClampInfo()
+        {
+            //Display ClampPower and FocusVert
+        }
+
         #endregion
 
         #region Simulation Checks
@@ -295,6 +304,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         /// </summary>
         public void MonitorInput()
         {
+            ShowClampInfo();
             if (ClampManager.PressedToggleDestroy)
                 holdCount++;
             else
