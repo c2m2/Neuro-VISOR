@@ -36,7 +36,6 @@ namespace C2M2
 
         public NeuronClampManager ndClampManager = null;
         public NDGraphManager ndGraphManager = null;
-        public GameObject[] clampControllers = new GameObject[0];
 
         [Header("Environment")]
         public int roomSelected = 0;
