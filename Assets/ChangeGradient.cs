@@ -5,7 +5,7 @@ using System.IO;
 using C2M2.Utils;
 using TMPro;
 
-namespace C2M2.Visualization
+namespace C2M2.Interaction.UI
 {
     /// <summary>
     /// Can change the color scale of a simulation, as well as read in gradients from text files
@@ -17,14 +17,15 @@ namespace C2M2.Visualization
     public class ChangeGradient : MonoBehaviour
     {
         public GradientDisplay display = null;
+        public TextMeshProUGUI nameDisplay = null;
         public Gradient[] gradients;
         public string[] gradientNames;
-        public string basePath = Application.streamingAssetsPath;
-        public string extension = ".txt";
-        public string subPath = Path.DirectorySeparatorChar + "Gradients";
         public string defaultGradient;
         private int activeGrad = 0;
-        public TextMeshProUGUI nameDisplay = null;
+
+        private string basePath = Application.streamingAssetsPath;
+        public string extension = ".txt";
+        public string subPath = Path.DirectorySeparatorChar + "Gradients";
 
         public void NextGrad()
         {
