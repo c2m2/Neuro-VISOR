@@ -34,11 +34,13 @@ namespace C2M2.NeuronalDynamics.Interaction
         [Tooltip("Alter the precision of the color scale display")]
         public int colorScalePrecision = 3;
 
-        // RODO: Allow SparseSolverTestv1 to be a variable script
+        // TODO: Allow SparseSolverTestv1 to be a variable script
         public void Load(RaycastHit hit)
         {
-            GameObject solveObj = new GameObject();
-            solveObj.name = solverType + "(Solver)";
+            GameObject solveObj = new GameObject
+            {
+                name = solverType + "(Solver)"
+            };
             solveObj.AddComponent<MeshFilter>();
             solveObj.AddComponent<MeshRenderer>();
             NDSimulation solver = solveObj.AddComponent<SparseSolverTestv1>();
