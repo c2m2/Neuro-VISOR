@@ -4059,7 +4059,7 @@ MonoBehaviour:
     m_NumAlphaKeys: 2
   displayLength: 75
   displayHeight: 10
-  numTextMarkers: 5
+  numTextMarkers: 8
   sim: {fileID: 0}
   textMarkerPrefab: {fileID: 3341310249270552722, guid: d6f0ffd5579541249a1283126978ff7a,
     type: 3}

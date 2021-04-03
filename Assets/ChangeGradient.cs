@@ -49,6 +49,7 @@ namespace C2M2.Interaction.UI
             {
                 nameDisplay.text = gradientNames[activeGrad];
             }
+            else Debug.LogWarning("Could not update gradient name.");
         }
 
         private void Awake()

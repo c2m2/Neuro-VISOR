@@ -13,6 +13,9 @@ namespace C2M2.Interaction.UI
         /// </summary>
         public GradientDisplay gradDisplay = null;
         public TextMeshProUGUI label = null;
+        public RectTransform increaseButton = null;
+        public RectTransform decreaseButton = null;
+        public RectTransform resetButton = null;
         public float buttonSize = 25;
         public bool affectMax = true;
         public float shiftSensivitivty = 100f;
@@ -52,17 +55,52 @@ namespace C2M2.Interaction.UI
         private float maxHoldTime = 5.0f;
         private float ff = -1;
 
-        private void Start()
+        private void Awake()
         {
-            if (gradDisplay == null)
+            NullChecks();
+
+            void NullChecks()
             {
-                gradDisplay = GetComponentInParent<GradientDisplay>();
+                bool fatal = false;
                 if (gradDisplay == null)
                 {
-                    Debug.LogError("No gradient display found");
-                    Destroy(this);
+                    gradDisplay = GetComponentInParent<GradientDisplay>();
+                    if (gradDisplay == null)
+                    {
+                        Debug.LogError("No gradient display found");
+                        fatal = true;
+                    }
                 }
+                if(label == null)
+                {
+                    label = GetComponentInChildren<TextMeshProUGUI>();
+                    if(label == null)
+                    {
+                        Debug.LogError("No label found.");
+                        fatal = true;
+                    }
+                }
+                if(increaseButton == null)
+                {
+                    Debug.LogError("No increase button given.");
+                    fatal = true;
+                }
+                if(decreaseButton == null)
+                {
+                    Debug.LogError("No decrease button given.");
+                    fatal = true;
+                }
+                if(resetButton == null)
+                {
+                    Debug.LogError("No reset button given.");
+                    fatal = true;
+                }
+
+                if (fatal) Destroy(this);
             }
+        }
+        private void Start()
+        {
             Image[] buttons = GetComponentsInChildren<Image>();
             foreach(Image b in buttons)
             {
@@ -87,14 +125,17 @@ namespace C2M2.Interaction.UI
         private void PositionButtons()
         {
             // Reposition buttons to the left of text
-            if (label != null)
-            {
-                float y = label.bounds.max.x + label.transform.localPosition.y + buttonSize;
-                transform.localPosition = new Vector3(label.transform.localPosition.x, y, label.transform.localPosition.z);
-            }
+            float y = label.bounds.max.x + label.transform.localPosition.y + buttonSize;
+            transform.localPosition = new Vector3(label.transform.localPosition.x, label.transform.localPosition.y, label.transform.localPosition.z);
+
+            float labelHeight = label.bounds.extents.y;
+            float labelWidth = label.bounds.extents.x;
+            increaseButton.localPosition = new Vector3(label.bounds.max.y + buttonSize, 0f, 0f);
+            decreaseButton.localPosition = new Vector3(label.bounds.min.y - buttonSize, 0f, 0f);
+            resetButton.localPosition = new Vector3(0f, label.bounds.extents.x + buttonSize, 0f);
         }
 
-        private void ShiftExtremaPress(float sign)
+        private void ScaleExtremaPress(float sign)
         {
             float pressAmt = 2 * (GlobalMax - GlobalMin) / shiftSensivitivty;
             SetExtrema(sign * pressAmt);
@@ -103,10 +144,10 @@ namespace C2M2.Interaction.UI
 
             startTime = Time.unscaledTime;
         }
-        public void IncreaseExtremaPress() => ShiftExtremaPress(1);
-        public void DecreaseExtremaPress() => ShiftExtremaPress(-1);
+        public void IncreaseExtremaPress() => ScaleExtremaPress(1);
+        public void DecreaseExtremaPress() => ScaleExtremaPress(-1);
 
-        private void ShiftExtremaHold(float sign)
+        private void ScaleExtremaHold(float sign)
         {
             float holdTime = Time.unscaledTime - startTime;
 
@@ -114,8 +155,8 @@ namespace C2M2.Interaction.UI
 
             PositionButtons();
         }
-        public void IncreaseExtremaHold() => ShiftExtremaHold(1);
-        public void DecreaseExtremaHold() => ShiftExtremaHold(-1);
+        public void IncreaseExtremaHold() => ScaleExtremaHold(1);
+        public void DecreaseExtremaHold() => ScaleExtremaHold(-1);
       
         private void SetExtrema(float val)
         {
