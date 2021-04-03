@@ -702,7 +702,7 @@ MonoBehaviour:
   increaseButton: {fileID: 530712448344691817}
   decreaseButton: {fileID: 7516759334815655367}
   resetButton: {fileID: 8145253064186434806}
-  buttonSize: 25
+  buttonSize: 40
   affectMax: 1
   shiftSensivitivty: 100
   latchToInt: 1

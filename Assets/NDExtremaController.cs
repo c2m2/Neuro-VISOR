@@ -101,33 +101,49 @@ namespace C2M2.Interaction.UI
         }
         private void Start()
         {
-            Image[] buttons = GetComponentsInChildren<Image>();
-            foreach(Image b in buttons)
-            {
-                Vector3 size = b.rectTransform.sizeDelta;
-                b.transform.localScale = new Vector3(buttonSize / size.x, buttonSize / size.y, 1f);
-            }
-            BoxCollider[] cols = GetComponentsInChildren<BoxCollider>();
-            foreach(BoxCollider b in cols)
-            {
-                b.size = new Vector3(buttonSize, buttonSize, 1f);
-            }
+            label.transform.hasChanged = true;
 
-            PositionButtons();
+            UpdateButtons();
 
             ResetScaler();
         }
         private void Update()
         {
-            PositionButtons();
+            UpdateButtons();
         }
 
-        private void PositionButtons()
+        private void UpdateButtons()
         {
-            // Reposition buttons to the left of text
-            float y = label.bounds.max.x + label.transform.localPosition.y + buttonSize;
-            transform.localPosition = new Vector3(label.transform.localPosition.x, label.transform.localPosition.y, label.transform.localPosition.z);
+            if(buttonSize != label.bounds.size.y)
+            {
+                buttonSize = label.bounds.size.y;
+                ResizeButtons();
+            }
 
+            if (label.transform.hasChanged)
+            {
+                RepositionButtons();
+                label.transform.hasChanged = false;
+            }
+        }
+        private void ResizeButtons()
+        {
+            Image[] buttons = GetComponentsInChildren<Image>();
+            foreach (Image b in buttons)
+            {
+                Vector3 size = b.rectTransform.sizeDelta;
+                b.transform.localScale = new Vector3(buttonSize / size.x, buttonSize / size.y, 1f);
+            }
+            BoxCollider[] cols = GetComponentsInChildren<BoxCollider>();
+            foreach (BoxCollider b in cols)
+            {
+                b.size = new Vector3(buttonSize, buttonSize, 1f);
+            }
+        }
+        private void RepositionButtons()
+        {
+            // Center buttons on label
+            transform.localPosition = new Vector3(label.transform.localPosition.x, label.transform.localPosition.y, label.transform.localPosition.z);
             float labelHeight = label.bounds.extents.y;
             float labelWidth = label.bounds.extents.x;
             increaseButton.localPosition = new Vector3(label.bounds.max.y + buttonSize, 0f, 0f);
@@ -140,7 +156,7 @@ namespace C2M2.Interaction.UI
             float pressAmt = 2 * (GlobalMax - GlobalMin) / shiftSensivitivty;
             SetExtrema(sign * pressAmt);
 
-            PositionButtons();
+            UpdateButtons();
 
             startTime = Time.unscaledTime;
         }
@@ -153,7 +169,7 @@ namespace C2M2.Interaction.UI
 
             SetExtrema(sign * Time.fixedDeltaTime * GetScaler(Math.Min(holdTime, maxHoldTime)));
 
-            PositionButtons();
+            UpdateButtons();
         }
         public void IncreaseExtremaHold() => ScaleExtremaHold(1);
         public void DecreaseExtremaHold() => ScaleExtremaHold(-1);
