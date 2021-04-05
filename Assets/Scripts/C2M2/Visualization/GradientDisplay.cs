@@ -195,7 +195,7 @@ namespace C2M2.Interaction.UI
 
                     DrawLR(textMarkers[i]);
 
-                    UpdateExtrema(textMarkers[i], (i == numTextMarkers-1), (i == 0));
+                    InitExtremaController(textMarkers[i], (i == numTextMarkers-1), (i == 0));
                 }
 
                 UpdateLabels();
@@ -215,12 +215,11 @@ namespace C2M2.Interaction.UI
                     tm.line.startWidth = LineWidth;
                     tm.line.endWidth = LineWidth;
                 }
-                void UpdateExtrema(TextMarker tm, bool isMax = false, bool isMin = false)
+                void InitExtremaController(TextMarker tm, bool isMax = false, bool isMin = false)
                 {
                     var extrema = tm.extremaController;
                     if (extrema != null)
                     {
-                        extrema.gradDisplay = this;
                         if (isMin)
                         {
                             extrema.gameObject.SetActive(true);
@@ -235,7 +234,8 @@ namespace C2M2.Interaction.UI
                         }
                         else
                         {
-                            extrema.gameObject.SetActive(false);
+                            Destroy(extrema.gameObject);
+                          //  extrema.gameObject.SetActive(false);
                         }
                     }
                 }
