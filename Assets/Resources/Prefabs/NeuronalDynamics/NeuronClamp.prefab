@@ -617,12 +617,12 @@ PrefabInstance:
     - target: {fileID: 4143456574193848350, guid: a4e40cc03c7baa44094ae21dbea8f42e,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: -1.25
       objectReference: {fileID: 0}
     - target: {fileID: 4143456574193848350, guid: a4e40cc03c7baa44094ae21dbea8f42e,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4143456574193848350, guid: a4e40cc03c7baa44094ae21dbea8f42e,
         type: 3}
@@ -684,6 +684,11 @@ PrefabInstance:
       propertyPath: m_textInfo.characterCount
       value: 11
       objectReference: {fileID: 0}
+    - target: {fileID: 4948050241293384272, guid: a4e40cc03c7baa44094ae21dbea8f42e,
+        type: 3}
+      propertyPath: clamp
+      value: 
+      objectReference: {fileID: 2030585019643067809}
     - target: {fileID: 4986261004240593986, guid: a4e40cc03c7baa44094ae21dbea8f42e,
         type: 3}
       propertyPath: m_textInfo.lineCount

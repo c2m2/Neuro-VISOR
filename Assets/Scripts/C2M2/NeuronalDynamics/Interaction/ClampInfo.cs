@@ -6,8 +6,7 @@ public class ClampInfo : MonoBehaviour
 {
     public TextMeshProUGUI vertexText;
     public TextMeshProUGUI clampText;
-    private NeuronClamp clamp;
-    //TODO set clamp
+    public NeuronClamp clamp;
 
     void Start()
     {
@@ -18,5 +17,6 @@ public class ClampInfo : MonoBehaviour
     {
         vertexText.text = clamp.FocusVert.ToString();
         clampText.text = clamp.ClampPower.ToString();
+        transform.eulerAngles = Vector3.up;
     }
 }
