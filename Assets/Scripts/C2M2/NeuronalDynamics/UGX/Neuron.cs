@@ -46,7 +46,23 @@ namespace C2M2.NeuronalDynamics.UGX
             /// <summary>
             /// Dictionary with NeighborId as key and edge weight as value
             /// </summary>
-            public Dictionary<int, double> AdjacencyList { get; set; }
+            public Dictionary<int, double> AdjacencyList { get; set; } = new Dictionary<int, double>();
+            /// <summary>
+            /// Neighbors serves the same purpose as AdjacencyList, but in a different format.
+            /// </summary>
+            public List<Neighbor> Neighbors { get; set; } = new List<Neighbor>();
+        }
+
+        public struct Neighbor
+        {
+            public int id;
+            public double dist;
+
+            public Neighbor(int id, double dist)
+            {
+                this.id = id;
+                this.dist = dist;
+            }
         }
 
         /// <summary>
@@ -85,8 +101,6 @@ namespace C2M2.NeuronalDynamics.UGX
                     Zcoords = gridMeshVertices[i].z
                 };
 
-                tempNode.AdjacencyList = new Dictionary<int, double>();
-
                 nodes.Add(tempNode);
             }
 
@@ -108,6 +122,9 @@ namespace C2M2.NeuronalDynamics.UGX
                 /// makes an adjacency list with edge weights
                 toNode.AdjacencyList.Add(fromNode.Id, edgeLength);
                 fromNode.AdjacencyList.Add(toNode.Id, edgeLength);
+
+                toNode.Neighbors.Add(new Neighbor(fromNode.Id, edgeLength));
+                fromNode.Neighbors.Add(new Neighbor(toNode.Id, edgeLength));
             }
 
             /// if a node has only one neighbor then it is a boundary node

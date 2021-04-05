@@ -174,6 +174,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52f34e95d85deb348ad939044d134a01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  solverName: C2M2.NeuronalDynamics.Simulation.ExampleNDSolver
   gradient:
     serializedVersion: 2
     key0: {r: 0, g: 0, b: 1, a: 1}
@@ -209,7 +210,6 @@ MonoBehaviour:
   timestepSize: 0.000006
   endTime: 100
   raycastHitValue: 0.05
-  solverType: SparseSolverTestv1
   unit: mV
   unitScaler: 1000
   colorScalePrecision: 1
@@ -1153,7 +1153,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 1763426731111834598}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0950df82e7936c84983497630bde5b54, type: 3}
   m_Name: 
@@ -3359,7 +3359,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1494866335
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4098,7 +4098,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1763904073
 MonoBehaviour:
   m_ObjectHideFlags: 0

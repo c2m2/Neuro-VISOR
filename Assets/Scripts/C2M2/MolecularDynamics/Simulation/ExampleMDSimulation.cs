@@ -22,10 +22,6 @@ namespace C2M2.MolecularDynamics.Simulation
             return coord;
         }
 
-        public override float GetSimulationTime()
-        {
-            return 0;
-        }
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
         /// Receive an interaction request, and translate it onto the proper sphere
@@ -105,6 +101,15 @@ namespace C2M2.MolecularDynamics.Simulation
 
         float dt;
         int t;
+        Normal normal;
+        protected override void PreSolve()
+        {
+            //instantiate a normal dist.
+            normal = Normal.WithMeanPrecision(0.0, 1.0);
+            force = Force(coord, bond_topo); // + angle_Force(x,angle_topo);
+            dt = timestepSize;
+            t = time;
+        }
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
         /// Molecular dynamics simulation code
@@ -112,48 +117,37 @@ namespace C2M2.MolecularDynamics.Simulation
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         protected override void SolveStep(int t)
         {
-            int nT = timestepCount;
-            dt = timestepSize;
+            // iterate over the atoms
+            for(int i = 0; i < coord.Length; i++)
+            {
+                float coeff = Convert.ToSingle(Math.Sqrt(kb*T*(1-c*c)/mass[i]));
+                double rxx = normal.Sample();
+                float rx = Convert.ToSingle(rxx);
 
-	        //instantiate a normal dist.
-	        var normal = Normal.WithMeanPrecision(0.0, 1.0);
-	        force = Force(coord,bond_topo); // + angle_Force(x,angle_topo);
-            // Iterate over time
-            for (t = 0; t < nT; t++)
-	        {
-                // iterate over the atoms
-                for(int i = 0; i < coord.Length; i++)
-                {
-                    float coeff = Convert.ToSingle(Math.Sqrt(kb*T*(1-c*c)/mass[i]));
-                    double rxx = normal.Sample();
-                    float rx = Convert.ToSingle(rxx);
+ 		        double ryy = normal.Sample();
+                float ry = Convert.ToSingle(ryy);
 
- 		            double ryy = normal.Sample();
-                    float ry = Convert.ToSingle(ryy);
-
-                    double rzz = normal.Sample();
-                    float rz = Convert.ToSingle(rzz);
+                double rzz = normal.Sample();
+                float rz = Convert.ToSingle(rzz);
                      
-                    Vector3 r = new Vector3(rx,ry,rz);
+                Vector3 r = new Vector3(rx,ry,rz);
 
-                    vel[i] = vel[i] + (dt*dt/2/mass[i]) * (force[i]);
-		            coord[i] = coord[i] + (dt/2) * vel[i];
+                vel[i] = vel[i] + (dt*dt/2/mass[i]) * (force[i]);
+		        coord[i] = coord[i] + (dt/2) * vel[i];
 
-                    vel[i] = c * vel[i] + coeff * r;
-		            coord[i] = coord[i] + (dt/2) * vel[i];
+                vel[i] = c * vel[i] + coeff * r;
+		        coord[i] = coord[i] + (dt/2) * vel[i];
                    
-                }
-
-                ResolvePBC();
-
-                force = Force(coord,bond_topo);
-
-                for(int i = 0; i < coord.Length; i++)
-                {
-                    vel[i] = vel[i] + (dt*dt/2/mass[i]) * (force[i]);
-                }
             }
-            Debug.Log("ExampleMDSimulation complete.");
+
+            ResolvePBC();
+
+            force = Force(coord,bond_topo);
+
+            for(int i = 0; i < coord.Length; i++)
+            {
+                vel[i] = vel[i] + (dt*dt/2/mass[i]) * (force[i]);
+            }       
         }
 
         void ResolvePBC()

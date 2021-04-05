@@ -151,7 +151,7 @@ namespace C2M2.Simulation
         #endregion
 
         public int time = -1;
-        public double k = 0.008 * 1e-3;
+        public double timeStep = 0.008 * 1e-3;
         public double endTime = 1.0;
         public int nT { get; private set; } = -1;
         /// <summary>
@@ -175,7 +175,7 @@ namespace C2M2.Simulation
 
             PreSolve();
 
-            nT = (int)(endTime / k);
+            nT = (int)(endTime / timeStep);
             
             for (time = 0; time < nT; time++)
             {
@@ -199,6 +199,8 @@ namespace C2M2.Simulation
             GameManager.instance.DebugLogSafe("Simulation Over.");
         }
 
+        public sealed override float GetSimulationTime() => time * (float)timeStep;
+
         /// <summary>
         /// PreSolveStep is called once per simulation frame, before SolveStep() 
         /// </summary>
@@ -215,7 +217,7 @@ namespace C2M2.Simulation
         /// This is useful if you need to initialize anything that makes use of Unity calls,
         /// which are not available to be called from secondary threads.
         /// </remarks>
-        protected virtual void PreSolve() { Debug.Log("PreSolve"); }
+        protected abstract void PreSolve();
         /// <summary>
         /// Called on the solve thread after the simulation for loop is completed
         /// </summary>

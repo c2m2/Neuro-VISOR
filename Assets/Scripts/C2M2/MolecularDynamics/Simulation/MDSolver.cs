@@ -22,10 +22,6 @@ namespace C2M2.MolecularDynamics.Simulation
         {
             return coord;
         }
-        public override float GetSimulationTime()
-        {
-            return 0;
-        }
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
         /// Receive an interaction request, and translate it onto the proper sphere
@@ -110,85 +106,85 @@ namespace C2M2.MolecularDynamics.Simulation
 
         int t;
         float dt;
+        Normal normal;
+        Vector3[] force;
+        float a;
+        protected override void PreSolve()
+        {
+            int nT = timestepCount;
+            dt = timestepSize;
+            //float m = 40.0f;
+            float gamma = 0.1f;
+            a = ((1 - gamma * dt / 2) / (1 + gamma * dt / 2));
+
+
+            //hard code the bond info
+            //int[][] bond_topo = new int[x.Length][];
+            //bond_topo[0]= new int[] {1};
+            //	    bond_topo[1]= new int[] {0,2};
+            //	    bond_topo[2]= new int[] {1};
+
+            //hard code the angle info
+            //int[][] angle_topo = new int[x.Length][];
+            //angle_topo[0]= new int[] {};
+            //angle_topo[1]= new int[] {0,1,2};
+            //angle_topo[2]= new int[] {};
+
+            //instantiate a normal dist.
+            normal = Normal.WithMeanPrecision(0.0, 1.0);
+            force = Force(coord, bond_topo); // + angle_Force(x,angle_topo);
+                                                       //Vector3[] angle = angle_Force(x);
+        }
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
         /// Molecular dynamics simulation code
         /// </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         protected override void SolveStep(int t)
-        {
-            int nT = timestepCount;
-            dt = timestepSize;
-            //float m = 40.0f;
-	        float gamma = 0.1f;
-            float a = ((1-gamma*dt/2)/(1+gamma*dt/2));
-            
+        {    
+            // iterate over the atoms
+            for(int i = 0; i < coord.Length; i++)
+            {
+                float coeff = Convert.ToSingle(Math.Sqrt(kb*T*(1-a*a)/mass[i]));
+                double rxx = normal.Sample();
+                float rx = Convert.ToSingle(rxx);
 
-	        //hard code the bond info
-            //int[][] bond_topo = new int[x.Length][];
-            //bond_topo[0]= new int[] {1};
-	        //	    bond_topo[1]= new int[] {0,2};
-	        //	    bond_topo[2]= new int[] {1};
+ 		        double ryy = normal.Sample();
+                float ry = Convert.ToSingle(ryy);
 
-            //hard code the angle info
-            //int[][] angle_topo = new int[x.Length][];
-            //angle_topo[0]= new int[] {};
-		    //angle_topo[1]= new int[] {0,1,2};
-		    //angle_topo[2]= new int[] {};
-
-	        //instantiate a normal dist.
-	        var normal = Normal.WithMeanPrecision(0.0, 1.0);
-	        Vector3[] force = Force(coord,bond_topo); // + angle_Force(x,angle_topo);
-                                                  //Vector3[] angle = angle_Force(x);
-
-            // Iterate over time
-            for (t = 0; t < nT; t++)
-	        {      
-                // iterate over the atoms
-                for(int i = 0; i < coord.Length; i++)
-                {
-                    float coeff = Convert.ToSingle(Math.Sqrt(kb*T*(1-a*a)/mass[i]));
-                    double rxx = normal.Sample();
-                    float rx = Convert.ToSingle(rxx);
-
- 		            double ryy = normal.Sample();
-                    float ry = Convert.ToSingle(ryy);
-
-                    double rzz = normal.Sample();
-                    float rz = Convert.ToSingle(rzz);
+                double rzz = normal.Sample();
+                float rz = Convert.ToSingle(rzz);
                      
-                    Vector3 r = new Vector3(rx,ry,rz);
+                Vector3 r = new Vector3(rx,ry,rz);
 
-                    // OPTION 2:
-                    /*
-                    Vector3 pushTerm = Vector3.zero;
-                    if (lastHit.distance != float.PositiveInfinity)
-                    {
-                        pushTerm = lastHit.normal;
-                        lastHit.distance = float.PositiveInfinity;
-                    }
-                    v[i]=v[i]+(dt*dt/2/m)*(force[i]+angle[i] + pushTerm);
-                    */
-                    vel[i] = vel[i] + (dt*dt/2/mass[i]) * (force[i]);
-		            coord[i] = coord[i] + (dt/2) * vel[i];
-                    vel[i]=a*vel[i] + coeff * r;
-		            coord[i]=coord[i] + (dt/2) * vel[i];
-                }
-
-		        force = Force(coord,bond_topo);
-
-                /*GameManager.instance.DebugLogSafe("force[1043]: " + force[1043]
-                    + "\nx[1043]: " + x[1043]
-                    + "\nv[1043]: " + v[1043]
-		    + "\nm[1043]: " + mass[1043]);
-                //angle = angle_Force(x); */
-
-                for(int i = 0; i < coord.Length; i++)
+                // OPTION 2:
+                /*
+                Vector3 pushTerm = Vector3.zero;
+                if (lastHit.distance != float.PositiveInfinity)
                 {
-                    vel[i] = vel[i] + (dt*dt/2/mass[i]) * (force[i]);
+                    pushTerm = lastHit.normal;
+                    lastHit.distance = float.PositiveInfinity;
                 }
+                v[i]=v[i]+(dt*dt/2/m)*(force[i]+angle[i] + pushTerm);
+                */
+                vel[i] = vel[i] + (dt*dt/2/mass[i]) * (force[i]);
+		        coord[i] = coord[i] + (dt/2) * vel[i];
+                vel[i]=a*vel[i] + coeff * r;
+		        coord[i]=coord[i] + (dt/2) * vel[i];
             }
-            Debug.Log("ExampleMDSimulation complete.");
+
+		    force = Force(coord,bond_topo);
+
+            /*GameManager.instance.DebugLogSafe("force[1043]: " + force[1043]
+                + "\nx[1043]: " + x[1043]
+                + "\nv[1043]: " + v[1043]
+		+ "\nm[1043]: " + mass[1043]);
+            //angle = angle_Force(x); */
+
+            for(int i = 0; i < coord.Length; i++)
+            {
+                vel[i] = vel[i] + (dt*dt/2/mass[i]) * (force[i]);
+            }
         }
     }
 }

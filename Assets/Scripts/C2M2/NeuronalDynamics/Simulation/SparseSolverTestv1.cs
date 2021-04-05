@@ -158,14 +158,6 @@ namespace C2M2.NeuronalDynamics.Simulation
         private Vector H;
 
         /// <summary>
-        /// This sends the current time to the simulation timer
-        /// Note that the solver is in MKS, right now the simulation timer uses MKS, no need to multiply by 1000
-        /// and the simulation timer object uses [ms]!
-        /// </summary>
-        /// <returns>i*(float)1000*(float) k</returns>
-        public override float GetSimulationTime() => time*(float) k;
-
-        /// <summary>
         /// Send simulation 1D values, this send the current voltage after the solve runs 1 iteration
         /// it passes <c>curVals</c>
         /// </summary>
@@ -253,7 +245,7 @@ namespace C2M2.NeuronalDynamics.Simulation
             reactConst = new List<double> { gk, gna, gl, ek, ena, el };
             ///<c>List<CoordinateStorage<double>> sparse_stencils = makeSparseStencils(Neuron, res, cap, k);</c> Construct sparse RHS and LHS in coordinate storage format, no zeros are stored \n
             /// <c>sparse_stencils</c> this is a list which contains only two matrices the LHS and RHS matrices for the Crank-Nicolson solve
-            sparse_stencils = makeSparseStencils(Neuron, res, cap, k);
+            sparse_stencils = makeSparseStencils(Neuron, res, cap, timeStep);
             ///<c>CompressedColumnStorage</c> call Compresses the sparse matrices which are stored in <c>sparse_stencils[0]</c> and <c>sparse_stencils[1]</c>
             r_csc = CompressedColumnStorage<double>.OfIndexed(sparse_stencils[0]); //null;
             l_csc = CompressedColumnStorage<double>.OfIndexed(sparse_stencils[1]); //null;
@@ -310,13 +302,13 @@ namespace C2M2.NeuronalDynamics.Simulation
             /// For the reaction solve we are solving
             /// \f[\frac{U_{next}-U_{curr}}{k} = R(U_{curr})\f]
             R.SetSubVector(0, Neuron.nodes.Count, reactF(reactConst, U, N, M, H, cap));
-            R.Multiply(k, R);
+            R.Multiply(timeStep, R);
             U.Add(R, U);
             /// this part solve the state variables using Forward Euler
             /// the general rule is \f$N_{next} = N_{curr}+k\cdot f_N(U_{curr},N_{curr})\f$
-            N.Add(fN(U, N).Multiply(k), N);
-            M.Add(fM(U, M).Multiply(k), M);
-            H.Add(fH(U, H).Multiply(k), H);
+            N.Add(fN(U, N).Multiply(timeStep), N);
+            M.Add(fM(U, M).Multiply(timeStep), M);
+            H.Add(fH(U, H).Multiply(timeStep), H);
             ///<c>if ((i * k >= 0.015) && SomaOn) { U[0] = vstart; }</c> this checks of the somaclamp is on and sets the soma location to <c>vstart</c>
             ///if ((t * k >= 0.015) && SomaOn) { U[0] = vstart; }      
         }

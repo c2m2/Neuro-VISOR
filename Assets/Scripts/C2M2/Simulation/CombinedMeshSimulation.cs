@@ -37,10 +37,6 @@ namespace C2M2.Simulation.Samples
                 values[value.Item1] = value.Item2;
             }
         }
-        public override float GetSimulationTime()
-        {
-            return 0;
-        }
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary> Get every child mesh and combine into one mesh </summary>
         /// <returns> Combined mesh </returns>
@@ -113,6 +109,11 @@ namespace C2M2.Simulation.Samples
 
             return combinedMesh;
         }
+        DateTime t0;
+        protected override void PreSolve()
+        {
+            throw new NotImplementedException();
+        }
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary> 
         /// Simply degrades the value at each point by the time change times its current value
@@ -121,15 +122,13 @@ namespace C2M2.Simulation.Samples
         protected override void SolveStep(int t)
         {
             DateTime t0 = DateTime.Now;
-            while (true)
+
+            float dt = (DateTime.Now - t0).Milliseconds;
+            for (int i = 0; i < values.Length; i++)
             {
-                float dt = (DateTime.Now - t0).Milliseconds;
-                for (int i = 0; i < values.Length; i++)
-                {
-                    values[i] -= dt * values[i];
-                }
-                t0 = DateTime.Now;
+                values[i] -= dt * values[i];
             }
+            t0 = DateTime.Now;
         }
     }
 }
