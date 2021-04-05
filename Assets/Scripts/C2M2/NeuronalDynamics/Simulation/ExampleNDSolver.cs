@@ -10,10 +10,6 @@ namespace C2M2.NeuronalDynamics.Simulation
         // One value for each 1D vertex
         double[] vals;
 
-        public override double Get1DValue(int index1D)
-        {
-            return vals[index1D];
-        }
         public override double[] Get1DValues()
         {
             return vals;

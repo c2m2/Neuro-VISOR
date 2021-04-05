@@ -19,7 +19,7 @@ namespace C2M2.Visualization
         public RectTransform infoPanelButton = null;
 
 
-        private int maxSamples = 750;
+        private int maxSamples = 100;
         public int MaxSamples
         {
             get

@@ -120,6 +120,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
         }
 
         public Vector3[] Verts1D { get { return grid1D.Mesh.vertices; } }
+        public double[] curVals1D = null;
 
         private Grid grid2D = null;
         public Grid Grid2D
@@ -235,15 +236,15 @@ namespace C2M2.NeuronalDynamics.Simulation {
         /// </summary>
         /// <returns> One scalar value for each 3D vertex based on its 1D vert's scalar value </returns>
         public sealed override double[] GetValues () {
-            double[] scalars1D = Get1DValues ();
+            curVals1D = Get1DValues ();
 
-            if (scalars1D == null) { return null; }
+            if (curVals1D == null) { return null; }
             //double[] scalars3D = new double[map.Length];
             for (int i = 0; i < Map.Length; i++) { // for each 3D point,
 
                 // Take an weighted average using lambda
                 // Equivalent to [lambda * v2 + (1 - lambda) * v1]
-                double newVal = map[i].lambda * (scalars1D[map[i].v2] - scalars1D[map[i].v1]) + scalars1D[map[i].v1];
+                double newVal = map[i].lambda * (curVals1D[map[i].v2] - curVals1D[map[i].v1]) + curVals1D[map[i].v1];
 
                 Scalars3D[i] = newVal;
             }
@@ -286,8 +287,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
         /// </summary>
         /// <returns></returns>
         public abstract double[] Get1DValues ();
-
-        public abstract double Get1DValue(int index1D);
         protected override void OnAwakePre()
         {
             UpdateGrid1D();

@@ -90,13 +90,13 @@ namespace C2M2.NeuronalDynamics.Visualization
                 transform.localScale.y / sim.transform.localScale.y,
                 transform.localScale.z / sim.transform.localScale.z);
 
-            lineGraph.MaxSamples = 1000;
+            lineGraph.MaxSamples = 300;
         }
 
         private void FixedUpdate()
         {
             // Get value at vertex ID
-            double val = sim.Get1DValue(vert);
+            double val = sim.curVals1D[vert];
 
             // Get time value from simulation
             float time = sim.GetSimulationTime();

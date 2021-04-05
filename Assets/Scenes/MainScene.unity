@@ -174,7 +174,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52f34e95d85deb348ad939044d134a01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  solverName: C2M2.NeuronalDynamics.Simulation.ExampleNDSolver
+  solverName: C2M2.NeuronalDynamics.Simulation.SparseSolverTestv1
   gradient:
     serializedVersion: 2
     key0: {r: 0, g: 0, b: 1, a: 1}
@@ -4382,7 +4382,7 @@ MonoBehaviour:
   raycastEventManager: {fileID: 0}
   defaultRaycastEvent: {fileID: 0}
   time: -1
-  k: 0.000002
+  timeStep: 0.000008
   endTime: 1
   pdbPath: PE/pe_cg.pdb
   psfPath: PE/octatetracontane_128.cg.psf
