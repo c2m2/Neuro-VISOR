@@ -9,8 +9,8 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
         public NDGraphManager Manager
         {
             get
-            {
-                return GameManager.instance.ndGraphManager;
+            {          
+                return Sim.graphManager;
             }
         }
 

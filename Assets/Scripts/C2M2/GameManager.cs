@@ -8,7 +8,7 @@ namespace C2M2
 {
     using Interaction.VR;
     using NeuronalDynamics.Interaction;
-    using NeuronalDynamics.Visualization;
+    using NeuronalDynamics.Interaction.UI;
     using Simulation;
 
     /// <summary>

@@ -3,13 +3,29 @@ using System.Collections.Generic;
 using UnityEngine;
 using C2M2.Interaction;
 using C2M2.NeuronalDynamics.Simulation;
-namespace C2M2.NeuronalDynamics.Visualization
+using System.IO;
+
+namespace C2M2.NeuronalDynamics.Interaction.UI
 {
     public class NDGraphManager : MonoBehaviour
     {
-        public GameObject graphPrefab = null;
-        public RaycastPressEvents hitEvent = null;
+        public NDSimulation sim = null;
+        public GameObject graphPrefab { get; private set; } = null;
+        public RaycastPressEvents hitEvent { get; private set; } = null;
         public List<NDLineGraph> graphs = new List<NDLineGraph>();
+
+        private void Awake()
+        {
+            graphPrefab = Resources.Load("Prefabs" + Path.DirectorySeparatorChar + "NeuronalDynamics" + Path.DirectorySeparatorChar + "NDLineGraph") as GameObject;
+            if (graphPrefab == null)
+            {
+                Debug.LogError("No graph prefab found.");
+                Destroy(this);
+            }
+
+            hitEvent = gameObject.AddComponent<RaycastPressEvents>();
+            hitEvent.OnPress.AddListener((hit) => InstantiateGraph(hit));
+        }
 
         /// <summary>
         /// Looks for NDSimulation instance and adds neuronClamp object if possible

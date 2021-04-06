@@ -14,7 +14,7 @@ using Grid = C2M2.NeuronalDynamics.UGX.Grid;
 using C2M2.NeuronalDynamics.Visualization.VRN;
 using C2M2.NeuronalDynamics.Interaction;
 using C2M2.NeuronalDynamics.Interaction.UI;
-using C2M2.Interaction.UI;
+using C2M2.Interaction;
 using C2M2.Visualization;
 using System.Linq;
 
@@ -65,6 +65,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
 
         private Dictionary<double, Mesh> meshCache = new Dictionary<double, Mesh>();
 
+        public NeuronClampManager clampManager = null;
         public NeuronClampManager ClampManager
         {
             get
@@ -75,6 +76,14 @@ namespace C2M2.NeuronalDynamics.Simulation {
         public List<NeuronClamp> clamps = new List<NeuronClamp>();
         public Mutex clampMutex { get; private set; } = new Mutex();
         private static readonly Tuple<int, double> nullClamp = new Tuple<int, double>(-1, -1);
+
+        public NDGraphManager graphManager { get; private set; } = null;
+        public List<NDLineGraph> Graphs
+        {
+            get { return graphManager.graphs; }
+            set { graphManager.graphs = value; }
+        }
+    
 
         [Header ("1D Visualization")]
         public bool visualize1D = false;
@@ -115,7 +124,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
         }
 
         public Vector3[] Verts1D { get { return grid1D.Mesh.vertices; } }
-        public double[] curVals1D = null;
+        public double[] vals1D = null;
 
         private Grid grid2D = null;
         public Grid Grid2D
@@ -231,18 +240,25 @@ namespace C2M2.NeuronalDynamics.Simulation {
         /// </summary>
         /// <returns> One scalar value for each 3D vertex based on its 1D vert's scalar value </returns>
         public sealed override double[] GetValues () {
-            curVals1D = Get1DValues ();
+            vals1D = Get1DValues ();
 
-            if (curVals1D == null) { return null; }
-            //double[] scalars3D = new double[map.Length];
+            if (vals1D == null) { return null; }
+            
             for (int i = 0; i < Map.Length; i++) { // for each 3D point,
 
                 // Take an weighted average using lambda
                 // Equivalent to [lambda * v2 + (1 - lambda) * v1]
-                double newVal = map[i].lambda * (curVals1D[map[i].v2] - curVals1D[map[i].v1]) + curVals1D[map[i].v1];
+                double newVal = map[i].lambda * (vals1D[map[i].v2] - vals1D[map[i].v1]) + vals1D[map[i].v1];
 
                 Scalars3D[i] = newVal;
             }
+
+            // Update graphs
+            foreach(NDLineGraph graph in Graphs)
+            {
+                graph.AddValue(GetSimulationTime(), (float)vals1D[graph.vert]);
+            }
+
             return Scalars3D;
         }
 
@@ -318,7 +334,16 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 Grid geom1D = Mapping.ModelGeometry;
                 GameObject lines1D = gameObject.AddComponent<LinesRenderer> ().Draw (geom1D, color1D, lineWidth1D);
             }
-            void InitUI () {
+            void InitUI ()
+            {
+                GameObject gm = new GameObject();
+                gm.name = "LineGraphManager";
+                gm.transform.parent = transform;
+                graphManager = gm.AddComponent<NDGraphManager>();
+                graphManager.sim = this;
+                
+
+
                 // Instantiate control panel prefab, announce active simulation to buttons
                 controlPanel = Resources.Load ("Prefabs/NeuronalDynamics/ControlPanel/NDControls") as GameObject;        
                 controlPanel = GameObject.Instantiate(controlPanel);

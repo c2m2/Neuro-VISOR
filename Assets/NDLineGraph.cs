@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using C2M2.Visualization;
 using C2M2.NeuronalDynamics.Simulation;
-namespace C2M2.NeuronalDynamics.Visualization
+namespace C2M2.NeuronalDynamics.Interaction.UI
 {
     [RequireComponent(typeof(LineGrapher))]
     public class NDLineGraph : MonoBehaviour
@@ -70,7 +70,6 @@ namespace C2M2.NeuronalDynamics.Visualization
                 lwh.y / 2 * graphScale.y,
                 lwh.x * graphScale.z);
 
- 
             rt.localPosition = new Vector3(focusPos.x - posShift.x, focusPos.y - posShift.y, focusPos.z + posShift.z);
             // Worldspace positional shift for panel
             // Vector3 posShift = ne
@@ -93,19 +92,13 @@ namespace C2M2.NeuronalDynamics.Visualization
             lineGraph.MaxSamples = 300;
         }
 
-        private void FixedUpdate()
+        public void AddValue(float x, float y)
         {
-            // Get value at vertex ID
-            double val = sim.curVals1D[vert];
-
-            // Get time value from simulation
-            float time = sim.GetSimulationTime();
-
             lineGraph.YMin = sim.globalMin;
             lineGraph.YMax = sim.globalMax;
-            
+
             // Add point to graph
-            lineGraph.AddValue(time, (float)val);
+            lineGraph.AddValue(x, y);
         }
 
         private void Update()

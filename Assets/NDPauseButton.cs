@@ -10,6 +10,9 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
     {
         public NDSimulationController simController = null;
         public NDSimulation Sim { get { return simController.sim; } }
+        public Color defaultCol;
+        public Color hoverCol;
+        public Color pressCol;
         public Image playButton = null;
         public Image pauseButton = null;
         public int buttonSize = 25;
@@ -17,6 +20,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
         private void Awake()
         {
             NullChecks();
+            ResizeButtons();
             
             void NullChecks()
             {
@@ -59,8 +63,28 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
 
         private void UpdateDisplay()
         {
-            pauseButton.enabled = Sim.paused;
-            playButton.enabled = !Sim.paused;
+            pauseButton.enabled = !Sim.paused;
+            playButton.enabled = Sim.paused;
+        }
+
+        public void DefaultButtonCol() => ChangeButtonCol(defaultCol);
+        public void HoverButtonCol() => ChangeButtonCol(hoverCol);
+        public void PressButtonCol() => ChangeButtonCol(pressCol);
+        private void ChangeButtonCol(Color col)
+        {
+            pauseButton.color = col;
+            playButton.color = col;
+        }
+
+        private void ResizeButtons()
+        {
+            playButton.rectTransform.localScale = new Vector3(buttonSize / playButton.rectTransform.sizeDelta.x,
+                buttonSize / playButton.rectTransform.sizeDelta.y, 1f);
+
+            pauseButton.rectTransform.localScale = new Vector3(buttonSize / pauseButton.rectTransform.sizeDelta.x,
+                buttonSize / pauseButton.rectTransform.sizeDelta.y, 1f);
+
+            GetComponent<BoxCollider>().size = new Vector3(buttonSize, buttonSize, 1f);
         }
 
     }

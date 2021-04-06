@@ -115,7 +115,7 @@ namespace C2M2.Simulation
         {
             OnUpdate();
 
-            if (!dryRun)
+            if (!paused && !dryRun)
             {
                 ValueType simulationValues = GetValues();
 
