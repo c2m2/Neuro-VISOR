@@ -24,6 +24,11 @@ namespace C2M2.Simulation
         /// Lookup table for more efficient color calculations on the gradient
         /// </summary>
         public LUTGradient ColorLUT { get; private set; } = null;
+        /// <summary>
+        /// Alter the precision of the color scale display
+        /// </summary>
+        [Tooltip("Alter the precision of the color scale display")]
+        public int colorMarkerPrecision = 3;
 
         public LUTGradient.ExtremaMethod extremaMethod { get; set; } = LUTGradient.ExtremaMethod.GlobalExtrema;
         [Tooltip("Must be set if extremaMethod is set to GlobalExtrema")]

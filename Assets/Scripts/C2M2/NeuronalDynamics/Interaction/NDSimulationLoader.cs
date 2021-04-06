@@ -89,7 +89,7 @@ namespace C2M2.NeuronalDynamics.Interaction
                 solver.raycastHitValue = raycastHitValue;
                 solver.unit = unit;
                 solver.unitScaler = unitScaler;
-                solver.colorScalePrecision = colorScalePrecision;
+                solver.colorMarkerPrecision = colorScalePrecision;
 
                 try
                 {

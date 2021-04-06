@@ -10,7 +10,6 @@ namespace C2M2
     using NeuronalDynamics.Interaction;
     using NeuronalDynamics.Visualization;
     using Simulation;
-    using Visualization;
 
     /// <summary>
     /// Stores many global variables, handles pregame initializations
@@ -32,7 +31,6 @@ namespace C2M2
 
         public GameObject cellPreviewer = null;
         public Interactable activeSim = null;
-        public List<SimulationTimerLabel> timerLabels = new List<SimulationTimerLabel>();
 
         public NeuronClampManager ndClampManager = null;
         public NDGraphManager ndGraphManager = null;

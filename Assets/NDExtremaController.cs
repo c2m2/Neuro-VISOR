@@ -4,7 +4,7 @@ using UnityEngine;
 using C2M2.Utils;
 using TMPro;
 using UnityEngine.UI;
-namespace C2M2.Interaction.UI
+namespace C2M2.NeuronalDynamics.Interaction.UI
 {
     [RequireComponent(typeof(BoxCollider))]
     public class NDExtremaController : MonoBehaviour
@@ -48,13 +48,13 @@ namespace C2M2.Interaction.UI
         {
             get
             {
-                return GradDisplay.sim.ColorLUT.GlobalMax;
+                return GradDisplay.Sim.ColorLUT.GlobalMax;
             }
             set
             {
                 if (value > GlobalMin)
                 {
-                    GradDisplay.sim.ColorLUT.GlobalMax = value;
+                    GradDisplay.Sim.ColorLUT.GlobalMax = value;
                 }
             }
         }
@@ -62,13 +62,13 @@ namespace C2M2.Interaction.UI
         {
             get
             {
-                return GradDisplay.sim.ColorLUT.GlobalMin;
+                return GradDisplay.Sim.ColorLUT.GlobalMin;
             }
             set
             {
                 if (value < GlobalMax)
                 {
-                    GradDisplay.sim.ColorLUT.GlobalMin = value;
+                    GradDisplay.Sim.ColorLUT.GlobalMin = value;
                 }
             }
         }

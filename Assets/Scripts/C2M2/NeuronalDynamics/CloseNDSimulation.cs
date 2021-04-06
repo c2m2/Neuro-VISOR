@@ -2,21 +2,41 @@
 using System.Collections.Generic;
 using UnityEngine;
 using C2M2.NeuronalDynamics.Simulation;
-namespace C2M2.NeuronalDynamics.Interaction
+namespace C2M2.NeuronalDynamics.Interaction.UI
 {
     public class CloseNDSimulation : MonoBehaviour
     {
-        public NDSimulation sim = null;
+        public NDSimulationController simController = null;
+        public NDSimulation Sim
+        {
+            get
+            {
+                return simController.sim;
+            }
+        }
+
+        private void Awake()
+        {
+            if(simController == null)
+            {
+                simController = GetComponentInParent<NDSimulationController>();
+                if(simController == null)
+                {
+                    Debug.LogError("No simulation controller found.");
+                    Destroy(this);
+                }
+            }
+        }
 
         public void CloseSimulation()
         {
-            if(sim != null)
+            if(Sim != null)
             {
                 // Destroy the cell's ruler
-                sim.CloseRuler();
+                Sim.CloseRuler();
 
                 // Destroy the cell
-                Destroy(sim.gameObject);
+                Destroy(Sim.gameObject);
 
                 // Destroy this control panel
                 Destroy(transform.root.gameObject);

@@ -22,6 +22,8 @@ namespace C2M2.Simulation
         /// </summary>
         public bool dryRun = false;
 
+        public bool paused = false;
+
         public double raycastHitValue = 55;
         public Tuple<int, double>[] raycastHits = new Tuple<int, double>[0];
 
@@ -179,6 +181,8 @@ namespace C2M2.Simulation
             
             for (time = 0; time < nT; time++)
             {
+                while (paused) { }
+
                 // mutex guarantees mutual exclusion over simulation values
                 mutex.WaitOne();
 

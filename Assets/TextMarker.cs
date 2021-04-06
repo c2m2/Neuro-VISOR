@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
-namespace C2M2.Interaction.UI
+namespace C2M2.NeuronalDynamics.Interaction.UI
 {
     public class TextMarker : MonoBehaviour
     {

@@ -13,6 +13,7 @@ using C2M2.Utils.MeshUtils;
 using Grid = C2M2.NeuronalDynamics.UGX.Grid;
 using C2M2.NeuronalDynamics.Visualization.VRN;
 using C2M2.NeuronalDynamics.Interaction;
+using C2M2.NeuronalDynamics.Interaction.UI;
 using C2M2.Interaction.UI;
 using C2M2.Visualization;
 using System.Linq;
@@ -81,12 +82,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
         public float lineWidth1D = 0.005f;
 
         public GameObject controlPanel = null;
-
-        /// <summary>
-        /// Alter the precision of the color scale display
-        /// </summary>
-        [Tooltip("Alter the precision of the color scale display")]
-        public int colorScalePrecision = 3;
 
         // Need mesh options for each refinement, diameter level
         [Tooltip("Name of the vrn file within Assets/StreamingAssets/NeuronalDynamics/Geometries")]
@@ -328,45 +323,16 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 controlPanel = Resources.Load ("Prefabs/NeuronalDynamics/ControlPanel/NDControls") as GameObject;        
                 controlPanel = GameObject.Instantiate(controlPanel);
 
-                NDFeatureToggle[] toggles = controlPanel.GetComponentsInChildren<NDFeatureToggle>();
-                foreach(NDFeatureToggle toggle in toggles)
+                NDSimulationController controller = controlPanel.GetComponent<NDSimulationController>();
+                if(controller == null)
                 {
-                    toggle.sim = this;
+                    Debug.LogWarning("No NDSimulationController found.");
+                    Destroy(controlPanel);
+                    return;
                 }
 
-                // Find the close button, report this simulation
-                CloseNDSimulation closeButton = controlPanel.GetComponentInChildren<CloseNDSimulation>();
-                if(closeButton != null)
-                {
-                    closeButton.sim = this;
-                }
+                controller.sim = this;
 
-                // Find gradient display and attach our values
-                GradientDisplay gradientDisplay = controlPanel.GetComponentInChildren<GradientDisplay>();
-                if (gradientDisplay != null)
-                {
-                    gradientDisplay.sim = this;
-                    if (ColorLUT != null)
-                    {
-                        gradientDisplay.gradient = ColorLUT.Gradient;
-                    }
-                    else if (ColorLUT == null) { Debug.LogWarning("No ColorLUT found on MeshSimulation"); }
-
-                    gradientDisplay.precision = "F" + colorScalePrecision.ToString();
-                }
-                else if (gradientDisplay == null) { Debug.LogWarning("No GradientDisplay found on NDControls"); }
-
-                SimulationTimerLabel timeLabel = controlPanel.GetComponentInChildren<SimulationTimerLabel>();
-                if (timeLabel != null)
-                {
-                    timeLabel.sim = this;
-                }
-
-                NDInfoDisplay info = controlPanel.GetComponentInChildren<NDInfoDisplay>();
-                if(info != null)
-                {
-                    info.sim = this;
-                }
             }
         }
 

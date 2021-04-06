@@ -5,7 +5,7 @@ using System.IO;
 using C2M2.Utils;
 using TMPro;
 
-namespace C2M2.Interaction.UI
+namespace C2M2.NeuronalDynamics.Interaction.UI
 {
     /// <summary>
     /// Can change the color scale of a simulation, as well as read in gradients from text files
@@ -44,7 +44,7 @@ namespace C2M2.Interaction.UI
 
         public void ApplyGrad()
         {
-            display.sim.ColorLUT.Gradient = gradients[activeGrad];
+            display.Sim.ColorLUT.Gradient = gradients[activeGrad];
             if (nameDisplay != null && gradientNames.Length == gradients.Length)
             {
                 nameDisplay.text = gradientNames[activeGrad];
