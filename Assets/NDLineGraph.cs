@@ -105,9 +105,9 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
         {
             if (lineGraph.pointerLines != null)
             {
-                Vector3 pointTo = new Vector3(focusPos.x * SimLocalScale.x, 
-                    focusPos.y * SimLocalScale.y, 
-                    focusPos.z * SimLocalScale.z);
+                Vector3 pointTo = new Vector3((focusPos.x * SimLocalScale.x) + sim.transform.position.x, 
+                    (focusPos.y * SimLocalScale.y) + sim.transform.position.y, 
+                    (focusPos.z * SimLocalScale.z) + sim.transform.position.z);
 
                 lineGraph.pointerLines.targetPos = pointTo;
             }
