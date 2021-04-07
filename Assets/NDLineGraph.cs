@@ -94,8 +94,8 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
 
         public void AddValue(float x, float y)
         {
-            lineGraph.YMin = sim.globalMin;
-            lineGraph.YMax = sim.globalMax;
+            lineGraph.YMin = sim.globalMin * sim.unitScaler;
+            lineGraph.YMax = sim.globalMax * sim.unitScaler;
 
             // Add point to graph
             lineGraph.AddValue(x, y);

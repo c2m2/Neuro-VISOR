@@ -256,7 +256,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
             // Update graphs
             foreach(NDLineGraph graph in Graphs)
             {
-                graph.AddValue(GetSimulationTime(), (float)vals1D[graph.vert]);
+                graph.AddValue(GetSimulationTime(), (float)vals1D[graph.vert] * unitScaler);
             }
 
             return Scalars3D;
