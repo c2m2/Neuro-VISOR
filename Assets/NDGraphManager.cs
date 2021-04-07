@@ -51,10 +51,6 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
         /// </summary>
         public void AttachToSimulation(NDLineGraph graph, NDSimulation simulation, RaycastHit hit)
         {
-            graph.sim = simulation;
-
-            //graph.transform.parent.parent = simulation.transform;
-
             int vertIndex = simulation.GetNearestPoint(hit);
 
             // Check for duplicates
