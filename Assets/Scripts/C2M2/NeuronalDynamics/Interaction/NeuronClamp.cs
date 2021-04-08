@@ -309,7 +309,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         {
             if (ClampManager.PressedCancel)
             {
-
+                ResetInput();
             }
 
             ShowClampInfo();
@@ -359,16 +359,12 @@ namespace C2M2.NeuronalDynamics.Interaction
                 {
                     Destroy(transform.parent.gameObject);
                 }
-                else if (holdCount > 0)
-                {
-                    ToggleClamp();
-                    // Switch cap to default color
-                    SwitchCaps(true);
-                }
+                else if (holdCount > 0) ToggleClamp();
             }
 
             holdCount = 0;
             powerClick = false;
+            SwitchCaps(true);
         }
 
         #endregion
