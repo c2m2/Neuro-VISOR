@@ -16,6 +16,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
             }
         }
 
+        public TextMeshProUGUI text = null;
         public TextMeshProUGUI cellName = null;
         public TextMeshProUGUI refinement = null;
         public TextMeshProUGUI vert1DTxt = null;
@@ -85,12 +86,22 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
             if (name.EndsWith(".vrn")) name = name.Substring(0, name.LastIndexOf(".vrn"));
             cellName.text = "Cell: " + name;
 
+            text.text = "Cell: " + name
+                + "\nRefinement: " + Sim.RefinementLevel
+                + "\n1D Verts: " + Sim.Grid1D.Mesh.vertexCount.ToString()
+                + ", Edges: " + Sim.Grid1D.Edges.Count
+                + "\n3D Verts: " + Sim.Grid2D.Mesh.vertexCount.ToString()
+                + ", Edges: " + Sim.Grid2D.Edges.Count
+                + "\nTriangles: " + Sim.Grid2D.Mesh.triangles.Length.ToString();
+
+            /*
             refinement.text = "Refinement: " + Sim.RefinementLevel;
             vert1DTxt.text = "1D Verts: " + Sim.Grid1D.Mesh.vertexCount.ToString() 
                 + ", Edges: " + Sim.Grid1D.Edges.Count;
             vert3DTxt.text = "3D Verts: " + Sim.Grid2D.Mesh.vertexCount.ToString()
                 + ", Edges: " + Sim.Grid2D.Edges.Count;
             triTxt.text = "Triangles: " + Sim.Grid2D.Mesh.triangles.Length.ToString();
+            */
         }
 
     }

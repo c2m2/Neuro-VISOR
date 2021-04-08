@@ -4,6 +4,7 @@ using UnityEngine;
 using System.IO;
 using C2M2.Utils;
 using TMPro;
+using UnityEngine.UI;
 
 namespace C2M2.NeuronalDynamics.Interaction.UI
 {
@@ -22,6 +23,19 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
         public string[] gradientNames;
         public string defaultGradient;
         private int activeGrad = 0;
+
+        public NDSimulationController simController = null;
+
+        private Color defaultCol = new Color(1f, 0.75f, 0f);
+        public Color DefaultCol
+        {
+            get { return (simController == null) ? defaultCol : simController.defaultCol; }
+        }
+        private Color hoverCol = new Color(1f, 0.85f, 0.4f);
+        public Color HoverCol
+        {
+            get { return (simController == null) ? hoverCol : simController.highlightCol; }
+        }
 
         private string basePath = Application.streamingAssetsPath;
         public string extension = ".txt";
@@ -54,17 +68,30 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
 
         private void Awake()
         {
-            if (display == null)
-            {
-                display = GetComponentInParent<GradientDisplay>();
-                if (display == null)
-                {
-                    Destroy(this);
-                    Debug.LogError("No GradientDisplay given.");
-                }
-            }
+            NullChecks();
 
             ReadGradients();
+
+            void NullChecks()
+            {
+                if (display == null)
+                {
+                    display = GetComponentInParent<GradientDisplay>();
+                    if (display == null)
+                    {
+                        Destroy(this);
+                        Debug.LogError("No GradientDisplay given.");
+                    }
+                }
+                if (simController == null)
+                {
+                    simController = GetComponentInParent<NDSimulationController>();
+                    if (simController == null)
+                    {
+                        Debug.LogWarning("No sim controller found. Text colors might be wrong.");
+                    }
+                }
+            }
         }
 
         private void Start()
@@ -124,6 +151,16 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
                 gradients = gradsTemp;
                 gradientNames = namesTemp;
             }
+        }
+
+        public void SetDefaultCol(Image img)
+        {
+            img.color = DefaultCol;
+        }
+
+        public void SetHighlightCol(Image img)
+        {
+            img.color = HoverCol;
         }
 
     }

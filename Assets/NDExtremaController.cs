@@ -13,10 +13,23 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
         public RectTransform increaseButton = null;
         public RectTransform decreaseButton = null;
         public RectTransform resetButton = null;
+        public NDSimulationController simController = null;
 
-        public Color defaultCol = new Color(1f, 0.75f, 0f);
-        public Color hoverCol = new Color(1f, 0.85f, 0.4f);
-        public Color pressCol = new Color(1f, 0.9f, 0.6f);
+        private Color defaultCol = new Color(1f, 0.75f, 0f);
+        public Color DefaultCol
+        {
+            get { return (simController == null) ? defaultCol : simController.defaultCol; }
+        }
+        private Color hoverCol = new Color(1f, 0.85f, 0.4f);
+        public Color HoverCol
+        {
+            get { return (simController == null) ? hoverCol : simController.highlightCol; }
+        }
+        private Color pressCol = new Color(1f, 0.9f, 0.6f);
+        public Color PressedCol
+        {
+            get { return (simController == null) ? pressCol : simController.pressedCol; }
+        }
 
         public float buttonSize = 25;
         public bool affectMax = true;
@@ -113,6 +126,15 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
             void NullChecks()
             {
                 bool fatal = false;
+
+                if(simController == null)
+                {
+                    simController = GetComponentInParent<NDSimulationController>();
+                    if(simController == null)
+                    {
+                        Debug.LogWarning("Could not find simulation controller. Text colors could be wrong.");
+                    }
+                }
                 if(increaseButton == null)
                 {
                     Debug.LogError("No increase button given.");
@@ -273,9 +295,9 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
         // f(x) = ((ff - fi) / maxHoldTime) * x + fi
         private float GetScaler(float holdTime) => ((ff - fi) / maxHoldTime) * holdTime + fi;
 
-        public void LabelColDefault() => ChangeLabelCol(defaultCol);
-        public void LabelColHover() => ChangeLabelCol(hoverCol);
-        public void LabelColPress() => ChangeLabelCol(pressCol);
+        public void LabelColDefault() => ChangeLabelCol(DefaultCol);
+        public void LabelColHover() => ChangeLabelCol(HoverCol);
+        public void LabelColPress() => ChangeLabelCol(PressedCol);
         private void ChangeLabelCol(Color col)
         {
             Label.color = col;
