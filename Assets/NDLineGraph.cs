@@ -33,49 +33,17 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
                 Destroy(this);
             }
 
-            string title = "Voltage vs. Time (Vert " + vert + ")";
-            string xLabel = "Time (ms)";
-            string yLabel = "Voltage (" + Sim.unit + ")";
-
-            lineGraph.SetLabels(title, xLabel, yLabel);
+            SetLabels();
 
             transform.SetParent(Sim.transform);
 
-            focusPos = Sim.Verts1D[vert];
+            rt.position = GetPanelPos();
 
-            // worldspace position of vertex
-            Vector3 cellPos = new Vector3(focusPos.x * Sim.transform.localScale.x,
-                focusPos.y * Sim.transform.localScale.y,
-                focusPos.z * Sim.transform.localScale.z);
-            cellPos += Sim.transform.position;
-            Vector3 cameraPos = Camera.main.transform.position;
-            // Vector pointing from camera to cell
-            Vector3 direction = (cellPos - cameraPos);
-            
-            float xSign = (cameraPos.x > cellPos.x) ? -1 : 1;
-            float zSign = (cameraPos.z > cellPos.z) ? -1 : 1;
-
-            Vector3 lwh = rt.sizeDelta;
-
-            Vector3 graphScaleW = new Vector3(lwh.x * rt.localScale.x, lwh.y * rt.localScale.y, lwh.z * rt.localScale.z);
-
-            // Worldspace positional shift for panel
-            //rt.localPosition = new Vector3(focusPos.x + (xSign * posShift.x), focusPos.y - posShift.y, focusPos.z + (zSign * posShift.z));
-            rt.position = new Vector3(cameraPos.x + (direction.x + xSign * (graphScaleW.x /2)), 
-                cellPos.y - (graphScaleW.y / 2),
-                cameraPos.z + (direction.z + zSign * (graphScaleW.y / 2)));
-
-            // Only keep y rotation
+            // Rotate panel towards camera in y direction
             rt.LookAt(Camera.main.transform);
             rt.localRotation = Quaternion.Euler(new Vector3(0f, rt.localRotation.eulerAngles.y, 0f));
 
-            // Point anchor lines to vertex
-            if(lineGraph.pointerLines != null)
-            {
-                lineGraph.pointerLines.UseWorldSpace = true;
-                lineGraph.pointerLines.onlyRenderShortestAnchor = true;
-            }
-            else Debug.LogWarning("Couldn't access pointer lines, feature may be disabled.");
+            InitPointerLines();
 
             // Reset graph to match original worldspace size
             transform.localScale = new Vector3(transform.localScale.x / Sim.transform.localScale.x,
@@ -83,6 +51,50 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
                 transform.localScale.z / Sim.transform.localScale.z);
 
             lineGraph.MaxSamples = 300;
+
+            void SetLabels()
+            {
+                string title = "Voltage vs. Time (Vert " + vert + ")";
+                string xLabel = "Time (ms)";
+                string yLabel = "Voltage (" + Sim.unit + ")";
+
+                lineGraph.SetLabels(title, xLabel, yLabel);
+            }
+
+            Vector3 GetPanelPos()
+            {
+                // Convert vertex position to world space
+                Vector3 vertPos = Sim.Verts1D[vert];
+                vertPos = new Vector3(vertPos.x * Sim.transform.localScale.x,
+                    vertPos.y * Sim.transform.localScale.y,
+                    vertPos.z * Sim.transform.localScale.z);
+                focusPos = vertPos;
+
+                vertPos += Sim.transform.position;
+                Vector3 cameraPos = Camera.main.transform.position;
+                // Vector pointing from camera to cell
+                Vector3 direction = (focusPos - cameraPos);
+
+                // Worldspace size of the graph
+                float graphSize = rt.sizeDelta.x * rt.localScale.x;
+                float newMagnitude = graphSize;
+                float oldMagnitude = direction.magnitude;
+                float magScale = newMagnitude / oldMagnitude;
+
+                // The panel is placed along a vector pointing from camera to vertex position
+                return new Vector3(direction.x * magScale, vertPos.y - (graphSize / 2), direction.z * magScale) + vertPos;
+            }
+
+            void InitPointerLines()
+            {
+                // Point anchor lines to vertex
+                if (lineGraph.pointerLines != null)
+                {
+                    lineGraph.pointerLines.UseWorldSpace = true;
+                    lineGraph.pointerLines.onlyRenderShortestAnchor = true;
+                }
+                else Debug.LogWarning("Couldn't access pointer lines, feature may be disabled.");
+            }
         }
 
         public void AddValue(float x, float y)
@@ -105,9 +117,9 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
         {
             if (lineGraph.pointerLines != null)
             {
-                Vector3 pointTo = new Vector3((focusPos.x * SimLocalScale.x) + Sim.transform.position.x, 
-                    (focusPos.y * SimLocalScale.y) + Sim.transform.position.y, 
-                    (focusPos.z * SimLocalScale.z) + Sim.transform.position.z);
+                Vector3 pointTo = new Vector3(focusPos.x + Sim.transform.position.x, 
+                    focusPos.y + Sim.transform.position.y, 
+                    focusPos.z + Sim.transform.position.z);
 
                 lineGraph.pointerLines.targetPos = pointTo;
             }
