@@ -3021,12 +3021,15 @@ MonoBehaviour:
   clampControllerL: {fileID: 835806272}
   allActive: 1
   hitEvent: {fileID: 1157977726}
-  toggleDestroyOVR: 2
-  toggleDestroyOVRS: 8
+  toggleDestroyOVR: 8192
+  toggleDestroyOVRS: 2097152
   powerModifierPlusKey: 273
   powerModifierMinusKey: 274
   highlightOVR: 16384
   highlightOVRS: 4194304
+  cancelCommand: 2
+  cancelCommandS: 8
+  cancelKey: 8
 --- !u!4 &1361725564 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8168634007274339819, guid: 01ee1288b45a4554d918c7499feabe0e,

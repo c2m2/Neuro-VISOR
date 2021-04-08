@@ -32,6 +32,9 @@ namespace C2M2.NeuronalDynamics.Interaction
 
         public NDSimulation simulation = null;
 
+        public GameObject defaultCapHolder = null;
+        public GameObject destroyCapHolder = null;
+
         private MeshRenderer mr;
         private Vector3 LocalExtents { get { return transform.localScale / 2; } }
         private Vector3 posFocus = Vector3.zero;
@@ -304,11 +307,20 @@ namespace C2M2.NeuronalDynamics.Interaction
         /// </summary>
         public void MonitorInput()
         {
+            if (ClampManager.PressedCancel)
+            {
+
+            }
+
             ShowClampInfo();
             if (ClampManager.PressedToggleDestroy)
+            {
                 holdCount++;
-            else
-                CheckInput();
+                // If we've held the button long enough to destory, color caps red until user releases button
+                if(holdCount > destroyCount && !powerClick) SwitchCaps(false);
+                else if (powerClick) SwitchCaps(true);
+            }
+            else CheckInput();
 
             float power = ClampManager.PowerModifier;
             
@@ -317,6 +329,15 @@ namespace C2M2.NeuronalDynamics.Interaction
 
             ClampPower += power;
             Math.Clamp(ClampPower, MinPower, MaxPower);
+        }
+
+        private void SwitchCaps(bool toDefault)
+        {
+            if (defaultCapHolder != null && destroyCapHolder != null)
+            {
+                defaultCapHolder.SetActive(toDefault);
+                destroyCapHolder.SetActive(!toDefault);
+            }
         }
 
         public void Highlight(bool highlight)
@@ -332,13 +353,18 @@ namespace C2M2.NeuronalDynamics.Interaction
 
         private void CheckInput()
         {
-            if (!powerClick)
+            if (!ClampManager.PressedCancel && !powerClick)
             {
                 if (holdCount >= destroyCount)
                 {
                     Destroy(transform.parent.gameObject);
                 }
-                else if (holdCount > 0) ToggleClamp();
+                else if (holdCount > 0)
+                {
+                    ToggleClamp();
+                    // Switch cap to default color
+                    SwitchCaps(true);
+                }
             }
 
             holdCount = 0;

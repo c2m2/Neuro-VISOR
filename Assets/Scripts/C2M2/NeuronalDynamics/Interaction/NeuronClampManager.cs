@@ -198,6 +198,20 @@ namespace C2M2.NeuronalDynamics.Interaction
                 else return false; // We cannot highlight through the emulator
             }
         }
+
+        public OVRInput.Button cancelCommand = OVRInput.Button.Two;
+        public OVRInput.Button cancelCommandS = OVRInput.Button.Four;
+        public KeyCode cancelKey = KeyCode.Backspace;
+        public bool PressedCancel
+        {
+            get
+            {
+                if (GameManager.instance.VrIsActive)
+                    return (OVRInput.Get(cancelCommand) || OVRInput.Get(cancelCommandS));
+                else
+                    return Input.GetKey(cancelKey);
+            }
+        }
         /// <summary>
         /// If the user holds a raycast down for X seconds on a clamp, it should destroy the clamp
         /// </summary>
