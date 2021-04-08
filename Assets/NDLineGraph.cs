@@ -11,7 +11,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
         public NDGraphManager manager = null;
         public NDSimulation Sim { get { return manager.sim; } }
         public int vert = -1;
-        public Vector3 focusPos { get; private set; }
+        public Vector3 vertPos { get; private set; }
 
         private LineGrapher lineGraph;
         private RectTransform rt = null;
@@ -64,16 +64,15 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
             Vector3 GetPanelPos()
             {
                 // Convert vertex position to world space
-                Vector3 vertPos = Sim.Verts1D[vert];
+                vertPos = Sim.Verts1D[vert];
                 vertPos = new Vector3(vertPos.x * Sim.transform.localScale.x,
                     vertPos.y * Sim.transform.localScale.y,
                     vertPos.z * Sim.transform.localScale.z);
-                focusPos = vertPos;
 
-                vertPos += Sim.transform.position;
+                Vector3 vertPosShift = vertPos + Sim.transform.position;
                 Vector3 cameraPos = Camera.main.transform.position;
                 // Vector pointing from camera to cell
-                Vector3 direction = (focusPos - cameraPos);
+                Vector3 direction = (vertPosShift - cameraPos);
 
                 // Worldspace size of the graph
                 float graphSize = rt.sizeDelta.x * rt.localScale.x;
@@ -82,7 +81,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
                 float magScale = newMagnitude / oldMagnitude;
 
                 // The panel is placed along a vector pointing from camera to vertex position
-                return new Vector3(direction.x * magScale, vertPos.y - (graphSize / 2), direction.z * magScale) + vertPos;
+                return new Vector3(direction.x * magScale, vertPosShift.y - (graphSize / 2), direction.z * magScale) + vertPos;
             }
 
             void InitPointerLines()
@@ -117,9 +116,9 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
         {
             if (lineGraph.pointerLines != null)
             {
-                Vector3 pointTo = new Vector3(focusPos.x + Sim.transform.position.x, 
-                    focusPos.y + Sim.transform.position.y, 
-                    focusPos.z + Sim.transform.position.z);
+                Vector3 pointTo = new Vector3(vertPos.x + Sim.transform.position.x, 
+                    vertPos.y + Sim.transform.position.y, 
+                    vertPos.z + Sim.transform.position.z);
 
                 lineGraph.pointerLines.targetPos = pointTo;
             }
