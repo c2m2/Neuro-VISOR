@@ -23,14 +23,14 @@ namespace C2M2.Simulation
         /// <summary>
         /// Lookup table for more efficient color calculations on the gradient
         /// </summary>
-        public LUTGradient ColorLUT { get; private set; } = null;
+        public ColorLUT ColorLUT { get; private set; } = null;
         /// <summary>
         /// Alter the precision of the color scale display
         /// </summary>
         [Tooltip("Alter the precision of the color scale display")]
         public int colorMarkerPrecision = 3;
 
-        public LUTGradient.ExtremaMethod extremaMethod { get; set; } = LUTGradient.ExtremaMethod.GlobalExtrema;
+        public ColorLUT.ExtremaMethod extremaMethod { get; set; } = ColorLUT.ExtremaMethod.GlobalExtrema;
         [Tooltip("Must be set if extremaMethod is set to GlobalExtrema")]
         public float globalMax = float.NegativeInfinity;
         [Tooltip("Must be set if extremaMethod is set to GlobalExtrema")]
@@ -129,10 +129,10 @@ namespace C2M2.Simulation
             void InitColors()
             {
                 // Initialize the color lookup table
-                ColorLUT = gameObject.AddComponent<LUTGradient>();
+                ColorLUT = gameObject.AddComponent<ColorLUT>();
                 ColorLUT.Gradient = gradient;
                 ColorLUT.extremaMethod = extremaMethod;
-                if (extremaMethod == LUTGradient.ExtremaMethod.GlobalExtrema)
+                if (extremaMethod == ColorLUT.ExtremaMethod.GlobalExtrema)
                 {
                     ColorLUT.GlobalMax = globalMax;
                     ColorLUT.GlobalMin = globalMin;

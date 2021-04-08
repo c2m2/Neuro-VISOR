@@ -59,7 +59,7 @@ namespace C2M2.NeuronalDynamics.Interaction
                 mr.material.color = activeCol;
             }
         }
-        private LUTGradient gradientLUT = null;
+        private ColorLUT gradientLUT = null;
 
         float currentVisualizationScale = 1;
         private void VisualInflationChangeHandler(double newInflation)
@@ -257,7 +257,7 @@ namespace C2M2.NeuronalDynamics.Interaction
 
                 this.simulation.OnVisualInflationChange += VisualInflationChangeHandler;
 
-                gradientLUT = this.simulation.GetComponent<LUTGradient>();
+                gradientLUT = this.simulation.GetComponent<ColorLUT>();
 
                 // clamp can be added to simulation, wait for list access, add to list
                 this.simulation.clampMutex.WaitOne();

@@ -380,7 +380,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
         private void Update2DGrid()
         {
             /// Retrieve mesh names from archive
-            string meshName2D = VrnReader.Retrieve2DMeshName(VisualInflation);
+            string meshName2D = VrnReader.Retrieve2DMeshName(VisualInflation, RefinementLevel);
 
             /// Empty 2D grid which stores geometry + mapping data
             Grid2D = new Grid(new Mesh(), meshName2D);

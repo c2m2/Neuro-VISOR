@@ -14,7 +14,7 @@ namespace C2M2.Visualization
     /// For large applications, like resolving the color of every vertex of a large mesh surface,
     /// this script will be much faster than Gradient.Evaluate().
     /// </remarks>
-    public class LUTGradient : MonoBehaviour
+    public class ColorLUT : MonoBehaviour
     {
         /// <summary>
         /// Should max/min for each time frame be decided by that time frame, a preset 
@@ -88,7 +88,17 @@ namespace C2M2.Visualization
             }
         }
         // Gradient look-up-table greatly reduces time expense and memory
-        public Color32[] lut { get; private set; } = null;
+        private Color32[] lut { get; set; } = null;
+        public Color32[] LUT
+        {
+            get { return lut; }
+            set
+            {
+                lut = value;
+                hasChanged = true;
+            }
+        }
+
 
         /// <summary> Given the extrema method, color an entire array of scalers using the LUT </summary>
         public Color32[] Evaluate(float[] unscaledTimes)
@@ -138,6 +148,13 @@ namespace C2M2.Visualization
             scalars.RescaleArray(0f, (lutRes - 1), GlobalMin, GlobalMax);
 
             return lut[Math.Clamp((int)scalars[1], 0, lutRes-1)];
+        }
+
+        // Build a LUT without a gradient object by manually assigning color keys
+        public Color32[] BuildLUT(Color32[] colorKeys)
+        {
+            lut = colorKeys;
+            return lut;
         }
 
         private Color32[] BuildLUT(Gradient gradient, int lutRes)
