@@ -151,8 +151,8 @@ namespace C2M2.NeuronalDynamics.Interaction
         /// <summary>
         /// Pressing these buttonb toggles clamps on/off. Holding these buttons down for long enough destroys the clamp
         /// </summary>
-        public OVRInput.Button toggleDestroyOVR = OVRInput.Button.Two;
-        public OVRInput.Button toggleDestroyOVRS = OVRInput.Button.Four;
+        public OVRInput.Button toggleDestroyOVR = OVRInput.Button.PrimaryIndexTrigger;
+        public OVRInput.Button toggleDestroyOVRS = OVRInput.Button.SecondaryIndexTrigger;
         public bool PressedToggleDestroy
         {
             get
