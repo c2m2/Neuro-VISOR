@@ -71,7 +71,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             // If there is no NDSimulation, don't try instantiating a clamp
             if (hit.collider.GetComponentInParent<NDSimulation>() == null) return;
 
-            int clampIndex = GetNearestPoint(hit);
+            int clampIndex = Simulation.GetNearestPoint(hit);
             //ensures the vertex is available
             if (VertIsAvailable(clampIndex))
             {
@@ -80,42 +80,6 @@ namespace C2M2.NeuronalDynamics.Interaction
                 clamp.ReportSimulation(Simulation, clampIndex);
             }
             
-        }
-
-        private int GetNearestPoint(RaycastHit hit)
-        {
-            // Translate contact point to local space
-            MeshFilter mf = Simulation.transform.GetComponentInParent<MeshFilter>();
-            if (mf == null) return -1;
-
-            // Get 3D mesh vertices from hit triangle
-            int triInd = hit.triangleIndex * 3;
-            int v1 = mf.mesh.triangles[triInd];
-            int v2 = mf.mesh.triangles[triInd + 1];
-            int v3 = mf.mesh.triangles[triInd + 2];
-
-            // Find 1D verts belonging to these 3D verts
-            int[] verts1D = new int[]
-            {
-                Simulation.Map[v1].v1, Simulation.Map[v1].v2,
-                Simulation.Map[v2].v1, Simulation.Map[v2].v2,
-                Simulation.Map[v3].v1, Simulation.Map[v3].v2
-            };
-            Vector3 localHitPoint = Simulation.transform.InverseTransformPoint(hit.point);
-
-            float nearestDist = float.PositiveInfinity;
-            int nearestVert1D = -1;
-            foreach (int vert in verts1D)
-            {
-                float dist = Vector3.Distance(localHitPoint, Simulation.Verts1D[vert]);
-                if (dist < nearestDist)
-                {
-                    nearestDist = dist;
-                    nearestVert1D = vert;
-                }
-            }
-
-            return nearestVert1D;
         }
 
         private bool VertIsAvailable(int clampIndex)
@@ -146,7 +110,10 @@ namespace C2M2.NeuronalDynamics.Interaction
             return true;
         }
 
-        private int destroyCount = 50;
+        /// <summary>
+        /// Hold down a raycast for this many frames in order to destroy a clamp
+        /// </summary>
+        public int destroyCount { get; private set; } = 50;
         private int holdCount = 0;
         /// <summary>
         /// Pressing these buttonb toggles clamps on/off. Holding these buttons down for long enough destroys the clamp
@@ -215,12 +182,12 @@ namespace C2M2.NeuronalDynamics.Interaction
         /// <summary>
         /// If the user holds a raycast down for X seconds on a clamp, it should destroy the clamp
         /// </summary>
-        public void MonitorInput()
+        public void MonitorGroupInput()
         {
             if (PressedToggleDestroy)
                 holdCount++;
             else
-                CheckInput();
+                CheckGroupInput();
 
             // Highlight all clamps if either hand trigger is held down
             HighlightAll(PressedHighlight);
@@ -235,13 +202,13 @@ namespace C2M2.NeuronalDynamics.Interaction
             }       
         }
 
-        public void ResetInput()
+        public void ResetGroupInput()
         {
-            CheckInput();
+            CheckGroupInput();
             HighlightAll(false);
         }
 
-        private void CheckInput()
+        private void CheckGroupInput()
         {
             if (!powerClick)
             {
@@ -295,6 +262,11 @@ namespace C2M2.NeuronalDynamics.Interaction
                     clamp.Highlight(highlight);
                 }
             }
+        }
+
+        public void PreviewClamp(RaycastHit hit)
+        {
+
         }
     }
 }

@@ -309,8 +309,6 @@ namespace C2M2.NeuronalDynamics.Interaction
         #endregion
 
         #region Input
-        [Tooltip("Hold down a raycast for this many frames in order to destroy a clamp")]
-        public int destroyCount = 50;
         int holdCount = 0;
 
         private bool powerClick = false;
@@ -328,8 +326,9 @@ namespace C2M2.NeuronalDynamics.Interaction
             if (ClampManager.PressedToggleDestroy)
             {
                 holdCount++;
+
                 // If we've held the button long enough to destory, color caps red until user releases button
-                if(holdCount > destroyCount && !powerClick) SwitchCaps(false);
+                if(holdCount > ClampManager.destroyCount && !powerClick) SwitchCaps(false);
                 else if (powerClick) SwitchCaps(true);
             }
             else CheckInput();
@@ -347,6 +346,8 @@ namespace C2M2.NeuronalDynamics.Interaction
         {
             if (defaultCapHolder != null && destroyCapHolder != null)
             {
+                // Disable body of clamp if in cancel
+                mr.enabled = toDefault;
                 defaultCapHolder.SetActive(toDefault);
                 destroyCapHolder.SetActive(!toDefault);
             }
@@ -368,7 +369,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         {
             if (!ClampManager.PressedCancel && !powerClick)
             {
-                if (holdCount >= destroyCount)
+                if (holdCount >= ClampManager.destroyCount)
                 {
                     Destroy(transform.parent.gameObject);
                 }

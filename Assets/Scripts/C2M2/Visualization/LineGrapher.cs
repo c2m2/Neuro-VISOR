@@ -14,9 +14,25 @@ namespace C2M2.Visualization
         public GraphCursor cursor = null;
         public GraphPointer pointerLines = null;
         public RectTransform closeButton = null;
+        public Color outlineColor;
+        public Color labelColor;
 
         public RectTransform infoPanel = null;
         public RectTransform infoPanelButton = null;
+        private LineRenderer outline;
+        public LineRenderer Outline
+        {
+            get
+            {
+                return outline;
+            }
+            set
+            {
+                outline = value;
+                outline.startColor = outlineColor;
+                outline.endColor = outlineColor;
+            }
+        }
 
 
         private int maxSamples = 100;
@@ -57,6 +73,7 @@ namespace C2M2.Visualization
             {
                 titleStr = value;
                 title.text = titleStr;
+                title.color = labelColor;
             }
         }
 
@@ -69,6 +86,7 @@ namespace C2M2.Visualization
             {
                 yLabelStr = value;
                 yLabel.text = yLabelStr;
+                yLabel.color = labelColor;
             }
         }
 
@@ -81,6 +99,7 @@ namespace C2M2.Visualization
             {
                 xLabelStr = value;
                 xLabel.text = xLabelStr;
+                xLabel.color = labelColor;
             }
         }
 
@@ -220,6 +239,17 @@ namespace C2M2.Visualization
 
                 Image backgroundImg = infoPanel.GetComponentInChildren<Image>();
                 backgroundImg.rectTransform.sizeDelta = lwh;
+
+                var infoOutline = infoPanel.GetComponent<LineRenderer>();
+                if(infoOutline != null)
+                {
+                    infoOutline.startColor = outlineColor;
+                    infoOutline.endColor = outlineColor;
+                }
+                foreach(var text in infoOutline.GetComponentsInChildren<TextMeshProUGUI>())
+                {
+                    text.color = labelColor;
+                }
             }
             void InitInfoPanelButton()
             {
@@ -234,15 +264,17 @@ namespace C2M2.Visualization
             }
             void InitOutline()
             {
-                LineRenderer lr = infoPanel.GetComponent<LineRenderer>();
+                Outline = infoPanel.GetComponent<LineRenderer>();
                 Vector3 lwh = infoPanel.sizeDelta;
-                lr.positionCount = 4;
-                lr.SetPositions(new Vector3[] {
+                Outline.positionCount = 4;
+                Outline.SetPositions(new Vector3[] {
                 new Vector3(-lwh.x / 2, -lwh.y / 2),
                 new Vector3(-lwh.x / 2, lwh.y / 2),
                 new Vector3(lwh.x / 2, lwh.y / 2),
                 new Vector3(lwh.x / 2, -lwh.y / 2) });
-                lr.loop = true;
+                Outline.loop = true;
+                outline.startColor = outlineColor;
+                outline.endColor = outlineColor;
             }
             void NullChecks()
             {
@@ -259,6 +291,7 @@ namespace C2M2.Visualization
                         Debug.LogError("No cursor found for LineGrapher.");
                         Destroy(this);
                     }
+                    cursor.cursorLabel.color = labelColor;
                 }
                 if (pointerLines == null)
                 {
