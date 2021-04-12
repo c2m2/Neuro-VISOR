@@ -35,6 +35,8 @@ namespace C2M2.NeuronalDynamics.Interaction
         public GameObject defaultCapHolder = null;
         public GameObject destroyCapHolder = null;
 
+        public ClampInfo clampInfo = null;
+
         private MeshRenderer mr;
         private Vector3 LocalExtents { get { return transform.localScale / 2; } }
         private Vector3 posFocus = Vector3.zero;
@@ -230,7 +232,17 @@ namespace C2M2.NeuronalDynamics.Interaction
         /// </summary>
         public void ShowClampInfo()
         {
-            //Display ClampPower and FocusVert
+            clampInfo.gameObject.SetActive(true);
+            clampInfo.vertexText.text = FocusVert.ToString();
+            clampInfo.clampText.text = ClampPower.ToString("G4") + " " + simulation.unit;
+        }
+
+        /// <summary>
+        /// Hides a popup of clamp voltage and clamp vertex
+        /// </summary>
+        public void HideClampInfo()
+        {
+            clampInfo.gameObject.SetActive(false);
         }
 
         #endregion
@@ -307,12 +319,12 @@ namespace C2M2.NeuronalDynamics.Interaction
         /// </summary>
         public void MonitorInput()
         {
+            ShowClampInfo();
             if (ClampManager.PressedCancel)
             {
                 ResetInput();
             }
 
-            ShowClampInfo();
             if (ClampManager.PressedToggleDestroy)
             {
                 holdCount++;
@@ -348,6 +360,7 @@ namespace C2M2.NeuronalDynamics.Interaction
 
         public void ResetInput()
         {
+            HideClampInfo();
             CheckInput();
         }
 

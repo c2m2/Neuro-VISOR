@@ -407,6 +407,7 @@ MonoBehaviour:
   simulation: {fileID: 0}
   defaultCapHolder: {fileID: 5483127028994316193}
   destroyCapHolder: {fileID: 1696048893164957766}
+  clampInfo: {fileID: 5555221349378481575}
   highlightObj: {fileID: 7733468709602801279}
   minHighlightGlobalSize: 0.03333333
   destroyCount: 50
@@ -438,10 +439,32 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   onHover:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 2030585019643067809}
+        m_MethodName: ShowClampInfo
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   onHoverEnd:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 2030585019643067809}
+        m_MethodName: HideClampInfo
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   onPress:
     m_PersistentCalls:
       m_Calls: []
@@ -746,12 +769,12 @@ PrefabInstance:
     - target: {fileID: 4143456574193848350, guid: a4e40cc03c7baa44094ae21dbea8f42e,
         type: 3}
       propertyPath: m_Pivot.x
-      value: 0
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 4143456574193848350, guid: a4e40cc03c7baa44094ae21dbea8f42e,
         type: 3}
       propertyPath: m_Pivot.y
-      value: 0
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 4143456574193848350, guid: a4e40cc03c7baa44094ae21dbea8f42e,
         type: 3}
@@ -841,12 +864,12 @@ PrefabInstance:
     - target: {fileID: 4143456574193848350, guid: a4e40cc03c7baa44094ae21dbea8f42e,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -1.25
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4143456574193848350, guid: a4e40cc03c7baa44094ae21dbea8f42e,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 1
+      value: 2.25
       objectReference: {fileID: 0}
     - target: {fileID: 4143456574193848350, guid: a4e40cc03c7baa44094ae21dbea8f42e,
         type: 3}
@@ -941,3 +964,15 @@ RectTransform:
     type: 3}
   m_PrefabInstance: {fileID: 698934360003127287}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &5555221349378481575 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4948050241293384272, guid: a4e40cc03c7baa44094ae21dbea8f42e,
+    type: 3}
+  m_PrefabInstance: {fileID: 698934360003127287}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9af0184a3f91eb34c9c1d985f3d857cc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
