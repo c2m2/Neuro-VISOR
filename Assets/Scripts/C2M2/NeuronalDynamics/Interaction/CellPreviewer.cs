@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 using System.Linq;
+using TMPro;
 using Random = System.Random;
 
 namespace C2M2.NeuronalDynamics.Interaction {
@@ -20,7 +21,7 @@ namespace C2M2.NeuronalDynamics.Interaction {
         public bool renderWalls = true;
         public Color32 windowColor = Color.black;
         public GameObject ErrorWindow = null;
-        
+
         /// <summary>
         /// Colors ot use for the 1D cell renderings. More than cellColors.Length cells will repeat these colors
         /// </summary>
@@ -88,8 +89,6 @@ namespace C2M2.NeuronalDynamics.Interaction {
                 }
                 Debug.LogWarning("No cells found in " + fullPath);
             }
-
-            
 
             void FindWindowPrefab()
             {
@@ -188,17 +187,6 @@ namespace C2M2.NeuronalDynamics.Interaction {
                 go.transform.parent = transform;
                 go.transform.localPosition = position;
                 go.name = fileName + "Preview";
-
-                // Find all line renderers in window, color according to input
-                LineRenderer[] prefabLines = go.GetComponentsInChildren<LineRenderer>();
-                if (prefabLines.Length > 0)
-                {
-                    foreach (LineRenderer r in prefabLines)
-                    {
-                        r.startColor = windowColor;
-                        r.endColor = windowColor;
-                    }
-                }
 
                 // Find each wall in window, color accoring to input
                 MeshRenderer[] prefabWalls = go.GetComponentsInChildren<MeshRenderer>();

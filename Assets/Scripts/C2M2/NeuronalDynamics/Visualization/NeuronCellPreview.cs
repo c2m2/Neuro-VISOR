@@ -23,6 +23,9 @@ namespace C2M2.NeuronalDynamics.Visualization
         public Color32 color;
         public NDSimulationLoader loader = null;
         public TextMeshProUGUI fileNameDisplay;
+        public TextMeshProUGUI sizeLabel;
+        public TextMeshProUGUI[] textColTargets = new TextMeshProUGUI[0];
+        public string LengthScale { get { return loader.lengthScale; } }
         public int refinement = 0;
         public int[] refinements { get; private set; }
         private VrnReader vrnReader = null;
@@ -70,15 +73,28 @@ namespace C2M2.NeuronalDynamics.Visualization
             }
 
             // Render cells
-            if (lines == null)
-            {
-                lines = gameObject.AddComponent<LinesRenderer>();
-            }
+            lines = gameObject.AddComponent<LinesRenderer>();
 
             // (line width = scale)
             lines.Draw(grid, color, scale);
 
-            if(fileNameDisplay != null) fileNameDisplay.text = vrnFileName.Remove(vrnFileName.Length - 4);
+            // Displays file name without file extension
+            if (fileNameDisplay != null)
+                fileNameDisplay.text = vrnFileName.Remove(vrnFileName.LastIndexOf('.'));
+
+            // Draw scale labels
+            Vector3 cellSize = grid.Mesh.bounds.size;
+            if (sizeLabel != null)
+                sizeLabel.text = 
+                    "Size: ("
+                    + cellSize.x.ToString() + ", "
+                    + cellSize.y.ToString() + ", " 
+                    + cellSize.z.ToString() + " " + LengthScale + ")";
+
+            foreach(var t in textColTargets)
+            {
+                t.color = color;
+            }
         }
         public void LoadThisCell(RaycastHit hit)
         {

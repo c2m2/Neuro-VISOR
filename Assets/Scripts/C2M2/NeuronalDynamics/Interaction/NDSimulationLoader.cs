@@ -22,6 +22,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         public Gradient gradient;
         public float globalMin = float.PositiveInfinity;
         public float globalMax = float.NegativeInfinity;
+        public string lengthScale = "μm";
         public int refinementLevel = 0;
         public double timestepSize = 0.002 * 1e-3;
         public double endTime = 100.0;

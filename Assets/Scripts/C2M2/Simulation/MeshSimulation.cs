@@ -47,6 +47,8 @@ namespace C2M2.Simulation
         [Tooltip("Can be used to manually convert Gradient Display values to match unit string")]
         public float unitScaler = 1000f;
 
+        public string lengthUnit = "μm";
+
         public Vector3 rulerInitPos = new Vector3(-0.5f, 0.443f, -0.322f);
         public Vector3 rulerInitRot = new Vector3(90, 0, 0);
 

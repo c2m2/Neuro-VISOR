@@ -41,7 +41,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
 
             // Rotate panel towards camera in y direction
             rt.LookAt(Camera.main.transform);
-            rt.localRotation = Quaternion.Euler(new Vector3(0f, rt.localRotation.eulerAngles.y, 0f));
+            rt.localRotation = Quaternion.Euler(new Vector3(0f, rt.localRotation.eulerAngles.y - 180, 0f));
 
             InitPointerLines();
 

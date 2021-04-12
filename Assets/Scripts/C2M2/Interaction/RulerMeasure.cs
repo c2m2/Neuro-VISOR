@@ -45,7 +45,10 @@ namespace C2M2.Interaction
                     float firstMarkerLength = markerSpacingPercent * rulerLength;
 
                     int magnitude = GetMagnitude(firstMarkerLength*2); //multiplication by 2 ensures that markers above 500 get treated as the next unit up
-                    units = GetUnit(magnitude);
+
+                    // Update simulation's length unit
+                    sim.lengthUnit = GetUnit(magnitude);
+                    units = " " + sim.lengthUnit;
 
                    int siPrefixGroup = (int)Math.Floor(magnitude / 3.0);
                     // scaledFirstMarkerLength is a scaled version of firstMarkerLength so it is between .5 and 500
@@ -73,18 +76,18 @@ namespace C2M2.Interaction
             {
                 // takes the magnitude and puts it in terms of nm by adding three. Then divides by 3 to get unit group and rounds down.
                 int eTerm = (magnitude + 3) / 3;
-                return " e" + 3 * eTerm + " nm";
+                return "e" + 3 * eTerm + " nm";
             }
-            else if (magnitude < 0) return " nm";
-            else if (magnitude < 3) return " μm";
-            else if (magnitude < 6) return " mm";
-            else if (magnitude < 9) return " m";
-            else if (magnitude <= 12) return " km";
+            else if (magnitude < 0) return "nm";
+            else if (magnitude < 3) return "μm";
+            else if (magnitude < 6) return "mm";
+            else if (magnitude < 9) return "m";
+            else if (magnitude <= 12) return "km";
             else if (magnitude > 12)
             {
                 // takes the magnitude and puts it in terms of km by subtracting twelve. Then divides by 3 to get unit group and rounds down.
                 int eTerm = (magnitude - 12) / 3;
-                return " e" + 3 * eTerm + " km";
+                return "e" + 3 * eTerm + " km";
             }
             else
             {
