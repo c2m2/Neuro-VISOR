@@ -11,8 +11,30 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
         public NDSimulationController simController = null;
         public NDSimulation Sim { get { return simController.sim; } }
         public Color defaultCol;
+        public Color DefaultCol
+        {
+            get
+            {
+                return (simController == null) ? defaultCol : simController.defaultCol;
+            }
+        }
         public Color hoverCol;
+        public Color HoverCol
+        {
+            get
+            {
+                return (simController == null) ? hoverCol : simController.highlightCol;
+            }
+        }
         public Color pressCol;
+        public Color PressCol
+        {
+            get
+            {
+                return (simController == null) ? pressCol : simController.pressedCol;
+            }
+        }
+
         public Image playButton = null;
         public Image pauseButton = null;
         public int buttonSize = 25;
@@ -67,9 +89,9 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
             playButton.enabled = Sim.paused;
         }
 
-        public void DefaultButtonCol() => ChangeButtonCol(defaultCol);
-        public void HoverButtonCol() => ChangeButtonCol(hoverCol);
-        public void PressButtonCol() => ChangeButtonCol(pressCol);
+        public void DefaultButtonCol() => ChangeButtonCol(DefaultCol);
+        public void HoverButtonCol() => ChangeButtonCol(HoverCol);
+        public void PressButtonCol() => ChangeButtonCol(PressCol);
         private void ChangeButtonCol(Color col)
         {
             pauseButton.color = col;
