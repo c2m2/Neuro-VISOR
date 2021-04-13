@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace C2M2.Utils
 {
@@ -19,7 +17,7 @@ namespace C2M2.Utils
         {
             get
             {
-                return GameManager.instance.VrIsActive ?
+                return GameManager.instance.vrDeviceManager.VRActive ?
                     (OculusRequested || Input.GetKey(quitKey))
                     : Input.GetKey(quitKey);
             }

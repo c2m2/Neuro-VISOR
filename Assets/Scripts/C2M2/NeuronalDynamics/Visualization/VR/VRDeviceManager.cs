@@ -22,34 +22,45 @@ namespace C2M2.Interaction.VR
         private OVRPlayerController playerController;
         private MovementController emulatorMove;
 
-        public bool VrIsActive { get { return !vrDevice.Equals("null"); } }
-        public string vrDevice { get; private set; } = "null";
+        private readonly KeyCode switchModeKey = KeyCode.Space;
+        private readonly OVRInput.Button switchModeButton = OVRInput.Button.Any;
+
+        public bool VRActive { get; set; } = false;
+        public bool VRDevicePresent { get { return !VRDevice.Equals(string.Empty); } }
+        public string VRDevice { get; private set; }
 
         private void Awake()
         {
-            // Get VR device (or lack of one)
-            // Note: in Unity 2019.4 XRDevice.model is obsolete but still works.
-            InputDevice inputDevice = new InputDevice();
-            Debug.Log("VR Device Name: " + inputDevice.name);
-            if (XRDevice.model.Equals(string.Empty)) vrDevice = "null";
-            else vrDevice = XRDevice.model;
+            CheckForVRDevice();
 
             emulator = GetComponent<MovingOVRHeadsetEmulator>();
             emulatorMove = GetComponent<MovementController>();
             mouseSignaler = GetComponent<MouseEventSignaler>();
             playerController = GetComponent<OVRPlayerController>();
 
-            SwitchState(VrIsActive);
+            SwitchState(VRDevicePresent);
+        }
 
-            if (Application.isPlaying)
-            {
-                if (VrIsActive) { Debug.Log("Running in VR mode on device [" + vrDevice + "]"); }
-                else Debug.Log("Running in emulator mode.");
-            }
+        public void Update()
+        {
+            if (VRActive && Input.GetKey(switchModeKey)) SwitchState(false);
+            else if (!VRActive && OVRInput.Get(switchModeButton)) SwitchState(true);
+        }
+
+        private void CheckForVRDevice()
+        {
+            // Get VR device (or lack of one)
+            // Note: in Unity 2019.4 XRDevice.model is obsolete but still works.
+            InputDevice inputDevice = new InputDevice();
+            Debug.Log("VR Device Name: " + inputDevice.name);
+            VRDevice = XRDevice.model;
         }
 
         private void SwitchState(bool vrActive)
         {
+            Debug.LogError("Swtich to" + vrActive);
+            VRActive = vrActive;
+
             if (informationDisplayTV != null) informationDisplayTV.SetActive(vrActive);
             playerController.enabled = vrActive;
 

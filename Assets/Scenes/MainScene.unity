@@ -6609,7 +6609,10 @@ PrefabInstance:
       propertyPath: onHoldPress.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 1763426731728089344, guid: dba47ce578d281342b7055d4b03912a9, type: 3}
+    - {fileID: 1763426730736563373, guid: dba47ce578d281342b7055d4b03912a9, type: 3}
+    - {fileID: 1763426731606070579, guid: dba47ce578d281342b7055d4b03912a9, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: dba47ce578d281342b7055d4b03912a9, type: 3}
 --- !u!1001 &3671467347388522957
 PrefabInstance:

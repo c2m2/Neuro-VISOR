@@ -41,8 +41,6 @@ namespace C2M2.Interaction
 
         private void Start()
         {
-            if (!GameManager.instance.VrIsActive) Destroy(this);
-
             grabbable = GetComponent<OVRGrabbable>();
 
             // Use this to determine how to scale at runtime

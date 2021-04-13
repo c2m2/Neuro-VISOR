@@ -124,7 +124,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         {
             get
             {
-                if (GameManager.instance.VrIsActive)
+                if (GameManager.instance.vrDeviceManager.VRActive)
                     return (OVRInput.Get(toggleDestroyOVR) || OVRInput.Get(toggleDestroyOVRS));
                 else return true;
             }
@@ -135,7 +135,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         {
             get
             {
-                if (GameManager.instance.VrIsActive)
+                if (GameManager.instance.vrDeviceManager.VRActive)
                 {
                     // Uses the value of both joysticks added together
                     float y1 = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick).y;
@@ -160,7 +160,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         {
             get
             {
-                if (GameManager.instance.VrIsActive)
+                if (GameManager.instance.vrDeviceManager.VRActive)
                     return (OVRInput.Get(highlightOVR) || OVRInput.Get(highlightOVRS));
                 else return false; // We cannot highlight through the emulator
             }
@@ -173,7 +173,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         {
             get
             {
-                if (GameManager.instance.VrIsActive)
+                if (GameManager.instance.vrDeviceManager.VRActive)
                     return (OVRInput.Get(cancelCommand) || OVRInput.Get(cancelCommandS));
                 else
                     return Input.GetKey(cancelKey);
