@@ -14,6 +14,9 @@ namespace C2M2.Utils
         public KeyCode left = KeyCode.A;
         public KeyCode right = KeyCode.D;
         public KeyCode upDown = KeyCode.LeftControl;
+        public bool limitPos = false;
+        public Vector3 maxPos = new Vector3(float.PositiveInfinity, float.PositiveInfinity, float.PositiveInfinity);
+        public Vector3 minPos = new Vector3(float.NegativeInfinity, float.NegativeInfinity, float.NegativeInfinity);
 
         private bool ForwardPress { get { return Input.GetKey(forward); } }
         private bool BackwardPress { get { return Input.GetKey(backward); } }
@@ -67,6 +70,9 @@ namespace C2M2.Utils
                     transform.Translate(new Vector3(x, y, z), Space.World);
                 else
                     transform.Translate(new Vector3(x, y, z), relativeTo);
+
+                if (limitPos) 
+                    transform.position = transform.position.Clamp(minPos, maxPos);
 
                 yield return new WaitForFixedUpdate();
             }

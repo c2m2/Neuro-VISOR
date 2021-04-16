@@ -44,6 +44,15 @@ namespace C2M2
             /// If value > max, returns max
             /// </summary>
             public static double Clamp(double value, double min, double max) => Max(min, Min(value, max));
+
+            /// <summary>
+            /// Clamp a Vector3 betwen a min and a max Vector3
+            /// </summary>
+            public static Vector3 Clamp(this Vector3 value, Vector3 min, Vector3 max) => 
+                new Vector3(
+                    Clamp(value.x, min.x, max.x),
+                    Clamp(value.y, min.y, max.y),
+                    Clamp(value.z, min.z, max.z));
             #endregion
 
             #region Array Functions
