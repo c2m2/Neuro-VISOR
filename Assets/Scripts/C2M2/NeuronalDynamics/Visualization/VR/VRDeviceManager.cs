@@ -5,8 +5,7 @@ namespace C2M2.Interaction.VR
 {
     using Interaction.Signaling;
     /// <summary>
-    /// Make sure that a VR device is loaded before using OVRPlayerController.
-    /// If none is loaded, add VR emulation tools
+    /// Handles switching between VR and emulator modes
     /// </summary>
     [RequireComponent(typeof(MovingOVRHeadsetEmulator))]
     [RequireComponent(typeof(MouseEventSignaler))]
@@ -22,6 +21,27 @@ namespace C2M2.Interaction.VR
         private OVRPlayerController playerController;
         private MovementController emulatorMove;
 
+        private Transform leftEye;
+        private Transform centerEye;
+        private Transform rightEye;
+        private Transform leftHand;
+        private Transform rightHand;
+
+        private Vector3 initialPlayerPositon;
+        private Vector3 initialPlayerRotation;
+        private Vector3 initialLeftEyePositon;
+        private Vector3 initialLeftEyeRotation;
+        private Vector3 initialCenterEyePositon;
+        private Vector3 initialCenterEyeRotation;
+        private Vector3 initialRightEyePositon;
+        private Vector3 initialRightEyeRotation;
+        private Vector3 initialLeftHandPositon;
+        private Vector3 initialLeftHandRotation;
+        private Vector3 initialRightHandPositon;
+        private Vector3 initialRightHandRotation;
+
+        private GameObject cameraRig;
+
         private readonly KeyCode switchModeKey = KeyCode.Space;
         private readonly OVRInput.Button switchModeButton = OVRInput.Button.Any;
 
@@ -31,12 +51,41 @@ namespace C2M2.Interaction.VR
 
         private void Awake()
         {
-            CheckForVRDevice();
+            /// TODO
+            /// 1) Fix starting location discrepancy
+            /// 2) Disable camera from being controlled by VR when in Emulator mode
+            /// 3) Fix camera issues when in desktop
+            
+            Camera[] cameras = GetComponentsInChildren<Camera>();
+            leftEye = cameras[0].transform;
+            centerEye = cameras[1].transform;
+            rightEye = cameras[2].transform;
+            PublicOVRGrabber[] hands = GetComponentsInChildren<PublicOVRGrabber>();
+            leftHand = hands[0].transform;
+            rightHand = hands[1].transform;
+
+            cameraRig = GetComponentInChildren<OVRCameraRig>().gameObject;
+
+            initialPlayerPositon = transform.position;
+            initialPlayerRotation = transform.eulerAngles;
+            initialLeftEyePositon = leftEye.position;
+            initialLeftEyeRotation = leftEye.eulerAngles;
+            initialCenterEyePositon = centerEye.position;
+            initialCenterEyeRotation = centerEye.eulerAngles;
+            initialRightEyePositon = rightEye.position;
+            initialRightEyeRotation = rightEye.eulerAngles;
+            initialLeftHandPositon = leftHand.position;
+            initialLeftHandRotation = leftHand.eulerAngles;
+            initialRightHandPositon = rightHand.position;
+            initialRightHandRotation = rightHand.eulerAngles;
+
 
             emulator = GetComponent<MovingOVRHeadsetEmulator>();
             emulatorMove = GetComponent<MovementController>();
             mouseSignaler = GetComponent<MouseEventSignaler>();
             playerController = GetComponent<OVRPlayerController>();
+
+            CheckForVRDevice();
 
             SwitchState(VRDevicePresent);
         }
@@ -44,7 +93,11 @@ namespace C2M2.Interaction.VR
         public void Update()
         {
             if (VRActive && Input.GetKey(switchModeKey)) SwitchState(false);
-            else if (!VRActive && OVRInput.Get(switchModeButton)) SwitchState(true);
+            else if (!VRActive && OVRInput.Get(switchModeButton))
+            {
+                if (!VRDevicePresent) CheckForVRDevice();
+                if (VRDevicePresent) SwitchState(true);
+            }
         }
 
         private void CheckForVRDevice()
@@ -58,8 +111,10 @@ namespace C2M2.Interaction.VR
 
         private void SwitchState(bool vrActive)
         {
-            Debug.LogError("Swtich to" + vrActive);
+            Debug.LogError("Switch to " + vrActive);
             VRActive = vrActive;
+
+            ResetView();
 
             if (informationDisplayTV != null) informationDisplayTV.SetActive(vrActive);
             playerController.enabled = vrActive;
@@ -69,13 +124,30 @@ namespace C2M2.Interaction.VR
             emulatorMove.enabled = !vrActive;
             if (informationOverlay != null) informationOverlay.SetActive(!vrActive);
 
+            //cameraRig.SetActive(vrActive);
 
-            // only enable oculus signalers if player controller is enabled
+            // only enable oculus signalers if VR is enabled
             OculusEventSignaler[] oculusSignalers = GetComponentsInChildren<OculusEventSignaler>();
             foreach (OculusEventSignaler o in oculusSignalers)
             {
                 o.enabled = vrActive;
             }
+        }
+
+        private void ResetView()
+        {
+            transform.position = initialPlayerPositon;
+            transform.eulerAngles = initialPlayerRotation;
+            leftEye.position = initialLeftEyePositon;
+            leftEye.eulerAngles = initialLeftEyeRotation;
+            centerEye.position = initialCenterEyePositon;
+            centerEye.eulerAngles = initialCenterEyeRotation;
+            rightEye.position = initialRightEyePositon;
+            rightEye.eulerAngles = initialRightEyeRotation;
+            leftHand.position = initialLeftHandPositon;
+            leftHand.eulerAngles = initialLeftHandRotation;
+            rightHand.position = initialRightHandPositon;
+            rightHand.eulerAngles = initialRightHandRotation;
         }
     }
 }
