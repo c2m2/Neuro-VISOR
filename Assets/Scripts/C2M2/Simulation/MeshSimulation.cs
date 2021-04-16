@@ -149,8 +149,10 @@ namespace C2M2.Simulation
                 else raycastable.SetSource(viz);
                 
                 gameObject.AddComponent<VRGrabbableMesh>();
-                gameObject.AddComponent<GrabRescaler>();
+                GrabRescaler rescaler =  gameObject.AddComponent<GrabRescaler>();
                 gameObject.AddComponent<PositionResetControl>();
+
+                defaultRaycastEvent.OnHover.AddListener((hit) => rescaler.Rescale());
 
                 // Instantiate ruler
                 GameObject rulerObj = Resources.Load("Prefabs/Ruler") as GameObject;

@@ -19,6 +19,10 @@ namespace C2M2.Interaction
         public bool xScale = true;
         public bool yScale = true;
         public bool zScale = true;
+        public OVRInput.Button vrThumbstick = OVRInput.Button.PrimaryThumbstick;
+        public KeyCode incKey = KeyCode.UpArrow;
+        public KeyCode decKey = KeyCode.DownArrow;
+        public KeyCode resetKey = KeyCode.R;
         private PublicOVRGrabber grabber;
 
         ///<returns>A float between -1 and 1, where -1 means the thumbstick y axis is completely down and 1 implies it is all the way up</returns>
@@ -26,22 +30,28 @@ namespace C2M2.Interaction
         {
             get
             {
-                return OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick, grabber.Controller).y;
+                float scaler = -1;
+                if (GameManager.instance.VrIsActive) return OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick, grabber.Controller).y;
+                else if (Input.GetKey(incKey)) return 1;
+                else if (Input.GetKey(decKey)) return -1;
+                return 0;
             }
         }
+
 
         ///<returns>A boolean of whether the joystick is pressed</returns>
         private bool ThumbstickPressed
         {
             get
             {
-                return OVRInput.Get(OVRInput.Button.PrimaryThumbstick, grabber.Controller);
+                if (GameManager.instance.VrIsActive) return OVRInput.Get(vrThumbstick, grabber.Controller);
+                else return Input.GetKey(resetKey);
             }
         }
 
         private void Start()
         {
-            if (!GameManager.instance.VrIsActive) Destroy(this);
+            //if (!GameManager.instance.VrIsActive) Destroy(this);
 
             grabbable = GetComponent<OVRGrabbable>();
 
@@ -53,30 +63,37 @@ namespace C2M2.Interaction
 
         void Update()
         {
+            if (!GameManager.instance.VrIsActive) return;
+
             grabber = (PublicOVRGrabber)grabbable.grabbedBy;
             if (grabbable.isGrabbed)
             {
-                // if joystick is pressed in, it resets the scale to the original scale
-                if (ThumbstickPressed)
-                {
-                    transform.localScale = origScale;
-                }
-                else
-                { // Otherwise resolve our new scale
-                    Vector3 scaleValue = scaler * ThumbstickScaler * origScale;
-                    Vector3 newLocalScale = transform.localScale + scaleValue;
+                Rescale();
+            }
+        }
 
-                    // Makes sure the new scale is within the determined range
-                    if (newLocalScale.x < minScale.x || newLocalScale.y < minScale.y || newLocalScale.z < minScale.z) newLocalScale = minScale;
-                    if (newLocalScale.x > maxScale.x || newLocalScale.y > maxScale.y || newLocalScale.z > maxScale.z) newLocalScale = maxScale;
-                    
-                    // Only scales the proper dimensions
-                    if (!xScale) newLocalScale.x = transform.localScale.x;
-                    if (!yScale) newLocalScale.y = transform.localScale.y;
-                    if (!zScale) newLocalScale.z = transform.localScale.z;
+        public void Rescale()
+        {
+            // if joystick is pressed in, it resets the scale to the original scale
+            if (ThumbstickPressed)
+            {
+                transform.localScale = origScale;
+            }
+            else
+            { // Otherwise resolve our new scale
+                Vector3 scaleValue = scaler * ThumbstickScaler * origScale;
+                Vector3 newLocalScale = transform.localScale + scaleValue;
 
-                    transform.localScale = newLocalScale;
-                }
+                // Makes sure the new scale is within the determined range
+                if (newLocalScale.x < minScale.x || newLocalScale.y < minScale.y || newLocalScale.z < minScale.z) newLocalScale = minScale;
+                if (newLocalScale.x > maxScale.x || newLocalScale.y > maxScale.y || newLocalScale.z > maxScale.z) newLocalScale = maxScale;
+
+                // Only scales the proper dimensions
+                if (!xScale) newLocalScale.x = transform.localScale.x;
+                if (!yScale) newLocalScale.y = transform.localScale.y;
+                if (!zScale) newLocalScale.z = transform.localScale.z;
+
+                transform.localScale = newLocalScale;
             }
         }
     }
