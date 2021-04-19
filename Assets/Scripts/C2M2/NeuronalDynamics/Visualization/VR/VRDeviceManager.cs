@@ -40,8 +40,6 @@ namespace C2M2.Interaction.VR
         private Vector3 initialRightHandPositon;
         private Vector3 initialRightHandRotation;
 
-        private GameObject cameraRig;
-
         private readonly KeyCode switchModeKey = KeyCode.Space;
         private readonly OVRInput.Button switchModeButton = OVRInput.Button.Any;
 
@@ -58,8 +56,6 @@ namespace C2M2.Interaction.VR
             PublicOVRGrabber[] hands = GetComponentsInChildren<PublicOVRGrabber>();
             leftHand = hands[0].transform;
             rightHand = hands[1].transform;
-
-            cameraRig = GetComponentInChildren<OVRCameraRig>().gameObject;
 
             initialPlayerPositon = transform.position;
             initialPlayerRotation = transform.eulerAngles;
@@ -87,13 +83,14 @@ namespace C2M2.Interaction.VR
 
         public void Update()
         {
-            if (VRActive && Input.GetKey(switchModeKey)) SwitchState(false);
-            else if (!VRActive && OVRInput.Get(switchModeButton))
-            {
-                if (!VRDevicePresent) CheckForVRDevice();
-                if (VRDevicePresent) SwitchState(true);
-                else Debug.LogError("No VR Device Present");
-            }
+            // uncomment this to enable mode switching
+            //if (VRActive && Input.GetKey(switchModeKey)) SwitchState(false);
+            //else if (!VRActive && OVRInput.Get(switchModeButton))
+            //{
+            //    if (!VRDevicePresent) CheckForVRDevice();
+            //    if (VRDevicePresent) SwitchState(true);
+            //    else Debug.LogError("No VR Device Present");
+            //}
         }
 
         private void CheckForVRDevice()
@@ -107,7 +104,6 @@ namespace C2M2.Interaction.VR
 
         private void SwitchState(bool vrActive)
         {
-            Debug.LogError("Switch to " + vrActive);
             VRActive = vrActive;
 
             ResetView();
@@ -119,8 +115,6 @@ namespace C2M2.Interaction.VR
             mouseSignaler.enabled = !vrActive;
             emulatorMove.enabled = !vrActive;
             if (informationOverlay != null) informationOverlay.SetActive(!vrActive);
-
-            //cameraRig.SetActive(vrActive);
 
             // only enable oculus signalers if VR is enabled
             OculusEventSignaler[] oculusSignalers = GetComponentsInChildren<OculusEventSignaler>();
