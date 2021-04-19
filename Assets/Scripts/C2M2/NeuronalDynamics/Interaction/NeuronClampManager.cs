@@ -121,19 +121,22 @@ namespace C2M2.NeuronalDynamics.Interaction
         {
             // Make sure we have a valid prefab
             if (clampPrefab == null) Debug.LogError("No Clamp prefab found");
-            EndPreviewClamp(hit);
+
+            // Destroy any existing preview clamp
+            DestroyPreviewClamp(hit);
 
             // If there is no NDSimulation, don't try instantiating a clamp
             if (hit.collider.GetComponentInParent<NDSimulation>() == null) return null;
 
+            // Find the 1D vertex that we hit
             int clampIndex = Simulation.GetNearestPoint(hit);
 
-            //ensures the vertex is available
             if (VertIsAvailable(clampIndex))
             {
+                // If this vertex is available, instantiate a clamp and attach it to the simulation
                 NeuronClamp clamp = Instantiate(clampPrefab, Simulation.transform).GetComponentInChildren<NeuronClamp>();
 
-                clamp.ReportSimulation(Simulation, clampIndex);
+                clamp.AttachSimulation(Simulation, clampIndex);
 
                 return clamp;
             }
@@ -147,6 +150,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             {
                 previewClamp = BuildClamp(hit);
 
+                // If we couldn't build a preview clamp, don't try to preview the position hit
                 if (previewClamp == null) return;
 
                 Clamps.Remove(previewClamp);
@@ -158,10 +162,13 @@ namespace C2M2.NeuronalDynamics.Interaction
                 previewClamp.name = "PreviewClamp";
             }
 
+            // Ensure the clamp is enabled
             previewClamp.transform.parent.gameObject.SetActive(true);
+
+            // Set the size and orientation of the preview clamp
             previewClamp.PlaceClamp(Simulation.GetNearestPoint(hit));
         }
-        public void EndPreviewClamp(RaycastHit hit)
+        public void DestroyPreviewClamp(RaycastHit hit)
         {
             if (previewClamp != null)
             {
@@ -170,6 +177,9 @@ namespace C2M2.NeuronalDynamics.Interaction
             }
         }
 
+        /// <summary>
+        /// Ensures that no clamp is placed too near to another clamp
+        /// </summary>
         private bool VertIsAvailable(int clampIndex)
         {
             // minimum distance between clamps 
@@ -206,7 +216,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             if (PressedToggleDestroy)
                 holdCount++;
             else
-                CheckGroupInput();
+                CheckInputResult();
 
             // Highlight all clamps if either hand trigger is held down
             HighlightAll(PressedHighlight);
@@ -223,11 +233,11 @@ namespace C2M2.NeuronalDynamics.Interaction
 
         public void ResetGroupInput()
         {
-            CheckGroupInput();
+            CheckInputResult();
             HighlightAll(false);
         }
 
-        private void CheckGroupInput()
+        private void CheckInputResult()
         {
             if (!powerClick)
             {

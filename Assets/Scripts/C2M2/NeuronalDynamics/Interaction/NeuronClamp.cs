@@ -263,7 +263,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         /// <summary>
         /// Attempt to latch a clamp onto a given simulation
         /// </summary>
-        public NDSimulation ReportSimulation(NDSimulation simulation, int clampIndex)
+        public NDSimulation AttachSimulation(NDSimulation simulation, int clampIndex)
         {
             if (this.simulation == null)
             {
@@ -278,7 +278,7 @@ namespace C2M2.NeuronalDynamics.Interaction
 
                 this.simulation.OnVisualInflationChange += VisualInflationChangeHandler;
 
-                // clamp can be added to simulation, wait for list access, add to list
+                // wait for clamp list access, add to list
                 this.simulation.clampMutex.WaitOne();
                 this.simulation.clamps.Add(this);
                 this.simulation.clampMutex.ReleaseMutex();
