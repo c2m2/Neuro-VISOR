@@ -44,15 +44,13 @@ namespace C2M2.Interaction
         {
             get
             {
-                if (GameManager.instance.VrIsActive) return OVRInput.Get(vrThumbstick, grabber.Controller);
+                if (GameManager.instance.vrDeviceManager.VRActive) return OVRInput.Get(vrThumbstick, grabber.Controller);
                 else return Input.GetKey(resetKey);
             }
         }
 
         private void Start()
         {
-            //if (!GameManager.instance.VrIsActive) Destroy(this);
-
             grabbable = GetComponent<OVRGrabbable>();
 
             // Use this to determine how to scale at runtime
@@ -63,7 +61,7 @@ namespace C2M2.Interaction
 
         void Update()
         {
-            if (!GameManager.instance.VrIsActive) return;
+            if (!GameManager.instance.vrDeviceManager.VRActive) return;
 
             grabber = (PublicOVRGrabber)grabbable.grabbedBy;
             if (grabbable.isGrabbed)

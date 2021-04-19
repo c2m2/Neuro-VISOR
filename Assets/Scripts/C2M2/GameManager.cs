@@ -21,13 +21,6 @@ namespace C2M2
         public int mainThreadId { get; private set; } = -1;
 
         public VRDeviceManager vrDeviceManager = null;
-        public bool VrIsActive {
-            get
-            {
-                if (vrDeviceManager == null) Debug.LogError("No VR Device Manager Found!");
-                return vrDeviceManager.VrIsActive;
-            }
-        }
 
         public GameObject cellPreviewer = null;
         public Interactable activeSim = null;

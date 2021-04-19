@@ -109,7 +109,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
             get
             {
                 // Uses the value of both joysticks added together
-                if (GameManager.instance.VrIsActive) return OVRInput.Get(thumbstickP).y + OVRInput.Get(thumbstickS).y;
+                if (GameManager.instance.vrDeviceManager.VRActive) return OVRInput.Get(thumbstickP).y + OVRInput.Get(thumbstickS).y;
                 else if (Input.GetKey(incKey)) return 1;
                 else if (Input.GetKey(decKey)) return -1;
                 else return 0f;

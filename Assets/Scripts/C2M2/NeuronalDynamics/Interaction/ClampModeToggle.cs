@@ -27,7 +27,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI {
             }
 
             // Enablle/Disable group clamp controllers
-            if (GameManager.instance.VrIsActive)
+            if (GameManager.instance.vrDeviceManager.VRActive)
             {
                 if (GameManager.instance.ndClampManager.clampControllerL != null)
                 {

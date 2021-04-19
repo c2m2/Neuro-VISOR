@@ -22,7 +22,7 @@ namespace C2M2.Interaction.Signaling
             grabVolume.radius = 0.1f;
             grabVolume.isTrigger = true;
 
-            // Greate OVRGrabber
+            // Create OVRGrabber
             grabber = grabTransform.gameObject.AddComponent<PublicOVRGrabber>();
             grabber.M_GrabVolumes = new Collider[] { grabVolume };
 
