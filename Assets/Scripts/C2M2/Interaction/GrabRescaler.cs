@@ -31,7 +31,7 @@ namespace C2M2.Interaction
             get
             {
                 float scaler = -1;
-                if (GameManager.instance.VrIsActive) return OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick, grabber.Controller).y;
+                if (GameManager.instance.vrDeviceManager.VRActive) return OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick, grabber.Controller).y;
                 else if (Input.GetKey(incKey)) return 1;
                 else if (Input.GetKey(decKey)) return -1;
                 return 0;
