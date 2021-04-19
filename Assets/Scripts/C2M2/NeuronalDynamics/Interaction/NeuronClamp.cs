@@ -24,11 +24,23 @@ namespace C2M2.NeuronalDynamics.Interaction
         public double MinPower { get { return ClampManager.MinPower; } }
         public double MaxPower { get { return ClampManager.MaxPower; } }
 
-        public int FocusVert { get; private set; } = -1;
-        public Vector3 focusPos;
+        public int focusVert { get; private set; } = -1;
+        public Vector3 FocusPos
+        {
+            get { return simulation.Verts1D[focusVert]; }
+        }
+
+        public Neuron.NodeData NodeData
+        {
+            get
+            {
+                return simulation.Neuron.nodes[focusVert];
+            }
+        }
 
         public Material activeMaterial = null;
         public Material inactiveMaterial = null;
+        public Material previewMaterial = null;
 
         public NDSimulation simulation = null;
 
@@ -64,7 +76,7 @@ namespace C2M2.NeuronalDynamics.Interaction
                 mr.material.color = activeCol;
             }
         }
-        private ColorLUT gradientLUT = null;
+        private ColorLUT ColorLUT { get { return simulation.ColorLUT; } }
 
         float currentVisualizationScale = 1;
         private void VisualInflationChangeHandler(double newInflation)
@@ -91,7 +103,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             {
                 if (ClampLive)
                 {
-                    Color newCol = gradientLUT.Evaluate((float)ClampPower);
+                    Color newCol = ColorLUT.Evaluate((float)ClampPower);
                     ActiveColor = newCol;
                 }
             }
@@ -125,8 +137,8 @@ namespace C2M2.NeuronalDynamics.Interaction
                 highlightSphereScale = 1.1f;
 
                 //Removes end caps
-                Destroy(transform.GetChild(0).gameObject);
-                Destroy(transform.GetChild(1).gameObject);
+                Destroy(defaultCapHolder.gameObject);
+                Destroy(destroyCapHolder.gameObject);
             }
         }
 
@@ -233,7 +245,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         public void ShowClampInfo()
         {
             clampInfo.gameObject.SetActive(true);
-            clampInfo.vertexText.text = FocusVert.ToString();
+            clampInfo.vertexText.text = focusVert.ToString();
             clampInfo.clampText.text = (ClampPower*simulation.unitScaler).ToString("G4") + " " + simulation.unit;
         }
 
@@ -259,31 +271,31 @@ namespace C2M2.NeuronalDynamics.Interaction
 
                 transform.parent.parent = this.simulation.transform;
 
-                Neuron.NodeData clampCellNodeData = this.simulation.Neuron.nodes[clampIndex];
-
                 if(this.simulation.Neuron.somaIDs.Contains(clampIndex)) somaClamp = true;
 
-                FocusVert = clampIndex;
-                focusPos = this.simulation.Verts1D[FocusVert];
 
-                SetAppearance(clampCellNodeData);
-                SetScale(clampCellNodeData);
-                SetRotation(clampCellNodeData);
+                PlaceClamp(clampIndex);
 
                 this.simulation.OnVisualInflationChange += VisualInflationChangeHandler;
-
-                gradientLUT = this.simulation.GetComponent<ColorLUT>();
 
                 // clamp can be added to simulation, wait for list access, add to list
                 this.simulation.clampMutex.WaitOne();
                 this.simulation.clamps.Add(this);
                 this.simulation.clampMutex.ReleaseMutex();
-
-
-                transform.parent.localPosition = focusPos;
             }
 
             return this.simulation;
+        }
+
+        public void PlaceClamp(int clampIndex)
+        {
+            focusVert = clampIndex;
+
+            SetAppearance(NodeData);
+            SetScale(NodeData);
+            SetRotation(NodeData);
+
+            transform.parent.localPosition = FocusPos;
         }
         #endregion
 
@@ -292,14 +304,17 @@ namespace C2M2.NeuronalDynamics.Interaction
         {
             ClampLive = true;
 
-            if (activeMaterial != null)
-                mr.material = activeMaterial;
+            SwitchMatieral(activeMaterial);
         }
         public void DeactivateClamp()
         {
             ClampLive = false;
-            if (inactiveMaterial != null)
-                mr.material = inactiveMaterial;
+            SwitchMatieral(inactiveMaterial);
+        }
+
+        public void SwitchMatieral(Material material)
+        {
+            if (material != null) mr.material = material;
         }
         public void ToggleClamp()
         {
