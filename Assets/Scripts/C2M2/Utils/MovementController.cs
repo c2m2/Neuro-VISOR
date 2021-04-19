@@ -26,9 +26,14 @@ namespace C2M2.Utils
         public float speed = 0.01f;
         public Transform relativeTo = null;
 
-        private void Start()
+        private void OnEnable ()
         {
             EnableMovement();
+        }
+
+        private void OnDisable()
+        {
+            DisableMovement();
         }
 
         public void EnableMovement()

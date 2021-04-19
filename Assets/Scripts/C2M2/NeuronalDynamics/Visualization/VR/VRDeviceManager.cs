@@ -50,12 +50,7 @@ namespace C2M2.Interaction.VR
         public string VRDevice { get; private set; }
 
         private void Awake()
-        {
-            /// TODO
-            /// 1) Fix starting location discrepancy
-            /// 2) Disable camera from being controlled by VR when in Emulator mode
-            /// 3) Fix camera issues when in desktop
-            
+        {   
             Camera[] cameras = GetComponentsInChildren<Camera>();
             leftEye = cameras[0].transform;
             centerEye = cameras[1].transform;
@@ -97,6 +92,7 @@ namespace C2M2.Interaction.VR
             {
                 if (!VRDevicePresent) CheckForVRDevice();
                 if (VRDevicePresent) SwitchState(true);
+                else Debug.LogError("No VR Device Present");
             }
         }
 
