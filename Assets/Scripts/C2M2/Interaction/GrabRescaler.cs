@@ -20,6 +20,7 @@ namespace C2M2.Interaction
         public bool yScale = true;
         public bool zScale = true;
         public OVRInput.Button vrThumbstick = OVRInput.Button.PrimaryThumbstick;
+        public OVRInput.Button vrThumbstickS = OVRInput.Button.SecondaryThumbstick;
         public KeyCode incKey = KeyCode.UpArrow;
         public KeyCode decKey = KeyCode.DownArrow;
         public KeyCode resetKey = KeyCode.R;
@@ -31,7 +32,7 @@ namespace C2M2.Interaction
             get
             {
                 float scaler = -1;
-                if (GameManager.instance.vrDeviceManager.VRActive) return OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick, grabber.Controller).y;
+                if (GameManager.instance.vrDeviceManager.VRActive) return (OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick).y + OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick).y);
                 else if (Input.GetKey(incKey)) return 1;
                 else if (Input.GetKey(decKey)) return -1;
                 return 0;
@@ -44,7 +45,7 @@ namespace C2M2.Interaction
         {
             get
             {
-                if (GameManager.instance.vrDeviceManager.VRActive) return OVRInput.Get(vrThumbstick, grabber.Controller);
+                if (GameManager.instance.vrDeviceManager.VRActive) return (OVRInput.Get(vrThumbstick) || OVRInput.Get(vrThumbstickS));
                 else return Input.GetKey(resetKey);
             }
         }
