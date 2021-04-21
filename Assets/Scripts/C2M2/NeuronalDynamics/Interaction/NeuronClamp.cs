@@ -41,6 +41,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         public Material activeMaterial = null;
         public Material inactiveMaterial = null;
         public Material previewMaterial = null;
+        public Material destroyMaterial = null;
 
         public NDSimulation simulation = null;
 
@@ -53,19 +54,6 @@ namespace C2M2.NeuronalDynamics.Interaction
         private Vector3 LocalExtents { get { return transform.localScale / 2; } }
         private Vector3 posFocus = Vector3.zero;
 
-        private Color32 inactiveCol = Color.black;
-        public Color32 InactiveCol
-        {
-            get
-            {
-                return inactiveCol;
-            }
-            set
-            {
-                inactiveCol = value;
-                inactiveMaterial.color = inactiveCol;
-            }
-        }
         private Color32 activeCol = Color.white;
         public Color32 ActiveColor
         {
@@ -138,7 +126,6 @@ namespace C2M2.NeuronalDynamics.Interaction
 
                 //Removes end caps
                 Destroy(defaultCapHolder.gameObject);
-                Destroy(destroyCapHolder.gameObject);
             }
         }
 
@@ -361,10 +348,14 @@ namespace C2M2.NeuronalDynamics.Interaction
         {
             if (defaultCapHolder != null && destroyCapHolder != null)
             {
-                // Disable body of clamp if in cancel
-                mr.enabled = toDefault;
                 defaultCapHolder.SetActive(toDefault);
                 destroyCapHolder.SetActive(!toDefault);
+                if (toDefault)
+                {
+                    if (ClampLive) SwitchMatieral(activeMaterial);
+                    else SwitchMatieral(inactiveMaterial);
+                }
+                else SwitchMatieral(destroyMaterial);
             }
         }
 

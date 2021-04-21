@@ -159,6 +159,8 @@ namespace C2M2.NeuronalDynamics.Interaction
                 }
                 previewClamp.SwitchMatieral(previewClamp.previewMaterial);
                 previewClamp.name = "PreviewClamp";
+                Destroy(previewClamp.defaultCapHolder);
+                Destroy(previewClamp.destroyCapHolder);
             }
 
             // Ensure the clamp is enabled
