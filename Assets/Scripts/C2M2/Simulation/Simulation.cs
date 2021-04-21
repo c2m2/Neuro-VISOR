@@ -24,9 +24,6 @@ namespace C2M2.Simulation
 
         public bool paused = false;
 
-        public double raycastHitValue = 55;
-        public Tuple<int, double>[] raycastHits = new Tuple<int, double>[0];
-
         /// <summary>
         /// Provide mutual exclusion to derived classes
         /// </summary>
@@ -101,7 +98,6 @@ namespace C2M2.Simulation
                 defaultRaycastEvent = child.AddComponent<RaycastPressEvents>();
 
                 defaultRaycastEvent.OnHoldPress.AddListener((hit) => SetValues(hit));
-                defaultRaycastEvent.OnEndPress.AddListener((hit) => ResetRaycastHits(hit));
 
                 raycastEventManager.LRTrigger = defaultRaycastEvent;
 
@@ -240,12 +236,7 @@ namespace C2M2.Simulation
             }
         }
 
-        public void ResetRaycastHits(RaycastHit hit)
-        {
-            raycastHits = new Tuple<int, double>[0];
-        }
-
-        public Tuple<int, double>[] HitToTriangles(RaycastHit hit)
+        public int[] HitToVertices(RaycastHit hit)
         {
             // We will have 3 new index/value pairings
             Tuple<int, double>[] newValues = new Tuple<int, double>[3];
@@ -258,12 +249,7 @@ namespace C2M2.Simulation
             int v2 = mf.mesh.triangles[triInd + 1];
             int v3 = mf.mesh.triangles[triInd + 2];
 
-            // Attach new values to new vertices
-            newValues[0] = new Tuple<int, double>(v1, raycastHitValue);
-            newValues[1] = new Tuple<int, double>(v2, raycastHitValue);
-            newValues[2] = new Tuple<int, double>(v3, raycastHitValue);
-
-            return newValues;
+            return new int[] { v1, v2, v3 };
         }
     }
 

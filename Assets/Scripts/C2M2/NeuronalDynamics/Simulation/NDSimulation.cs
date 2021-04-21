@@ -266,10 +266,16 @@ namespace C2M2.NeuronalDynamics.Simulation {
         /// Translate 3D vertex values to 1D values, and pass them downwards for interaction
         /// </summary>
         public sealed override void SetValues (RaycastHit hit) {
-            SetValues(HitToTriangles(hit));
+            int[] verts = HitToVertices(hit);
+            Tuple<int, double>[] newValues = new Tuple<int, double>[verts.Length];
+            for (int i = 0; i < verts.Length; i++)
+            {
+                newValues[i] = new Tuple<int, double>(verts[i], raycastHitValue);
+            }
+            SetValues(newValues);
         }
         /// <summary>
-        /// Translate 3D vertex values to 1D values, and pass them downwards for interaction
+        /// Translate 3D vertex values to 1D values, and store the values to be applied to simulation values
         /// </summary>
         public void SetValues (Tuple<int, double>[] newValues) {
             // Reserve space for new1DValuess

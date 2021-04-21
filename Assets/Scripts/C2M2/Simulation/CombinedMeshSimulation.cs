@@ -30,8 +30,13 @@ namespace C2M2.Simulation.Samples
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         public override void SetValues(RaycastHit hit)
         {
-            Tuple<int, double>[] newValues = HitToTriangles(hit);
-
+            int[] verts = HitToVertices(hit);
+            Tuple<int, double>[] newValues = new Tuple<int, double>[verts.Length];
+            for(int i = 0; i < verts.Length; i++)
+            {
+                newValues[i] = new Tuple<int, double>(verts[i], raycastHitValue);
+            }
+            
             foreach (Tuple<int, double> value in newValues)
             {
                 values[value.Item1] = value.Item2;

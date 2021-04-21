@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using C2M2.Visualization;
 using C2M2.Interaction;
+using System;
 
 namespace C2M2.Simulation
 {
@@ -51,6 +52,9 @@ namespace C2M2.Simulation
 
         public Vector3 rulerInitPos = new Vector3(-0.5f, 0.443f, -0.322f);
         public Vector3 rulerInitRot = new Vector3(90, 0, 0);
+
+        public double raycastHitValue = 55;
+        public Tuple<int, double>[] raycastHits = new Tuple<int, double>[0];
 
         public RulerMeasure ruler = null;
 
@@ -153,6 +157,8 @@ namespace C2M2.Simulation
                 gameObject.AddComponent<PositionResetControl>();
 
                 defaultRaycastEvent.OnHover.AddListener((hit) => rescaler.Rescale());
+                defaultRaycastEvent.OnHoldPress.AddListener((hit)=>)
+                defaultRaycastEvent.OnEndPress.AddListener((hit) => ResetRaycastHits(hit));
 
                 // Instantiate ruler
                 GameObject rulerObj = Resources.Load("Prefabs/Ruler") as GameObject;
@@ -164,12 +170,22 @@ namespace C2M2.Simulation
             }
         }
 
+        public void ShiftRaycastValue()
+        {
+
+        }
+
         public void CloseRuler()
         {
             if (ruler != null)
             {
                 Destroy(ruler.gameObject);
             }
+        }
+
+        public void ResetRaycastHits(RaycastHit hit)
+        {
+            raycastHits = new Tuple<int, double>[0];
         }
     }
 }
