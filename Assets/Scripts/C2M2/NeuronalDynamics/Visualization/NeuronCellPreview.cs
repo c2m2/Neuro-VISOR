@@ -61,6 +61,7 @@ namespace C2M2.NeuronalDynamics.Visualization
 
             // Scale the parent object by 1 / max scale to make the cell fit within size (1,1,1)
             float scale = 1 / Math.Max(grid.Mesh.bounds.size);
+
             transform.localScale = new Vector3(scale, scale, scale);
 
             // Adjust center so cell mesh is centered at (0,0,0)
