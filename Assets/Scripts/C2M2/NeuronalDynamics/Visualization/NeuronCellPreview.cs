@@ -24,7 +24,8 @@ namespace C2M2.NeuronalDynamics.Visualization
         public NDSimulationLoader loader = null;
         public TextMeshProUGUI fileNameDisplay;
         public TextMeshProUGUI sizeLabel;
-        public TextMeshProUGUI[] textColTargets = new TextMeshProUGUI[0];
+        public TextMeshProUGUI vertLabel;
+
         public string LengthScale { get { return loader.lengthScale; } }
         public int refinement = 0;
         public int[] refinements { get; private set; }
@@ -77,7 +78,7 @@ namespace C2M2.NeuronalDynamics.Visualization
             lines = gameObject.AddComponent<LinesRenderer>();
 
             // (line width = scale)
-            lines.Draw(grid, color, scale);
+            lines.Draw(grid, color, 3*scale);
 
             // Displays file name without file extension
             if (fileNameDisplay != null)
@@ -92,10 +93,9 @@ namespace C2M2.NeuronalDynamics.Visualization
                     + cellSize.y.ToString() + ", " 
                     + cellSize.z.ToString() + " " + LengthScale + ")";
 
-            foreach(var t in textColTargets)
-            {
-                t.color = color;
-            }
+            if (vertLabel != null)
+                vertLabel.text =
+                    "Vertices: " + grid.Mesh.vertexCount;
         }
         public void LoadThisCell(RaycastHit hit)
         {
