@@ -109,7 +109,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         /// <summary>
         /// Sets the design of the clamp based on whether it is on the soma
         /// </summary>
-        private void SetAppearance(Neuron.NodeData cellNodeData)
+        private void CheckSoma(Neuron.NodeData cellNodeData)
         {
             if (somaClamp)
             {
@@ -278,7 +278,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         {
             focusVert = clampIndex;
 
-            SetAppearance(NodeData);
+            CheckSoma(NodeData);
             SetScale(NodeData);
             SetRotation(NodeData);
 
@@ -344,6 +344,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             Math.Clamp(ClampPower, MinPower, MaxPower);
         }
 
+        // Changes clamp to a red aesthetic to signal that destroy is imminent
         private void SwitchCaps(bool toDefault)
         {
             if (defaultCapHolder != null && destroyCapHolder != null)

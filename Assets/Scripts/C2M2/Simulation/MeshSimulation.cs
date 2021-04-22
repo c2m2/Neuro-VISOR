@@ -157,8 +157,8 @@ namespace C2M2.Simulation
                 gameObject.AddComponent<PositionResetControl>();
 
                 defaultRaycastEvent.OnHover.AddListener((hit) => rescaler.Rescale());
-                defaultRaycastEvent.OnHoldPress.AddListener((hit)=>)
-                defaultRaycastEvent.OnEndPress.AddListener((hit) => ResetRaycastHits(hit));
+                defaultRaycastEvent.OnHoldPress.AddListener((hit) => ShiftRaycastValue());
+                defaultRaycastEvent.OnEndPress.AddListener((hit) => ResetRaycastHits());
 
                 // Instantiate ruler
                 GameObject rulerObj = Resources.Load("Prefabs/Ruler") as GameObject;
@@ -170,9 +170,35 @@ namespace C2M2.Simulation
             }
         }
 
+        public KeyCode powerModifierPlusKey = KeyCode.UpArrow;
+        public KeyCode powerModifierMinusKey = KeyCode.DownArrow;
+
+        // Sensitivity of the clamp power control. Lower sensitivity means clamp power changes more quickly
+        public float sensitivity = 200f;
+        public float ThumbstickScaler { get { return (ColorLUT.GlobalMax - ColorLUT.GlobalMin) / sensitivity; } }
+        public float PowerModifier
+        {
+            get
+            {
+                if (GameManager.instance.vrDeviceManager.VRActive)
+                {
+                    // Uses the value of both joysticks added together
+                    float scaler = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick).y + OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick).y;
+
+                    return ThumbstickScaler * scaler;
+                }
+                else
+                {
+                    if (Input.GetKey(powerModifierPlusKey)) return ThumbstickScaler;
+                    if (Input.GetKey(powerModifierMinusKey)) return -ThumbstickScaler;
+                    else return 0;
+                }
+            }
+        }
         public void ShiftRaycastValue()
         {
-
+            raycastHitValue += PowerModifier;
+            raycastHitValue = Math.Clamp(raycastHitValue, ColorLUT.GlobalMin, ColorLUT.GlobalMax);
         }
 
         public void CloseRuler()
@@ -183,7 +209,7 @@ namespace C2M2.Simulation
             }
         }
 
-        public void ResetRaycastHits(RaycastHit hit)
+        public void ResetRaycastHits()
         {
             raycastHits = new Tuple<int, double>[0];
         }
