@@ -10,6 +10,13 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
         public NDGraphManager manager = null;
         public NDSimulation Sim { get { return manager.sim; } }
         public int vert = -1;
+
+        /// <summary>
+        /// If true, this object will scale with parent object as per usual.
+        /// If false, this object will maintain worldspace size as parent scales
+        /// </summary>
+        public bool obeyParent = false;
+
         public Vector3 vertPos { get; private set; }
         private RectTransform rt = null;
         // World space size of the graph
@@ -118,9 +125,9 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
 
             if (Sim.transform.hasChanged)
             {
-                UpdateSize();
+               // UpdateSize();
 
-                Sim.transform.hasChanged = false;
+              //  Sim.transform.hasChanged = false;
             }
         }
 
