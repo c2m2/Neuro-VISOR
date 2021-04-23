@@ -15,12 +15,13 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
         /// If true, this object will scale with parent object as per usual.
         /// If false, this object will maintain worldspace size as parent scales
         /// </summary>
-        public bool obeyParent = false;
+        public bool obeyParentScale = false;
 
-        public Vector3 vertPos { get; private set; }
+        // Worldspace position of the vertex
+        public Vector3 VertPos { get { return Sim.transform.TransformPoint(Sim.Verts1D[vert]) + Sim.transform.position; } }
         private RectTransform rt = null;
         // World space size of the graph
-        private float GraphSize { get { return rt.sizeDelta.x * rt.localScale.x; } }
+        private Vector3 GraphSize { get { return rt.sizeDelta * rt.localScale; } }
 
         private void Awake()
         {
@@ -38,8 +39,6 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
             }
 
             SetLabels();
-
-            transform.SetParent(Sim.transform);
 
             rt.position = GetPanelPos();
 
@@ -64,24 +63,17 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
 
             Vector3 GetPanelPos()
             {
-                // Convert vertex position to world space
-                vertPos = Sim.Verts1D[vert];
-                vertPos = new Vector3(vertPos.x * Sim.transform.localScale.x,
-                    vertPos.y * Sim.transform.localScale.y,
-                    vertPos.z * Sim.transform.localScale.z);
-
-                Vector3 vertPosShift = vertPos + Sim.transform.position;
                 Vector3 cameraPos = Camera.main.transform.position;
                 // Vector pointing from camera to cell
-                Vector3 direction = (vertPosShift - cameraPos);
+                Vector3 direction = (VertPos - cameraPos);
 
                 // Worldspace size of the graph
-                float newMagnitude = GraphSize;
+                float newMagnitude = GraphSize.x;
                 float oldMagnitude = direction.magnitude;
                 float magScale = newMagnitude / oldMagnitude;
 
                 // The panel is placed along a vector pointing from camera to vertex position
-                return new Vector3(direction.x * magScale, vertPosShift.y - (GraphSize / 2), direction.z * magScale) + vertPos;
+                return new Vector3(direction.x * magScale, VertPos.y - (GraphSize.x / 2), direction.z * magScale) + VertPos;
             }
 
             void InitPointerLines()
@@ -116,19 +108,16 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
         {
             if (pointerLines != null)
             {
-                Vector3 pointTo = new Vector3(vertPos.x + Sim.transform.position.x, 
-                    vertPos.y + Sim.transform.position.y, 
-                    vertPos.z + Sim.transform.position.z);
-
-                pointerLines.targetPos = pointTo;
+                pointerLines.targetPos = VertPos;
             }
 
-            if (Sim.transform.hasChanged)
+            /*
+            if (!obeyParentScale && Sim.transform.hasChanged)
             {
-               // UpdateSize();
+                UpdateSize();
 
               //  Sim.transform.hasChanged = false;
-            }
+            }*/
         }
 
         private void OnDestroy()

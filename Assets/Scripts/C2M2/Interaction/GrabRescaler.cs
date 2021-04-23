@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using C2M2.Interaction.VR;
+using C2M2.Utils;
 
 namespace C2M2.Interaction
 {
@@ -78,14 +79,13 @@ namespace C2M2.Interaction
             {
                 transform.localScale = origScale;
             }
-            else
+            else if(ThumbstickScaler != 0)
             { // Otherwise resolve our new scale
                 Vector3 scaleValue = scaler * ThumbstickScaler * origScale;
                 Vector3 newLocalScale = transform.localScale + scaleValue;
 
                 // Makes sure the new scale is within the determined range
-                if (newLocalScale.x < minScale.x || newLocalScale.y < minScale.y || newLocalScale.z < minScale.z) newLocalScale = minScale;
-                if (newLocalScale.x > maxScale.x || newLocalScale.y > maxScale.y || newLocalScale.z > maxScale.z) newLocalScale = maxScale;
+                newLocalScale = Math.Clamp(newLocalScale, minScale, maxScale);
 
                 // Only scales the proper dimensions
                 if (!xScale) newLocalScale.x = transform.localScale.x;
