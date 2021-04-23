@@ -5,23 +5,20 @@ using C2M2.Visualization;
 using C2M2.NeuronalDynamics.Simulation;
 namespace C2M2.NeuronalDynamics.Interaction.UI
 {
-    [RequireComponent(typeof(LineGrapher))]
-    public class NDLineGraph : MonoBehaviour
+    public class NDLineGraph : LineGrapher
     {
         public NDGraphManager manager = null;
         public NDSimulation Sim { get { return manager.sim; } }
         public int vert = -1;
         public Vector3 vertPos { get; private set; }
-
-        private LineGrapher lineGraph;
         private RectTransform rt = null;
+        // World space size of the graph
+        private float GraphSize { get { return rt.sizeDelta.x * rt.localScale.x; } }
 
         private void Awake()
         {
-            lineGraph = GetComponent<LineGrapher>();
-
             // Get width and height of the graph
-            rt = (RectTransform)lineGraph.transform;
+            rt = (RectTransform)transform;
         }
 
         // Start is called before the first frame update
@@ -45,12 +42,9 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
 
             InitPointerLines();
 
-            // Reset graph to match original worldspace size
-            transform.localScale = new Vector3(transform.localScale.x / Sim.transform.localScale.x,
-                transform.localScale.y / Sim.transform.localScale.y,
-                transform.localScale.z / Sim.transform.localScale.z);
+            UpdateSize();
 
-            lineGraph.MaxSamples = 300;
+            MaxSamples = 300;
 
             void SetLabels()
             {
@@ -58,7 +52,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
                 string xLabel = "Time (ms)";
                 string yLabel = "Voltage (" + Sim.unit + ")";
 
-                lineGraph.SetLabels(title, xLabel, yLabel);
+                base.SetLabels(title, xLabel, yLabel);
             }
 
             Vector3 GetPanelPos()
@@ -75,34 +69,33 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
                 Vector3 direction = (vertPosShift - cameraPos);
 
                 // Worldspace size of the graph
-                float graphSize = rt.sizeDelta.x * rt.localScale.x;
-                float newMagnitude = graphSize;
+                float newMagnitude = GraphSize;
                 float oldMagnitude = direction.magnitude;
                 float magScale = newMagnitude / oldMagnitude;
 
                 // The panel is placed along a vector pointing from camera to vertex position
-                return new Vector3(direction.x * magScale, vertPosShift.y - (graphSize / 2), direction.z * magScale) + vertPos;
+                return new Vector3(direction.x * magScale, vertPosShift.y - (GraphSize / 2), direction.z * magScale) + vertPos;
             }
 
             void InitPointerLines()
             {
                 // Point anchor lines to vertex
-                if (lineGraph.pointerLines != null)
+                if (pointerLines != null)
                 {
-                    lineGraph.pointerLines.UseWorldSpace = true;
-                    lineGraph.pointerLines.onlyRenderShortestAnchor = true;
+                    pointerLines.UseWorldSpace = true;
+                    pointerLines.onlyRenderShortestAnchor = true;
                 }
                 else Debug.LogWarning("Couldn't access pointer lines, feature may be disabled.");
             }
         }
 
-        public void AddValue(float x, float y)
+        public override void AddValue(float x, float y)
         {
-            lineGraph.YMin = Sim.globalMin * Sim.unitScaler;
-            lineGraph.YMax = Sim.globalMax * Sim.unitScaler;
+            YMin = Sim.globalMin * Sim.unitScaler;
+            YMax = Sim.globalMax * Sim.unitScaler;
 
             // Add point to graph
-            lineGraph.AddValue(x, y);
+            base.AddValue(x, y);
         }
 
         private Vector3 SimLocalScale
@@ -114,19 +107,34 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
         }
         private void Update()
         {
-            if (lineGraph.pointerLines != null)
+            if (pointerLines != null)
             {
                 Vector3 pointTo = new Vector3(vertPos.x + Sim.transform.position.x, 
                     vertPos.y + Sim.transform.position.y, 
                     vertPos.z + Sim.transform.position.z);
 
-                lineGraph.pointerLines.targetPos = pointTo;
+                pointerLines.targetPos = pointTo;
+            }
+
+            if (Sim.transform.hasChanged)
+            {
+                UpdateSize();
+
+                Sim.transform.hasChanged = false;
             }
         }
 
         private void OnDestroy()
         {
             manager.graphs.Remove(this);
-        }    
+        }   
+        
+        private void UpdateSize()
+        {
+            // Reset graph to match original worldspace size
+            transform.localScale = new Vector3(transform.localScale.x / Sim.transform.localScale.x,
+                transform.localScale.y / Sim.transform.localScale.y,
+                transform.localScale.z / Sim.transform.localScale.z);
+        }
     }
 }

@@ -126,7 +126,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 997f1d532831c2949a408eb9b360bc4d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lineGraph: {fileID: 2168964937537411966}
+  lineGraph: {fileID: 0}
   numSampleReading: {fileID: 2168964936606529673}
   xPrecisionReading: {fileID: 2168964937664224680}
   yPrecisionReading: {fileID: 2168964935833955966}
@@ -2691,7 +2691,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f0c3191236cdee94eb9792031df9b5a5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lineGraph: {fileID: 2168964937537411966}
+  lineGraph: {fileID: 0}
   cursorWidth: 15
   xCursor: {fileID: 2168964936933138513}
   yCursor: {fileID: 2168964937490465490}
@@ -4452,7 +4452,7 @@ MonoBehaviour:
   onPress:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2168964937537411966}
+      - m_Target: {fileID: 2168964937537411964}
         m_MethodName: DestroyPlot
         m_Mode: 1
         m_Arguments:
@@ -7120,9 +7120,8 @@ GameObject:
   - component: {fileID: 2168964937537411955}
   - component: {fileID: 2168964937537411952}
   - component: {fileID: 2168964937537411953}
-  - component: {fileID: 2168964937537411966}
-  - component: {fileID: 2168964937537411967}
   - component: {fileID: 2168964937537411964}
+  - component: {fileID: 2168964937537411967}
   - component: {fileID: 2168964937537411965}
   - component: {fileID: 2168964937537411962}
   - component: {fileID: 8198696467454360633}
@@ -7215,7 +7214,7 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
---- !u!114 &2168964937537411966
+--- !u!114 &2168964937537411964
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -7224,7 +7223,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 2168964937537411963}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 41a3bde4d424b904badb046755866df7, type: 3}
+  m_Script: {fileID: 11500000, guid: 78cb2e54adaf72542b30a5e397bcf8a1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   backgroundPanel: {fileID: 2168964936805258208}
@@ -7248,6 +7247,8 @@ MonoBehaviour:
   yMinLabel: {fileID: 2168964936445175920}
   yMaxLabel: {fileID: 2168964936027736413}
   positions: []
+  manager: {fileID: 0}
+  vert: -1
 --- !u!65 &2168964937537411967
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -7261,20 +7262,6 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 600, y: 600, z: 0.01}
   m_Center: {x: 0, y: 0, z: -0.5}
---- !u!114 &2168964937537411964
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2168964937537411963}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 78cb2e54adaf72542b30a5e397bcf8a1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  manager: {fileID: 0}
-  vert: -1
 --- !u!114 &2168964937537411965
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7328,6 +7315,7 @@ MonoBehaviour:
   yScale: 1
   zScale: 1
   vrThumbstick: 32768
+  vrThumbstickS: 8388608
   incKey: 273
   decKey: 274
   resetKey: 114

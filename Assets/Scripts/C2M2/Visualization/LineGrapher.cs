@@ -320,7 +320,7 @@ namespace C2M2.Visualization
             }
         }
 
-        public void AddValue(float x, float y)
+        public virtual void AddValue(float x, float y)
         {
             if (positions.Count > MaxSamples)
             {
