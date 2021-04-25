@@ -15,8 +15,8 @@ namespace C2M2.Interaction
         private Vector3 minScale;
         private Vector3 maxScale;
         public float scaler = 0.2f;
-        public float minPercentage = 0.25f;
-        public float maxPercentage = 4f;
+        public float minPercentage = 0.5f;
+        public float maxPercentage = 3f;
         public bool xScale = true;
         public bool yScale = true;
         public bool zScale = true;

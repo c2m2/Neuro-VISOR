@@ -1208,7 +1208,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 1763426731111834598}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0950df82e7936c84983497630bde5b54, type: 3}
   m_Name: 
@@ -3878,7 +3878,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1494866335
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4819,7 +4819,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1763904073
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5077,7 +5077,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dryRun: 0
   paused: 0
-  raycastHitValue: 55
   raycastEventManager: {fileID: 0}
   defaultRaycastEvent: {fileID: 0}
   time: -1

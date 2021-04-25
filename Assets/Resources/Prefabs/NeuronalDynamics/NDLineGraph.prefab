@@ -7249,6 +7249,7 @@ MonoBehaviour:
   positions: []
   manager: {fileID: 0}
   vert: -1
+  obeyParentScale: 0
 --- !u!65 &2168964937537411967
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -7309,8 +7310,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scaler: 0.2
-  minPercentage: 0.25
-  maxPercentage: 4
+  minPercentage: 0.5
+  maxPercentage: 3
   xScale: 1
   yScale: 1
   zScale: 1

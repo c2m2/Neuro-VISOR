@@ -48,9 +48,11 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
 
             InitPointerLines();
 
-            UpdateSize();
+            //UpdateSize();
 
             MaxSamples = 300;
+
+            name = "LineGraph(" + Sim.name + ")[vert" + vert + "]";
 
             void SetLabels()
             {

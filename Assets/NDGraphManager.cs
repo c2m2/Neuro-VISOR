@@ -40,7 +40,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
             // If there is no NDSimulation, don't try instantiating a clamp
             if (sim == null) return;
 
-            var graphObj = Instantiate(graphPrefab, sim.transform);
+            var graphObj = Instantiate(graphPrefab);
             NDLineGraph graph = graphObj.GetComponent<NDLineGraph>();
             graph.manager = this;
             AttachToSimulation(graph, sim, hit);
