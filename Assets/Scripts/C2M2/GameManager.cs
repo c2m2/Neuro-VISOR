@@ -21,6 +21,7 @@ namespace C2M2
         public int mainThreadId { get; private set; } = -1;
 
         public VRDeviceManager vrDeviceManager = null;
+        public bool VRActive { get { return vrDeviceManager.VRActive; } }
 
         public GameObject cellPreviewer = null;
         public Interactable activeSim = null;

@@ -53,7 +53,12 @@ namespace C2M2.Visualization
                 }
 
                 maxSamples = value;
-                
+                // If our current list is larger than the new capacity, reduce the list
+                if(positions.Count > maxSamples)
+                {
+                    int overage = positions.Count - maxSamples;
+                    positions.RemoveRange(0, overage);
+                }
                 positions.Capacity = maxSamples;
             }
         }

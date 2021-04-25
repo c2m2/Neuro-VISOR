@@ -147,12 +147,18 @@ namespace C2M2.NeuronalDynamics.Interaction
             // If we hven't already created a preview clamp, create one
             if (previewClamp == null)
             {
+                Simulation.clampMutex.WaitOne();
                 previewClamp = BuildClamp(hit);
 
                 // If we couldn't build a preview clamp, don't try to preview the position hit
-                if (previewClamp == null) return;
+                if (previewClamp == null)
+                {
+                    Simulation.clampMutex.ReleaseMutex();
+                    return;
+                }
 
                 Clamps.Remove(previewClamp);
+                Simulation.clampMutex.ReleaseMutex();
                 foreach (Collider col in previewClamp.GetComponentsInChildren<Collider>())
                 {
                     col.enabled = false;

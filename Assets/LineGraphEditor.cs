@@ -22,27 +22,33 @@ namespace C2M2.Visualization {
         public TextMeshProUGUI numSampleReading = null;
         public TextMeshProUGUI xPrecisionReading = null;
         public TextMeshProUGUI yPrecisionReading = null;
+        public Color cellBackgroundCol;
+        public Color highlightCol;
 
         private void Awake()
         {
             NullChecks();
 
-            NumSamples = lineGraph.MaxSamples;
-            xPrecisionReading.text = lineGraph.XPrecision.ToString();
-            yPrecisionReading.text = lineGraph.YPrecision.ToString();
+           // xPrecisionReading.text = lineGraph.XPrecision.ToString();
+           // yPrecisionReading.text = lineGraph.YPrecision.ToString();
 
             void NullChecks()
             {
                 if (lineGraph == null)
                 {
-                    Debug.LogError("No linegraph given to LineGraphEditor.");
-                    Destroy(this);
+                    lineGraph = GetComponentInParent<LineGrapher>();
+                    if (lineGraph == null)
+                    {
+                        Debug.LogError("No linegraph given to LineGraphEditor.");
+                        Destroy(this);
+                    }
                 }
                 if (numSampleReading == null)
                 {
                     Debug.LogError("No sample reading given to LineGraphEditor.");
                     Destroy(this);
                 }
+                /*
                 if (xPrecisionReading == null)
                 {
                     Debug.LogError("No X Precision reading given to LineGraphEditor.");
@@ -53,7 +59,13 @@ namespace C2M2.Visualization {
                     Debug.LogError("No Y Precision reading given to LineGraphEditor.");
                     Destroy(this);
                 }
+                */
             }
+        }
+
+        private void Start()
+        {
+            NumSamples = lineGraph.MaxSamples;
         }
 
         public void XPrecisionAdd(RaycastHit hit)
@@ -76,5 +88,30 @@ namespace C2M2.Visualization {
             lineGraph.YPrecision--;
             yPrecisionReading.text = lineGraph.YPrecision.ToString();
         }
+
+        // Returns a value between [-2, 2] depending on how thumbsticks are held, and how far they are held.
+        private float ThumbstickState
+        {
+            get 
+            {
+                if (GameManager.instance.VRActive)
+                    return OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick).y + OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick).y;
+                else if (Input.GetKey(KeyCode.UpArrow)) return 1f;
+                else if (Input.GetKey(KeyCode.DownArrow)) return -1f;
+                else return 0;
+            }
+        }
+        public void ShiftNumSamples()
+        {
+            int shiftAmt = Mathf.RoundToInt(10f * ThumbstickState);
+
+            if(NumSamples + shiftAmt > 1 && NumSamples + shiftAmt < 2000)
+            {
+                NumSamples += shiftAmt;
+            }
+        }
+
+        public void DefaultCol(Image img) => img.color = cellBackgroundCol;
+        public void HighlightCol(Image img) => img.color = highlightCol;
     }
 }
