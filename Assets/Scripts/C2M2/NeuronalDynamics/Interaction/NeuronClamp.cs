@@ -113,19 +113,8 @@ namespace C2M2.NeuronalDynamics.Interaction
         {
             if (somaClamp)
             {
-                //Replaces mesh; no way to pull a primative mesh without generating its game object
-                GameObject tempSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                transform.GetComponent<MeshFilter>().sharedMesh = tempSphere.GetComponent<MeshFilter>().mesh;
-                Destroy(tempSphere);
-
-                //Scales to normal sphere
-                transform.localScale = Vector3.one;
-
                 //Lowers the highlight radius
                 highlightSphereScale = 1.1f;
-
-                //Removes end caps
-                Destroy(defaultCapHolder.gameObject);
             }
         }
 
@@ -258,7 +247,7 @@ namespace C2M2.NeuronalDynamics.Interaction
 
                 transform.parent.parent = this.simulation.transform;
 
-                if(this.simulation.Neuron.somaIDs.Contains(clampIndex)) somaClamp = true;
+                if (this.simulation.Neuron.somaIDs.Contains(clampIndex)) somaClamp = true;
 
 
                 PlaceClamp(clampIndex);

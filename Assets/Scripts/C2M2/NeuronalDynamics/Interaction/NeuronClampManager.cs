@@ -17,6 +17,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         public float ThumbstickScaler { get { return (MaxPower - MinPower) / sensitivity; } }
 
         public GameObject clampPrefab = null;
+        public GameObject somaClampPrefab = null;
         public GameObject clampControllerR = null;
         public GameObject clampControllerL = null;
         private NeuronClamp previewClamp = null;
@@ -118,8 +119,9 @@ namespace C2M2.NeuronalDynamics.Interaction
         }
         private NeuronClamp BuildClamp(RaycastHit hit)
         {
-            // Make sure we have a valid prefab
+            // Make sure we have valid prefabs
             if (clampPrefab == null) Debug.LogError("No Clamp prefab found");
+            if (somaClampPrefab == null) Debug.LogError("No Soma Clamp prefab found");
 
             // Destroy any existing preview clamp
             DestroyPreviewClamp(hit);
@@ -133,7 +135,9 @@ namespace C2M2.NeuronalDynamics.Interaction
             if (VertIsAvailable(clampIndex))
             {
                 // If this vertex is available, instantiate a clamp and attach it to the simulation
-                NeuronClamp clamp = Instantiate(clampPrefab, Simulation.transform).GetComponentInChildren<NeuronClamp>();
+                NeuronClamp clamp;
+                if (Simulation.Neuron.somaIDs.Contains(clampIndex)) clamp = Instantiate(somaClampPrefab, Simulation.transform).GetComponentInChildren<NeuronClamp>();
+                else clamp = Instantiate(clampPrefab, Simulation.transform).GetComponentInChildren<NeuronClamp>();
 
                 clamp.AttachSimulation(Simulation, clampIndex);
 

@@ -1208,7 +1208,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 1763426731111834598}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0950df82e7936c84983497630bde5b54, type: 3}
   m_Name: 
@@ -3369,6 +3369,8 @@ MonoBehaviour:
   sensitivity: 100
   clampPrefab: {fileID: 7051469727396962550, guid: 4565241fccd266147a078e252b27d27f,
     type: 3}
+  somaClampPrefab: {fileID: 7706642781083156315, guid: c16f9a23908a54e4f8d89d95e3d7a90d,
+    type: 3}
   clampControllerR: {fileID: 320645336}
   clampControllerL: {fileID: 835806272}
   allActive: 1
@@ -3878,7 +3880,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1494866335
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4819,7 +4821,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1763904073
 MonoBehaviour:
   m_ObjectHideFlags: 0
