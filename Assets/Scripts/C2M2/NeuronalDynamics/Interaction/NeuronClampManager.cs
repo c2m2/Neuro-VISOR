@@ -148,7 +148,7 @@ namespace C2M2.NeuronalDynamics.Interaction
 
         public void PreviewClamp(RaycastHit hit)
         {
-            // If we hven't already created a preview clamp, create one
+            // If we haven't already created a preview clamp, create one
             if (previewClamp == null)
             {
                 Simulation.clampMutex.WaitOne();

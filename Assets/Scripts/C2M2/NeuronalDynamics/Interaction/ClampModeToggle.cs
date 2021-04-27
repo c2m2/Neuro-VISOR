@@ -26,7 +26,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI {
                 Sim.raycastEventManager.LRTrigger = GameManager.instance.ndClampManager.hitEvent;
             }
 
-            // Enablle/Disable group clamp controllers
+            // Enable/Disable group clamp controllers
             if (GameManager.instance.vrDeviceManager.VRActive)
             {
                 if (GameManager.instance.ndClampManager.clampControllerL != null)

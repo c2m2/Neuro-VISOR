@@ -156,9 +156,25 @@ namespace C2M2.Simulation
                 GrabRescaler rescaler =  gameObject.AddComponent<GrabRescaler>();
                 gameObject.AddComponent<PositionResetControl>();
 
-                defaultRaycastEvent.OnHover.AddListener((hit) => rescaler.Rescale());
-                defaultRaycastEvent.OnHoldPress.AddListener((hit) => ShiftRaycastValue());
-                defaultRaycastEvent.OnEndPress.AddListener((hit) => ResetRaycastHits());
+                defaultRaycastEvent.OnHover.AddListener((hit) =>
+                {
+                    rescaler.Rescale();
+                    ShowHoverInfo(hit);
+                });
+                defaultRaycastEvent.OnHoverEnd.AddListener((hit) =>
+                {
+                    HideHoverInfo();
+                });
+                defaultRaycastEvent.OnHoldPress.AddListener((hit) =>
+                {
+                    ShiftRaycastValue();
+                    ShowHoverInfo(hit);
+                });
+                defaultRaycastEvent.OnEndPress.AddListener((hit) =>
+                {
+                    ResetRaycastHits();
+                    HideHoverInfo();
+                });
 
                 // Instantiate ruler
                 GameObject rulerObj = Resources.Load("Prefabs/Ruler") as GameObject;
@@ -168,6 +184,25 @@ namespace C2M2.Simulation
                 rulerObj.transform.eulerAngles = rulerInitRot;
                 rulerObj.name = gameObject.name + "Ruler";
             }
+        }
+
+        /// <summary>
+        /// Shows a popup of clamp voltage and clamp vertex
+        /// </summary>
+        public void ShowHoverInfo(RaycastHit hit)
+        {
+            //hoverInfo.gameObject.SetActive(true);
+            //hoverInfo.vertexText.text = focusVert.ToString();
+            //hoverInfo.clampText.text = (ClampPower * simulation.unitScaler).ToString("G4") + " " + simulation.unit;
+            //hoverInfo.postion = hit.point;
+        }
+
+        /// <summary>
+        /// Hides a popup of clamp voltage and clamp vertex
+        /// </summary>
+        public void HideHoverInfo()
+        {
+            //hoverInfo.gameObject.SetActive(false);
         }
 
         public KeyCode powerModifierPlusKey = KeyCode.UpArrow;
