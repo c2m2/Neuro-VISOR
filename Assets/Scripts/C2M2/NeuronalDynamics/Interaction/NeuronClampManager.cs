@@ -167,10 +167,16 @@ namespace C2M2.NeuronalDynamics.Interaction
                 {
                     col.enabled = false;
                 }
-                previewClamp.SwitchMatieral(previewClamp.previewMaterial);
+                previewClamp.SwitchMaterial(previewClamp.previewMaterial);
                 previewClamp.name = "PreviewClamp";
-                Destroy(previewClamp.defaultCapHolder);
-                Destroy(previewClamp.destroyCapHolder);
+                foreach (GameObject defaultCapHolder in previewClamp.defaultCapHolders)
+                {
+                    Destroy(defaultCapHolder);
+                }
+                foreach (GameObject destroyCapHolder in previewClamp.destroyCapHolders)
+                {
+                    Destroy(destroyCapHolder);
+                }
             }
 
             // Ensure the clamp is enabled

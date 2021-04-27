@@ -327,8 +327,10 @@ MonoBehaviour:
   previewMaterial: {fileID: 2100000, guid: 1b9e22857f37d024a8aa6aa336a12219, type: 2}
   destroyMaterial: {fileID: 2100000, guid: cdb984a62adddda4f96228000d103b50, type: 2}
   simulation: {fileID: 0}
-  defaultCapHolder: {fileID: 5483127028994316193}
-  destroyCapHolder: {fileID: 1776878145815968951}
+  defaultCapHolders:
+  - {fileID: 5483127028994316193}
+  destroyCapHolders:
+  - {fileID: 1776878145815968951}
   clampInfo: {fileID: 5555221349378481575}
   highlightObj: {fileID: 7733468709602801279}
   minHighlightGlobalSize: 0.03333333

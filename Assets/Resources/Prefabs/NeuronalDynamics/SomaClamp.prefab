@@ -568,7 +568,7 @@ Transform:
   - {fileID: 8671654518629186470}
   - {fileID: 1772706752665116336}
   m_Father: {fileID: 4947018193065713164}
-  m_RootOrder: 1
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4484835257017053351
 GameObject:
@@ -682,6 +682,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 0.05, z: 1}
   m_Children:
+  - {fileID: 6917641093622008739}
+  - {fileID: 9140111615234291467}
   - {fileID: 5142543735207180391}
   - {fileID: 849891637744960583}
   m_Father: {fileID: 5911865599838955489}
@@ -754,8 +756,14 @@ MonoBehaviour:
   previewMaterial: {fileID: 2100000, guid: 1b9e22857f37d024a8aa6aa336a12219, type: 2}
   destroyMaterial: {fileID: 2100000, guid: cdb984a62adddda4f96228000d103b50, type: 2}
   simulation: {fileID: 0}
-  defaultCapHolder: {fileID: 7603234800012140164}
-  destroyCapHolder: {fileID: 3614039848770375040}
+  defaultCapHolders:
+  - {fileID: 7603234800012140164}
+  - {fileID: 733734072842584106}
+  - {fileID: 8862705597721064147}
+  destroyCapHolders:
+  - {fileID: 3614039848770375040}
+  - {fileID: 5628725828760174139}
+  - {fileID: 2193534672486426038}
   clampInfo: {fileID: 5351590115422812736}
   highlightObj: {fileID: 5775996226698500373}
   minHighlightGlobalSize: 0.03333333
@@ -1008,10 +1016,8 @@ GameObject:
   - component: {fileID: 6917641093622008739}
   - component: {fileID: 9041640546772897280}
   - component: {fileID: 5937682528130521648}
-  - component: {fileID: 8752719384944475144}
-  - component: {fileID: 8889979837842835982}
-  - component: {fileID: 8182815815551724452}
   - component: {fileID: 4313439447865923228}
+  - component: {fileID: 3216034357745586910}
   m_Layer: 8
   m_Name: Y Cylinder
   m_TagString: NeuronClamp
@@ -1026,14 +1032,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5960906447399457026}
-  m_LocalRotation: {x: 1, y: 0, z: 0, w: 0}
+  m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 0.05, z: 1}
+  m_LocalScale: {x: 1, y: 0.04999999, z: 20}
   m_Children:
   - {fileID: 3149268378277020027}
   - {fileID: 5734076142186179251}
-  m_Father: {fileID: 5911865599838955489}
-  m_RootOrder: 3
+  m_Father: {fileID: 4947018193065713164}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 180, y: 0, z: 0}
 --- !u!33 &9041640546772897280
 MeshFilter:
@@ -1082,116 +1088,6 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!114 &8752719384944475144
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5960906447399457026}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fa5a5446d4c4c934da65530be09c19c2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  radiusRatio: 3
-  heightRatio: 3
-  highlightSphereScale: 3
-  activeMaterial: {fileID: 2100000, guid: 35c891bae7ccbb440a4193edaae59b1a, type: 2}
-  inactiveMaterial: {fileID: 2100000, guid: b5682c8bb520e8a46bbeab52c1a74097, type: 2}
-  previewMaterial: {fileID: 2100000, guid: 1b9e22857f37d024a8aa6aa336a12219, type: 2}
-  destroyMaterial: {fileID: 2100000, guid: cdb984a62adddda4f96228000d103b50, type: 2}
-  simulation: {fileID: 0}
-  defaultCapHolder: {fileID: 733734072842584106}
-  destroyCapHolder: {fileID: 5628725828760174139}
-  clampInfo: {fileID: 0}
-  highlightObj: {fileID: 0}
-  minHighlightGlobalSize: 0.03333333
---- !u!114 &8889979837842835982
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5960906447399457026}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6dee7b5c4ddc78f44b1b1919d3ea115d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  rightTrigger: {fileID: 8182815815551724452}
-  leftTrigger: {fileID: 8182815815551724452}
---- !u!114 &8182815815551724452
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5960906447399457026}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2066920c5141f0e4ca235394b5f8bd4a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  onHover:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 8752719384944475144}
-        m_MethodName: ShowClampInfo
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  onHoverEnd:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 8752719384944475144}
-        m_MethodName: HideClampInfo
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  onPress:
-    m_PersistentCalls:
-      m_Calls: []
-  onHoldPress:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 8752719384944475144}
-        m_MethodName: MonitorInput
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  onEndPress:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 8752719384944475144}
-        m_MethodName: ResetInput
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
 --- !u!65 &4313439447865923228
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1205,6 +1101,19 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1.0000001, y: 2, z: 1.0000002}
   m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}
+--- !u!114 &3216034357745586910
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5960906447399457026}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b502aa8ccd2e8774183649f90df14ae8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  meshRendererTopCopy: {fileID: 273655018366450241}
 --- !u!1 &6248572321229500064
 GameObject:
   m_ObjectHideFlags: 0
@@ -1393,7 +1302,7 @@ Transform:
   - {fileID: 3567352426769343094}
   - {fileID: 3133634256512421184}
   m_Father: {fileID: 4947018193065713164}
-  m_RootOrder: 0
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7706642781083156315
 GameObject:
@@ -1425,8 +1334,6 @@ Transform:
   - {fileID: 4947018193065713164}
   - {fileID: 3422260693028263140}
   - {fileID: 3994455841930711054}
-  - {fileID: 6917641093622008739}
-  - {fileID: 9140111615234291467}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1678,10 +1585,8 @@ GameObject:
   - component: {fileID: 9140111615234291467}
   - component: {fileID: 8743148198268049010}
   - component: {fileID: 3432525686457000828}
-  - component: {fileID: 4150148599814960622}
-  - component: {fileID: 8694787888250961006}
-  - component: {fileID: 1090990239774809240}
   - component: {fileID: 1696778223494567454}
+  - component: {fileID: 8320718031825024996}
   m_Layer: 8
   m_Name: Z Cylinder
   m_TagString: NeuronClamp
@@ -1696,14 +1601,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8849094601950137888}
-  m_LocalRotation: {x: 0.5, y: 0.5, z: -0.5, w: 0.5}
+  m_LocalRotation: {x: -0, y: -0, z: -0.7071068, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 0.05, z: 1}
+  m_LocalScale: {x: 20, y: 0.049999997, z: 1}
   m_Children:
   - {fileID: 2570201872609210737}
   - {fileID: 6755127037512965889}
-  m_Father: {fileID: 5911865599838955489}
-  m_RootOrder: 4
+  m_Father: {fileID: 4947018193065713164}
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: -90}
 --- !u!33 &8743148198268049010
 MeshFilter:
@@ -1752,116 +1657,6 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!114 &4150148599814960622
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8849094601950137888}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fa5a5446d4c4c934da65530be09c19c2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  radiusRatio: 3
-  heightRatio: 3
-  highlightSphereScale: 3
-  activeMaterial: {fileID: 2100000, guid: 35c891bae7ccbb440a4193edaae59b1a, type: 2}
-  inactiveMaterial: {fileID: 2100000, guid: b5682c8bb520e8a46bbeab52c1a74097, type: 2}
-  previewMaterial: {fileID: 2100000, guid: 1b9e22857f37d024a8aa6aa336a12219, type: 2}
-  destroyMaterial: {fileID: 2100000, guid: cdb984a62adddda4f96228000d103b50, type: 2}
-  simulation: {fileID: 0}
-  defaultCapHolder: {fileID: 8862705597721064147}
-  destroyCapHolder: {fileID: 2193534672486426038}
-  clampInfo: {fileID: 0}
-  highlightObj: {fileID: 0}
-  minHighlightGlobalSize: 0.03333333
---- !u!114 &8694787888250961006
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8849094601950137888}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6dee7b5c4ddc78f44b1b1919d3ea115d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  rightTrigger: {fileID: 1090990239774809240}
-  leftTrigger: {fileID: 1090990239774809240}
---- !u!114 &1090990239774809240
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8849094601950137888}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2066920c5141f0e4ca235394b5f8bd4a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  onHover:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 4150148599814960622}
-        m_MethodName: ShowClampInfo
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  onHoverEnd:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 4150148599814960622}
-        m_MethodName: HideClampInfo
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  onPress:
-    m_PersistentCalls:
-      m_Calls: []
-  onHoldPress:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 4150148599814960622}
-        m_MethodName: MonitorInput
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  onEndPress:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 4150148599814960622}
-        m_MethodName: ResetInput
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
 --- !u!65 &1696778223494567454
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1875,6 +1670,19 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1.0000001, y: 2, z: 1.0000002}
   m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}
+--- !u!114 &8320718031825024996
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8849094601950137888}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b502aa8ccd2e8774183649f90df14ae8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  meshRendererTopCopy: {fileID: 273655018366450241}
 --- !u!1 &8862705597721064147
 GameObject:
   m_ObjectHideFlags: 0

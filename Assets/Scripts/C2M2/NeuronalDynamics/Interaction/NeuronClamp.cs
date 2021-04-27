@@ -45,8 +45,8 @@ namespace C2M2.NeuronalDynamics.Interaction
 
         public NDSimulation simulation = null;
 
-        public GameObject defaultCapHolder = null;
-        public GameObject destroyCapHolder = null;
+        public List<GameObject> defaultCapHolders = null;
+        public List<GameObject> destroyCapHolders = null;
 
         public ClampInfo clampInfo = null;
 
@@ -280,18 +280,19 @@ namespace C2M2.NeuronalDynamics.Interaction
         {
             ClampLive = true;
 
-            SwitchMatieral(activeMaterial);
+            SwitchMaterial(activeMaterial);
         }
         public void DeactivateClamp()
         {
             ClampLive = false;
-            SwitchMatieral(inactiveMaterial);
+            SwitchMaterial(inactiveMaterial);
         }
 
-        public void SwitchMatieral(Material material)
+        public void SwitchMaterial(Material material)
         {
             if (material != null) mr.material = material;
         }
+
         public void ToggleClamp()
         {
             if (ClampLive) DeactivateClamp();
@@ -336,16 +337,22 @@ namespace C2M2.NeuronalDynamics.Interaction
         // Changes clamp to a red aesthetic to signal that destroy is imminent
         private void SwitchCaps(bool toDefault)
         {
-            if (defaultCapHolder != null && destroyCapHolder != null)
+            if (defaultCapHolders != null && destroyCapHolders != null)
             {
-                defaultCapHolder.SetActive(toDefault);
-                destroyCapHolder.SetActive(!toDefault);
+                foreach (GameObject defaultCapHolder in defaultCapHolders)
+                {
+                    defaultCapHolder.SetActive(toDefault);
+                }
+                foreach (GameObject destroyCapHolder in destroyCapHolders)
+                {
+                    destroyCapHolder.SetActive(!toDefault);
+                }
                 if (toDefault)
                 {
-                    if (ClampLive) SwitchMatieral(activeMaterial);
-                    else SwitchMatieral(inactiveMaterial);
+                    if (ClampLive) SwitchMaterial(activeMaterial);
+                    else SwitchMaterial(inactiveMaterial);
                 }
-                else SwitchMatieral(destroyMaterial);
+                else SwitchMaterial(destroyMaterial);
             }
         }
 
