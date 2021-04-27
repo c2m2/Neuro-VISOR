@@ -558,7 +558,7 @@ GameObject:
   - component: {fileID: 9086472248968558892}
   - component: {fileID: 9086472248968558893}
   m_Layer: 5
-  m_Name: ClampPower
+  m_Name: Voltage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -187,7 +187,7 @@ namespace C2M2.Simulation
         }
 
         /// <summary>
-        /// Shows a popup of clamp voltage and clamp vertex
+        /// Shows a popup of voltage and vertex
         /// </summary>
         public void ShowHoverInfo(RaycastHit hit)
         {
@@ -198,7 +198,7 @@ namespace C2M2.Simulation
         }
 
         /// <summary>
-        /// Hides a popup of clamp voltage and clamp vertex
+        /// Hides a popup of voltage and vertex
         /// </summary>
         public void HideHoverInfo()
         {
