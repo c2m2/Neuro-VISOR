@@ -112,14 +112,10 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
             {
                 pointerLines.targetPos = VertPos;
             }
-
-            /*
-            if (!obeyParentScale && Sim.transform.hasChanged)
+            if(Sim == null || manager == null)
             {
-                UpdateSize();
-
-              //  Sim.transform.hasChanged = false;
-            }*/
+                DestroyPlot();
+            }
         }
 
         private void OnDestroy()

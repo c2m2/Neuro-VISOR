@@ -81,5 +81,13 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
 
             return validLocation;
         }
+
+        private void OnDestroy()
+        {
+            foreach(var graph in graphs)
+            {
+                graph.DestroyPlot();
+            }
+        }
     }
 }

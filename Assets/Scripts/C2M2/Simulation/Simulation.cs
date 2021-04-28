@@ -137,7 +137,7 @@ namespace C2M2.Simulation
             StopSimulation();
         }
 
-        private void OnDestroy()
+        protected void OnDestroy()
         {
             OnDest();
             StopSimulation();
