@@ -83,7 +83,7 @@ namespace C2M2.Interaction.VR
 
         public void Update()
         {
-            if (Input.GetKey(KeyCode.A)) SwitchState(true); // temp for testing
+            if (Input.GetKey(KeyCode.Tilde)) SwitchState(true); // temp for testing
             if (VRActive && Input.GetKey(switchModeKey)) SwitchState(false);
             else if (!VRActive && OVRInput.Get(switchModeButton))
             {
