@@ -20,21 +20,18 @@ namespace C2M2.Interaction.VR
         private MouseEventSignaler mouseSignaler;
         private OVRPlayerController playerController;
         private MovementController emulatorMove;
+        private OVRManager ovrManager;
 
-        //private Transform leftEye;
+        private Transform leftEye;
         private Transform centerEye;
-        //private Transform rightEye;
+        private Transform rightEye;
         private Transform leftHand;
         private Transform rightHand;
 
         private Vector3 initialPlayerPositon;
-        private Quaternion initialPlayerRotation;
-        //private Vector3 initialLeftEyePositon;
-        //private Quaternion initialLeftEyeRotation;
+        private Vector3 initialLeftEyePositon;
         private Vector3 initialCenterEyePositon;
-        private Quaternion initialCenterEyeRotation;
-        //private Vector3 initialRightEyePositon;
-        //private Quaternion initialRightEyeRotation;
+        private Vector3 initialRightEyePositon;
         private Vector3 initialLeftHandPositon;
         private Quaternion initialLeftHandRotation;
         private Vector3 initialRightHandPositon;
@@ -50,31 +47,24 @@ namespace C2M2.Interaction.VR
         private void Awake()
         {   
             Camera[] cameras = GetComponentsInChildren<Camera>();
-            //leftEye = cameras[0].transform;
+            leftEye = cameras[0].transform;
             centerEye = cameras[1].transform;
-            //rightEye = cameras[2].transform;
+            rightEye = cameras[2].transform;
             PublicOVRGrabber[] hands = GetComponentsInChildren<PublicOVRGrabber>();
             leftHand = hands[0].transform;
             rightHand = hands[1].transform;
 
             initialPlayerPositon = transform.position;
-            initialPlayerRotation = transform.rotation;
-            //initialLeftEyePositon = leftEye.position;
-            //initialLeftEyeRotation = leftEye.rotation;
+            initialLeftEyePositon = leftEye.position;
             initialCenterEyePositon = centerEye.position;
-            initialCenterEyeRotation = centerEye.rotation;
-            //initialRightEyePositon = rightEye.position;
-            //initialRightEyeRotation = rightEye.rotation;
-            initialLeftHandPositon = leftHand.position;
-            initialLeftHandRotation = leftHand.rotation;
-            initialRightHandPositon = rightHand.position;
-            initialRightHandRotation = rightHand.rotation;
+            initialRightEyePositon = rightEye.position;
 
 
             emulator = GetComponent<MovingOVRHeadsetEmulator>();
             emulatorMove = GetComponent<MovementController>();
             mouseSignaler = GetComponent<MouseEventSignaler>();
             playerController = GetComponent<OVRPlayerController>();
+            ovrManager = GetComponentInChildren<OVRManager>();
 
             CheckForVRDevice();
 
@@ -83,9 +73,9 @@ namespace C2M2.Interaction.VR
 
         public void Update()
         {
-            if (Input.GetKey(KeyCode.Tilde)) SwitchState(true); // temp for testing
+            if (Input.GetKey(KeyCode.Slash)) SwitchState(true); // temp for testing
             if (VRActive && Input.GetKey(switchModeKey)) SwitchState(false);
-            else if (!VRActive && OVRInput.Get(switchModeButton))
+            else if (!VRActive && OVRInput.Get(switchModeButton)) //Won't work if disabling controllers so need an alternate
             {
                 if (!VRDevicePresent) CheckForVRDevice();
                 if (VRDevicePresent) SwitchState(true);
@@ -104,11 +94,13 @@ namespace C2M2.Interaction.VR
 
         private void SwitchState(bool vrActive)
         {
+            Debug.LogError("Mode switch to" + vrActive);
+
             VRActive = vrActive;
 
             XRSettings.enabled = vrActive;
 
-            playerController.enabled = vrActive;
+            playerController.enabled = vrActive; //can most likely be permanently set to true?
             emulator.enabled = !vrActive;
             mouseSignaler.enabled = !vrActive;
             emulatorMove.enabled = !vrActive;
@@ -129,19 +121,22 @@ namespace C2M2.Interaction.VR
         private void ResetView()
         {
             transform.position = initialPlayerPositon;
-            transform.rotation = initialPlayerRotation;
-            //leftEye.position = initialLeftEyePositon;
-            //leftEye.rotation = initialLeftEyeRotation;
-            centerEye.position = initialCenterEyePositon;
-            centerEye.rotation = initialCenterEyeRotation;
-            //rightEye.position = initialRightEyePositon;
-            //rightEye.rotation = initialRightEyeRotation;
-            leftHand.position = initialLeftHandPositon;
-            leftHand.rotation = initialLeftHandRotation;
-            rightHand.position = initialRightHandPositon;
-            rightHand.rotation = initialRightHandRotation;
 
-            playerController.ResetOrientation(); //Not sure if this does anything or is helpful. Occulus documentation is pretty unclear
+            //Something is overriding this
+            leftEye.position = Vector3.zero;
+            leftEye.rotation = Quaternion.Euler(0, 0, 0);
+            centerEye.position = Vector3.zero;
+            centerEye.rotation = Quaternion.Euler(0, 0, 0);
+            rightEye.position = Vector3.zero;
+            rightEye.rotation = Quaternion.Euler(0,0,0);
+
+
+            //leftHand.position = initialLeftHandPositon;
+            //leftHand.rotation = initialLeftHandRotation;
+            //rightHand.position = initialRightHandPositon;
+            //rightHand.rotation = initialRightHandRotation;
+            
+            ovrManager.headPoseRelativeOffsetRotation = Vector3.zero;
         }
     }
 }
