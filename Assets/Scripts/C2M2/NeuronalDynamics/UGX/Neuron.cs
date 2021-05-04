@@ -29,6 +29,10 @@ namespace C2M2.NeuronalDynamics.UGX
         /// a soma maybe a segment of points, not a singular point
         /// </summary>
         public List<int> somaIDs = new List<int>();
+
+        public double MaxRadius = new double();
+        public double TargetEdgeLength = new double();
+
         /// <summary>
         /// This is the NodeData structure, it will group information together corresponding to each node in the 1D graph geometry
         /// the information stored is analogous to what would be found in the 1D .swc file of the neuron geometry
@@ -82,6 +86,8 @@ namespace C2M2.NeuronalDynamics.UGX
         public Neuron(Grid grid)
         {
             Vector3[] gridMeshVertices = grid.Mesh.vertices;
+            MaxRadius = 0;
+            TargetEdgeLength = 0;
 
             VertexAttachementAccessor<DiameterData> diameterAccessor = new VertexAttachementAccessor<DiameterData>(grid);
             for (int i = 0; i < grid.Vertices.Count; i++)
@@ -90,7 +96,6 @@ namespace C2M2.NeuronalDynamics.UGX
                 {
                     /// this gets the radius by dividing the diameter by 2
                     NodeRadius = diameterAccessor[i].Diameter / 2,
-
                     /// this the node id --> these may not be consecutive
                     Id = grid.Vertices[i].Id,
 
@@ -100,6 +105,8 @@ namespace C2M2.NeuronalDynamics.UGX
                     Ycoords = gridMeshVertices[i].y,
                     Zcoords = gridMeshVertices[i].z
                 };
+
+                if ((tempNode.NodeRadius>=MaxRadius )){ MaxRadius = tempNode.NodeRadius; }
 
                 nodes.Add(tempNode);
             }
@@ -116,6 +123,7 @@ namespace C2M2.NeuronalDynamics.UGX
                     Length = edgeLength
                 }
                 );
+                TargetEdgeLength = TargetEdgeLength + edgeLength;
 
                 toNode.Pid = fromNode.Id;
 
@@ -126,6 +134,8 @@ namespace C2M2.NeuronalDynamics.UGX
                 toNode.Neighbors.Add(new Neighbor(fromNode.Id, edgeLength));
                 fromNode.Neighbors.Add(new Neighbor(toNode.Id, edgeLength));
             }
+
+            TargetEdgeLength = TargetEdgeLength / (grid.Edges.Count);
 
             /// if a node has only one neighbor then it is a boundary node
             boundaryNodes.AddRange(nodes.FindAll(node => node.AdjacencyList.Count == 1));

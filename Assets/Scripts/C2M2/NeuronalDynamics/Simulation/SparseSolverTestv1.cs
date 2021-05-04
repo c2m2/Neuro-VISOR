@@ -88,7 +88,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// [ohm.m] resistance.length, this is the axial resistence of the neuron, increasing this value has the effect of making the AP waves more localized and slower conduction speed
         /// decreasing this value has the effect of make the AP waves larger and have a faster conduction speed
         /// </summary>
-        private double res = 2500.0 * 1.0E-2;
+        private double res = 300.0 * 1.0E-2;
         /// <summary>
         /// [F/m2] capacitance per unit area, this is the plasma membrane capacitance, this a standard value for the capacitance
         /// </summary>
@@ -222,13 +222,13 @@ namespace C2M2.NeuronalDynamics.Simulation
             }
         }
 
-        private Vector R;
-        private double[] b;
-        List<double> reactConst;
-        List<CoordinateStorage<double>> sparse_stencils;
-        CompressedColumnStorage<double> r_csc;
-        CompressedColumnStorage<double> l_csc;
-        private SparseLU lu;
+        private Vector R;                                 //This is a vector for the reaction solve 
+        private double[] b;                               //This is the right hand side vector when solving Ax = b
+        List<double> reactConst;                            //This is for passing the reaction function constants
+        List<CoordinateStorage<double>> sparse_stencils;    
+        CompressedColumnStorage<double> r_csc;              //This is for the rhs sparse matrix
+        CompressedColumnStorage<double> l_csc;              //This is for the lhs sparse matrix
+        private SparseLU lu;                                //Initialize the LU factorizaation
 
         /// <summary>
         /// This is a small routine call to initialize the Neuron Cell
@@ -241,6 +241,11 @@ namespace C2M2.NeuronalDynamics.Simulation
             R = Vector.Build.Dense(Neuron.nodes.Count);
             ///<c>reactConst</c> this is a small list for collecting the conductances and reversal potential which is sent to the reaction solve routine
             reactConst = new List<double> { gk, gna, gl, ek, ena, el };
+
+            /// this sets the target time step size
+            timeStep = SetTargetTimeStep(cap, 2 * Neuron.MaxRadius, Neuron.TargetEdgeLength, gna, gk, res);
+            ///UnityEngine.Debug.Log("Target Time Step = " + timeStep);
+            
             ///<c>List<CoordinateStorage<double>> sparse_stencils = makeSparseStencils(Neuron, res, cap, k);</c> Construct sparse RHS and LHS in coordinate storage format, no zeros are stored \n
             /// <c>sparse_stencils</c> this is a list which contains only two matrices the LHS and RHS matrices for the Crank-Nicolson solve
             sparse_stencils = makeSparseStencils(Neuron, res, cap, timeStep);
@@ -312,6 +317,43 @@ namespace C2M2.NeuronalDynamics.Simulation
         }
 
         #region Local Functions
+
+        /// <summary>
+        /// This function sets the target time step size
+        /// </summary>
+        /// <param name="cap"></param> this is the capacitance
+        /// <param name="maxDiameter"></param> this is the maximum diameter
+        /// <param name="edgeLength"></param> this is the target edge length of the graph geometry
+        /// <param name="gna"></param> this is the sodium conductance
+        /// <param name="gk"></param> this is the potassium conductance
+        /// <param name="res"></param> this is the axial resistance
+        /// <returns></returns>
+        public static double SetTargetTimeStep(double cap, double maxDiameter, double edgeLength ,double gna, double gk, double res)
+        {
+            /// here we set the minimum time step size and maximum time step size
+            double dtmin = 2e-6;  
+            double dtmax = 32e-6;
+            double incscf = 1.1;        // this is the scale factor for increasing the time step size if it is unnecessarily small
+            double Rmemscf = 0.65;      // the membrane resistance does not hit the theoretical maximum, it is approximately 65%
+
+            /// this is where we compute the maximum conduction speed (wave speed) of the ap wave
+            double vmax = (1 / cap) * System.Math.Sqrt(maxDiameter * (1e-6) *Rmemscf* (gna + gk) / (res));
+
+            /// this is the target time step size
+            double tstep = (edgeLength / vmax) * (1e-6);
+            
+            /// we use the loop incase the time step is unnecessarily small
+            while(tstep < dtmin)
+            {
+                tstep = tstep * incscf;
+            }
+
+            /// this avoid making the time step too big will cause numerical instability
+            if (tstep > dtmax) { tstep = tstep * 0.5; }
+
+            return tstep;
+        }
+
         /// <summary>
         /// This function initializes the voltage vector <c>U</c> and the state vectors
         /// <c>M</c>, <c>N</c>, and <c>H</c> \n
