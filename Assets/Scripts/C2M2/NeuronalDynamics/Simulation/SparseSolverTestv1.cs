@@ -78,12 +78,6 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// This is for turning the soma on/off, this option is primarily used for testing purposes for the convergence analysis, for a soma clamp experiment
         /// </summary>
         public bool SomaOn = false;            
-        /// <summary>
-        /// send LHS and RHS stencil matrices to output file for saving. This option is available if the user would like to check the sparsity pattern of the HINES matrix,
-        /// this is a sparse matrix which corresponds to the sparsity nature of the stencil matrix. The stencil matrix is used for the diffusion solve of the PDE equation when
-        /// we perform the operator splitting.
-        /// </summary>
-        private bool saveMatrices = false;
         ///<summary>
         /// [ohm.m] resistance.length, this is the axial resistence of the neuron, increasing this value has the effect of making the AP waves more localized and slower conduction speed
         /// decreasing this value has the effect of make the AP waves larger and have a faster conduction speed
@@ -134,7 +128,16 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// <summary>
         /// [] sodium channel state probability, unitless  
         /// </summary>
-        private double hi = 0.9959410;            
+        private double hi = 0.9959410;
+        /// <summary>
+        /// the membrane resistance does not hit the theoretical maximum, it is approximately 65%
+        /// but this may change depending on the rate functions that are used
+        /// </summary>
+        private double Rmemscf = 0.65;
+        /// <summary>
+        /// this is the scale factor for increasing the time step size if it is unnecessarily small
+        /// </summary>
+        private double cfl = 1.5;        
 
         /// <summary>
         /// These are the solution vectors for the voltage <code>U</code>
@@ -243,7 +246,7 @@ namespace C2M2.NeuronalDynamics.Simulation
             reactConst = new List<double> { gk, gna, gl, ek, ena, el };
 
             /// this sets the target time step size
-            timeStep = SetTargetTimeStep(cap, 2 * Neuron.MaxRadius, Neuron.TargetEdgeLength, gna, gk, res);
+            timeStep = SetTargetTimeStep(cap, 2 * Neuron.MaxRadius, Neuron.TargetEdgeLength, gna, gk, res, Rmemscf,cfl);
             ///UnityEngine.Debug.Log("Target Time Step = " + timeStep);
             
             ///<c>List<CoordinateStorage<double>> sparse_stencils = makeSparseStencils(Neuron, res, cap, k);</c> Construct sparse RHS and LHS in coordinate storage format, no zeros are stored \n
@@ -319,7 +322,29 @@ namespace C2M2.NeuronalDynamics.Simulation
         #region Local Functions
 
         /// <summary>
-        /// This function sets the target time step size
+        /// This function sets the target time step size, below is the formula for the conduction speed of the action potential (wave speed)
+        ///
+        /// \f[v = \frac{1}{C}\sqrt{\frac{d}{R_a R_{mem}}}]
+        ///
+        /// where
+        /// \f[R_{mem} = \frac{1}{g_{Na}m^3 h + g_K n^4}]
+        /// 
+        /// and n,m,h are the probability states which vary in time and depend on the voltage
+        /// Notice that
+        /// 
+        /// \f[\frac{1}{R_{mem}}\leq g_{Na}+g_K=G_{mem-theor-max}]
+        /// 
+        /// therefore we define the max conduction speed vmax as
+        /// 
+        /// v_{max} = \frac{1}{C}\sqrt{\frac{d_max\cdot (g_{Na}+g_K)}{R_a}}
+        /// 
+        /// then we solve for our target \f[Delta t] by computing
+        /// 
+        /// \f[\Delta t = \frac{\Delta x}{v_{max}}]
+        /// 
+        /// where \f[Delta x] is the median edge length, in this case we use the average this is because our geometries are regularize and there
+        /// are not excessively small edges in the graph geometry.
+        ///  
         /// </summary>
         /// <param name="cap"></param> this is the capacitance
         /// <param name="maxDiameter"></param> this is the maximum diameter
@@ -327,30 +352,24 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// <param name="gna"></param> this is the sodium conductance
         /// <param name="gk"></param> this is the potassium conductance
         /// <param name="res"></param> this is the axial resistance
+        /// <param name="Rmemscf"></param> this is membrane resistance scale factor, since this is only a fraction of theoretical maximum
         /// <returns></returns>
-        public static double SetTargetTimeStep(double cap, double maxDiameter, double edgeLength ,double gna, double gk, double res)
+        public static double SetTargetTimeStep(double cap, double maxDiameter, double edgeLength ,double gna, double gk, double res, double Rmemscf, double cfl)
         {
             /// here we set the minimum time step size and maximum time step size
+            /// the dtmin is based on prior numerical experiments that revealed that for each refinement level the 
+            /// voltage profiles were visually accurate when compared to Yale Neuron for delta t at least 2 microseconds
             double dtmin = 2e-6;  
-            double dtmax = 32e-6;
-            double incscf = 1.1;        // this is the scale factor for increasing the time step size if it is unnecessarily small
-            double Rmemscf = 0.65;      // the membrane resistance does not hit the theoretical maximum, it is approximately 65%
-
+            double dtmax = 32e-6;        
             /// this is where we compute the maximum conduction speed (wave speed) of the ap wave
+            /// set the maxDiameter to [m] by multiplying by 1e-6
             double vmax = (1 / cap) * System.Math.Sqrt(maxDiameter * (1e-6) *Rmemscf* (gna + gk) / (res));
-
-            /// this is the target time step size
-            double tstep = (edgeLength / vmax) * (1e-6);
-            
-            /// we use the loop incase the time step is unnecessarily small
-            while(tstep < dtmin)
-            {
-                tstep = tstep * incscf;
-            }
-
+            /// this is the target time step size, set to seconds by multiplying by 1e-6
+            double tstep = (edgeLength / vmax) * (1e-6);            
+            /// we use the loop incase the time step if it is unnecessarily small
+            while(tstep < dtmin){ tstep = tstep * cfl;}
             /// this avoid making the time step too big will cause numerical instability
             if (tstep > dtmax) { tstep = tstep * 0.5; }
-
             return tstep;
         }
 
