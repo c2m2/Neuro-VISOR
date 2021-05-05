@@ -21,6 +21,7 @@ namespace C2M2.Interaction.VR
         private MouseEventSignaler mouseSignaler;
         private OVRPlayerController playerController;
         private MovementController emulatorMove;
+        private OVRManager ovrManager;
 
         private Transform leftEye;
         private Transform centerEye;
@@ -29,17 +30,13 @@ namespace C2M2.Interaction.VR
         private Transform rightHand;
 
         private Vector3 initialPlayerPositon;
-        private Vector3 initialPlayerRotation;
         private Vector3 initialLeftEyePositon;
-        private Vector3 initialLeftEyeRotation;
         private Vector3 initialCenterEyePositon;
-        private Vector3 initialCenterEyeRotation;
         private Vector3 initialRightEyePositon;
-        private Vector3 initialRightEyeRotation;
         private Vector3 initialLeftHandPositon;
-        private Vector3 initialLeftHandRotation;
+        private Quaternion initialLeftHandRotation;
         private Vector3 initialRightHandPositon;
-        private Vector3 initialRightHandRotation;
+        private Quaternion  initialRightHandRotation;
 
         private readonly KeyCode switchModeKey = KeyCode.Space;
         private readonly OVRInput.Button switchModeButton = OVRInput.Button.Any;
@@ -59,23 +56,16 @@ namespace C2M2.Interaction.VR
             rightHand = hands[1].transform;
 
             initialPlayerPositon = transform.position;
-            initialPlayerRotation = transform.eulerAngles;
             initialLeftEyePositon = leftEye.position;
-            initialLeftEyeRotation = leftEye.eulerAngles;
             initialCenterEyePositon = centerEye.position;
-            initialCenterEyeRotation = centerEye.eulerAngles;
             initialRightEyePositon = rightEye.position;
-            initialRightEyeRotation = rightEye.eulerAngles;
-            initialLeftHandPositon = leftHand.position;
-            initialLeftHandRotation = leftHand.eulerAngles;
-            initialRightHandPositon = rightHand.position;
-            initialRightHandRotation = rightHand.eulerAngles;
 
 
             emulator = GetComponent<MovingOVRHeadsetEmulator>();
             emulatorMove = GetComponent<MovementController>();
             mouseSignaler = GetComponent<MouseEventSignaler>();
             playerController = GetComponent<OVRPlayerController>();
+            ovrManager = GetComponentInChildren<OVRManager>();
 
             CheckForVRDevice();
 
@@ -84,14 +74,14 @@ namespace C2M2.Interaction.VR
 
         public void Update()
         {
-            // uncomment this to enable mode switching
-            //if (VRActive && Input.GetKey(switchModeKey)) SwitchState(false);
-            //else if (!VRActive && OVRInput.Get(switchModeButton))
-            //{
-            //    if (!VRDevicePresent) CheckForVRDevice();
-            //    if (VRDevicePresent) SwitchState(true);
-            //    else Debug.LogError("No VR Device Present");
-            //}
+            if (Input.GetKey(KeyCode.Slash)) SwitchState(true); // temp for testing
+            if (VRActive && Input.GetKey(switchModeKey)) SwitchState(false);
+            else if (!VRActive && OVRInput.Get(switchModeButton)) //Won't work if disabling controllers so need an alternate
+            {
+                if (!VRDevicePresent) CheckForVRDevice();
+                if (VRDevicePresent) SwitchState(true);
+                else Debug.LogError("No VR Device Present");
+            }
         }
 
         private void CheckForVRDevice()
@@ -105,40 +95,49 @@ namespace C2M2.Interaction.VR
 
         private void SwitchState(bool vrActive)
         {
+            Debug.LogError("Mode switch to" + vrActive);
+
             VRActive = vrActive;
+
+            XRSettings.enabled = vrActive;
+
+            playerController.enabled = vrActive; //can most likely be permanently set to true?
+            emulator.enabled = !vrActive;
+            mouseSignaler.enabled = !vrActive;
+            emulatorMove.enabled = !vrActive;
 
             ResetView();
 
             if (informationDisplayTV != null) informationDisplayTV.SetActive(vrActive);
-            playerController.enabled = vrActive;
-
-            emulator.enabled = !vrActive;
-            mouseSignaler.enabled = !vrActive;
-            emulatorMove.enabled = !vrActive;
             if (informationOverlay != null) informationOverlay.SetActive(!vrActive);
 
             // only enable oculus signalers if VR is enabled
-            OculusEventSignaler[] oculusSignalers = GetComponentsInChildren<OculusEventSignaler>();
-            foreach (OculusEventSignaler o in oculusSignalers)
-            {
-                o.enabled = vrActive;
-            }
+            //OculusEventSignaler[] oculusSignalers = GetComponentsInChildren<OculusEventSignaler>();
+            //foreach (OculusEventSignaler o in oculusSignalers)
+            //{
+                //o.enabled = vrActive;
+            //}
         }
 
         private void ResetView()
         {
             transform.position = initialPlayerPositon;
-            transform.eulerAngles = initialPlayerRotation;
-            leftEye.position = initialLeftEyePositon;
-            leftEye.eulerAngles = initialLeftEyeRotation;
-            centerEye.position = initialCenterEyePositon;
-            centerEye.eulerAngles = initialCenterEyeRotation;
-            rightEye.position = initialRightEyePositon;
-            rightEye.eulerAngles = initialRightEyeRotation;
-            leftHand.position = initialLeftHandPositon;
-            leftHand.eulerAngles = initialLeftHandRotation;
-            rightHand.position = initialRightHandPositon;
-            rightHand.eulerAngles = initialRightHandRotation;
+
+            //Something is overriding this
+            leftEye.position = Vector3.zero;
+            leftEye.rotation = Quaternion.Euler(0, 0, 0);
+            centerEye.position = Vector3.zero;
+            centerEye.rotation = Quaternion.Euler(0, 0, 0);
+            rightEye.position = Vector3.zero;
+            rightEye.rotation = Quaternion.Euler(0,0,0);
+
+
+            //leftHand.position = initialLeftHandPositon;
+            //leftHand.rotation = initialLeftHandRotation;
+            //rightHand.position = initialRightHandPositon;
+            //rightHand.rotation = initialRightHandRotation;
+            
+            ovrManager.headPoseRelativeOffsetRotation = Vector3.zero;
         }
     }
 }

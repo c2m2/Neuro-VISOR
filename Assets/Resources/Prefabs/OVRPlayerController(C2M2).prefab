@@ -799,7 +799,7 @@ MonoBehaviour:
   localAvatar: {fileID: 1763426731008494305}
   isLeftHand: 1
   staticHand: {fileID: 663461083721551501}
-  clickDistance: 0.01
+  pressDistance: 0.01
 --- !u!1 &1763426730734285159
 GameObject:
   m_ObjectHideFlags: 0
@@ -1455,10 +1455,10 @@ MonoBehaviour:
   RotationRatchet: 45
   SnapRotation: 1
   FixedSpeedSteps: 0
-  HmdResetsY: 1
-  HmdRotatesY: 1
+  HmdResetsY: 0
+  HmdRotatesY: 0
   GravityModifier: 1
-  useProfileData: 1
+  useProfileData: 0
   EnableLinearMovement: 0
   EnableRotation: 0
   RotationEitherThumbstick: 0
@@ -1504,7 +1504,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   opMode: 2
   resetHmdPoseOnRelease: 0
-  resetHmdPoseByMiddleMouseButton: 1
+  resetHmdPoseByMiddleMouseButton: 0
   activateKeys: 3201000031010000
   pitchKeys: 3401000033010000
   slowMoveKeys: 300100002f010000
@@ -1559,6 +1559,9 @@ MonoBehaviour:
   left: 97
   right: 100
   upDown: 308
+  limitPos: 0
+  maxPos: {x: Infinity, y: Infinity, z: Infinity}
+  minPos: {x: -Infinity, y: -Infinity, z: -Infinity}
   speed: 0.01
   relativeTo: {fileID: 663461083721551503}
 --- !u!1 &1763426730964481122
@@ -2056,7 +2059,7 @@ MonoBehaviour:
   localAvatar: {fileID: 1763426731008494305}
   isLeftHand: 0
   staticHand: {fileID: 663461083721551500}
-  clickDistance: 0.01
+  pressDistance: 0.01
 --- !u!1 &1763426731366549414
 GameObject:
   m_ObjectHideFlags: 0
