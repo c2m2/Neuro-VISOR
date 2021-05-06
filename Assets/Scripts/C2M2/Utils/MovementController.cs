@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace C2M2.Utils
@@ -28,6 +27,29 @@ namespace C2M2.Utils
         public bool isMoving { get; private set; } = false;
         public float speed = 0.01f;
         public Transform relativeTo = null;
+
+        public float rotateSpeed = 2.0f;
+
+        private float x = 0.0f;
+        private float y = 0.0f;
+
+        void Update()
+        {
+            if (Input.GetKey(KeyCode.LeftControl))
+            {
+                Cursor.lockState = CursorLockMode.Locked;
+
+                x += rotateSpeed * Input.GetAxis("Mouse X");
+                y -= rotateSpeed * Input.GetAxis("Mouse Y");
+
+                transform.eulerAngles = new Vector3(y, x, 0.0f);
+            }
+            else
+            {
+                Cursor.lockState = CursorLockMode.None;
+            }
+
+        }
 
         private void OnEnable ()
         {

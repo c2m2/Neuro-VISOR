@@ -43,7 +43,6 @@ namespace C2M2.Interaction.VR
 
         private void OnEnable()
         {
-            EnableAvatar(false);
             InitUI(true);
             StartCoroutine(CheckSpeed());
 
@@ -52,7 +51,6 @@ namespace C2M2.Interaction.VR
 
         private void OnDisable()
         {
-            EnableAvatar(true);
             InitUI(false);
             StopCoroutine(CheckSpeed());
 
@@ -68,19 +66,6 @@ namespace C2M2.Interaction.VR
             }
         }
 
-        // Controls OVRAvatar body, head, and hand rendering
-        private void EnableAvatar(bool enable)
-        {
-            OvrAvatar avatar = GetComponentInChildren<OvrAvatar>();
-            if (avatar != null)
-            {
-                avatar.EnableHands = enable;
-                avatar.EnableBody = enable;
-                avatar.EnableBase = enable;
-                avatar.EnableExpressive = enable;
-            }
-
-        }
         private void InitUI(bool enable)
         {
             if (enable) {
