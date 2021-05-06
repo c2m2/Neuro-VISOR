@@ -65,8 +65,6 @@ namespace C2M2.Interaction.VR
 
         private void SwitchState(bool vrActive)
         {
-            Debug.LogError("Mode switch to: " + vrActive);
-
             VRActive = vrActive;
 
             XRSettings.enabled = vrActive; //not sure how this needs to be handled

@@ -20,7 +20,6 @@ namespace C2M2.Interaction.VR
         public float speed = 0.1f;
         public float slowSpeed = 0.025f;
         private MovementController controls = null;
-        private GameObject controlUI;
         private bool SlowMoving
         {
             get
@@ -43,7 +42,6 @@ namespace C2M2.Interaction.VR
 
         private void OnEnable()
         {
-            InitUI(true);
             StartCoroutine(CheckSpeed());
 
             if (controls != null) controls.enabled = true;
@@ -51,7 +49,6 @@ namespace C2M2.Interaction.VR
 
         private void OnDisable()
         {
-            InitUI(false);
             StopCoroutine(CheckSpeed());
 
             if (controls != null) controls.enabled = false;
@@ -66,19 +63,6 @@ namespace C2M2.Interaction.VR
             }
         }
 
-        private void InitUI(bool enable)
-        {
-            if (enable) {
-                controlUI = Instantiate(Resources.Load("Prefabs/ControlOverlay") as GameObject);
-                List<KeyCode> keys = new List<KeyCode>(4);
-                keys.AddRange(slowMoveKeys);
-                keys.AddRange(activateKeys);
-                keys.AddRange(pitchKeys);
-                controlUI.GetComponent<ControlOverlay>().SetActivationKeys(keys.ToArray());
-            }
-            else {
-                if (controlUI != null) Destroy(controlUI);
-            }
-        }
+       
     }
 }

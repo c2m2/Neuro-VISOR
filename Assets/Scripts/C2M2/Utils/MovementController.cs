@@ -1,5 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
+using System.Collections.Generic;
+using C2M2.Interaction.UI;
 
 namespace C2M2.Utils
 {
@@ -8,20 +10,20 @@ namespace C2M2.Utils
     /// </summary>
     public class MovementController : MonoBehaviour
     {
-        public KeyCode forward = KeyCode.W;
-        public KeyCode backward = KeyCode.S;
-        public KeyCode left = KeyCode.A;
-        public KeyCode right = KeyCode.D;
-        public KeyCode upDown = KeyCode.LeftControl;
+        public KeyCode forwardKey = KeyCode.W;
+        public KeyCode backwardKey = KeyCode.S;
+        public KeyCode leftKey = KeyCode.A;
+        public KeyCode rightKey = KeyCode.D;
+        public KeyCode rotationKey = KeyCode.LeftControl;
         public bool limitPos = false;
         public Vector3 maxPos = new Vector3(float.PositiveInfinity, float.PositiveInfinity, float.PositiveInfinity);
         public Vector3 minPos = new Vector3(float.NegativeInfinity, float.NegativeInfinity, float.NegativeInfinity);
 
-        private bool ForwardPress { get { return Input.GetKey(forward); } }
-        private bool BackwardPress { get { return Input.GetKey(backward); } }
-        private bool LeftPress { get { return Input.GetKey(left); } }
-        private bool RightPress { get { return Input.GetKey(right); } }
-        private bool UpDownPress { get { return Input.GetKey(upDown); } }
+        private bool ForwardPress { get { return Input.GetKey(forwardKey); } }
+        private bool BackwardPress { get { return Input.GetKey(backwardKey); } }
+        private bool LeftPress { get { return Input.GetKey(leftKey); } }
+        private bool RightPress { get { return Input.GetKey(rightKey); } }
+        private bool RotationPress { get { return Input.GetKey(rotationKey); } }
 
         private Coroutine moveRoutine = null;
         public bool isMoving { get; private set; } = false;
@@ -33,9 +35,11 @@ namespace C2M2.Utils
         private float x = 0.0f;
         private float y = 0.0f;
 
+        private GameObject controlUI;
+
         void Update()
         {
-            if (Input.GetKey(KeyCode.LeftControl))
+            if (RotationPress)
             {
                 Cursor.lockState = CursorLockMode.Locked;
 
@@ -54,11 +58,13 @@ namespace C2M2.Utils
         private void OnEnable ()
         {
             EnableMovement();
+            InitUI(true);
         }
 
         private void OnDisable()
         {
             DisableMovement();
+            InitUI(false);
         }
 
         public void EnableMovement()
@@ -78,30 +84,38 @@ namespace C2M2.Utils
             while (true)
             {
                 float x = 0f, y = 0f, z = 0f;
-                if (ForwardPress)
-                    if (UpDownPress)
-                        y += speed;             // Move up
-                    else
-                        z += speed;             // Move forward
-                if (BackwardPress)
-                    if (UpDownPress)
-                        y -= speed;             // Move down 
-                    else
-                        z -= speed;             // Move backward
-                if (LeftPress)
-                    x -= speed;                 // Move left
-                if (RightPress)
-                    x += speed;                 // Move right
+                if (ForwardPress) z += speed;             // Move forward
+                if (BackwardPress) z -= speed;            // Move backward
+                if (LeftPress) x -= speed;                // Move left
+                if (RightPress) x += speed;               // Move right
 
-                if (relativeTo == null)
-                    transform.Translate(new Vector3(x, y, z), Space.World);
-                else
-                    transform.Translate(new Vector3(x, y, z), relativeTo);
+                if (relativeTo == null) transform.Translate(new Vector3(x, y, z), Space.World);
+                else transform.Translate(new Vector3(x, y, z), relativeTo);
 
-                if (limitPos) 
-                    transform.position = transform.position.Clamp(minPos, maxPos);
+                if (limitPos) transform.position = transform.position.Clamp(minPos, maxPos);
 
                 yield return new WaitForFixedUpdate();
+            }
+        }
+
+        private void InitUI(bool enable)
+        {
+            if (enable)
+            {
+                controlUI = Instantiate(Resources.Load("Prefabs/ControlOverlay") as GameObject);
+                List<KeyCode> keys = new List<KeyCode>(4)
+                {
+                    forwardKey,
+                    backwardKey,
+                    leftKey,
+                    rightKey,
+                    forwardKey
+                };
+                controlUI.GetComponent<ControlOverlay>().SetActivationKeys(keys.ToArray());
+            }
+            else
+            {
+                if (controlUI != null) Destroy(controlUI);
             }
         }
     }
