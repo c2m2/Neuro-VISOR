@@ -309,7 +309,6 @@ namespace C2M2.NeuronalDynamics.Interaction
         /// </summary>
         public void MonitorInput()
         {
-            ShowClampInfo();
             if (ClampManager.PressedCancel)
             {
                 ResetInput();
@@ -364,7 +363,6 @@ namespace C2M2.NeuronalDynamics.Interaction
 
         public void ResetInput()
         {
-            HideClampInfo();
             CheckInput();
         }
 
