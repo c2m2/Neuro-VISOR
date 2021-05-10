@@ -21,7 +21,7 @@ namespace C2M2.Interaction.VR
         //private OvrAvatar avatar;
 
         private readonly KeyCode switchModeKey = KeyCode.Space;
-        private readonly OVRInput.Button switchModeButton = OVRInput.Button.Any;
+        //private readonly OVRInput.Button switchModeButton = OVRInput.Button.Any;
 
         public bool VRActive { get; set; } = false;
         public bool VRDevicePresent { get { return !VRDevice.Equals(string.Empty); } }
@@ -67,7 +67,7 @@ namespace C2M2.Interaction.VR
         {
             VRActive = vrActive;
 
-            XRSettings.enabled = vrActive; //not sure how this needs to be handled
+            XRSettings.enabled = vrActive;
 
             vrController.SetActive(vrActive);
             desktopController.SetActive(!vrActive);

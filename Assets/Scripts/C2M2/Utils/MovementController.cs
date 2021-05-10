@@ -23,7 +23,8 @@ namespace C2M2.Utils
         private bool BackwardPress { get { return Input.GetKey(backwardKey); } }
         private bool LeftPress { get { return Input.GetKey(leftKey); } }
         private bool RightPress { get { return Input.GetKey(rightKey); } }
-        private bool RotationPress { get { return Input.GetKey(rotationKey); } }
+        private bool ControlPress { get { return Input.GetKey(rotationKey); } }
+        private float ScrollWheel { get { return Input.GetAxis("Mouse ScrollWheel"); } }
 
         private Coroutine moveRoutine = null;
         public bool isMoving { get; private set; } = false;
@@ -39,19 +40,7 @@ namespace C2M2.Utils
 
         void Update()
         {
-            if (RotationPress)
-            {
-                Cursor.lockState = CursorLockMode.Locked;
 
-                x += rotateSpeed * Input.GetAxis("Mouse X");
-                y -= rotateSpeed * Input.GetAxis("Mouse Y");
-
-                transform.eulerAngles = new Vector3(y, x, 0.0f);
-            }
-            else
-            {
-                Cursor.lockState = CursorLockMode.None;
-            }
 
         }
 
@@ -83,14 +72,30 @@ namespace C2M2.Utils
         {
             while (true)
             {
-                float x = 0f, y = 0f, z = 0f;
-                if (ForwardPress) z += speed;             // Move forward
-                if (BackwardPress) z -= speed;            // Move backward
-                if (LeftPress) x -= speed;                // Move left
-                if (RightPress) x += speed;               // Move right
+                float pos_x = 0f, pos_y = 0f, pos_z = 0f;
+                if (ForwardPress) pos_z += speed;             // Move forward
+                if (BackwardPress) pos_z -= speed;            // Move backward
+                if (LeftPress) pos_x -= speed;                // Move left
+                if (RightPress) pos_x += speed;               // Move right
 
-                if (relativeTo == null) transform.Translate(new Vector3(x, y, z), Space.World);
-                else transform.Translate(new Vector3(x, y, z), relativeTo);
+                if (ControlPress)
+                {
+                    Cursor.lockState = CursorLockMode.Locked;
+
+                    x += rotateSpeed * Input.GetAxis("Mouse X");  // Turn left and right
+                    y -= rotateSpeed * Input.GetAxis("Mouse Y");  // Turn up and down
+
+                    transform.eulerAngles = new Vector3(y, x, 0.0f);
+
+                    pos_y = ScrollWheel; // Move up and down
+                }
+                else
+                {
+                    Cursor.lockState = CursorLockMode.None;
+                }
+
+                if (relativeTo == null) transform.Translate(new Vector3(pos_x, pos_y, pos_z), Space.World);
+                else transform.Translate(new Vector3(pos_x, pos_y, pos_z), relativeTo);
 
                 if (limitPos) transform.position = transform.position.Clamp(minPos, maxPos);
 
