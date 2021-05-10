@@ -28,10 +28,10 @@ namespace C2M2.Utils
 
         private Coroutine moveRoutine = null;
         public bool isMoving { get; private set; } = false;
-        public float speed = 0.01f;
+        public float speed = 0.1f;
         public Transform relativeTo = null;
 
-        public float rotateSpeed = 2.0f;
+        public float rotateSpeed = 5.0f;
 
         private float x = 0.0f;
         private float y = 0.0f;

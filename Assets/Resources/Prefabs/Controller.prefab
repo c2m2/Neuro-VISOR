@@ -1828,7 +1828,6 @@ GameObject:
   - component: {fileID: 806130743097329635}
   - component: {fileID: 806130743097329637}
   - component: {fileID: 806130743097329656}
-  - component: {fileID: 806130743097329639}
   m_Layer: 9
   m_Name: DesktopController
   m_TagString: MainCamera
@@ -1913,16 +1912,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 597233ff510da7843934b28b865314c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  forward: 119
-  backward: 115
-  left: 97
-  right: 100
-  upDown: 308
+  forwardKey: 119
+  backwardKey: 115
+  leftKey: 97
+  rightKey: 100
+  rotationKey: 306
   limitPos: 1
   maxPos: {x: 1.5, y: 1.5, z: 1.75}
   minPos: {x: -1.5, y: -1, z: -1.75}
-  speed: 0.01
-  relativeTo: {fileID: 806130743097329634}
+  speed: 0.1
+  relativeTo: {fileID: 0}
+  rotateSpeed: 5
 --- !u!114 &806130743097329656
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1941,26 +1941,6 @@ MonoBehaviour:
     m_Bits: 0
   maxRaycastDistance: 10
   grabKeys: 67000000
---- !u!114 &806130743097329639
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 806130743097329633}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3a8cd0d4978ffb04a86f0208200fb4ce, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  opMode: 1
-  resetHmdPoseOnRelease: 1
-  resetHmdPoseByMiddleMouseButton: 1
-  activateKeys: 3201000031010000
-  pitchKeys: 3401000033010000
-  slowMoveKeys: 300100002f010000
-  speed: 0.1
-  slowSpeed: 0.025
 --- !u!1 &806130743142518289
 GameObject:
   m_ObjectHideFlags: 0
