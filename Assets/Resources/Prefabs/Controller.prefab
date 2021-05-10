@@ -1921,7 +1921,7 @@ MonoBehaviour:
   maxPos: {x: 1.5, y: 1.5, z: 1.75}
   minPos: {x: -1.5, y: -1, z: -1.75}
   speed: 0.1
-  relativeTo: {fileID: 0}
+  relativeTo: {fileID: 806130743097329634}
   rotateSpeed: 5
 --- !u!114 &806130743097329656
 MonoBehaviour:

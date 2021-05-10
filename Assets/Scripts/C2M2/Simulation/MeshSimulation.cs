@@ -159,21 +159,14 @@ namespace C2M2.Simulation
                 defaultRaycastEvent.OnHover.AddListener((hit) =>
                 {
                     rescaler.Rescale();
-                    ShowHoverInfo(hit);
-                });
-                defaultRaycastEvent.OnHoverEnd.AddListener((hit) =>
-                {
-                    HideHoverInfo();
                 });
                 defaultRaycastEvent.OnHoldPress.AddListener((hit) =>
                 {
                     ShiftRaycastValue();
-                    ShowHoverInfo(hit);
                 });
                 defaultRaycastEvent.OnEndPress.AddListener((hit) =>
                 {
                     ResetRaycastHits();
-                    HideHoverInfo();
                 });
 
                 // Instantiate ruler
@@ -184,25 +177,6 @@ namespace C2M2.Simulation
                 rulerObj.transform.eulerAngles = rulerInitRot;
                 rulerObj.name = gameObject.name + "Ruler";
             }
-        }
-
-        /// <summary>
-        /// Shows a popup of voltage and vertex
-        /// </summary>
-        public void ShowHoverInfo(RaycastHit hit)
-        {
-            //hoverInfo.gameObject.SetActive(true);
-            //hoverInfo.vertexText.text = focusVert.ToString();
-            //hoverInfo.clampText.text = (ClampPower * simulation.unitScaler).ToString("G4") + " " + simulation.unit;
-            //hoverInfo.postion = hit.point;
-        }
-
-        /// <summary>
-        /// Hides a popup of voltage and vertex
-        /// </summary>
-        public void HideHoverInfo()
-        {
-            //hoverInfo.gameObject.SetActive(false);
         }
 
         public KeyCode powerModifierPlusKey = KeyCode.UpArrow;

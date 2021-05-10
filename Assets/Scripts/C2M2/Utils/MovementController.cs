@@ -14,7 +14,7 @@ namespace C2M2.Utils
         public KeyCode backwardKey = KeyCode.S;
         public KeyCode leftKey = KeyCode.A;
         public KeyCode rightKey = KeyCode.D;
-        public KeyCode rotationKey = KeyCode.LeftControl;
+        public KeyCode controlKey = KeyCode.LeftControl;
         public bool limitPos = false;
         public Vector3 maxPos = new Vector3(float.PositiveInfinity, float.PositiveInfinity, float.PositiveInfinity);
         public Vector3 minPos = new Vector3(float.NegativeInfinity, float.NegativeInfinity, float.NegativeInfinity);
@@ -23,7 +23,7 @@ namespace C2M2.Utils
         private bool BackwardPress { get { return Input.GetKey(backwardKey); } }
         private bool LeftPress { get { return Input.GetKey(leftKey); } }
         private bool RightPress { get { return Input.GetKey(rightKey); } }
-        private bool ControlPress { get { return Input.GetKey(rotationKey); } }
+        private bool ControlPress { get { return Input.GetKey(controlKey); } }
         private float ScrollWheel { get { return Input.GetAxis("Mouse ScrollWheel"); } }
 
         private Coroutine moveRoutine = null;
@@ -37,12 +37,6 @@ namespace C2M2.Utils
         private float y = 0.0f;
 
         private GameObject controlUI;
-
-        void Update()
-        {
-
-
-        }
 
         private void OnEnable ()
         {
@@ -114,7 +108,7 @@ namespace C2M2.Utils
                     backwardKey,
                     leftKey,
                     rightKey,
-                    forwardKey
+                    controlKey
                 };
                 controlUI.GetComponent<ControlOverlay>().SetActivationKeys(keys.ToArray());
             }
