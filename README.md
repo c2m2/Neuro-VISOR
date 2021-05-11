@@ -82,7 +82,7 @@ A pre-commit hook will block commits made with inappropriate versions of Git, Gi
 
 Make sure that your HMD is set up and that you have gone through the first-time setup. Ideally you have tested several other programs on your headset before using this software.
 
-1. Clone project to any location
+1. Clone project to any location (Downloading as a zip archive has been known to cause unplanned behaviour in this project).
 
 2. Ensure the correct version of the Unity Editor is installed
 
