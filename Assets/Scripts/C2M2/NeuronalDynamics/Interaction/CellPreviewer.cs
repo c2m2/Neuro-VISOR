@@ -67,7 +67,7 @@ namespace C2M2.NeuronalDynamics.Interaction {
                 // Make a preview window for each found geometry
                 Vector3[] windowPositions = GetWindowPositions(geoms.Length);
                 Color32[] previewColors = GetWindowColors(geoms.Length);
-                for (int i = 0; i < geoms.Length; i++)
+                for (int i = 0; i < windowPositions.Length; i++)
                 {
                     InstantiatePreviewWindow(geoms[i], windowPositions[i], previewColors[i]);
                 }
