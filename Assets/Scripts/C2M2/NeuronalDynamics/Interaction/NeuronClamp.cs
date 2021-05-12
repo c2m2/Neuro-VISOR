@@ -48,7 +48,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         public List<GameObject> defaultCapHolders = null;
         public List<GameObject> destroyCapHolders = null;
 
-        public ClampInfo clampInfo = null;
+        public InfoPanel clampInfo = null;
 
         private MeshRenderer mr;
         private Vector3 LocalExtents { get { return transform.localScale / 2; } }
@@ -222,7 +222,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         {
             clampInfo.gameObject.SetActive(true);
             clampInfo.vertexText.text = focusVert.ToString();
-            clampInfo.clampText.text = (ClampPower*simulation.unitScaler).ToString("G4") + " " + simulation.unit;
+            clampInfo.powerText.text = (ClampPower*simulation.unitScaler).ToString("G4") + " " + simulation.unit;
         }
 
         /// <summary>

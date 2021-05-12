@@ -276,7 +276,7 @@ GameObject:
   m_Component:
   - component: {fileID: 9086472247997349709}
   - component: {fileID: 9086472247997349708}
-  - component: {fileID: 230282718587688195}
+  - component: {fileID: 6125331984661468320}
   m_Layer: 5
   m_Name: HoverInfo
   m_TagString: Untagged
@@ -326,7 +326,7 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
---- !u!114 &230282718587688195
+--- !u!114 &6125331984661468320
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -335,11 +335,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 9086472247997349700}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9af0184a3f91eb34c9c1d985f3d857cc, type: 3}
+  m_Script: {fileID: 11500000, guid: 9b28a55bb6add3c478c87f77e05168d2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   vertexText: {fileID: 192494129721363217}
-  clampText: {fileID: 9086472248677096630}
+  powerText: {fileID: 9086472248677096630}
+  GlobalSize: {x: 0.0005, y: 0.0005, z: 0.0005}
 --- !u!1 &9086472248526693393
 GameObject:
   m_ObjectHideFlags: 0

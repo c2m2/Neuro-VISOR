@@ -90,6 +90,10 @@ namespace C2M2.NeuronalDynamics.Simulation {
         public Color32 color1D = Color.yellow;
         public float lineWidth1D = 0.005f;
 
+        private InfoPanel infoPanel = null;
+
+        public GameObject infoPanelPrefab = null;
+
         public GameObject controlPanel = null;
 
         // Need mesh options for each refinement, diameter level
@@ -201,6 +205,23 @@ namespace C2M2.NeuronalDynamics.Simulation {
             }
         }
 
+        void showInfoPanel(bool show, RaycastHit hit)
+        {
+            if (infoPanel == null)
+            {
+                infoPanel = Instantiate(infoPanelPrefab, transform).GetComponent<InfoPanel>();
+            }
+            infoPanel.gameObject.SetActive(show);
+            if(show)
+            {
+                int id = GetNearestPoint(hit);
+                infoPanel.vertexText.text = id.ToString();
+                infoPanel.powerText.text = (vals1D[id] * unitScaler).ToString("G4") + " " + unit;
+                infoPanel.transform.localPosition = Verts1D[id]+ new Vector3(0,2.5f,0); //offset so the popup is not in the middle of the dendrite
+            }
+            
+        }
+
         protected override void PostSolveStep()
         {
             ApplyInteractionVals();
@@ -236,6 +257,24 @@ namespace C2M2.NeuronalDynamics.Simulation {
             }
         }
 
+        protected override void OnAwakePost(Mesh viz)
+        {
+            base.OnAwakePost(viz);
+            infoPanelPrefab = (GameObject)Resources.Load("Prefabs" + Path.DirectorySeparatorChar + "NeuronalDynamics" + Path.DirectorySeparatorChar + "HoverInfo");
+
+            defaultRaycastEvent.OnHover.AddListener((hit) =>
+            {
+                showInfoPanel(true, hit);
+            });
+            defaultRaycastEvent.OnHoverEnd.AddListener((hit) =>
+            {
+                showInfoPanel(false, hit);
+            });
+            defaultRaycastEvent.OnHoldPress.AddListener((hit) =>
+            {
+                showInfoPanel(true, hit);
+            });
+        }
         /// <summary>
         /// Translate 1D vertex values to 3D values and pass them upwards for visualization
         /// </summary>
@@ -348,8 +387,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 gm.transform.parent = transform;
                 graphManager = gm.AddComponent<NDGraphManager>();
                 graphManager.sim = this;
-                
-
 
                 // Instantiate control panel prefab, announce active simulation to buttons
                 controlPanel = Resources.Load ("Prefabs/NeuronalDynamics/ControlPanel/NDControls") as GameObject;        

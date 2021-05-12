@@ -764,7 +764,7 @@ MonoBehaviour:
   - {fileID: 3614039848770375040}
   - {fileID: 5628725828760174139}
   - {fileID: 2193534672486426038}
-  clampInfo: {fileID: 5351590115422812736}
+  clampInfo: {fileID: 5656178515365214000}
   highlightObj: {fileID: 5775996226698500373}
   minHighlightGlobalSize: 0.03333333
 --- !u!114 &1522192095639545717
@@ -1935,15 +1935,15 @@ RectTransform:
     type: 3}
   m_PrefabInstance: {fileID: 1076267546733658128}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &5351590115422812736 stripped
+--- !u!114 &5656178515365214000 stripped
 MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 4948050241293384272, guid: a4e40cc03c7baa44094ae21dbea8f42e,
+  m_CorrespondingSourceObject: {fileID: 4652609592052512544, guid: a4e40cc03c7baa44094ae21dbea8f42e,
     type: 3}
   m_PrefabInstance: {fileID: 1076267546733658128}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9af0184a3f91eb34c9c1d985f3d857cc, type: 3}
+  m_Script: {fileID: 11500000, guid: 9b28a55bb6add3c478c87f77e05168d2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 

@@ -144,6 +144,9 @@ namespace C2M2.Simulation
                     ColorLUT.GlobalMin = globalMin;
                 }
             }
+
+            
+
             void InitInteraction()
             {
                 VRRaycastableMesh raycastable = gameObject.GetComponent<VRRaycastableMesh>();

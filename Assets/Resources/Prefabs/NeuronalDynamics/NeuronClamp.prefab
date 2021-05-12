@@ -331,7 +331,7 @@ MonoBehaviour:
   - {fileID: 5483127028994316193}
   destroyCapHolders:
   - {fileID: 1776878145815968951}
-  clampInfo: {fileID: 7684570058451775353}
+  clampInfo: {fileID: 7971214658265702921}
   highlightObj: {fileID: 7733468709602801279}
   minHighlightGlobalSize: 0.03333333
 --- !u!114 &1525391653058632939
@@ -973,15 +973,15 @@ RectTransform:
     type: 3}
   m_PrefabInstance: {fileID: 3318610567279482153}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &7684570058451775353 stripped
+--- !u!114 &7971214658265702921 stripped
 MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 4948050241293384272, guid: a4e40cc03c7baa44094ae21dbea8f42e,
+  m_CorrespondingSourceObject: {fileID: 4652609592052512544, guid: a4e40cc03c7baa44094ae21dbea8f42e,
     type: 3}
   m_PrefabInstance: {fileID: 3318610567279482153}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9af0184a3f91eb34c9c1d985f3d857cc, type: 3}
+  m_Script: {fileID: 11500000, guid: 9b28a55bb6add3c478c87f77e05168d2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
