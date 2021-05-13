@@ -236,6 +236,9 @@ namespace C2M2.Simulation
             }
         }
 
+        /// <summary>
+        /// Given a raycast hit, find the hit 3D vertices
+        /// </summary>
         public int[] HitToVertices(RaycastHit hit)
         {
             // We will have 3 new index/value pairings

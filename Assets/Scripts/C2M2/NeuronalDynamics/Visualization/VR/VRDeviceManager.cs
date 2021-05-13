@@ -9,8 +9,8 @@ namespace C2M2.Interaction.VR
     /// </summary>
     public class VRDeviceManager : MonoBehaviour
     {
-        public GameObject informationOverlay = null;
-        public GameObject informationDisplayTV = null;
+        public GameObject desktopControlScheme = null;
+        public GameObject vrControlScheme = null;
 
         private GameObject vrController;
         private GameObject desktopController;
@@ -73,8 +73,8 @@ namespace C2M2.Interaction.VR
             desktopController.SetActive(!vrActive);
 
             // Enable information displays
-            if (informationDisplayTV != null) informationDisplayTV.SetActive(vrActive);
-            if (informationOverlay != null) informationOverlay.SetActive(!vrActive);
+            if (vrControlScheme != null) vrControlScheme.SetActive(vrActive);
+            if (desktopControlScheme != null) desktopControlScheme.SetActive(!vrActive);
 
             // Enable controllers
             OculusEventSignaler[] oculusSignalers = GetComponentsInChildren<OculusEventSignaler>();
