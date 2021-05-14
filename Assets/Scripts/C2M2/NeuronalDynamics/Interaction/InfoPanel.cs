@@ -39,7 +39,7 @@ public class InfoPanel : MonoBehaviour
     /// <remarks>
     /// Panel will automatically place itself at this position, and shift itself to the side if requested.
     /// </remarks>
-    public Vector3 FocusPosition
+    public Vector3 FocusLocalPosition
     {
         get { return transform.localPosition; }
         set

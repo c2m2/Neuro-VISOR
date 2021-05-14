@@ -218,9 +218,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 infoPanel.unit = unit;
                 infoPanel.Vertex = id;
                 infoPanel.Power = vals1D[id] * unitScaler;
-                Vector3 offset = new Vector3(0, 2.5f, 0);
-
-                infoPanel.FocusPosition = Verts1D[id] + offset; //offset so the popup is not in the middle of the dendrite
+                infoPanel.FocusLocalPosition = Verts1D[id]; //offset so the popup is not in the middle of the dendrite
             }
             
         }

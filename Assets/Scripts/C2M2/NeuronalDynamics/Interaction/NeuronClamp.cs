@@ -221,8 +221,9 @@ namespace C2M2.NeuronalDynamics.Interaction
         public void ShowClampInfo()
         {
             clampInfo.gameObject.SetActive(true);
-            clampInfo.vertexText.text = focusVert.ToString();
-            clampInfo.powerText.text = (ClampPower*simulation.unitScaler).ToString("G4") + " " + simulation.unit;
+            clampInfo.Vertex = focusVert;
+            clampInfo.Power = ClampPower * simulation.unitScaler;
+            clampInfo.FocusLocalPosition = transform.localPosition;
         }
 
         /// <summary>
