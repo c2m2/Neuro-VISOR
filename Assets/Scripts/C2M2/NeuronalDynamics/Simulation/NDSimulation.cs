@@ -205,7 +205,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
             }
         }
 
-        void showInfoPanel(bool show, RaycastHit hit)
+        void ShowInfoPanel(bool show, RaycastHit hit)
         {
             if (infoPanel == null)
             {
@@ -215,9 +215,12 @@ namespace C2M2.NeuronalDynamics.Simulation {
             if(show)
             {
                 int id = GetNearestPoint(hit);
-                infoPanel.vertexText.text = id.ToString();
-                infoPanel.powerText.text = (vals1D[id] * unitScaler).ToString("G4") + " " + unit;
-                infoPanel.transform.localPosition = Verts1D[id]+ new Vector3(0,2.5f,0); //offset so the popup is not in the middle of the dendrite
+                infoPanel.unit = unit;
+                infoPanel.Vertex = id;
+                infoPanel.Power = vals1D[id] * unitScaler;
+                Vector3 offset = new Vector3(0, 2.5f, 0);
+
+                infoPanel.FocusPosition = Verts1D[id] + offset; //offset so the popup is not in the middle of the dendrite
             }
             
         }
@@ -264,15 +267,15 @@ namespace C2M2.NeuronalDynamics.Simulation {
 
             defaultRaycastEvent.OnHover.AddListener((hit) =>
             {
-                showInfoPanel(true, hit);
+                ShowInfoPanel(true, hit);
             });
             defaultRaycastEvent.OnHoverEnd.AddListener((hit) =>
             {
-                showInfoPanel(false, hit);
+                ShowInfoPanel(false, hit);
             });
             defaultRaycastEvent.OnHoldPress.AddListener((hit) =>
             {
-                showInfoPanel(true, hit);
+                ShowInfoPanel(true, hit);
             });
         }
         /// <summary>
