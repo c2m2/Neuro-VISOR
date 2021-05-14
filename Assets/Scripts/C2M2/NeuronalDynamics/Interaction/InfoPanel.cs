@@ -19,6 +19,20 @@ public class InfoPanel : MonoBehaviour
             vertexText.text = "Vertex " + value.ToString();
         }
     }
+    private int powerPrecisionInt = 2;
+    public int PowerPrecision
+    {
+        get
+        {
+            return powerPrecisionInt;
+        }
+        set
+        {          
+            powerPrecisionInt = Mathf.Clamp(value, 2, 6); ;
+            powerPrecision = "F" + powerPrecisionInt;
+        }
+    }
+    private string powerPrecision = "F2";
     public double Power
     {
         get
@@ -28,7 +42,9 @@ public class InfoPanel : MonoBehaviour
         }
         set
         {
-            powerText.text = string.Format(powerFormat, valueLabel, value.ToString("F4"), unit);
+            if (value < 1 && value > -1) PowerPrecision++;
+            else PowerPrecision--;
+            powerText.text = string.Format(powerFormat, valueLabel, value.ToString(powerPrecision), unit);
         }
     }
     private readonly string powerFormat = "{0} {1} {2}";
