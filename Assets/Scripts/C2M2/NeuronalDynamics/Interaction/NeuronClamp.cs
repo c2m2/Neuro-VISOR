@@ -131,8 +131,8 @@ namespace C2M2.NeuronalDynamics.Interaction
             //Ensures clamp is always at least as wide as tall when Visual Inflation is 1
             float radiusLength = Math.Max(radiusScalingValue, heightScalingValue) * currentVisualizationScale;
 
-            if (somaClamp) transform.parent.localScale = new Vector3(radiusLength, radiusLength, radiusLength);
-            else transform.parent.localScale = new Vector3(radiusLength, radiusLength, heightScalingValue);
+            //if (somaClamp) transform.parent.localScale = new Vector3(radiusLength, radiusLength, radiusLength);
+            transform.parent.localScale = new Vector3(radiusLength, radiusLength, heightScalingValue);
             UpdateHighLightScale(transform.parent.localScale);
         }
 
@@ -147,7 +147,7 @@ namespace C2M2.NeuronalDynamics.Interaction
                 Vector3 tempVector = transform.parent.localScale;
                 tempVector.x *= modifiedScale;
                 tempVector.y *= modifiedScale;
-                if (somaClamp) tempVector.z *= modifiedScale;
+                //if (somaClamp) tempVector.z *= modifiedScale;
                 transform.parent.localScale = tempVector;
                 currentVisualizationScale = newScale;
                 UpdateHighLightScale(transform.parent.localScale);
@@ -268,7 +268,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         {
             focusVert = clampIndex;
 
-            CheckSoma(NodeData);
+            //CheckSoma(NodeData);
             SetScale(NodeData);
             SetRotation(NodeData);
 

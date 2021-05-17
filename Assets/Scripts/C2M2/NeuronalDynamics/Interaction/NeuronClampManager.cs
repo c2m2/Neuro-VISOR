@@ -136,8 +136,8 @@ namespace C2M2.NeuronalDynamics.Interaction
             {
                 // If this vertex is available, instantiate a clamp and attach it to the simulation
                 NeuronClamp clamp;
-                if (Simulation.Neuron.somaIDs.Contains(clampIndex)) clamp = Instantiate(somaClampPrefab, Simulation.transform).GetComponentInChildren<NeuronClamp>();
-                else clamp = Instantiate(clampPrefab, Simulation.transform).GetComponentInChildren<NeuronClamp>();
+                //if (Simulation.Neuron.somaIDs.Contains(clampIndex)) clamp = Instantiate(somaClampPrefab, Simulation.transform).GetComponentInChildren<NeuronClamp>();
+                clamp = Instantiate(clampPrefab, Simulation.transform).GetComponentInChildren<NeuronClamp>();
 
                 clamp.AttachSimulation(Simulation, clampIndex);
 
