@@ -83,3 +83,6 @@ ProjectSettings/LocalProjectVersion.txt
 
 outputVoltage.txt
 timesteps.txt
+
+# Visual Studio Code
+.vscode/

@@ -58,6 +58,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             }catch(Visualization.VRN.CouldNotReadMeshFromVRNArchive e)
             {
                 Debug.LogWarning("Could not read mesh for given refinement level. Removing refinement level from options.");
+                Debug.LogWarning(e);
                 cellPreview.RemoveRefinement(cellPreview.refinement);
                 StartCoroutine(DrawError(increase, errorImgTime));
             }

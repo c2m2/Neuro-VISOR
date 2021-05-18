@@ -19,7 +19,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
 
         // Worldspace position of the vertex
         public Vector3 VertPos { get { return Sim.transform.TransformPoint(Sim.Verts1D[vert]) + Sim.transform.position; } }
-        private RectTransform rt = null;
+        private new RectTransform rt = null;
         // World space size of the graph
         private Vector3 GraphSize { get { return rt.sizeDelta * rt.localScale; } }
 
