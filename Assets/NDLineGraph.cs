@@ -18,7 +18,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
         public bool obeyParentScale = false;
 
         // Worldspace position of the vertex
-        public Vector3 VertPos { get { return Sim.transform.TransformPoint(Sim.Verts1D[vert]) + Sim.transform.position; } }
+        public Vector3 VertPos { get { return Sim.transform.TransformPoint(Sim.Verts1D[vert]); } }
         private new RectTransform rt = null;
         // World space size of the graph
         private Vector3 GraphSize { get { return rt.sizeDelta * rt.localScale; } }
@@ -49,8 +49,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
             InitPointerLines();
 
             //UpdateSize();
-
-            MaxSamples = 300;
+            MaxSamples = 500;
 
             name = "LineGraph(" + Sim.name + ")[vert" + vert + "]";
 
@@ -65,17 +64,18 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
 
             Vector3 GetPanelPos()
             {
+                Debug.Log("Vert position: " + VertPos);
                 Vector3 cameraPos = Camera.main.transform.position;
                 // Vector pointing from camera to cell
                 Vector3 direction = (VertPos - cameraPos);
 
                 // Worldspace size of the graph
-                float newMagnitude = GraphSize.x;
+                float newMagnitude = GraphSize.x / 2;
                 float oldMagnitude = direction.magnitude;
                 float magScale = newMagnitude / oldMagnitude;
 
-                // The panel is placed along a vector pointing from camera to vertex position
-                return new Vector3(direction.x * magScale, VertPos.y - (GraphSize.x / 2), direction.z * magScale) + VertPos;
+                // The panel is placed along a vector pointing from camera to vertex position'
+                return new Vector3(VertPos.x + direction.x * magScale, VertPos.y, VertPos.z + direction.z * magScale);
             }
 
             void InitPointerLines()

@@ -84,13 +84,9 @@ namespace C2M2.Visualization
             }
 
             if (onlyRenderShortestAnchor)
-            {
                 RenderShortestAnchor();
-            }
             else
-            {
                 RenderAllAnchors();
-            }
 
             void RenderAllAnchors()
             {
@@ -98,7 +94,6 @@ namespace C2M2.Visualization
                 for (int i = 0; i < lineRends.Length; i++)
                 {
                     lineRends[i].SetPositions(lines[i]);
-
                 }
             }
             void RenderShortestAnchor()
@@ -117,16 +112,10 @@ namespace C2M2.Visualization
 
                 for (int i = 0; i < lineRends.Length; i++)
                 {
-                    if (i == shortestInd)
-                    {
-                        lineRends[i].enabled = true;
-                        lineRends[i].SetPositions(lines[i]);
-                    }
-                    else
-                    {
-                        lineRends[i].enabled = false;
-                    }
+                    lineRends[i].enabled = false;
                 }
+                lineRends[shortestInd].enabled = true;
+                lineRends[shortestInd].SetPositions(lines[shortestInd]);
             }
         }
     }
