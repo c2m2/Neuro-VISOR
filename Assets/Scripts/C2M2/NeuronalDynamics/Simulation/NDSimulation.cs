@@ -275,6 +275,10 @@ namespace C2M2.NeuronalDynamics.Simulation {
             {
                 ShowInfoPanel(true, hit);
             });
+            defaultRaycastEvent.OnEndPress.AddListener((hit) =>
+            {
+                ShowInfoPanel(false, hit);
+            });
         }
         /// <summary>
         /// Translate 1D vertex values to 3D values and pass them upwards for visualization
