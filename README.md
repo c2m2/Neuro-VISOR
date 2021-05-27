@@ -36,7 +36,7 @@ Neuro-VISOR considers an application in neuroscience: a wire-frame neuron geomet
 
 ## Recommended software
 
-- Unity 2019.4.19f1 (LTS)
+- Unity 2019.4.26f1 (LTS)
 
 - Windows 10 64-bit - This program may be functional on other operating systems, but its performance is not guaranteed. The emulator functions have been tested on Ubuntu 16.04 LTS.
 
