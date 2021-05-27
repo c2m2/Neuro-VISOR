@@ -1,27 +1,15 @@
-# C2M2-VR
+# Neuro-VISOR
 
-## Neuroscience project
+Neuro-VISOR is a project from Temple University's Center for Computational Mathematics and Modeling (C2M2). The overarching long-term vision is to produce novel concepts and software that enable efficient immersed virtual reality (VR) visualization and real-time interaction with simulations of real-world processes described via principled mathematical equations.
 
-C2M2-VR is a project from Temple University's Center for Computational Mathematics and Modeling (C2M2). The overarching long-term vision is to produce novel concepts and software that enable efficient immersed virtual reality (VR) visualization and real-time interaction with simulations of real-world processes described via principled mathematical equations.
+Neuro-VISOR considers an application in neuroscience: a wire-frame neuron geometry file is retrieved from [NeuroMorpho](http://neuromorpho.org/) and a surface mesh is generated from it. This mesh is then visualized in VR, while an efficient numerical method approximates the Hodgkin-Huxley model on the given wire-frame neuron geometry. The simulation, as it is running, is provided to the VR environment in real time, and moreover, the user can interact with and affect the simulation while it is running via several methods outlined [below](#controls).
 
-This specific product [yet to be named] considers an application in neuroscience: a wire-frame neuron geometry file is retrieved from [NeuroMorpho](http://neuromorpho.org/) and a surface mesh is generated from it. This mesh is then visualized in VR, while an efficient numerical method solves (approximately) the Hodgkin-Huxley model on the given wire-frame neuron geometry. The simulation, as it is running, is provided to the VR environment in real time, and moreover, the user can interact with and affect the simulation while it is running via several methods outlined [below](#controls).
-
-# Research Team
-This project is produced at the Center for Computational Mathematics and Modeling (C2M2) at Temple University.
-
-Project lead: Dr. Benjamin Seibold, Dr. Gillian Queisser
-
-Researchers and developers: [Craig Fox](https://github.com/CraigFox0), [Stephan Grein](https://github.com/stephanmg), Bogdan Nagirniak, [James Rosado](https://github.com/jarosado0911), [Jacob Wells](https://github.com/jacobwells97), Noah Williams.
-
-# License
-
-We use a modified version of the GNU LPGL v3. Our license can be found in LICENSE.txt
-
-## Code quality
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/ac2c4122b3174e4a8209ef2e791792b3)](https://www.codacy.com?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=c2m2/virtual-reality&amp;utm_campaign=Badge_Grade)
 [![CodeQL](https://github.com/c2m2/virtual-reality/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/c2m2/virtual-reality/actions/workflows/codeql-analysis.yml)
 
-# Recommended hardware
+# Use Guide
+
+## Recommended hardware
 
 * **Oculus Rift, Rift S, or Quest Head Mounted Display (HMD)** - This project is currently tested on the Oculus Rift S and the Oculus Quest. It was previously developed on the original Rift headset. This project was developed using the Oculus SDK and may or may not work using other HMDs. A list of Oculus-approved computers can be found [here](https://www.oculus.com/rift-s/oculus-ready-pcs/).
 
@@ -47,7 +35,7 @@ We use a modified version of the GNU LPGL v3. Our license can be found in LICENS
 </table>
 
 
-# Recommended software
+## Recommended software
 
 - Unity 2019.4.19f1 (LTS)
 
@@ -61,23 +49,14 @@ We use a modified version of the GNU LPGL v3. Our license can be found in LICENS
 
 - Git LFS version >= 2.10.0
 
-## Cloning this repository
-Git users (versions < 2.23.0) should clone the repository by using
-`git lfs clone` all other should use `git clone`.
-
-For users of older git versions this remedies the problem that every LFS versioned file will ask the user for their password.
+- Note: Git users (versions < 2.23.0) should clone the repository by using `git lfs clone`. All other should use `git clone`. For users of older git versions this remedies the problem that every LFS versioned file will ask the user for their password.
 
 ### Version Consistency
 A pre-commit hook will block commits made with inappropriate versions of Git, Git LFS, or Unity. Users should install the hooks by calling `./install_git_hooks.sh` from the root directory after cloning.
 - git lfs: `git lfs env` in a terminal/console.
 - git: `git --version`
 - Unity: see UnityEditor
-
-## Quick Start Guide
-
-
-# Use Guide
-
+- 
 ## Starting the program
 
 Make sure that your HMD is set up and that you have gone through the first-time setup. Ideally you have tested several other programs on your headset before using this software.
@@ -171,15 +150,25 @@ Within a static build, custom .vrn cell archives can be placed within `virtual-r
 ## Documentation
 Our code is documented [here](https://c2m2.github.io/doxyhtml/index.html)
 
-## Previously developed code
+## Other code
 VR grids are maintained [over here](https://github.com/stephanmg/vr-grids).
 
 Custom attributes which proved useful during development are maintained [here](https://github.com/stephanmg/vr-utils).
 
-Code was previously hosted on [Gitlab](https://gitlab.com/vr-lab-repos). This repo still contains useful code for CUDA, compute shaders, Burst examples, OBJ and VTK handling.
+## License
+
+We use a modified version of the GNU LPGL v3. Our license can be found in LICENSE.txt
+
+## Research Team
+
+This project is produced at the Center for Computational Mathematics and Modeling (C2M2) at Temple University.
+
+Project lead: Dr. Benjamin Seibold, Dr. Gillian Queisser
+
+Researchers and developers: Craig Fox, [Stephan Grein](https://github.com/stephanmg), Bogdan Nagirniak, James Rosado, [Jacob Wells](https://github.com/jacobwells97), Noah Williams.
 
 ## Connect with us
-We have a [blog](https://c2m2vr.wordpress.com/) where we sometimes write about our implementations.
+We have a [blog](https://c2m2vr.wordpress.com/) where we go into finer detail about some of our past and current code solutions. While far from complete, we feel that this blog still has lots of interesting details about the areas of the project that it does cover.
 
 Inquiries about the project can be made to seibold@temple.edu.
 
