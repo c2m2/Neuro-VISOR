@@ -78,7 +78,8 @@ namespace C2M2.NeuronalDynamics.Visualization
             lines = gameObject.AddComponent<LinesRenderer>();
 
             // (line width = scale)
-            lines.Draw(grid, color, 3*scale);
+            //lines.Draw(grid, color, 3*scale);
+            lines.Draw(grid, color, 0.005f);
 
             // Displays file name without file extension
             if (fileNameDisplay != null)
@@ -94,8 +95,10 @@ namespace C2M2.NeuronalDynamics.Visualization
                     + cellSize.z.ToString() + " " + LengthScale + ")";
 
             if (vertLabel != null)
-                vertLabel.text =
-                    "Vertices: " + grid.Mesh.vertexCount;
+            {
+                vertLabel.text = "Vertices: " + grid.Mesh.vertexCount;
+                vertLabel.color = (grid.Mesh.vertexCount > 8000) ? new Color(1, 100f / 255f, 0, 1) : Color.white;
+            }
         }
         public void LoadThisCell(RaycastHit hit)
         {
