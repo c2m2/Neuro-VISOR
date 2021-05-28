@@ -50,12 +50,11 @@ NeuroVISOR considers an application in neuroscience: a wire-frame neuron geometr
 
 - Note: Git users (versions < 2.23.0) should clone the repository by using `git lfs clone`. All other should use `git clone`. For users of older git versions this remedies the problem that every LFS versioned file will ask the user for their password.
 
-### Version Consistency
-A pre-commit hook will block commits made with inappropriate versions of Git, Git LFS, or Unity. Users should install the hooks by calling `./install_git_hooks.sh` from the root directory after cloning.
-- git lfs: `git lfs env` in a terminal/console.
-- git: `git --version`
-- Unity: see UnityEditor
-- 
+- A pre-commit hook will block commits made with inappropriate versions of Git, Git LFS, or Unity. Users should install the hooks by calling `./install_git_hooks.sh` from the root directory after cloning.
+    - git lfs: `git lfs env` in a terminal/console.
+    - git: `git --version`
+    - Unity: see UnityEditor
+
 ## Starting the program
 
 Make sure that your HMD is set up and that you have gone through the first-time setup. Ideally you have tested several other programs on your headset before using this software.
