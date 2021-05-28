@@ -147,7 +147,7 @@ A standalone build for Windows 64-bit can be downloaded from the "Releases" sect
 Within a static build, custom .vrn cell archives can be placed within `virtual-reality_Data\StreamingAssets\NeuronalDynamics\Geometries` to be run within the application.
 
 ## Documentation
-Our code is documented [here](https://c2m2.github.io/doxyhtml/index.html)
+Our code is documented [here](https://c2m2.github.io/doxyhtml/index.html). This documentation is produced using [Doxygen](https://www.doxygen.nl/index.html). The completeness of this documentation is dependent on code commenting, so there may be gaps and imperfections. If you notice issues with this documentation, please report it to jacob.wells@temple.edu.
 
 ## Other code
 VR grids are maintained [over here](https://github.com/stephanmg/vr-grids).
@@ -162,9 +162,9 @@ We use a modified version of the GNU LPGL v3. Our license can be found in LICENS
 
 This project is produced at the Center for Computational Mathematics and Modeling (C2M2) at Temple University.
 
-Project lead: Dr. Benjamin Seibold, Dr. Gillian Queisser
+Project lead: [Dr. Benjamin Seibold](https://github.com/benjaminseibold), Dr. Gillian Queisser
 
-Researchers and developers: Craig Fox, [Stephan Grein](https://github.com/stephanmg), Bogdan Nagirniak, James Rosado, [Jacob Wells](https://github.com/jacobwells97), Noah Williams.
+Researchers and developers: [Craig Fox](https://github.com/CraigFox0)[(LinkedIn)](https://www.linkedin.com/in/craig-fox-738951192/), [Stephan Grein](https://github.com/stephanmg), Bogdan Nagirniak, [James Rosado](https://github.com/jarosado0911)[(LinkedIn)](https://www.linkedin.com/in/rosado-james-3239b2119/), [Jacob Wells](https://github.com/jacobwells97)[(LinkedIn)](https://www.linkedin.com/in/jacob-wells/), Noah Williams.
 
 ## Connect with us
 We have a [blog](https://c2m2vr.wordpress.com/) where we go into finer detail about some of our past and current code solutions. While far from complete, we feel that this blog still has lots of interesting details about the areas of the project that it does cover.
