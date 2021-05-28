@@ -1,8 +1,8 @@
-# Neuro-VISOR
+# NeuroVISOR
 
-Neuro-VISOR is a project from Temple University's Center for Computational Mathematics and Modeling (C2M2). The overarching long-term vision is to produce novel concepts and software that enable efficient immersed virtual reality (VR) visualization and real-time interaction with simulations of real-world processes described via principled mathematical equations.
+NeuroVISOR is a project from Temple University's Center for Computational Mathematics and Modeling (C2M2). The overarching long-term vision is to produce novel concepts and software that enable efficient immersed virtual reality (VR) visualization and real-time interaction with simulations of real-world processes described via principled mathematical equations.
 
-Neuro-VISOR considers an application in neuroscience: a wire-frame neuron geometry file is retrieved from [NeuroMorpho](http://neuromorpho.org/) and a surface mesh is generated from it. This mesh is then visualized in VR, while an efficient numerical method approximates the Hodgkin-Huxley model on the given wire-frame neuron geometry. The simulation, as it is running, is provided to the VR environment in real time, and moreover, the user can interact with and affect the simulation while it is running via several methods outlined [below](#controls).
+NeuroVISOR considers an application in neuroscience: a wire-frame neuron geometry file is retrieved from [NeuroMorpho](http://neuromorpho.org/) and a surface mesh is generated from it. This mesh is then visualized in VR, while an efficient numerical method approximates the Hodgkin-Huxley model on the given wire-frame neuron geometry. The simulation, as it is running, is provided to the VR environment in real time, and moreover, the user can interact with and affect the simulation while it is running via several methods outlined [below](#controls).
 
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/ac2c4122b3174e4a8209ef2e791792b3)](https://www.codacy.com?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=c2m2/virtual-reality&amp;utm_campaign=Badge_Grade)
 
