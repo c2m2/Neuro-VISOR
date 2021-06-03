@@ -7,6 +7,15 @@ using System.Collections.Generic;
 
 namespace C2M2.Utils.DebugUtils
 {
+    /// <summary>
+    /// Gets scripts and other asset dependencies for all scenes.
+    /// </summary>
+    /// <remarks>
+    /// Can be called from the toolbar (Assets/Get All Asset Dependencies),
+    /// or used as a monobehaviour. 
+    /// The menu item will only get dependencies at the moment that it is called.
+    /// The monobehaviour will get all dependencies used at runtime.
+    /// </remarks>
     public class GetAllDependencies : MonoBehaviour
     {
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -47,6 +56,11 @@ namespace C2M2.Utils.DebugUtils
             }
             // Print result
             Debug.Log("All direct and indirect dependencies from all scenes in project:\n\n" + root.ToString());
+        }
+
+        private void Awake()
+        {
+            
         }
 
         /// <summary>
