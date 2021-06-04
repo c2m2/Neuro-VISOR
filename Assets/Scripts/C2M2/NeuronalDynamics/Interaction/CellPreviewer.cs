@@ -202,7 +202,7 @@ namespace C2M2.NeuronalDynamics.Interaction {
                 // Start neuron cell previewer.
                 NeuronCellPreview preview = go.GetComponentInChildren<NeuronCellPreview>();
                 preview.vrnFileName = fileName;
-                preview.color = color;
+                preview.windowColor = color;
                 preview.loader = loader;
                 preview.PreviewCell(fileName, color);
 

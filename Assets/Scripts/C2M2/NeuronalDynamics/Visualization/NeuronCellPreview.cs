@@ -20,11 +20,12 @@ namespace C2M2.NeuronalDynamics.Visualization
     public class NeuronCellPreview : MonoBehaviour
     {
         public string vrnFileName = "null";
-        public Color32 color;
+        public Color32 windowColor;
         public NDSimulationLoader loader = null;
         public TextMeshProUGUI fileNameDisplay;
         public TextMeshProUGUI sizeLabel;
         public TextMeshProUGUI vertLabel;
+        public GameObject cellSizeWarning;
 
         public string LengthScale { get { return loader.lengthScale; } }
         public int refinement = 0;
@@ -34,7 +35,7 @@ namespace C2M2.NeuronalDynamics.Visualization
 
         public void PreviewCell()
         {
-            PreviewCell(vrnFileName, color);
+            PreviewCell(vrnFileName, windowColor);
         }
         public void PreviewCell(string vrnFileName, Color32 color)
         {
@@ -94,11 +95,18 @@ namespace C2M2.NeuronalDynamics.Visualization
                     + cellSize.y.ToString() + ", " 
                     + cellSize.z.ToString() + " " + LengthScale + ")";
 
+
+            bool shouldWarn = grid.Mesh.vertexCount > 8000;
+            Color warnColor = new Color(1, 100f / 255f, 0, 1);
+
             if (vertLabel != null)
             {
                 vertLabel.text = "Vertices: " + grid.Mesh.vertexCount;
-                vertLabel.color = (grid.Mesh.vertexCount > 8000) ? new Color(1, 100f / 255f, 0, 1) : Color.white;
+                vertLabel.color = shouldWarn ? warnColor : Color.white;
             }
+
+            if(cellSizeWarning != null) 
+                cellSizeWarning.SetActive(shouldWarn);
         }
         public void LoadThisCell(RaycastHit hit)
         {
