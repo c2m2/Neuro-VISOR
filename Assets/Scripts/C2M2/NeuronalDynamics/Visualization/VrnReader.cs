@@ -31,7 +31,8 @@ namespace C2M2.NeuronalDynamics.Visualization.VRN
                 this.description = description;
                 this.inflations = inflations;
             }
-        }
+
+        } 
 
         /// <summary>
         /// Stores the 2d geometries by name, inflation (factor), and description
@@ -43,6 +44,7 @@ namespace C2M2.NeuronalDynamics.Visualization.VRN
             public string name;
             public string description;
 
+
             public Geom2d(string inflation, string name, string description)
             {
                 this.inflation = inflation;
@@ -51,17 +53,32 @@ namespace C2M2.NeuronalDynamics.Visualization.VRN
             }
         }
 
+        public struct MetaInfo {
+            public string archive;
+            public string species;
+            public string strain;
+
+            public MetaInfo(string archive, string species, string strain) {
+                this.archive = archive;
+                this.species = species;
+                this.strain = strain;
+            }
+        }
+
         /// <summary>
         /// Stores 1D and associated 2D geometries in the member geom1d
+        /// Additional metadata of the cell is stored in MetaInfo
         /// </summary>
         [Serializable]
         private class Geometry
         {
             public Geom1d[] geom1d;
+            public MetaInfo metaInfos;
 
-            public Geometry(Geom1d[] geom1d)
+            public Geometry(Geom1d[] geom1d, MetaInfo metaInfos)
             {
                 this.geom1d = geom1d;
+                this.metaInfos = metaInfos;
             }
         }
 
@@ -96,6 +113,13 @@ namespace C2M2.NeuronalDynamics.Visualization.VRN
         }
 
         ///<summary>
+        /// Returns the metainfo for the loaded cell geometry
+        /// </summary>
+        public MetaInfo GetMetaInfo() {
+            return geometry.metaInfos;
+        }
+
+        /// <summary>
         /// Print out a list of 1D and 2D geometries contained in .vrn archive
         /// </summary>
         public string List()
