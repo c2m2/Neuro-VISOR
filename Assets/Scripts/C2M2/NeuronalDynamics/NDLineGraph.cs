@@ -64,7 +64,6 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
 
             Vector3 GetPanelPos()
             {
-                Debug.Log("Vert position: " + VertPos);
                 Vector3 cameraPos = Camera.main.transform.position;
                 // Vector pointing from camera to cell
                 Vector3 direction = (VertPos - cameraPos);
@@ -92,8 +91,8 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
 
         public override void AddValue(float x, float y)
         {
-            YMin = Sim.globalMin * Sim.unitScaler;
-            YMax = Sim.globalMax * Sim.unitScaler;
+            YMin = Sim.ColorLUT.GlobalMin * Sim.unitScaler;
+            YMax = Sim.ColorLUT.GlobalMax * Sim.unitScaler;
 
             // Add point to graph
             base.AddValue(x, y);
