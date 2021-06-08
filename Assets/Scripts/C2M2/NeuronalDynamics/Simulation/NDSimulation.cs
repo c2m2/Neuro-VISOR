@@ -17,7 +17,6 @@ using C2M2.NeuronalDynamics.Interaction.UI;
 using C2M2.Interaction;
 using C2M2.Visualization;
 using System.Linq;
-
 namespace C2M2.NeuronalDynamics.Simulation {
 
     /// <summary>
@@ -370,7 +369,8 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 Update2DGrid();
 
                 VisualMesh = Grid2D.Mesh;
-                VisualMesh.Rescale (transform, new Vector3 (4, 4, 4));
+ 
+                VisualMesh.Rescale(transform, new Vector3 (4, 4, 4));
                 VisualMesh.RecalculateNormals ();
 
                 // Pass blownupMesh upwards to MeshSimulation
@@ -385,6 +385,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 Grid geom1D = Mapping.ModelGeometry;
                 GameObject lines1D = gameObject.AddComponent<LinesRenderer> ().Draw (geom1D, color1D, lineWidth1D);
             }
+
             void InitUI ()
             {
                 GameObject gm = new GameObject();

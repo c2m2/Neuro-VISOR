@@ -37,7 +37,7 @@ namespace C2M2.Interaction.Adjacency
         private void CreateAdjacencyList()
         {
             uniqueVertices = GetComponent<UniqueVertices>() ?? gameObject.AddComponent<UniqueVertices>();
-            mesh = GetComponent<MeshFilter>().mesh ?? throw new MeshFilterNotFoundException();
+            mesh = GetComponent<MeshFilter>().mesh;
             vertices = mesh.vertices;
             triangles = mesh.triangles;
             // Each unique vertex will have its own list of nodes
