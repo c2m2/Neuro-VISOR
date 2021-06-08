@@ -1,0 +1,91 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using C2M2.NeuronalDynamics.Simulation;
+
+public class #SCRIPTNAME# : NDSimulation {
+
+	/// <summary>
+    /// Returns a scalar value for each 1D vertex in the cell.
+    /// </summary>
+    /// <remarks>
+    /// This method must be implemented for vizualization to work.
+    /// </remarks>
+    public override double[] Get1DValues()
+    {
+        return null;
+    }
+
+    /// <summary>
+    /// Interaction scripts will use this to set 1D values
+    /// </summary>
+    /// <param name="newValues">
+    /// Each member of the array is a pair with the index of a 1D vertex and a new value for that vertex.
+    /// </param>
+    /// <remarks>
+    /// This method must be implemented for interaction to work
+    /// </remarks>
+    public override void Set1DValues(Tuple<int, double>[] newValues)
+    {
+
+    }
+
+    /// <summary>
+    /// This code will run before solver code.
+    /// </summary>
+    /// <remarks>
+    /// You can use this to initialize variables
+    /// </remarks>
+    protected override void PreSolve()
+    {
+
+    }
+
+    /// <summary>
+    /// Run before SolveStep
+    /// </summary>
+    /// <param name="t"> Current time step </param>
+    /// <remarks>
+    /// This is optional to implement
+    /// </remarks>
+    protected override void PreSolveStep(int t) 
+    { 
+
+    }
+
+    /// <summary>
+    /// This will be run Simulation.nT times.
+    /// </summary>
+    /// <param name="t"> Current time step. </param>
+    /// <remarks>
+    /// Use this method to update simulation values
+    /// </remarks>
+    protected override void SolveStep(int t)
+    {
+
+    }
+
+    /// <summary>
+    /// Run after SolveStep
+    /// </summary>
+    /// <param name="t"> Current time step </param>
+    /// <remarks>
+    /// This is optional to implement
+    /// </remarks>
+    protected override void PostSolveStep(int t)
+    {
+        base.PostSolveStep(t);
+    }
+
+    /// <summary>
+    /// Run after Solve() completes.
+    /// </summary>
+    /// <remarks>
+    /// Use this for clean up and printing results
+    /// </remarks>
+    protected override void PostSolve()
+    {
+        base.PostSolve();
+    }
+}

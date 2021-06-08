@@ -223,7 +223,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
             
         }
 
-        protected override void PostSolveStep()
+        protected override void PostSolveStep(int t)
         {
             ApplyInteractionVals();
             void ApplyInteractionVals()
