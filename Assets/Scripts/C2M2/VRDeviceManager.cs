@@ -35,8 +35,6 @@ namespace C2M2.Interaction.VR
             vrCameras = vrController.GetComponentsInChildren<Camera>();
             desktopCamera = desktopController.GetComponent<Camera>();
 
-            //avatar = GetComponentInChildren<OvrAvatar>();
-
             CheckForVRDevice();
 
             SwitchState(VRDevicePresent);
@@ -46,12 +44,6 @@ namespace C2M2.Interaction.VR
         {
             if (Input.GetKeyDown(switchModeKey) && VRActive) SwitchState(false);
             else if (Input.GetKeyDown(switchModeKey) && VRDevicePresent) SwitchState(true);
-            //else if (!VRActive && OVRInput.Get(switchModeButton))
-            //{
-                //if (!VRDevicePresent) CheckForVRDevice();
-                //if (VRDevicePresent) SwitchState(true);
-                //else Debug.LogError("No VR Device Present");
-            //}
         }
 
         private void CheckForVRDevice()
@@ -82,15 +74,6 @@ namespace C2M2.Interaction.VR
             {
                 o.enabled = vrActive;
             }
-
-            // Enable avatar
-            //if (avatar != null)
-            //{
-                //avatar.EnableHands = vrActive;
-                //avatar.EnableBody = vrActive;
-                //avatar.EnableBase = vrActive;
-                //avatar.EnableExpressive = vrActive;
-            //}
 
             // Enable proper cameras
             foreach (Camera cam in vrCameras)

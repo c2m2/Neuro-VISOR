@@ -36,20 +36,6 @@ namespace C2M2.Utils
         private float x = 0.0f;
         private float y = 0.0f;
 
-        private GameObject controlUI;
-
-        private void OnEnable ()
-        {
-            EnableMovement();
-            InitUI(true);
-        }
-
-        private void OnDisable()
-        {
-            DisableMovement();
-            InitUI(false);
-        }
-
         public void EnableMovement()
         {
             moveRoutine = StartCoroutine(Movement());
@@ -97,25 +83,14 @@ namespace C2M2.Utils
             }
         }
 
-        private void InitUI(bool enable)
+        private void OnEnable()
         {
-            if (enable)
-            {
-                controlUI = Instantiate(Resources.Load("Prefabs/ControlOverlay") as GameObject);
-                List<KeyCode> keys = new List<KeyCode>(4)
-                {
-                    forwardKey,
-                    backwardKey,
-                    leftKey,
-                    rightKey,
-                    controlKey
-                };
-                controlUI.GetComponent<ControlOverlay>().SetActivationKeys(keys.ToArray());
-            }
-            else
-            {
-                if (controlUI != null) Destroy(controlUI);
-            }
+            EnableMovement();
+        }
+
+        private void OnDisable()
+        {
+            DisableMovement();
         }
     }
 }
