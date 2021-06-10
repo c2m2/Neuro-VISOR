@@ -54,13 +54,17 @@ namespace C2M2.NeuronalDynamics.UGX
         public Vector3 Start { get; }
         public Vector3 End { get; }
         public Double Lambda { get; }
+
+        public int? StartIndex { get; }
+
+        public int? EndIndex { get; }
         /// <summary>
         /// MappingData 
         /// </summary>
         /// <param name="start">From vertex</param>
         /// <param name="end">To vertex</param>
         /// <param name="lambda">Interpolation parameter</param>
-        public MappingData(in Vector3 start, in Vector3 end, in Double lambda) => (Start, End, Lambda) = (start, end, lambda);
+        public MappingData(in Vector3 start, in Vector3 end, in Double lambda, in int? startIndex, in int? endIndex) => (Start, End, Lambda, StartIndex, EndIndex) = (start, end, lambda, startIndex, endIndex);
     }
     /// SynapseData
     /// <summary>

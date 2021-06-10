@@ -23,7 +23,7 @@ namespace C2M2.NeuronalDynamics.UGX {
     /// </summary>
     /// Methods provided below will allow to read in UGX grids into Unity Meshes with additional / arbitrary attachment data
     public static class UGXReader {
-        private static readonly byte MAPPING_FIELDS = 7;
+        private static readonly byte MAPPING_FIELDS = 9; // Include now the direct indices of each 3d vertex wrt 1d mesh vertices
         private static readonly string XSD_SCHEMA = @Application.streamingAssetsPath + Path.DirectorySeparatorChar + "ugx.xsd";
         //private static readonly string UGX_EXTENSION = ".ugx";
         public static Boolean Validate = false;
@@ -255,22 +255,36 @@ namespace C2M2.NeuronalDynamics.UGX {
                                 //////////////////////////////////////////////////////////////////////////////////////////
                                 if (name.Value == "npMapping") {
                                     if (grid.HasVertexAttachment<MappingAttachment> ()) {
+
+                                        /// get the mapping data
                                         float[] mappings = Array.ConvertAll (element.Value.Split (' '), float.Parse);
-                                        int size = mappings.Length / MAPPING_FIELDS;
+
+                                        /// Check for legacy format
+                                        bool legacyFormat =  false;
+                                        if ( (mappings.Length % MAPPING_FIELDS != 0) && ( mappings.Length % (MAPPING_FIELDS-2) != 0)) {
+                                            Debug.LogError ("Mapping vertex attachment (npMapping) not in any supported mapping format.");
+                                            return;
+                                            if (mappings.Length % MAPPING_FIELDS != 0) {
+                                                Debug.Log( "Using legacy mapping format (might be slow for large geometries).");
+                                            }
+                                        }
+
+                                        /// Set correct number of expected fields
+                                        int numberOfFields = mappings.Length % MAPPING_FIELDS != 0 ? 7 : MAPPING_FIELDS;
+
+                                        /// determine total number of mapping data available (one piece of data for each vertex)
+                                        int size = mappings.Length / numberOfFields;
                                         VertexAttachementAccessor<MappingData> accessor =
                                             new VertexAttachementAccessor<MappingData> (grid, size, new MappingData ());
 
-                                        if (mappings.Length % MAPPING_FIELDS != 0) {
-                                            Debug.LogError ("Mapping vertex attachment (npMapping) not in correct format.");
-                                        }
-
+                                        /// finally populate the mapping data vertex attachment accessor for Unity
                                         for (int i = 0; i < size; i++) {
                                             accessor[i] = new MappingData (
-                                                new Vector3 (mappings[i * MAPPING_FIELDS], mappings[(i * MAPPING_FIELDS) + 1],
-                                                    mappings[(i * MAPPING_FIELDS) + 2]),
-                                                new Vector3 (mappings[(i * MAPPING_FIELDS) + 3], mappings[(i * MAPPING_FIELDS) + 4],
-                                                    mappings[(i * MAPPING_FIELDS) + 5]),
-                                                mappings[(i * MAPPING_FIELDS) + 6]
+                                                new Vector3 (mappings[i * numberOfFields], mappings[(i * numberOfFields) + 1],
+                                                    mappings[(i * numberOfFields) + 2]),
+                                                new Vector3 (mappings[(i * numberOfFields) + 3], mappings[(i * numberOfFields) + 4],
+                                                    mappings[(i * numberOfFields) + 5]),
+                                                mappings[(i * numberOfFields) + 6], (int) mappings.ElementAtOrDefault(8), (int) mappings.ElementAtOrDefault(9)
                                             );
                                         }
                                     }
