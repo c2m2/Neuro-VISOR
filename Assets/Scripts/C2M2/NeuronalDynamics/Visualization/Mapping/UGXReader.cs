@@ -293,8 +293,9 @@ namespace C2M2.NeuronalDynamics.UGX {
                                 if ("defSH".Equals (element.Attribute ("name").Value)) {
                                     foreach (XElement el in element.Elements ().Where (el => HasValue ("name", el))) {
                                         String subsetName = el.Attribute ("name").Value;
-                                        /// We ignore subsets with name defSub and zero vertices. These should never be contained in a valid .ugx file.
-                                        if (subsetName.Equals ("defSub") && IsEmpty (subsetName, el)) {
+                                        /// We ignore subsets with name defSub and zero vertices and empty subsets. 
+                                        /// These should never be contained in a valid .ugx file. 
+                                        if (subsetName.Equals ("defSub") && IsEmpty (subsetName, el) || IsEmpty(subsetName, el)) {
                                             UnityEngine.Debug.Log (@"Subsets with name defSub (And 0 vertices) are ignored.
                                             Make sure your input geometry (.ugx) is consistent and does not contain empty subsets");
                                             continue;
