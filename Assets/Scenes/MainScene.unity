@@ -5299,6 +5299,21 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 806130742410350238, guid: b8e32f33023aba348a3a271448030708,
+        type: 3}
+      propertyPath: EnableExpressive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 806130742414835212, guid: b8e32f33023aba348a3a271448030708,
+        type: 3}
+      propertyPath: m_Height
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 806130742527054365, guid: b8e32f33023aba348a3a271448030708,
+        type: 3}
+      propertyPath: useProfileData
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 806130743097329634, guid: b8e32f33023aba348a3a271448030708,
         type: 3}
       propertyPath: m_LocalPosition.x
