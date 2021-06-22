@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 using C2M2.Interaction.VR;
-namespace C2M2.Interaction.Signaling
+namespace C2M2.Interaction
 {
     public class MouseEventSignaler : RaycastEventSignaler
     {

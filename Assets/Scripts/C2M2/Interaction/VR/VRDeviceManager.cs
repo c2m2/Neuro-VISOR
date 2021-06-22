@@ -3,7 +3,6 @@ using UnityEngine.XR;
 
 namespace C2M2.Interaction.VR
 {
-    using Interaction.Signaling;
     /// <summary>
     /// Handles switching between VR and emulator modes
     /// </summary>

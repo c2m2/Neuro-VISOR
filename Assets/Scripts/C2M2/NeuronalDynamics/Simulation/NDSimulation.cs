@@ -14,7 +14,7 @@ using Grid = C2M2.NeuronalDynamics.UGX.Grid;
 using C2M2.NeuronalDynamics.Visualization.VRN;
 using C2M2.NeuronalDynamics.Interaction;
 using C2M2.NeuronalDynamics.Interaction.UI;
-using C2M2.Interaction;
+using C2M2.Interaction.UI;
 using C2M2.Visualization;
 using System.Linq;
 namespace C2M2.NeuronalDynamics.Simulation {
