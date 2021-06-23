@@ -58,7 +58,8 @@ namespace C2M2.NeuronalDynamics.Visualization.VRN
             public string SPECIES;
             public string STRAIN;
 
-            public MetaInfo(string archive, string species, string strain) {
+            public MetaInfo(string archive, string species, string strain)
+            {
                 this.ARCHIVE = archive;
                 this.SPECIES = species;
                 this.STRAIN = strain;
@@ -80,6 +81,9 @@ namespace C2M2.NeuronalDynamics.Visualization.VRN
             public Geometry(Geom1d[] geom1d, string ARCHIVE, string SPECIES, string STRAIN)
             {
                 this.geom1d = geom1d;
+                this.ARCHIVE = ARCHIVE;
+                this.SPECIES = SPECIES;
+                this.STRAIN = STRAIN;
             }
         }
 
@@ -118,7 +122,8 @@ namespace C2M2.NeuronalDynamics.Visualization.VRN
         ///<summary>
         /// Returns the metainfo for the loaded cell geometry
         /// </summary>
-        public MetaInfo? GetMetaInfo() {
+        public MetaInfo? GetMetaInfo()
+        {
             return metaInfo;
         }
 
