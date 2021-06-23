@@ -31,7 +31,8 @@ namespace C2M2.NeuronalDynamics.Visualization.VRN
                 this.description = description;
                 this.inflations = inflations;
             }
-        }
+
+        } 
 
         /// <summary>
         /// Stores the 2d geometries by name, inflation (factor), and description
@@ -43,6 +44,7 @@ namespace C2M2.NeuronalDynamics.Visualization.VRN
             public string name;
             public string description;
 
+
             public Geom2d(string inflation, string name, string description)
             {
                 this.inflation = inflation;
@@ -51,15 +53,31 @@ namespace C2M2.NeuronalDynamics.Visualization.VRN
             }
         }
 
+        public struct MetaInfo {
+            public string ARCHIVE;
+            public string SPECIES;
+            public string STRAIN;
+
+            public MetaInfo(string archive, string species, string strain) {
+                this.ARCHIVE = archive;
+                this.SPECIES = species;
+                this.STRAIN = strain;
+            }
+        }
+
         /// <summary>
         /// Stores 1D and associated 2D geometries in the member geom1d
+        /// Additional metadata of the cell is stored in MetaInfo
         /// </summary>
         [Serializable]
         private class Geometry
         {
             public Geom1d[] geom1d;
+            public string ARCHIVE;
+            public string STRAIN;
+            public string SPECIES;
 
-            public Geometry(Geom1d[] geom1d)
+            public Geometry(Geom1d[] geom1d, string ARCHIVE, string SPECIES, string STRAIN)
             {
                 this.geom1d = geom1d;
             }
@@ -67,6 +85,7 @@ namespace C2M2.NeuronalDynamics.Visualization.VRN
 
         private readonly string fileName;
         private Geometry geometry;
+        private MetaInfo metaInfo;
         private Boolean loaded;
 
         /// LOAD
@@ -91,11 +110,19 @@ namespace C2M2.NeuronalDynamics.Visualization.VRN
                         throw new CouldNotReadMeshFromVRNArchive(nameof(file));
                     geometry = JsonUtility.FromJson<Geometry>(new StreamReader(file.Open()).ReadToEnd());
                     loaded = true;
+                    metaInfo = new MetaInfo(geometry.ARCHIVE, geometry.SPECIES, geometry.STRAIN);
                 }
             }
         }
 
         ///<summary>
+        /// Returns the metainfo for the loaded cell geometry
+        /// </summary>
+        public MetaInfo? GetMetaInfo() {
+            return metaInfo;
+        }
+
+        /// <summary>
         /// Print out a list of 1D and 2D geometries contained in .vrn archive
         /// </summary>
         public string List()
