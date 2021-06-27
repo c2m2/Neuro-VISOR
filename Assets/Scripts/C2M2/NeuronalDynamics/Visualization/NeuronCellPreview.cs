@@ -25,6 +25,9 @@ namespace C2M2.NeuronalDynamics.Visualization
         public TextMeshProUGUI fileNameDisplay;
         public TextMeshProUGUI sizeLabel;
         public TextMeshProUGUI vertLabel;
+        public TextMeshProUGUI speciesLabel;
+        public TextMeshProUGUI strainLabel;
+        public TextMeshProUGUI archiveLabel;
         public GameObject cellSizeWarning;
 
         public string LengthScale { get { return loader.lengthScale; } }
@@ -86,27 +89,56 @@ namespace C2M2.NeuronalDynamics.Visualization
             if (fileNameDisplay != null)
                 fileNameDisplay.text = vrnFileName.Remove(vrnFileName.LastIndexOf('.'));
 
-            // Draw scale labels
-            Vector3 cellSize = grid.Mesh.bounds.size;
-            if (sizeLabel != null)
-                sizeLabel.text = 
-                    "Size: ("
-                    + cellSize.x.ToString() + ", "
-                    + cellSize.y.ToString() + ", " 
-                    + cellSize.z.ToString() + " " + LengthScale + ")";
+            FillLabels();
 
-
-            bool shouldWarn = grid.Mesh.vertexCount > 8000;
-            Color warnColor = new Color(1, 100f / 255f, 0, 1);
-
-            if (vertLabel != null)
+            void FillLabels()
             {
-                vertLabel.text = "Vertices: " + grid.Mesh.vertexCount;
-                vertLabel.color = shouldWarn ? warnColor : Color.white;
-            }
+                // Draw scale labels
+                Vector3 cellSize = grid.Mesh.bounds.size;
+                if (sizeLabel != null)
+                    sizeLabel.text =
+                        "Size: ("
+                        + cellSize.x.ToString() + ", "
+                        + cellSize.y.ToString() + ", "
+                        + cellSize.z.ToString() + " " + LengthScale + ")";
 
-            if(cellSizeWarning != null) 
-                cellSizeWarning.SetActive(shouldWarn);
+
+                bool shouldWarn = grid.Mesh.vertexCount > 8000;
+                Color warnColor = new Color(1, 100f / 255f, 0, 1);
+
+                if (vertLabel != null)
+                {
+                    vertLabel.text = "Vertices: " + grid.Mesh.vertexCount;
+                    vertLabel.color = shouldWarn ? warnColor : Color.white;
+                }
+
+                if (cellSizeWarning != null)
+                    cellSizeWarning.SetActive(shouldWarn);
+
+                VrnReader.MetaInfo metaInfo = (VrnReader.MetaInfo)vrnReader.GetMetaInfo();
+
+                string species = "Missing";
+                string strain = "Missing";
+                string archive = "Missing";
+
+                // If the metainfo object exists
+                if (!metaInfo.Equals(default(VrnReader.MetaInfo)))
+                {
+                    // If the information given is not empty, retrieve it
+                    if (!metaInfo.SPECIES.Equals(string.Empty)) species = metaInfo.SPECIES;
+                    if (!metaInfo.STRAIN.Equals(string.Empty)) strain = metaInfo.STRAIN;
+                    if (!metaInfo.ARCHIVE.Equals(string.Empty)) archive = metaInfo.ARCHIVE;
+                }
+
+                // Capitalizes the first letter of each label
+                species = char.ToUpper(species[0]) + species.Substring(1).ToLower();
+                strain = char.ToUpper(strain[0]) + strain.Substring(1).ToLower();
+                archive = char.ToUpper(archive[0]) + archive.Substring(1).ToLower();
+
+                if (speciesLabel != null) speciesLabel.text = "Species: " + species;
+                if(strainLabel != null) strainLabel.text = "Strain: " + strain;
+                if(archiveLabel != null) archiveLabel.text = "Archive: " + archive;
+            }
         }
         public void LoadThisCell(RaycastHit hit)
         {

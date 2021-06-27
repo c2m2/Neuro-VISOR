@@ -110,15 +110,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
                     if (!vrnFileName.EndsWith(".vrn")) vrnFileName = vrnFileName + ".vrn";
                     vrnReader = new VrnReader(Application.streamingAssetsPath + sl + "NeuronalDynamics" + sl + "Geometries" + sl + vrnFileName);
                 }
-
-                VrnReader.MetaInfo metaInfo = (VrnReader.MetaInfo)vrnReader.GetMetaInfo();
-                string s =
-                    "ARCHIVE: [" + metaInfo.ARCHIVE
-                    + "]\nSPECIES: [" + metaInfo.SPECIES
-                    + "]\nSTRAIN: [" + metaInfo.STRAIN + "]";
-                Debug.Log(s);
-
-
                 return vrnReader;
             }
             set { vrnReader = value; }
