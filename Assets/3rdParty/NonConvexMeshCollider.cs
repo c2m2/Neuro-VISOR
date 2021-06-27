@@ -48,7 +48,7 @@ public static class NonConvexMeshCollider
 
         // Find MeshFilter & mesh
         MeshFilter mf = go.GetComponent<MeshFilter>();
-        if (mf == null) throw new MeshFilterNotFoundException();
+        if (mf == null) Debug.LogError("No MeshFilter found.");
         if (mf.sharedMesh == null) throw new MeshNotFoundException();
 
         // Find RigidBody & store its settings

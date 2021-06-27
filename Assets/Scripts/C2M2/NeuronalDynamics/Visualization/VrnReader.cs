@@ -170,7 +170,7 @@ namespace C2M2.NeuronalDynamics.Visualization.VRN
             {
                 var file = archive.GetEntry(meshName);
                 _ = file ??
-                    throw new CouldNotReadMeshFromVRNArchive(nameof(file));
+                    throw new CouldNotReadMeshFromVRNArchive(this.fileName);
                 using (var stream = file.Open())
                 {
                     UGXReader.ReadUGX(stream, ref grid);

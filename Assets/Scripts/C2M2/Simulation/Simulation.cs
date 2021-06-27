@@ -69,6 +69,16 @@ namespace C2M2.Simulation
         /// </remarks>
         protected abstract void SolveStep(int t);
 
+        /// <summary>
+        /// PreSolveStep is called once per simulation frame, before SolveStep() 
+        /// </summary>
+        protected virtual void PreSolveStep(int t) { }
+
+        /// <summary>
+        /// PostSolveStep is called once per simulation frame, after SolveStep() 
+        /// </summary>
+        protected virtual void PostSolveStep(int t) { }
+
         #region Unity Methods
         public void Initialize()
         {
@@ -182,13 +192,13 @@ namespace C2M2.Simulation
                 // mutex guarantees mutual exclusion over simulation values
                 mutex.WaitOne();
 
-                PreSolveStep();
+                PreSolveStep(time);
 
                 solveStepSampler.Begin();
                 SolveStep(time);
                 solveStepSampler.End();
 
-                PostSolveStep();
+                PostSolveStep(time);
 
                 mutex.ReleaseMutex();
             }
@@ -201,15 +211,6 @@ namespace C2M2.Simulation
 
         public sealed override float GetSimulationTime() => time * (float)timeStep;
 
-        /// <summary>
-        /// PreSolveStep is called once per simulation frame, before SolveStep() 
-        /// </summary>
-        protected virtual void PreSolveStep() { }
-
-        /// <summary>
-        /// PostSolveStep is called once per simulation frame, after SolveStep() 
-        /// </summary>
-        protected virtual void PostSolveStep() { }
         /// <summary>
         /// Called on the main thread before the Solve thread is launched
         /// </summary>

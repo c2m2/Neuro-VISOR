@@ -2,6 +2,7 @@
 using UnityEngine;
 using C2M2.NeuronalDynamics.Simulation;
 using C2M2.NeuronalDynamics.UGX;
+using C2M2.Interaction.UI;
 using C2M2.Visualization;
 using Math = C2M2.Utils.Math;
 using System.Linq;
