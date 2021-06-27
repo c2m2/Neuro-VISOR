@@ -99,7 +99,10 @@ namespace C2M2.NeuronalDynamics.Simulation {
         [Tooltip("Name of the vrn file within Assets/StreamingAssets/NeuronalDynamics/Geometries")]
         public string vrnFileName = "test.vrn";
         private VrnReader vrnReader = null;
-        private VrnReader VrnReader
+        /// <summary>
+        /// Used to read cell data from .vrn archives
+        /// </summary>
+        public VrnReader VrnReader
         {
             get
             {
@@ -111,8 +114,12 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 }
                 return vrnReader;
             }
-            set { vrnReader = value; }
+            private set { vrnReader = value; }
         }
+        /// <summary>
+        /// Includes info like cell species, strain, and archive
+        /// </summary>
+        public VrnReader.MetaInfo MetaInfo { get { return (VrnReader.MetaInfo)vrnReader.GetMetaInfo(); } }
 
         private Grid grid1D = null;
         public Grid Grid1D

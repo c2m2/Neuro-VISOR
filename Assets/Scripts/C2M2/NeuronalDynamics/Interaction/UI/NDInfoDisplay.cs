@@ -76,10 +76,33 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
         void Start()
         {
             string name = Sim.vrnFileName;
+            var metaInfo = Sim.MetaInfo;
+            
             if (name.EndsWith(".vrn")) name = name.Substring(0, name.LastIndexOf(".vrn"));
             cellName.text = "Cell: " + name;
 
+            string species = "Missing";
+            string strain = "Missing";
+            string archive = "Missing";
+
+            // If the metainfo object exists
+            if (!metaInfo.Equals(default(Visualization.VRN.VrnReader.MetaInfo)))
+            {
+                // If the information given is not empty, retrieve it
+                if (!metaInfo.SPECIES.Equals(string.Empty)) species = metaInfo.SPECIES;
+                if (!metaInfo.STRAIN.Equals(string.Empty)) strain = metaInfo.STRAIN;
+                if (!metaInfo.ARCHIVE.Equals(string.Empty)) archive = metaInfo.ARCHIVE;
+            }
+
+            // Capitalizes the first letter of each label
+            species = char.ToUpper(species[0]) + species.Substring(1).ToLower();
+            strain = char.ToUpper(strain[0]) + strain.Substring(1).ToLower();
+            archive = char.ToUpper(archive[0]) + archive.Substring(1).ToLower();
+
             text.text = "Cell: " + name
+                + "\nSpecies: " + species
+                + "\nStrain: " + strain
+                + "\nArchive: " + archive
                 + "\nRefinement: " + Sim.RefinementLevel
                 + "\n1D V: " + Sim.Grid1D.Mesh.vertexCount.ToString()
                 + ", E: " + Sim.Grid1D.Edges.Count

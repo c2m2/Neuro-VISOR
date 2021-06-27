@@ -9,7 +9,7 @@ using Grid = C2M2.NeuronalDynamics.UGX.Grid;
 
 namespace C2M2.NeuronalDynamics.Visualization.VRN
 {
-    sealed class VrnReader
+    public class VrnReader
     {
 
         /// <summary>
