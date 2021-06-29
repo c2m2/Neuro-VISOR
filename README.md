@@ -11,6 +11,18 @@ The Neuro-VISOR software can be run in a VR version (currently only for Oculus),
 
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/ac2c4122b3174e4a8209ef2e791792b3)](https://www.codacy.com?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=c2m2/virtual-reality&amp;utm_campaign=Badge_Grade)
 
+## License
+
+We use a modified version of the GNU LPGL v3. Our license can be found in LICENSE.txt
+
+## Research Team
+
+This project is produced at the Center for Computational Mathematics and Modeling (C2M2) at Temple University.
+
+Project lead: [Dr. Benjamin Seibold](https://github.com/benjaminseibold), Dr. Gillian Queisser
+
+Researchers and developers: [Craig Fox](https://github.com/CraigFox0) [(in)](https://www.linkedin.com/in/craig-fox-738951192/), [Stephan Grein](https://github.com/stephanmg) [(in)](https://www.linkedin.com/in/stephan-grein-8520ba101/), Bogdan Nagirniak, [James Rosado](https://github.com/jarosado0911) [(in)](https://www.linkedin.com/in/rosado-james-3239b2119/), [Jacob Wells](https://github.com/jacobwells97) [(in)](https://www.linkedin.com/in/jacob-wells/), Noah Williams.
+
 # Use Guide
 
 ## Recommended hardware
@@ -78,6 +90,19 @@ Make sure that your HMD is set up and that you have gone through the first-time 
 
 7. Our control scheme is outlined [below](#controls). Try moving around and looking at your hands.
 
+## Builds
+A standalone build for Windows 64-bit can be downloaded from the "Releases" section. Standalone builds can be run as executable files without the need for the Unity editor and will improve performance. Builds can be made by anybody with the Unity project, but we have made "approved" builds with relevant build information.
+
+Within a static build, custom .vrn cell archives can be placed within `virtual-reality_Data\StreamingAssets\NeuronalDynamics\Geometries` to be run within the application.
+
+## Documentation
+Our code is documented [here](https://c2m2.github.io/doxyhtml/index.html). This documentation is produced using [Doxygen](https://www.doxygen.nl/index.html). The completeness of this documentation is dependent on code commenting, so there may be gaps and imperfections. If you notice issues with this documentation, please report it to jacob.wells@temple.edu.
+
+## Other code
+VR grids are maintained [over here](https://github.com/stephanmg/vr-grids).
+
+Custom attributes which proved useful during development are maintained [here](https://github.com/stephanmg/vr-utils).
+
 ## Controls
 Oculus touch controller naming conventions can be found [here](https://docs.unity3d.com/2019.2/Documentation/Manual/OculusControllers.html). An instructional video demonstrating the controls can be found [here](https://drive.google.com/file/d/1tWS7FYvMIaawStV07K7PyEg2EZRHR93h/view?usp=sharing). The term 'Hand Trigger' and 'Grip Trigger'
 are used analogously throughout the project, as are the terms 'Index Trigger' and
@@ -144,31 +169,6 @@ Users can place many clamps on the geometry. Clamps cannot be placed too near to
 In addition to each clamp being individually interactable, the "finger clamps" mentioned in [Enable Clamp Mode](#enable-clamp-mode) are also interactable, and act as controllers for all existing clamps. Any control that can be done to a single clamp (toggle, alter power, destroy), can be done to all existing clamps at once by interacting with the finger clamp in the same manner.
 
 The user can highlight all clamps with a red sphere to clarify their position to the user. This is particularly useful on complicated geometries with many clamps attached. While pointing at the finger clamp and holding the Interact button, hold down the hand trigger to highlight all existing spheres.
-
-## Builds
-A standalone build for Windows 64-bit can be downloaded from the "Releases" section. Standalone builds can be run as executable files without the need for the Unity editor and will improve performance. Builds can be made by anybody with the Unity project, but we have made "approved" builds with relevant build information.
-
-Within a static build, custom .vrn cell archives can be placed within `virtual-reality_Data\StreamingAssets\NeuronalDynamics\Geometries` to be run within the application.
-
-## Documentation
-Our code is documented [here](https://c2m2.github.io/doxyhtml/index.html). This documentation is produced using [Doxygen](https://www.doxygen.nl/index.html). The completeness of this documentation is dependent on code commenting, so there may be gaps and imperfections. If you notice issues with this documentation, please report it to jacob.wells@temple.edu.
-
-## Other code
-VR grids are maintained [over here](https://github.com/stephanmg/vr-grids).
-
-Custom attributes which proved useful during development are maintained [here](https://github.com/stephanmg/vr-utils).
-
-## License
-
-We use a modified version of the GNU LPGL v3. Our license can be found in LICENSE.txt
-
-## Research Team
-
-This project is produced at the Center for Computational Mathematics and Modeling (C2M2) at Temple University.
-
-Project lead: [Dr. Benjamin Seibold](https://github.com/benjaminseibold), Dr. Gillian Queisser
-
-Researchers and developers: [Craig Fox](https://github.com/CraigFox0) [(in)](https://www.linkedin.com/in/craig-fox-738951192/), [Stephan Grein](https://github.com/stephanmg) [(in)](https://www.linkedin.com/in/stephan-grein-8520ba101/), Bogdan Nagirniak, [James Rosado](https://github.com/jarosado0911) [(in)](https://www.linkedin.com/in/rosado-james-3239b2119/), [Jacob Wells](https://github.com/jacobwells97) [(in)](https://www.linkedin.com/in/jacob-wells/), Noah Williams.
 
 ## Connect with us
 We have a [blog](https://c2m2vr.wordpress.com/) where we go into finer detail about some of our past and current code solutions. While far from complete, we feel that this blog still has lots of interesting details about the areas of the project that it does cover.
