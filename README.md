@@ -147,11 +147,11 @@ While grabbing a cell, hold the thumbstick up or down on the hand that is being 
 
 A large user interface is spawned upon selecting a cell. This board contains useful static information about the cell. 
 
-The board contains a color table that shows the current color gradient applied to the cell, and the voltage value corresponding to different color values. The user can change the color scheme by interacting with the arrows beneath the color table.
+The board contains a color table that shows the current color gradient applied to the cell. The voltage value corresponding to different color values is diosplayed to the left of the color table. The user can change the value corresponding to the top or bottom of the color scale by hovering their finger cursor over either number and holding up/down on the joystick (or the up/down arrow key). The user can also change the color scheme by interacting with the arrows beneath the color table.
 
 The board contains a subpanel for selecting the type of interaction. The user can select any of these toggles to change the effect of directly interacting with the surface. See [direct](#direct-cell-interaction), [clamp](#clamp-cell-interaction), and [plot](#point-plotter-interaction) interactions for explanations of each.
 
-The board also contains a play/pause button. The user can use this to pause solver code at the current time step.
+The board also contains a play/pause button. The user can use this to pause solver code at the current time step. Beneath is displayed the current simulation time.
 
 ### Ruler controls
 A ruler is spawned with every cell geometry. The ruler can be used to understand the length scale of the cell in its local space. While grabbing the ruler, resize it by moving the thumbstick up or down on the hand that is being used to grab the ruler.
