@@ -189,7 +189,7 @@ In addition to each clamp being individually interactable, the "finger clamps" m
 The user can highlight all clamps with a red sphere to clarify their position to the user. This is particularly useful on complicated geometries with many clamps attached. While pointing at the finger clamp and holding the Interact button, hold down the hand trigger to highlight all existing spheres.
 
 ## Point-plotter interaction
-<img src="https://i.imgur.com/LG0Xa2P.png" alt="clamps" width="500"/>
+<img src="https://i.imgur.com/LG0Xa2P.png" alt="clamps" width="400"/>
 The user is able to spawn line graphs that are attached to specific 1D vertices on the neuron cell. These graphs will show the voltage at that 1D point over time. To spawn a graph panel, the user simply needs to toggle "Plot" on the board UI, and then raycast and interact with the surface normally. Interacting with the surface at a distance or tapping it will place a panel at that 1D vertex. Panels are grabbable and resizeable in the same way that the cell or the ruler is.
 
 The number of samples in the graph can be altered by opening the "more info" panel (top-right corner of the graph), hovering over "number of samples", and holding up or down on the joystick (or holding the up or down arrows on the keyboard).
