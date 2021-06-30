@@ -190,7 +190,11 @@ The user can highlight all clamps with a red sphere to clarify their position to
 
 ## Point-plotter interaction
 <img src="https://i.imgur.com/LG0Xa2P.png" alt="clamps" width="400"/>
-The user is able to spawn line graphs that are attached to specific 1D vertices on the neuron cell. These graphs will show the voltage at that 1D point over time. To spawn a graph panel, the user simply needs to toggle "Plot" on the board UI, and then raycast and interact with the surface normally. Interacting with the surface at a distance or tapping it will place a panel at that 1D vertex. Panels are grabbable and resizeable in the same way that the cell or the ruler is.
+The user is able to spawn line graphs that are attached to specific 1D vertices on the neuron cell. These graphs will show the voltage at that 1D point over time. 
+
+To spawn a graph panel, the user simply needs to toggle "Plot" on the [board UI](#board-info-and-controls). At this point the user can raycast onto the surface of the mesh and press the index trigger (or click with the mouse) in order to spawn a graph attached to the nearest 1D vertex. Panels are grabbable and resizeable in the same way that the cell or the ruler is.
+
+The user can hover hover the graph-plane with their raycasting finger or the mouse in order to spawn a cursor at the point of hovering. The cursor will display the exact value of the graph at that point. The user can then press the index trigger (or click on the mouse) to lock the cursor at that position. Clicking again will free the cursor.
 
 The number of samples in the graph can be altered by opening the "more info" panel (top-right corner of the graph), hovering over "number of samples", and holding up or down on the joystick (or holding the up or down arrows on the keyboard).
 
