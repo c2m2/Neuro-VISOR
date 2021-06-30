@@ -127,6 +127,7 @@ Rotate camera | Look around! | (H) Left-Ctrl + move mouse cursor |
 | (H) | Hold button down |
 
 ### Selecting a cell
+<img src="https://i.imgur.com/knL8vTZ.png" alt="cell previewer" width="500">
 
 1.  A cell previewer stands against the whiteboard near the window. It attempts to render the 1D mesh of any neuron `.vrn` cell file archives found in `Assets/StreamingAssets/NeuronalDynamics/Geometries`. Three example cells are included with this repo. Several more cells can be found [here](https://drive.google.com/drive/folders/1kyz8S-txISfarPegJSMzABrF_UprH3Y-?usp=sharing).
 
