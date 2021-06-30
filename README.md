@@ -30,6 +30,14 @@ Inquiries about the project can be made to seibold@temple.edu.
 
 Performance issues or code-related questions can be sent to jacob.wells@temple.edu
 
+## Code Documentation
+Our code is documented [here](https://c2m2.github.io/doxyhtml/index.html). This documentation is produced using [Doxygen](https://www.doxygen.nl/index.html). The completeness of this documentation is dependent on code commenting, so there may be gaps and imperfections. If you notice issues with this documentation, please report it to jacob.wells@temple.edu.
+
+## Other code
+VR grids are maintained [over here](https://github.com/stephanmg/vr-grids).
+
+Custom attributes which proved useful during development are maintained [here](https://github.com/stephanmg/vr-utils).
+
 # Use Guide
 
 ## Recommended hardware
@@ -101,14 +109,6 @@ Make sure that your HMD is set up and that you have gone through the first-time 
 A standalone build for Windows 64-bit can be downloaded from the "Releases" section. Standalone builds can be run as executable files without the need for the Unity editor and will improve performance. Builds can be made by anybody with the Unity project, but we have made "approved" builds with relevant build information.
 
 Within a static build, custom .vrn cell archives can be placed within `virtual-reality_Data\StreamingAssets\NeuronalDynamics\Geometries` to be run within the application.
-
-## Documentation
-Our code is documented [here](https://c2m2.github.io/doxyhtml/index.html). This documentation is produced using [Doxygen](https://www.doxygen.nl/index.html). The completeness of this documentation is dependent on code commenting, so there may be gaps and imperfections. If you notice issues with this documentation, please report it to jacob.wells@temple.edu.
-
-## Other code
-VR grids are maintained [over here](https://github.com/stephanmg/vr-grids).
-
-Custom attributes which proved useful during development are maintained [here](https://github.com/stephanmg/vr-utils).
 
 ## Controls
 Oculus touch controller naming conventions can be found [here](https://docs.unity3d.com/2019.2/Documentation/Manual/OculusControllers.html). An instructional video demonstrating the controls can be found [here](https://drive.google.com/file/d/1tWS7FYvMIaawStV07K7PyEg2EZRHR93h/view?usp=sharing). The term 'Hand Trigger' and 'Grip Trigger'
