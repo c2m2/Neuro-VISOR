@@ -23,6 +23,13 @@ Project lead: [Dr. Benjamin Seibold](https://github.com/benjaminseibold), Dr. Gi
 
 Researchers and developers: [Craig Fox](https://github.com/CraigFox0) [(in)](https://www.linkedin.com/in/craig-fox-738951192/), [Stephan Grein](https://github.com/stephanmg) [(in)](https://www.linkedin.com/in/stephan-grein-8520ba101/), Bogdan Nagirniak, [James Rosado](https://github.com/jarosado0911) [(in)](https://www.linkedin.com/in/rosado-james-3239b2119/), [Jacob Wells](https://github.com/jacobwells97) [(in)](https://www.linkedin.com/in/jacob-wells/), Noah Williams.
 
+## Connect with us
+We have a [blog](https://c2m2vr.wordpress.com/) where we go into finer detail about some of our past and current code solutions. While far from complete, we feel that this blog still has lots of interesting details about the areas of the project that it does cover.
+
+Inquiries about the project can be made to seibold@temple.edu.
+
+Performance issues or code-related questions can be sent to jacob.wells@temple.edu
+
 # Use Guide
 
 ## Recommended hardware
@@ -169,10 +176,3 @@ Users can place many clamps on the geometry. Clamps cannot be placed too near to
 In addition to each clamp being individually interactable, the "finger clamps" mentioned in [Enable Clamp Mode](#enable-clamp-mode) are also interactable, and act as controllers for all existing clamps. Any control that can be done to a single clamp (toggle, alter power, destroy), can be done to all existing clamps at once by interacting with the finger clamp in the same manner.
 
 The user can highlight all clamps with a red sphere to clarify their position to the user. This is particularly useful on complicated geometries with many clamps attached. While pointing at the finger clamp and holding the Interact button, hold down the hand trigger to highlight all existing spheres.
-
-## Connect with us
-We have a [blog](https://c2m2vr.wordpress.com/) where we go into finer detail about some of our past and current code solutions. While far from complete, we feel that this blog still has lots of interesting details about the areas of the project that it does cover.
-
-Inquiries about the project can be made to seibold@temple.edu.
-
-Performance issues or code-related questions can be sent to jacob.wells@temple.edu
