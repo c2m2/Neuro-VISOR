@@ -155,6 +155,7 @@ The board contains a subpanel for selecting the type of interaction. The user ca
 The board also contains a play/pause button. The user can use this to pause solver code at the current time step. Beneath is displayed the current simulation time.
 
 ### Ruler controls
+<img src="https://i.imgur.com/acM7ogE.png" alt="ruler" width="100"/>
 A ruler is spawned with every cell geometry. The ruler can be used to understand the length scale of the cell in its local space. While grabbing the ruler, resize it by moving the thumbstick up or down on the hand that is being used to grab the ruler.
 
 The measurements on the ruler will adapt to the world-space size of the geometry so that it can always act as a translator between the size of the cell in the user's space and the local length scales of the neuron.
