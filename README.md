@@ -143,7 +143,13 @@ The cell can be grabbed by hovering your hand over the 3D geometry and pressing 
 While grabbing a cell, hold the thumbstick up or down on the hand that is being used to grab the cell to resize the cell in world space. Note: this does not affect the environment of the solver code: the cell can be scaled freely in world space without affecting the stored vertex positions of the 1D or 3D meshes.
 
 ### Board info and controls
-A large user interface is spawned upon selecting a cell. This board contains useful static information about the cell. It contains a color table that shows the current gradient applied to the cell, and the voltage value corresponding to different color values. The user can change the color scheme by interacting with the arrows beneath the color table.
+A large user interface is spawned upon selecting a cell. This board contains useful static information about the cell. 
+
+The board contains a color table that shows the current color gradient applied to the cell, and the voltage value corresponding to different color values. The user can change the color scheme by interacting with the arrows beneath the color table.
+
+The board contains a subpanel for selecting the type of interaction. The user can select any of these toggles to change the effect of directly interacting with the surface. See [direct](#direct-cell-interaction), [clamp](#clamp-cell-interaction), and [plot](#point-plotter-interaction) interactions for explanations of each.
+
+The board also contains a play/pause button. The user can use this to pause solver code at the current time step.
 
 ### Ruler controls
 A ruler is spawned with every cell geometry. The ruler can be used to understand the length scale of the cell in its local space. While grabbing the ruler, resize it by moving the thumbstick up or down on the hand that is being used to grab the ruler.
