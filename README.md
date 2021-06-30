@@ -126,15 +126,15 @@ Rotate camera | Look around! | (H) Left-Ctrl + move mouse cursor |
 | (P) | Press button once |
 | (H) | Hold button down |
 
-## Selecting a cell
+### Selecting a cell
 
 1.  A cell previewer stands against the whiteboard near the window. It attempts to render the 1D mesh of any neuron `.vrn` cell file archives found in `Assets/StreamingAssets/NeuronalDynamics/Geometries`. Three example cells are included with this repo. Several more cells can be found [here](https://drive.google.com/drive/folders/1kyz8S-txISfarPegJSMzABrF_UprH3Y-?usp=sharing).
 
 2.  Enable raycast mode in VR. The hand with raycast mode enabled should be constantly pointing forward.
 
-3.  With raycast mode enabled, hover over a cell preview window by pointing at it. A blue guide line should be drawn between your pointer finger and the preview window. Continue hovering to see the preview rotate, or press the Interact button to load the cell and launch solve code. The guide line should turn orange while pressing/holding. The geometry should render in the middle of the room, scaled to fit within the room and appearing in a uniform color. A color scale should now be displayed on the whiteboard.
+3.  With raycast mode enabled, hover over a cell preview window by pointing at it. A blue guide line should be drawn between your pointer finger and the preview window. Continue hovering to see more information about the cell, or press the Interact button to load the cell and launch solve code. The guide line should turn orange while pressing/holding. The geometry should render in the middle of the room, scaled to fit within the room and appearing in a uniform color. A color scale should now be displayed on the whiteboard.
 
-## Simple cell interaction
+### Simple cell interaction
 
 #### Grabbing
 The cell can be grabbed by hovering your hand over the 3D geometry and pressing the hand trigger on that hand's controller. Once grabbed, you can  move and rotate cells freely.
@@ -142,15 +142,18 @@ The cell can be grabbed by hovering your hand over the 3D geometry and pressing 
 #### Resizing
 While grabbing a cell, hold the thumbstick up or down on the hand that is being used to grab the cell to resize the cell in world space. Note: this does not affect the environment of the solver code: the cell can be scaled freely in world space without affecting the stored vertex positions of the 1D or 3D meshes.
 
-## Ruler controls
+### Board info and controls
+A large user interface is spawned upon selecting a cell. This board contains useful static information about the cell. It contains a color table that shows the current gradient applied to the cell, and the voltage value corresponding to different color values. The user can change the color scheme by interacting with the arrows beneath the color table.
+
+### Ruler controls
 A ruler is spawned with every cell geometry. The ruler can be used to understand the length scale of the cell in its local space. While grabbing the ruler, resize it by moving the thumbstick up or down on the hand that is being used to grab the ruler.
 
 The measurements on the ruler will adapt to the world-space size of the geometry so that it can always act as a translator between the size of the cell in the user's space and the local length scales of the neuron.
 
-## Direct cell interaction
+### Direct cell interaction
 With raycast mode enabled, point at the surface of the geometry. A blue line should be drawn between your pointer finger and the surface of the geometry. Tap the geometry from up close, or press the Interact button from a distance to directly alter simulation value at the nearest 1D vertex to the point of interaction. The guide line should turn orange upon pressing, and the surface of the geometry should change color to reflect the affected potential at the nearest 1D vertex on the geometry.
 
-## Clamp cell interaction
+### Clamp cell interaction
 Clamps can be used to continuously alter the value of a single vertex on the 1D mesh.
 
 #### Enable Clamp Mode
@@ -173,6 +176,11 @@ Users can place many clamps on the geometry. Clamps cannot be placed too near to
 In addition to each clamp being individually interactable, the "finger clamps" mentioned in [Enable Clamp Mode](#enable-clamp-mode) are also interactable, and act as controllers for all existing clamps. Any control that can be done to a single clamp (toggle, alter power, destroy), can be done to all existing clamps at once by interacting with the finger clamp in the same manner.
 
 The user can highlight all clamps with a red sphere to clarify their position to the user. This is particularly useful on complicated geometries with many clamps attached. While pointing at the finger clamp and holding the Interact button, hold down the hand trigger to highlight all existing spheres.
+
+## Point-plotter interaction
+The user is able to spawn line graphs that are attached to specific 1D vertices on the neuron cell. These graphs will show the voltage at that 1D point over time. To spawn a graph panel, the user simply needs to toggle "Plot" on the board UI, and then raycast and interact with the surface normally. Interacting with the surface at a distance or tapping it will place a panel at that 1D vertex. Panels are grabbable and resizeable in the same way that the cell or the ruler is.
+
+The number of samples in the graph can be altered by opening the "more info" panel (top-right corner of the graph), hovering over "number of samples", and holding up or down on the joystick (or holding the up or down arrows on the keyboard).
 
 # Standalone Builds
 A standalone build for Windows 64-bit can be downloaded from the "Releases" section. Standalone builds can be run as executable files without the need for the Unity editor and will improve performance. Builds can be made by anybody with the Unity project, but we have made "approved" builds with relevant build information.
