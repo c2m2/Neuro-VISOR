@@ -164,6 +164,7 @@ The measurements on the ruler will adapt to the world-space size of the geometry
 With raycast mode enabled, point at the surface of the geometry. A blue line should be drawn between your pointer finger and the surface of the geometry. Tap the geometry from up close, or press the Interact button from a distance to directly alter simulation value at the nearest 1D vertex to the point of interaction. The guide line should turn orange upon pressing, and the surface of the geometry should change color to reflect the affected potential at the nearest 1D vertex on the geometry.
 
 ### Clamp cell interaction
+<img src="https://c2m2vr.files.wordpress.com/2020/11/variablevoltage.png" alt="clamps" width="500"/>
 Clamps can be used to continuously alter the value of a single vertex on the 1D mesh.
 
 #### Enable Clamp Mode
