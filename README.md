@@ -127,7 +127,7 @@ Rotate camera | Look around! | (H) Left-Ctrl + move mouse cursor |
 | (H) | Hold button down |
 
 ### Selecting a cell
-<center><img src="https://i.imgur.com/knL8vTZ.png" alt="cell previewer" width="500"></center>
+<img src="https://i.imgur.com/knL8vTZ.png" alt="cell previewer" width="500">
 
 1.  A cell previewer stands against the whiteboard near the window. It attempts to render the 1D mesh of any neuron `.vrn` cell file archives found in `Assets/StreamingAssets/NeuronalDynamics/Geometries`. Three example cells are included with this repo. Several more cells can be found [here](https://drive.google.com/drive/folders/1kyz8S-txISfarPegJSMzABrF_UprH3Y-?usp=sharing).
 
@@ -144,7 +144,7 @@ The cell can be grabbed by hovering your hand over the 3D geometry and pressing 
 While grabbing a cell, hold the thumbstick up or down on the hand that is being used to grab the cell to resize the cell in world space. Note: this does not affect the environment of the solver code: the cell can be scaled freely in world space without affecting the stored vertex positions of the 1D or 3D meshes.
 
 ### Board info and controls
-<center><img src="https://i.imgur.com/v7gbFza.png" alt="board controls" width="500"/></center>
+<img src="https://i.imgur.com/v7gbFza.png" alt="board controls" width="500"/>
 
 A large user interface is spawned upon selecting a cell. This board contains useful static information about the cell. 
 
