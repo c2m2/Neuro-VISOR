@@ -36,7 +36,7 @@ We have a [blog](https://c2m2vr.wordpress.com/) where we go into finer detail ab
 
 Inquiries about the project can be made to seibold@temple.edu.
 
-Performance issues or code-related questions can be sent to jacob.wells@temple.edu
+Performance issues and code-related questions can be sent to jacob.wells@temple.edu
 
 # Use Guide
 
