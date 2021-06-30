@@ -143,7 +143,8 @@ The cell can be grabbed by hovering your hand over the 3D geometry and pressing 
 While grabbing a cell, hold the thumbstick up or down on the hand that is being used to grab the cell to resize the cell in world space. Note: this does not affect the environment of the solver code: the cell can be scaled freely in world space without affecting the stored vertex positions of the 1D or 3D meshes.
 
 ### Board info and controls
-![board controls](https://i.imgur.com/v7gbFza.png)
+<img src="https://i.imgur.com/v7gbFza.png" alt="board controls" width="200"/>
+
 A large user interface is spawned upon selecting a cell. This board contains useful static information about the cell. 
 
 The board contains a color table that shows the current color gradient applied to the cell, and the voltage value corresponding to different color values. The user can change the color scheme by interacting with the arrows beneath the color table.
