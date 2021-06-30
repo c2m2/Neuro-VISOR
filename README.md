@@ -194,7 +194,7 @@ The user is able to spawn line graphs that are attached to specific 1D vertices 
 
 To spawn a graph panel, the user simply needs to toggle "Plot" on the [board UI](#board-info-and-controls). At this point the user can raycast onto the surface of the mesh and press the index trigger (or click with the mouse) in order to spawn a graph attached to the nearest 1D vertex. Panels are grabbable and resizeable in the same way that the cell or the ruler is.
 
-The user can hover hover the graph-plane with their raycasting finger or the mouse in order to spawn a cursor at the point of hovering. The cursor will display the exact value of the graph at that point. The user can then press the index trigger (or click on the mouse) to lock the cursor at that position. Clicking again will free the cursor.
+The user can hover over the graph-plane with their raycasting finger or the mouse in order to spawn a cursor at the point of hovering. The cursor will display the exact value of the graph at that point. The user can then press the index trigger (or click on the mouse) to lock the cursor at that position. Clicking again will free the cursor.
 
 The number of samples in the graph can be altered by opening the "more info" panel (top-right corner of the graph), hovering over "number of samples", and holding up or down on the joystick (or holding the up or down arrows on the keyboard).
 
