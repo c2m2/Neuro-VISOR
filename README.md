@@ -42,9 +42,9 @@ Performance issues and code-related questions can be sent to jacob.wells@temple.
 
 ## Recommended hardware
 
-* **Oculus Rift, Rift S, or Quest Head Mounted Display (HMD)** - This project is currently tested on the Oculus Rift S and the Oculus Quest. It was previously developed on the original Rift headset. This project was developed using the Oculus SDK and may or may not work using other HMDs. A list of Oculus-approved computers can be found [here](https://www.oculus.com/rift-s/oculus-ready-pcs/).
+* **Oculus Rift, Rift S, or Quest Head Mounted Display (HMD)** - This project is currently tested on the Oculus Rift S and the Oculus Quest. It was previously developed on the original Rift headset. This project was developed using the Oculus SDK. We have not been able to run this project on other headsets, but have been working to make it more cross-compatible.
 
-* We do not have rigorously tested minimum computer specs. We have listed our hardware setup below for convenience.
+* We do not have rigorously tested minimum computer specs. We have listed our hardware setup below for convenience. A list of Oculus-approved computers can be found [here](https://www.oculus.com/rift-s/oculus-ready-pcs/), but we do not necessarily endorse any computer recommended there.
 
 <table>
   <tr>
