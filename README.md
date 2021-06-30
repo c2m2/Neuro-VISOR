@@ -1,5 +1,7 @@
 # Neuro-VISOR
 
+![Raycasting-and-Grabbing](https://imgur.com/ckL3pW5)
+
 VISOR (Virtual Interactive Simulation Of Reality) is a research and software theme developed by Temple University's [Center for Computational Mathematics and Modeling (C2M2)](https://c2m2.cst.temple.edu/), College of Science and Technology. The overarching long-term vision is to produce novel concepts and software that enable efficient immersed virtual reality (VR) visualization and real-time interaction with simulations of real-world processes described via principled mathematical equations. Unlike traditional high performance computing (HPC) applications, the philosophy of VISOR is that (a) the simulation runs while it is visualized in a virtual environment, and (b) the simulation continues even when the user affects and/or modifies the system state or its conditions.
 
 Neuro-VISOR focuses on applications in computational neuroscience. Specifically, it provides a pipeline that (a) retrieves a wire-frame neuron geometry file from the public neuron database [NeuroMorpho](http://neuromorpho.org/), and (b) generates a surface mesh from it. This mesh is then (c) visualized in VR, while an efficient numerical method approximates the Hodgkin-Huxley model on the given wire-frame neuron geometry. Finally, while the running simulation is fed to the VR environment in real time, (d) the user can interact with the surface mesh and affect the simulation while it is running via several methods outlined under [controls](#controls).
@@ -24,12 +26,12 @@ Project lead: [Dr. Benjamin Seibold](https://github.com/benjaminseibold), Dr. Gi
 Researchers and developers: [Craig Fox](https://github.com/CraigFox0) [(in)](https://www.linkedin.com/in/craig-fox-738951192/), [Stephan Grein](https://github.com/stephanmg) [(in)](https://www.linkedin.com/in/stephan-grein-8520ba101/), Bogdan Nagirniak, [James Rosado](https://github.com/jarosado0911) [(in)](https://www.linkedin.com/in/rosado-james-3239b2119/), [Jacob Wells](https://github.com/jacobwells97) [(in)](https://www.linkedin.com/in/jacob-wells/), Noah Williams.
 
 ## Code Documentation
-Our code is documented [here](https://c2m2.github.io/doxyhtml/index.html). This documentation is produced using [Doxygen](https://www.doxygen.nl/index.html). The completeness of this documentation is dependent on code commenting, so there may be gaps and imperfections. If you notice issues with this documentation, please report it to jacob.wells@temple.edu.
+We have [code documentation](https://c2m2.github.io/doxyhtml/index.html) generated using [Doxygen](https://www.doxygen.nl/index.html). The completeness of this documentation is dependent on code commenting, so there may be gaps and imperfections. If you notice issues with this documentation, please report it to jacob.wells@temple.edu.
 
 ## Other code
-VR grids are maintained [over here](https://github.com/stephanmg/vr-grids).
+We maintain a [separate project](https://github.com/stephanmg/vr-grids) for generating neuron grids.
 
-Custom attributes which proved useful during development are maintained [here](https://github.com/stephanmg/vr-utils).
+We have [another project](https://github.com/stephanmg/vr-utils) containing additional custom attributes which proved useful during development.
 
 ## Connect with us
 We have a [blog](https://c2m2vr.wordpress.com/) where we go into finer detail about some of our past and current code solutions. While far from complete, we feel that this blog still has lots of interesting details about the areas of the project that it does cover.
@@ -44,7 +46,7 @@ Performance issues and code-related questions can be sent to jacob.wells@temple.
 
 * **Oculus Rift, Rift S, or Quest Head Mounted Display (HMD)** - This project is currently tested on the Oculus Rift S and the Oculus Quest. It was previously developed on the original Rift headset. This project was developed using the Oculus SDK. We have not been able to run this project on other headsets, but have been working to make it more cross-compatible.
 
-* We do not have rigorously tested minimum computer specs. We have listed our hardware setup below for convenience. A list of Oculus-approved computers can be found [here](https://www.oculus.com/rift-s/oculus-ready-pcs/), but we do not necessarily endorse any computer recommended there.
+* We do not have rigorously tested minimum computer specs. We have listed our hardware setup below for convenience. Oculus has provided [a list](https://www.oculus.com/rift-s/oculus-ready-pcs/) of VR-ready computers, but we do not necessarily endorse any computer recommended by them.
 
 <table>
   <tr>
@@ -104,11 +106,6 @@ Make sure that your HMD is set up and that you have gone through the first-time 
 6. Upon startup, the user is placed in a model of C2M2's lab. The application will detect a VR headset and launch in VR/keyboard emulator mode automatically.
 
 7. Our control scheme is outlined [below](#controls). Try moving around and looking at your hands.
-
-## Builds
-A standalone build for Windows 64-bit can be downloaded from the "Releases" section. Standalone builds can be run as executable files without the need for the Unity editor and will improve performance. Builds can be made by anybody with the Unity project, but we have made "approved" builds with relevant build information.
-
-Within a static build, custom .vrn cell archives can be placed within `virtual-reality_Data\StreamingAssets\NeuronalDynamics\Geometries` to be run within the application.
 
 ## Controls
 Oculus touch controller naming conventions can be found [here](https://docs.unity3d.com/2019.2/Documentation/Manual/OculusControllers.html). An instructional video demonstrating the controls can be found [here](https://drive.google.com/file/d/1tWS7FYvMIaawStV07K7PyEg2EZRHR93h/view?usp=sharing). The term 'Hand Trigger' and 'Grip Trigger'
@@ -176,3 +173,8 @@ Users can place many clamps on the geometry. Clamps cannot be placed too near to
 In addition to each clamp being individually interactable, the "finger clamps" mentioned in [Enable Clamp Mode](#enable-clamp-mode) are also interactable, and act as controllers for all existing clamps. Any control that can be done to a single clamp (toggle, alter power, destroy), can be done to all existing clamps at once by interacting with the finger clamp in the same manner.
 
 The user can highlight all clamps with a red sphere to clarify their position to the user. This is particularly useful on complicated geometries with many clamps attached. While pointing at the finger clamp and holding the Interact button, hold down the hand trigger to highlight all existing spheres.
+
+# Standalone Builds
+A standalone build for Windows 64-bit can be downloaded from the "Releases" section. Standalone builds can be run as executable files without the need for the Unity editor and will improve performance. Builds can be made by anybody with the Unity project, but we have made "approved" builds with relevant build information.
+
+Within a static build, custom .vrn cell archives can be placed within `virtual-reality_Data\StreamingAssets\NeuronalDynamics\Geometries` to be run within the application.
