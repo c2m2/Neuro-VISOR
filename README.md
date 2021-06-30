@@ -23,13 +23,6 @@ Project lead: [Dr. Benjamin Seibold](https://github.com/benjaminseibold), Dr. Gi
 
 Researchers and developers: [Craig Fox](https://github.com/CraigFox0) [(in)](https://www.linkedin.com/in/craig-fox-738951192/), [Stephan Grein](https://github.com/stephanmg) [(in)](https://www.linkedin.com/in/stephan-grein-8520ba101/), Bogdan Nagirniak, [James Rosado](https://github.com/jarosado0911) [(in)](https://www.linkedin.com/in/rosado-james-3239b2119/), [Jacob Wells](https://github.com/jacobwells97) [(in)](https://www.linkedin.com/in/jacob-wells/), Noah Williams.
 
-## Connect with us
-We have a [blog](https://c2m2vr.wordpress.com/) where we go into finer detail about some of our past and current code solutions. While far from complete, we feel that this blog still has lots of interesting details about the areas of the project that it does cover.
-
-Inquiries about the project can be made to seibold@temple.edu.
-
-Performance issues or code-related questions can be sent to jacob.wells@temple.edu
-
 ## Code Documentation
 Our code is documented [here](https://c2m2.github.io/doxyhtml/index.html). This documentation is produced using [Doxygen](https://www.doxygen.nl/index.html). The completeness of this documentation is dependent on code commenting, so there may be gaps and imperfections. If you notice issues with this documentation, please report it to jacob.wells@temple.edu.
 
@@ -37,6 +30,13 @@ Our code is documented [here](https://c2m2.github.io/doxyhtml/index.html). This 
 VR grids are maintained [over here](https://github.com/stephanmg/vr-grids).
 
 Custom attributes which proved useful during development are maintained [here](https://github.com/stephanmg/vr-utils).
+
+## Connect with us
+We have a [blog](https://c2m2vr.wordpress.com/) where we go into finer detail about some of our past and current code solutions. While far from complete, we feel that this blog still has lots of interesting details about the areas of the project that it does cover.
+
+Inquiries about the project can be made to seibold@temple.edu.
+
+Performance issues or code-related questions can be sent to jacob.wells@temple.edu
 
 # Use Guide
 
