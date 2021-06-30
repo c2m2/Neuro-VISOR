@@ -44,7 +44,7 @@ Custom attributes which proved useful during development are maintained [here](h
 
 * **Oculus Rift, Rift S, or Quest Head Mounted Display (HMD)** - This project is currently tested on the Oculus Rift S and the Oculus Quest. It was previously developed on the original Rift headset. This project was developed using the Oculus SDK and may or may not work using other HMDs. A list of Oculus-approved computers can be found [here](https://www.oculus.com/rift-s/oculus-ready-pcs/).
 
-* We do not have rigorously tested minimum computer specs. Our lab computer's hardware is listed below, but this program has been tested on several lower-end computers. With this hardware running this standalone build on the example cells included, the application performed "ideally": i.e. at around an average of 80 FPS. The Oculus has a hardware-side VSync of 80 FPS; this is the refresh rate of the Rift S HMD. This means that our performance of 80 FPS was "capped" at 80. It may be possible to replicate this performance using these same cells on lower-end computers, or using more complex neuron geometries on an identical computer. An FPS estimator can be seen at runtime on the lab model's TV screen.
+* We do not have rigorously tested minimum computer specs. We have listed our hardware setup below for convenience.
 
 <table>
   <tr>
