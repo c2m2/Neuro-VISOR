@@ -2,8 +2,10 @@
 using UnityEngine;
 using C2M2.NeuronalDynamics.Simulation;
 using C2M2.NeuronalDynamics.UGX;
+using C2M2.Interaction.UI;
 using C2M2.Visualization;
 using Math = C2M2.Utils.Math;
+using System.Linq;
 
 namespace C2M2.NeuronalDynamics.Interaction
 {
@@ -14,39 +16,45 @@ namespace C2M2.NeuronalDynamics.Interaction
         public float heightRatio = 1f;
         [Tooltip("The highlight sphere's radius is some real multiple of the clamp's radius")]
         public float highlightSphereScale = 3f;
+        private bool somaClamp = false;
 
-        public bool clampLive { get; private set; } = false;
+        public bool ClampLive { get; private set; } = false;
 
-        public double clampPower { get; set; } = double.PositiveInfinity;
+        public double ClampPower { get; set; } = double.PositiveInfinity;
         public NeuronClampManager ClampManager { get { return GameManager.instance.ndClampManager; } }
         public double MinPower { get { return ClampManager.MinPower; } }
         public double MaxPower { get { return ClampManager.MaxPower; } }
 
         public int focusVert { get; private set; } = -1;
-        public Vector3 focusPos;
+        public Vector3 FocusPos
+        {
+            get { return simulation.Verts1D[focusVert]; }
+        }
+
+        public Neuron.NodeData NodeData
+        {
+            get
+            {
+                return simulation.Neuron.nodes[focusVert];
+            }
+        }
 
         public Material activeMaterial = null;
         public Material inactiveMaterial = null;
+        public Material previewMaterial = null;
+        public Material destroyMaterial = null;
 
         public NDSimulation simulation = null;
+
+        public List<GameObject> defaultCapHolders = null;
+        public List<GameObject> destroyCapHolders = null;
+
+        public InfoPanel clampInfo = null;
 
         private MeshRenderer mr;
         private Vector3 LocalExtents { get { return transform.localScale / 2; } }
         private Vector3 posFocus = Vector3.zero;
 
-        private Color32 inactiveCol = Color.black;
-        public Color32 InactiveCol
-        {
-            get
-            {
-                return inactiveCol;
-            }
-            set
-            {
-                inactiveCol = value;
-                inactiveMaterial.color = inactiveCol;
-            }
-        }
         private Color32 activeCol = Color.white;
         public Color32 ActiveColor
         {
@@ -57,7 +65,7 @@ namespace C2M2.NeuronalDynamics.Interaction
                 mr.material.color = activeCol;
             }
         }
-        private LUTGradient gradientLUT = null;
+        private ColorLUT ColorLUT { get { return simulation.ColorLUT; } }
 
         float currentVisualizationScale = 1;
         private void VisualInflationChangeHandler(double newInflation)
@@ -76,15 +84,15 @@ namespace C2M2.NeuronalDynamics.Interaction
 
         private void Start()
         {
-            clampPower = (MaxPower - MinPower) / 2;
+            ClampPower = (MaxPower - MinPower) / 2;
         }
         private void FixedUpdate()
         {
             if(simulation != null)
             {
-                if (clampLive)
+                if (ClampLive)
                 {
-                    Color newCol = gradientLUT.Evaluate((float)clampPower);
+                    Color newCol = ColorLUT.Evaluate((float)ClampPower);
                     ActiveColor = newCol;
                 }
             }
@@ -97,22 +105,34 @@ namespace C2M2.NeuronalDynamics.Interaction
         }
         #endregion
 
-        #region Orientation
+        #region Appearance
 
+        /// <summary>
+        /// Sets the design of the clamp based on whether it is on the soma
+        /// </summary>
+        private void CheckSoma(Neuron.NodeData cellNodeData)
+        {
+            if (somaClamp)
+            {
+                //Lowers the highlight radius
+                highlightSphereScale = 1.1f;
+            }
+        }
 
         /// <summary>
         /// Sets the radius and height of the clamp
         /// </summary>
-        private void SetScale(NDSimulation simulation, NeuronCell.NodeData cellNodeData)
+        private void SetScale(Neuron.NodeData cellNodeData)
         {
             currentVisualizationScale = (float)simulation.VisualInflation;
 
-            float radiusScalingValue = radiusRatio * (float)cellNodeData.nodeRadius;
+            float radiusScalingValue = radiusRatio * (float)cellNodeData.NodeRadius;
             float heightScalingValue = heightRatio * simulation.AverageDendriteRadius;
 
             //Ensures clamp is always at least as wide as tall when Visual Inflation is 1
             float radiusLength = Math.Max(radiusScalingValue, heightScalingValue) * currentVisualizationScale;
 
+            //if (somaClamp) transform.parent.localScale = new Vector3(radiusLength, radiusLength, radiusLength);
             transform.parent.localScale = new Vector3(radiusLength, radiusLength, heightScalingValue);
             UpdateHighLightScale(transform.parent.localScale);
         }
@@ -128,6 +148,7 @@ namespace C2M2.NeuronalDynamics.Interaction
                 Vector3 tempVector = transform.parent.localScale;
                 tempVector.x *= modifiedScale;
                 tempVector.y *= modifiedScale;
+                //if (somaClamp) tempVector.z *= modifiedScale;
                 transform.parent.localScale = tempVector;
                 currentVisualizationScale = newScale;
                 UpdateHighLightScale(transform.parent.localScale);
@@ -165,9 +186,9 @@ namespace C2M2.NeuronalDynamics.Interaction
         /// <summary>
         /// Sets the orientation of the clamp based on the surrounding neighbors
         /// </summary>
-        public void SetRotation(NDSimulation simulation, NeuronCell.NodeData cellNodeData)
+        public void SetRotation(Neuron.NodeData cellNodeData)
         {
-            List<int> neighbors = cellNodeData.neighborIDs;
+            List<int> neighbors = cellNodeData.AdjacencyList.Keys.ToList();
 
             // Get each neighbor's Vector3 value
             List<Vector3> neighborVectors = new List<Vector3>();
@@ -179,167 +200,109 @@ namespace C2M2.NeuronalDynamics.Interaction
             Vector3 rotationVector;
             if (neighborVectors.Count == 2)
             {
-                Vector3 clampToFirstNeighborVector = neighborVectors[0] - simulation.Verts1D[cellNodeData.id];
-                Vector3 clampToSecondNeighborVector = neighborVectors[1] - simulation.Verts1D[cellNodeData.id];
+                Vector3 clampToFirstNeighborVector = neighborVectors[0] - simulation.Verts1D[cellNodeData.Id];
+                Vector3 clampToSecondNeighborVector = neighborVectors[1] - simulation.Verts1D[cellNodeData.Id];
 
                 rotationVector = clampToFirstNeighborVector.normalized - clampToSecondNeighborVector.normalized;
             }
-            else if (neighborVectors.Count > 0)
+            else if (neighborVectors.Count > 0 && cellNodeData.Pid != -1) //Nodes with a Pid of -1 are somas
             {
-                rotationVector = simulation.Verts1D[cellNodeData.pid].normalized - transform.parent.localPosition.normalized;
+                rotationVector = simulation.Verts1D[cellNodeData.Pid] - simulation.Verts1D[cellNodeData.Id];
             }
             else
             {
-                rotationVector = Vector3.up; //if a clamp has no neighbors it will use a default orientation of facing up
+                rotationVector = Vector3.up; //if a clamp has no neighbors or is soma it will use a default orientation of facing up
             }
             transform.parent.localRotation = Quaternion.LookRotation(rotationVector);
         }
+
+        /// <summary>
+        /// Shows a popup of clamp voltage and clamp vertex
+        /// </summary>
+        public void ShowClampInfo()
+        {
+            clampInfo.gameObject.SetActive(true);
+            clampInfo.Vertex = focusVert;
+            clampInfo.Power = ClampPower * simulation.unitScaler;
+            clampInfo.FocusLocalPosition = transform.localPosition;
+        }
+
+        /// <summary>
+        /// Hides a popup of clamp voltage and clamp vertex
+        /// </summary>
+        public void HideClampInfo()
+        {
+            clampInfo.gameObject.SetActive(false);
+        }
+
         #endregion
 
         #region Simulation Checks
         /// <summary>
-        /// Attempt to latch a clamp onto a simulation object
-        /// </summary>
-        public NDSimulation ReportSimulation(RaycastHit hit)
-        {
-            var sim = hit.collider.GetComponent<NDSimulation>();
-            if (sim == null) sim = hit.collider.GetComponentInParent<NDSimulation>();
-            if (sim == null) return null;
-            return ReportSimulation(sim, hit);
-        }
-        /// <summary>
         /// Attempt to latch a clamp onto a given simulation
         /// </summary>
-        public NDSimulation ReportSimulation(NDSimulation simulation, RaycastHit hit)
+        public NDSimulation AttachSimulation(NDSimulation simulation, int clampIndex)
         {
             if (this.simulation == null)
             {
                 this.simulation = simulation;
 
-                transform.parent.parent = simulation.transform;
+                transform.parent.parent = this.simulation.transform;
 
-                int clampIndex = GetNearestPoint(this.simulation, hit);
+                if (this.simulation.Neuron.somaIDs.Contains(clampIndex)) somaClamp = true;
 
-                NeuronCell.NodeData clampCellNodeData = simulation.NeuronCell.nodeData[clampIndex];
 
-                // Check for duplicates
-                if (!VertIsAvailable(clampIndex, simulation))
-                {
-                    Destroy(transform.parent.gameObject);
-                }
+                PlaceClamp(clampIndex);
 
-                focusVert = clampIndex;
-                focusPos = simulation.Verts1D[focusVert];
+                this.simulation.OnVisualInflationChange += VisualInflationChangeHandler;
 
-                SetScale(this.simulation, clampCellNodeData);
-                SetRotation(this.simulation, clampCellNodeData);
-
-                simulation.OnVisualInflationChange += VisualInflationChangeHandler;
-
-                gradientLUT = this.simulation.GetComponent<LUTGradient>();
-
-                // clamp can be added to simulation, wait for list access, add to list
-                simulation.clampMutex.WaitOne();
+                // wait for clamp list access, add to list
+                this.simulation.clampMutex.WaitOne();
                 this.simulation.clamps.Add(this);
-                simulation.clampMutex.ReleaseMutex();
-
-                transform.parent.localPosition = focusPos;
+                this.simulation.clampMutex.ReleaseMutex();
             }
 
             return this.simulation;
         }
-        private int GetNearestPoint(NDSimulation simulation, RaycastHit hit)
+
+        public void PlaceClamp(int clampIndex)
         {
-            // Translate contact point to local space
-            MeshFilter mf = simulation.transform.GetComponentInParent<MeshFilter>();
-            if (mf == null) return -1;
+            focusVert = clampIndex;
 
-            // Get 3D mesh vertices from hit triangle
-            int triInd = hit.triangleIndex * 3;
-            int v1 = mf.mesh.triangles[triInd];
-            int v2 = mf.mesh.triangles[triInd + 1];
-            int v3 = mf.mesh.triangles[triInd + 2];
+            //CheckSoma(NodeData);
+            SetScale(NodeData);
+            SetRotation(NodeData);
 
-            // Find 1D verts belonging to these 3D verts
-            int[] verts1D = new int[]
-            {
-                simulation.Map[v1].v1, simulation.Map[v1].v2,
-                simulation.Map[v2].v1, simulation.Map[v2].v2,
-                simulation.Map[v3].v1, simulation.Map[v3].v2
-            };
-            Vector3 localHitPoint = simulation.transform.InverseTransformPoint(hit.point); 
-
-            float nearestDist = float.PositiveInfinity;
-            int nearestVert1D = -1;
-            foreach(int vert in verts1D)
-            {
-                float dist = Vector3.Distance(localHitPoint, simulation.Verts1D[vert]);
-                if (dist < nearestDist)
-                {
-                    nearestDist = dist;
-                    nearestVert1D = vert;
-                }
-            }
-
-            return nearestVert1D;
-        }
-
-        /// <returns> True if the 1D index is available, otherwise returns false</returns>
-        private bool VertIsAvailable(int clampIndex, NDSimulation simulation)
-        {
-            bool validLocation = true;
-            // minimum distance between clamps 
-            float distanceBetweenClamps = simulation.AverageDendriteRadius * heightRatio * 2;
-            Vector3[] verts = simulation.Verts1D; //expensive?
-
-            foreach (NeuronClamp clamp in simulation.clamps)
-            {
-                // If there is a clamp on that 1D vertex, the spot is not open
-                if (clamp.focusVert == clampIndex)
-                {
-                    Debug.LogWarning("Clamp already exists on focus vert [" + clampIndex + "]");
-                    validLocation = false;
-                }
-                // If there is a clamp within 2*clamp height, the spot is not open
-                else
-                {
-                    
-                    float dist = (verts[clamp.focusVert] - verts[clampIndex]).magnitude;
-                    if (dist < distanceBetweenClamps)
-                    {
-                        Debug.LogWarning("Clamp too close to clamp located on vert [" + clamp.focusVert + "].");
-                        validLocation = false;
-                    }
-                }
-            }
-            return validLocation;
+            transform.parent.localPosition = FocusPos;
         }
         #endregion
 
         #region Clamp Controls
         public void ActivateClamp()
         {
-            clampLive = true;
+            ClampLive = true;
 
-            if (activeMaterial != null)
-                mr.material = activeMaterial;
+            SwitchMaterial(activeMaterial);
         }
         public void DeactivateClamp()
         {
-            clampLive = false;
-            if (inactiveMaterial != null)
-                mr.material = inactiveMaterial;
+            ClampLive = false;
+            SwitchMaterial(inactiveMaterial);
         }
+
+        public void SwitchMaterial(Material material)
+        {
+            if (material != null) mr.material = material;
+        }
+
         public void ToggleClamp()
         {
-            if (clampLive) DeactivateClamp();
+            if (ClampLive) DeactivateClamp();
             else ActivateClamp();
         }
         #endregion
 
         #region Input
-        [Tooltip("Hold down a raycast for this many frames in order to destroy a clamp")]
-        public int destroyCount = 50;
         int holdCount = 0;
 
         private bool powerClick = false;
@@ -348,18 +311,50 @@ namespace C2M2.NeuronalDynamics.Interaction
         /// </summary>
         public void MonitorInput()
         {
+            if (ClampManager.PressedCancel)
+            {
+                ResetInput();
+            }
+
             if (ClampManager.PressedToggleDestroy)
+            {
                 holdCount++;
-            else
-                CheckInput();
+
+                // If we've held the button long enough to destory, color caps red until user releases button
+                if(holdCount > ClampManager.destroyCount && !powerClick) SwitchCaps(false);
+                else if (powerClick) SwitchCaps(true);
+            }
+            else CheckInput();
 
             float power = ClampManager.PowerModifier;
             
             // If clamp power is modified while the user holds a click, don't let the click also toggle/destroy the clamp
             if (power != 0 && !powerClick) powerClick = true;
 
-            clampPower += power;
-            Math.Clamp(clampPower, MinPower, MaxPower);
+            ClampPower += power;
+            Math.Clamp(ClampPower, MinPower, MaxPower);
+        }
+
+        // Changes clamp to a red aesthetic to signal that destroy is imminent
+        private void SwitchCaps(bool toDefault)
+        {
+            if (defaultCapHolders != null && destroyCapHolders != null)
+            {
+                foreach (GameObject defaultCapHolder in defaultCapHolders)
+                {
+                    defaultCapHolder.SetActive(toDefault);
+                }
+                foreach (GameObject destroyCapHolder in destroyCapHolders)
+                {
+                    destroyCapHolder.SetActive(!toDefault);
+                }
+                if (toDefault)
+                {
+                    if (ClampLive) SwitchMaterial(activeMaterial);
+                    else SwitchMaterial(inactiveMaterial);
+                }
+                else SwitchMaterial(destroyMaterial);
+            }
         }
 
         public void Highlight(bool highlight)
@@ -375,9 +370,9 @@ namespace C2M2.NeuronalDynamics.Interaction
 
         private void CheckInput()
         {
-            if (!powerClick)
+            if (!ClampManager.PressedCancel && !powerClick)
             {
-                if (holdCount >= destroyCount)
+                if (holdCount >= ClampManager.destroyCount)
                 {
                     Destroy(transform.parent.gameObject);
                 }
@@ -386,6 +381,7 @@ namespace C2M2.NeuronalDynamics.Interaction
 
             holdCount = 0;
             powerClick = false;
+            SwitchCaps(true);
         }
 
         #endregion

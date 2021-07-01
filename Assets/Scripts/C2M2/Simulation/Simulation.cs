@@ -2,15 +2,18 @@
 using System.Threading;
 using System;
 using C2M2.Interaction;
-using C2M2.Visualization;
 using UnityEngine.Profiling;
 
 namespace C2M2.Simulation
 {
+
     /// <summary>
     /// Provides an base interface for simulations using a general data type T
     /// </summary>
-    /// <typeparam name="ValueType"> Type of simulation values </typeparam>
+    /// <typeparam name="ValueType">Type of simulation values</typeparam>
+    /// <typeparam name="VizType"></typeparam>
+    /// <typeparam name="RaycastType"></typeparam>
+    /// <typeparam name="GrabType"></typeparam>
     public abstract class Simulation<ValueType, VizType, RaycastType, GrabType> : Interactable
     {
         [Tooltip("Run simulation code without visualization or interaction features")]
@@ -19,12 +22,7 @@ namespace C2M2.Simulation
         /// </summary>
         public bool dryRun = false;
 
-        /// <summary>
-        /// Should the simulation start itself in Awake?
-        /// </summary>
-        public bool startOnAwake = true; // TODO: Move away from using this
-
-        public double raycastHitValue = 55;
+        public bool paused = false;
 
         /// <summary>
         /// Provide mutual exclusion to derived classes
@@ -36,6 +34,8 @@ namespace C2M2.Simulation
         /// </summary>
         private Thread solveThread = null;
         protected CustomSampler solveStepSampler = null;
+        public RaycastEventManager raycastEventManager = null;
+        public RaycastPressEvents defaultRaycastEvent = null;
 
         /// <summary>
         /// Require derived classes to make simulation values available
@@ -51,7 +51,7 @@ namespace C2M2.Simulation
         /// </remarks>
         protected abstract VizType BuildVisualization();
 
-        public VizType viz { get; protected set; }
+        public VizType Viz { get; protected set; }
 
         /// <summary>
         /// Update the visualization. This will be called once per Update() call
@@ -69,6 +69,16 @@ namespace C2M2.Simulation
         /// </remarks>
         protected abstract void SolveStep(int t);
 
+        /// <summary>
+        /// PreSolveStep is called once per simulation frame, before SolveStep() 
+        /// </summary>
+        protected virtual void PreSolveStep(int t) { }
+
+        /// <summary>
+        /// PostSolveStep is called once per simulation frame, after SolveStep() 
+        /// </summary>
+        protected virtual void PostSolveStep(int t) { }
+
         #region Unity Methods
         public void Initialize()
         {
@@ -77,56 +87,41 @@ namespace C2M2.Simulation
 
             if (!dryRun)
             {
-                viz = BuildVisualization();
+                Viz = BuildVisualization();
                 BuildInteraction();
             }
 
             // Run child awake methods first
-            OnAwakePost(viz);
+            OnAwakePost(Viz);
 
             return;
 
             void BuildInteraction()
             {
-                switch (interactionType)
-                {
-                    case (InteractionType.Discrete):
-                        Heater = gameObject.AddComponent<RaycastSimHeaterDiscrete>();
-                        ((RaycastSimHeaterDiscrete)Heater).value = raycastHitValue;
-                        break;
-                    case (InteractionType.Continuous): Heater = gameObject.AddComponent<RaycastSimHeaterContinuous>(); break;
-                }
-
                 /// Add event child object for interaction scripts to find
-                GameObject child = new GameObject("HitInteractionEvent");
+                GameObject child = new GameObject("DirectRaycastInteractionEvent");
                 child.transform.parent = transform;
-                child.transform.position = Vector3.zero;
-                child.transform.eulerAngles = Vector3.zero;
 
                 // Attach hit events to an event manager
-                eventManager = gameObject.AddComponent<RaycastEventManager>();
+                raycastEventManager = gameObject.AddComponent<RaycastEventManager>();
                 // Create hit events
-                raycastEvents = child.AddComponent<RaycastPressEvents>();
-                // TODO: Get rid of RaycastSimHeater, just add Simulation.AddValue here
-                raycastEvents.OnHoldPress.AddListener((hit) => Heater.Hit(hit));
-                eventManager.rightTrigger = raycastEvents;
-                eventManager.leftTrigger = raycastEvents;
+                defaultRaycastEvent = child.AddComponent<RaycastPressEvents>();
 
-                // Some scripts change transform position for some reason, reset the position/rotation at the first frame
-                gameObject.AddComponent<Utils.DebugUtils.Actions.TransformResetter>();
+                defaultRaycastEvent.OnHoldPress.AddListener((hit) => SetValues(hit));
+
+                raycastEventManager.LRTrigger = defaultRaycastEvent;
 
                 OnStart();
 
-                if (startOnAwake) StartSimulation();
+                StartSimulation();
             }
         }
-        public RaycastEventManager eventManager { get; protected set; } = null;
-        public RaycastPressEvents raycastEvents { get; protected set; } = null;
+
         public void FixedUpdate()
         {
             OnUpdate();
 
-            if (!dryRun)
+            if (!paused && !dryRun)
             {
                 ValueType simulationValues = GetValues();
 
@@ -152,7 +147,7 @@ namespace C2M2.Simulation
             StopSimulation();
         }
 
-        private void OnDestroy()
+        protected void OnDestroy()
         {
             OnDest();
             StopSimulation();
@@ -164,7 +159,7 @@ namespace C2M2.Simulation
         #endregion
 
         public int time = -1;
-        public double k = 0.008 * 1e-3;
+        public double timeStep = 0.008 * 1e-3;
         public double endTime = 1.0;
         public int nT { get; private set; } = -1;
         /// <summary>
@@ -188,20 +183,22 @@ namespace C2M2.Simulation
 
             PreSolve();
 
-            nT = (int)(endTime / k);
+            nT = (int)(endTime / timeStep);
             
             for (time = 0; time < nT; time++)
             {
+                while (paused) { }
+
                 // mutex guarantees mutual exclusion over simulation values
                 mutex.WaitOne();
 
-                PreSolveStep();
+                PreSolveStep(time);
 
                 solveStepSampler.Begin();
                 SolveStep(time);
                 solveStepSampler.End();
 
-                PostSolveStep();
+                PostSolveStep(time);
 
                 mutex.ReleaseMutex();
             }
@@ -212,15 +209,8 @@ namespace C2M2.Simulation
             GameManager.instance.DebugLogSafe("Simulation Over.");
         }
 
-        /// <summary>
-        /// PreSolveStep is called once per simulation frame, before SolveStep() 
-        /// </summary>
-        protected virtual void PreSolveStep() { }
+        public sealed override float GetSimulationTime() => time * (float)timeStep;
 
-        /// <summary>
-        /// PostSolveStep is called once per simulation frame, after SolveStep() 
-        /// </summary>
-        protected virtual void PostSolveStep() { }
         /// <summary>
         /// Called on the main thread before the Solve thread is launched
         /// </summary>
@@ -228,7 +218,7 @@ namespace C2M2.Simulation
         /// This is useful if you need to initialize anything that makes use of Unity calls,
         /// which are not available to be called from secondary threads.
         /// </remarks>
-        protected virtual void PreSolve() { Debug.Log("PreSolve"); }
+        protected abstract void PreSolve();
         /// <summary>
         /// Called on the solve thread after the simulation for loop is completed
         /// </summary>
@@ -246,11 +236,32 @@ namespace C2M2.Simulation
                 solveThread = null;             
             }
         }
+
+        /// <summary>
+        /// Given a raycast hit, find the hit 3D vertices
+        /// </summary>
+        public int[] HitToVertices(RaycastHit hit)
+        {
+            // We will have 3 new index/value pairings
+            Tuple<int, double>[] newValues = new Tuple<int, double>[3];
+
+            // Translate hit triangle index so we can index into triangles array
+            int triInd = hit.triangleIndex * 3;
+            MeshFilter mf = hit.transform.GetComponentInParent<MeshFilter>();
+            // Get mesh vertices from hit triangle
+            int v1 = mf.mesh.triangles[triInd];
+            int v2 = mf.mesh.triangles[triInd + 1];
+            int v3 = mf.mesh.triangles[triInd + 2];
+
+            return new int[] { v1, v2, v3 };
+        }
     }
+
     public class SimulationNotFoundException : Exception
     {
         public SimulationNotFoundException() : base() { }
         public SimulationNotFoundException(string message) : base(message) { }
         public SimulationNotFoundException(string message, Exception inner) : base(message, inner) { }
     }
+
 }

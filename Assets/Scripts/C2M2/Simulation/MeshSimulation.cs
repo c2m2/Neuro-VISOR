@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using C2M2.Visualization;
-using C2M2.Utils.MeshUtils;
 using C2M2.Interaction;
+using System;
 
 namespace C2M2.Simulation
 {
@@ -24,16 +24,37 @@ namespace C2M2.Simulation
         /// <summary>
         /// Lookup table for more efficient color calculations on the gradient
         /// </summary>
-        public LUTGradient colorLUT { get; private set; } = null;
+        public ColorLUT ColorLUT { get; private set; } = null;
+        /// <summary>
+        /// Alter the precision of the color scale display
+        /// </summary>
+        [Tooltip("Alter the precision of the color scale display")]
+        public int colorMarkerPrecision = 3;
 
-        public LUTGradient.ExtremaMethod extremaMethod = LUTGradient.ExtremaMethod.GlobalExtrema;
+        public ColorLUT.ExtremaMethod extremaMethod { get; set; } = ColorLUT.ExtremaMethod.GlobalExtrema;
         [Tooltip("Must be set if extremaMethod is set to GlobalExtrema")]
         public float globalMax = float.NegativeInfinity;
         [Tooltip("Must be set if extremaMethod is set to GlobalExtrema")]
         public float globalMin = float.PositiveInfinity;
 
+        /// <summary>
+        /// Unit display string that can be manually set by the user
+        /// </summary>
+        [Tooltip("Unit display string that can be manually set by the user")]
+        public string unit = "mV";
+        /// <summary>
+        /// Can be used to manually convert Gradient Display values to match unit string
+        /// </summary>
+        [Tooltip("Can be used to manually convert Gradient Display values to match unit string")]
+        public float unitScaler = 1000f;
+
+        public string lengthUnit = "μm";
+
         public Vector3 rulerInitPos = new Vector3(-0.5f, 0.443f, -0.322f);
         public Vector3 rulerInitRot = new Vector3(90, 0, 0);
+
+        public double raycastHitValue = 55;
+        public Tuple<int, double>[] raycastHits = new Tuple<int, double>[0];
 
         public RulerMeasure ruler = null;
 
@@ -71,8 +92,8 @@ namespace C2M2.Simulation
             }
         }
 
-        private MeshFilter mf;
-        private MeshRenderer mr;
+        protected MeshFilter mf;
+        protected MeshRenderer mr;
         #endregion
 
         /// <summary>
@@ -80,7 +101,7 @@ namespace C2M2.Simulation
         /// </summary>
         private void UpdateVisualization(in float[] scalars3D)
         {
-            Color32[] newCols = colorLUT.Evaluate(scalars3D);
+            Color32[] newCols = ColorLUT.Evaluate(scalars3D);
             if(newCols != null)
             {
                 mf.mesh.colors32 = newCols;
@@ -114,24 +135,42 @@ namespace C2M2.Simulation
             void InitColors()
             {
                 // Initialize the color lookup table
-                colorLUT = gameObject.AddComponent<LUTGradient>();
-                colorLUT.Gradient = gradient;
-                colorLUT.extremaMethod = extremaMethod;
-                if (extremaMethod == LUTGradient.ExtremaMethod.GlobalExtrema)
+                ColorLUT = gameObject.AddComponent<ColorLUT>();
+                ColorLUT.Gradient = gradient;
+                ColorLUT.extremaMethod = extremaMethod;
+                if (extremaMethod == ColorLUT.ExtremaMethod.GlobalExtrema)
                 {
-                    colorLUT.GlobalMax = globalMax;
-                    colorLUT.GlobalMin = globalMin;
+                    ColorLUT.GlobalMax = globalMax;
+                    ColorLUT.GlobalMin = globalMin;
                 }
             }
+
+            
+
             void InitInteraction()
             {
-                VRRaycastableMesh raycastable = gameObject.AddComponent<VRRaycastableMesh>();
+                VRRaycastableMesh raycastable = gameObject.GetComponent<VRRaycastableMesh>();
+                if(raycastable == null) raycastable = gameObject.AddComponent<VRRaycastableMesh>();
+
                 if (ColliderMesh != null) raycastable.SetSource(ColliderMesh);
                 else raycastable.SetSource(viz);
                 
                 gameObject.AddComponent<VRGrabbableMesh>();
-                gameObject.AddComponent<GrabRescaler>();
+                GrabRescaler rescaler =  gameObject.AddComponent<GrabRescaler>();
                 gameObject.AddComponent<PositionResetControl>();
+
+                defaultRaycastEvent.OnHover.AddListener((hit) =>
+                {
+                    rescaler.Rescale();
+                });
+                defaultRaycastEvent.OnHoldPress.AddListener((hit) =>
+                {
+                    ShiftRaycastValue();
+                });
+                defaultRaycastEvent.OnEndPress.AddListener((hit) =>
+                {
+                    ResetRaycastHits();
+                });
 
                 // Instantiate ruler
                 GameObject rulerObj = Resources.Load("Prefabs/Ruler") as GameObject;
@@ -143,12 +182,48 @@ namespace C2M2.Simulation
             }
         }
 
+        public KeyCode powerModifierPlusKey = KeyCode.UpArrow;
+        public KeyCode powerModifierMinusKey = KeyCode.DownArrow;
+
+        // Sensitivity of the clamp power control. Lower sensitivity means clamp power changes more quickly
+        public float sensitivity = 200f;
+        public float ThumbstickScaler { get { return (ColorLUT.GlobalMax - ColorLUT.GlobalMin) / sensitivity; } }
+        public float PowerModifier
+        {
+            get
+            {
+                if (GameManager.instance.vrDeviceManager.VRActive)
+                {
+                    // Uses the value of both joysticks added together
+                    float scaler = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick).y + OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick).y;
+
+                    return ThumbstickScaler * scaler;
+                }
+                else
+                {
+                    if (Input.GetKey(powerModifierPlusKey)) return ThumbstickScaler;
+                    if (Input.GetKey(powerModifierMinusKey)) return -ThumbstickScaler;
+                    else return 0;
+                }
+            }
+        }
+        public void ShiftRaycastValue()
+        {
+            raycastHitValue += PowerModifier;
+            raycastHitValue = Math.Clamp(raycastHitValue, ColorLUT.GlobalMin, ColorLUT.GlobalMax);
+        }
+
         public void CloseRuler()
         {
-            if(ruler != null)
+            if (ruler != null)
             {
                 Destroy(ruler.gameObject);
             }
+        }
+
+        public void ResetRaycastHits()
+        {
+            raycastHits = new Tuple<int, double>[0];
         }
     }
 }

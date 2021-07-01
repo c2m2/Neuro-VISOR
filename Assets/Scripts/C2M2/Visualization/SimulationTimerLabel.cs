@@ -4,12 +4,20 @@ using UnityEngine;
 using System.Runtime.Serialization;
 using C2M2.Simulation;
 
-namespace C2M2.Visualization
+namespace C2M2.NeuronalDynamics.Interaction.UI
 {
     [RequireComponent(typeof(Simulation<,,,>))]
     public class SimulationTimerLabel : MonoBehaviour
     {
-        public Interactable sim = null;
+        public NDSimulationController simController = null;
+        public Interactable Sim
+        {
+            get
+            {
+                return simController.sim;
+            }
+        }
+
         public TextMeshProUGUI timerText;
 
         /// <summary>
@@ -17,37 +25,38 @@ namespace C2M2.Visualization
         /// </summary>
         public double time;
 
-        private void Start()
+        private void Awake()
         {
-            if (timerText == null) throw new LabelNotFoundException();
-            timerText.text = time.ToString();
+            bool fatal = false;
+            if(timerText == null)
+            {
+                Debug.LogError("No label found.");
+                fatal = true;
+            }
+            if(simController == null)
+            {
+                simController = GetComponentInParent<NDSimulationController>();
+                if(simController == null)
+                {
+                    Debug.LogError("No simulation controller found.");
+                    fatal = true;
+                }
+            }
+            if (fatal) Destroy(this);
         }
 
         private void FixedUpdate()
         {
-            if (sim != null)
-            {
-                time = sim.GetSimulationTime();
-                timerText.text = ToString();
-            }
-            else
-            {
-                timerText.text = "";
-            }
+            time = Sim.GetSimulationTime();
+            timerText.text = ToString();
         }
 
+        static string sFormat = "{0:f0} s {1:f0} ms";
+        static string msFormat = "{0:f0} ms";
         public override string ToString()
         {
-            if (time > 1) return String.Format("{0:f0} s     {1:f0} ms", (int)time, (int)((time - (int)time) * 1000));
-            else return String.Format("{0:f0} ms", (int)(time * 1000));
-        }
-
-        public class LabelNotFoundException : Exception
-        {
-            public LabelNotFoundException() { }
-            public LabelNotFoundException(string message) : base(message) { }
-            public LabelNotFoundException(string message, Exception inner) : base(message, inner) { }
-            protected LabelNotFoundException(SerializationInfo info, StreamingContext ctxt) : base(info, ctxt) { }
+            if (time > 1) return String.Format(sFormat, (int)time, (int)((time - (int)time) * 1000));
+            else return String.Format(msFormat, (int)(time * 1000));
         }
     }
 }

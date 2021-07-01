@@ -19,6 +19,7 @@ namespace C2M2.Interaction
         private float initialTopEndCapLength;
         private float initialBottomEndCapLength;
         private float initialRulerLength;
+        private float prevRulerLength = 0;
         private float scaledRulerLength;
         private string units;
 
@@ -34,22 +35,29 @@ namespace C2M2.Interaction
         // Update is called once per frame
         void Update()
         {
-            float markerSpacing = 0.03f; ///< minimum spacing between each marker and beginning and end of ruler
-            float markerSpacingPercent = markerSpacing * initialRulerLength / transform.lossyScale.z; ///< minimum spacing between each marker and beginning and end of ruler in percent of ruler's length
             if (sim != null)
             {
                 float rulerLength = transform.lossyScale.z / sim.transform.lossyScale.z;
-                float firstMarkerLength = markerSpacingPercent * rulerLength;
+                if (prevRulerLength != rulerLength && Math.Abs((prevRulerLength - rulerLength)/prevRulerLength) >= .005) /// length change must be greater than 0.5% to update
+                {
+                    float markerSpacing = 0.03f; ///< minimum spacing between each marker and beginning and end of ruler
+                    float markerSpacingPercent = markerSpacing * initialRulerLength / transform.lossyScale.z; ///< minimum spacing between each marker and beginning and end of ruler in percent of ruler's length
+                    float firstMarkerLength = markerSpacingPercent * rulerLength;
 
-                int magnitude = GetMagnitude(firstMarkerLength*2); //multiplication by 2 ensures that markers above 500 get treated as the next unit up
-                units = GetUnit(magnitude);
+                    int magnitude = GetMagnitude(firstMarkerLength*2); //multiplication by 2 ensures that markers above 500 get treated as the next unit up
 
-                int siPrefixGroup = (int)Math.Floor(magnitude / 3.0);
-                // scaledFirstMarkerLength is a scaled version of firstMarkerLength so it is between .5 and 500
-                float scaledFirstMarkerLength = (float)(firstMarkerLength / Math.Pow(10, siPrefixGroup * 3));
-                scaledRulerLength = (float)(rulerLength / Math.Pow(10, siPrefixGroup * 3));
-                UpdateMarkers(scaledFirstMarkerLength);
-                UpdateEndCaps();
+                    // Update simulation's length unit
+                    sim.lengthUnit = GetUnit(magnitude);
+                    units = " " + sim.lengthUnit;
+
+                   int siPrefixGroup = (int)Math.Floor(magnitude / 3.0);
+                    // scaledFirstMarkerLength is a scaled version of firstMarkerLength so it is between .5 and 500
+                    float scaledFirstMarkerLength = (float)(firstMarkerLength / Math.Pow(10, siPrefixGroup * 3));
+                    scaledRulerLength = (float)(rulerLength / Math.Pow(10, siPrefixGroup * 3));
+                    UpdateMarkers(scaledFirstMarkerLength);
+                    UpdateEndCaps();
+                    prevRulerLength = rulerLength;
+                }
             }
         }
 
@@ -68,18 +76,18 @@ namespace C2M2.Interaction
             {
                 // takes the magnitude and puts it in terms of nm by adding three. Then divides by 3 to get unit group and rounds down.
                 int eTerm = (magnitude + 3) / 3;
-                return " e" + 3 * eTerm + " nm";
+                return "e" + 3 * eTerm + " nm";
             }
-            else if (magnitude < 0) return " nm";
-            else if (magnitude < 3) return " μm";
-            else if (magnitude < 6) return " mm";
-            else if (magnitude < 9) return " m";
-            else if (magnitude <= 12) return " km";
+            else if (magnitude < 0) return "nm";
+            else if (magnitude < 3) return "μm";
+            else if (magnitude < 6) return "mm";
+            else if (magnitude < 9) return "m";
+            else if (magnitude <= 12) return "km";
             else if (magnitude > 12)
             {
                 // takes the magnitude and puts it in terms of km by subtracting twelve. Then divides by 3 to get unit group and rounds down.
                 int eTerm = (magnitude - 12) / 3;
-                return " e" + 3 * eTerm + " km";
+                return "e" + 3 * eTerm + " km";
             }
             else
             {

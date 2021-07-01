@@ -1,24 +1,22 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using C2M2.NeuronalDynamics.UGX;
-using UnityEditor;
 using UnityEngine;
 using System.Threading;
 using DiameterAttachment = C2M2.NeuronalDynamics.UGX.IAttachment<C2M2.NeuronalDynamics.UGX.DiameterData>;
 using MappingAttachment = C2M2.NeuronalDynamics.UGX.IAttachment<C2M2.NeuronalDynamics.UGX.MappingData>;
-using TMPro;
 using Math = C2M2.Utils.Math;
-using C2M2.Interaction;
 using C2M2.Simulation;
 using C2M2.Utils.DebugUtils;
 using C2M2.Utils.MeshUtils;
 using Grid = C2M2.NeuronalDynamics.UGX.Grid;
 using C2M2.NeuronalDynamics.Visualization.VRN;
 using C2M2.NeuronalDynamics.Interaction;
+using C2M2.NeuronalDynamics.Interaction.UI;
+using C2M2.Interaction.UI;
 using C2M2.Visualization;
-
+using System.Linq;
 namespace C2M2.NeuronalDynamics.Simulation {
 
     /// <summary>
@@ -38,7 +36,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 if (visualInflation != value)
                 {
                     visualInflation = value;
-                    if (ColliderInflation < visualInflation) ColliderInflation = visualInflation;
 
                     Update2DGrid();
 
@@ -50,21 +47,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
 
         public delegate void OnVisualInflationChangeDelegate(double newInflation);
         public event OnVisualInflationChangeDelegate OnVisualInflationChange;
-
-        private double colliderInflation = 1;
-        public double ColliderInflation
-        {
-            get { return colliderInflation; }
-            set
-            {
-                if (colliderInflation != value)
-                {
-                    if (value < visualInflation) return;
-                    colliderInflation = value;
-                    ColliderMesh = CheckMeshCache(colliderInflation);
-                }
-            }
-        }
 
         private int refinementLevel = 0;
         public int RefinementLevel
@@ -80,76 +62,47 @@ namespace C2M2.NeuronalDynamics.Simulation {
             }
         }
 
-        //returns time simulation has been running in milliseconds (ms)
-        //public abstract float GetTime();
-
         private Dictionary<double, Mesh> meshCache = new Dictionary<double, Mesh>();
 
-        private bool clampMode = false;
-        public bool ClampMode
+        public NeuronClampManager clampManager = null;
+        public NeuronClampManager ClampManager
         {
-            get { return clampMode; }
-            set
+            get
             {
-                clampMode = value;
-
-                // TODO: Using GameManager here is bad design
-                // If clampmode is set to true, find ClampMode raycast event and focus on it. Otherwise find default raycast event
-                RaycastPressEvents newEvents = clampMode ?
-                    GameManager.instance.gameObject.GetComponent<RaycastPressEvents>()
-                    : GetComponentInChildren<RaycastPressEvents>();
-                if (newEvents == null) return;
-                raycastManager.leftTrigger = newEvents;
-                raycastManager.rightTrigger = newEvents;
-
-                /*
-                foreach (GameObject clamp in GameManager.instance.clampControllers)
-                {
-                    MeshRenderChild renderControls = clamp.GetComponentInParent<MeshRenderChild>();
-                    if (renderControls != null) renderControls.enabled = clampMode;
-                    clamp.SetActive(clampMode);
-                }*/
-
-                if (GameManager.instance.ndClampManager.clampControllerL != null)
-                {
-                    GameManager.instance.ndClampManager.clampControllerL.SetActive(clampMode);
-                }
-                if (GameManager.instance.ndClampManager.clampControllerR != null)
-                {
-                    GameManager.instance.ndClampManager.clampControllerR.SetActive(clampMode);
-                }
-
-                Debug.Log("ClampMode set to " + clampMode);
+                return GameManager.instance.ndClampManager;
             }
         }
+        public List<NeuronClamp> clamps = new List<NeuronClamp>();
+        public Mutex clampMutex { get; private set; } = new Mutex();
+        private static readonly Tuple<int, double> nullClamp = new Tuple<int, double>(-1, -1);
+
+        public NDGraphManager graphManager { get; private set; } = null;
+        public List<NDLineGraph> Graphs
+        {
+            get { return graphManager.graphs; }
+            set { graphManager.graphs = value; }
+        }
+    
 
         [Header ("1D Visualization")]
         public bool visualize1D = false;
         public Color32 color1D = Color.yellow;
         public float lineWidth1D = 0.005f;
 
+        private InfoPanel infoPanel = null;
+
+        public GameObject infoPanelPrefab = null;
+
         public GameObject controlPanel = null;
-        /// <summary>
-        /// Unit display string that can be manually set by the user
-        /// </summary>
-        [Tooltip("Unit display string that can be manually set by the user")]
-        public string unit = "mV";
-        /// <summary>
-        /// Can be used to manually convert Gradient Display values to match unit string
-        /// </summary>
-        [Tooltip("Can be used to manually convert Gradient Display values to match unit string")]
-        public float unitScaler = 1000f;
-        /// <summary>
-        /// Alter the precision of the color scale display
-        /// </summary>
-        [Tooltip("Alter the precision of the color scale display")]
-        public int colorScalePrecision = 3;
 
         // Need mesh options for each refinement, diameter level
         [Tooltip("Name of the vrn file within Assets/StreamingAssets/NeuronalDynamics/Geometries")]
         public string vrnFileName = "test.vrn";
         private VrnReader vrnReader = null;
-        private VrnReader VrnReader
+        /// <summary>
+        /// Used to read cell data from .vrn archives
+        /// </summary>
+        public VrnReader VrnReader
         {
             get
             {
@@ -161,8 +114,12 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 }
                 return vrnReader;
             }
-            set { vrnReader = value; }
+            private set { vrnReader = value; }
         }
+        /// <summary>
+        /// Includes info like cell species, strain, and archive
+        /// </summary>
+        public VrnReader.MetaInfo MetaInfo { get { return (VrnReader.MetaInfo)vrnReader.GetMetaInfo(); } }
 
         private Grid grid1D = null;
         public Grid Grid1D
@@ -175,7 +132,9 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 grid1D = value;
             }
         }
+
         public Vector3[] Verts1D { get { return grid1D.Mesh.vertices; } }
+        public double[] vals1D = null;
 
         private Grid grid2D = null;
         public Grid Grid2D
@@ -189,13 +148,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 grid2D = value;
             }
         }
-
-        private NeuronCell neuronCell = null;
-        public NeuronCell NeuronCell
-        {
-            get { return neuronCell; }
-            set { neuronCell = value; }
-        }
+        public Neuron Neuron { get; set; } = null;
 
         private float averageDendriteRadius = 0;
         public float AverageDendriteRadius
@@ -204,12 +157,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
             {
                 if (averageDendriteRadius == 0)
                 {
-                    float radiusSum = 0;
-                    foreach (NeuronCell.NodeData node in NeuronCell.nodeData)
-                    {
-                        radiusSum += (float) node.nodeRadius;
-                    }
-                    averageDendriteRadius = radiusSum / NeuronCell.nodeData.Count;
+                    averageDendriteRadius = (float)Neuron.nodes.Select(node => node.NodeRadius).Average();
                 }
                 return averageDendriteRadius;
             }
@@ -250,8 +198,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
             }
         }
 
-        private RaycastEventManager raycastManager = null;
-
         private double[] scalars3D = new double[0];
         private double[] Scalars3D
         {
@@ -265,28 +211,40 @@ namespace C2M2.NeuronalDynamics.Simulation {
             }
         }
 
-        public Tuple<int, double>[] raycastHits = new Tuple<int, double>[0];
-        public List<NeuronClamp> clamps = new List<NeuronClamp>();
+        void ShowInfoPanel(bool show, RaycastHit hit)
+        {
+            if (infoPanel == null)
+            {
+                infoPanel = Instantiate(infoPanelPrefab, transform).GetComponent<InfoPanel>();
+            }
+            infoPanel.gameObject.SetActive(show);
+            if(show)
+            {
+                int id = GetNearestPoint(hit);
+                infoPanel.unit = unit;
+                infoPanel.Vertex = id;
+                infoPanel.Power = vals1D[id] * unitScaler;
+                infoPanel.FocusLocalPosition = Verts1D[id]; //offset so the popup is not in the middle of the dendrite
+            }        
+        }
 
-        public Mutex clampMutex { get;  private set; } = new Mutex();
-        private static Tuple<int, double> nullClamp = new Tuple<int, double>(-1, -1);
-
-        protected override void PostSolveStep()
+        protected override void PostSolveStep(int t)
         {
             ApplyInteractionVals();
             void ApplyInteractionVals()
             {
                 ///<c>if (clamps != null && clamps.Count > 0)</c> this if statement is where we apply voltage clamps   
                 // Apply clamp values, if there are any clamps
+
                 if (clamps.Count > 0)
                 {
                     Tuple<int, double>[] clampValues = new Tuple<int, double>[clamps.Count];
                     clampMutex.WaitOne();
                     for (int i = 0; i < clamps.Count; i++)
                     {
-                        if (clamps[i] != null && clamps[i].focusVert != -1 && clamps[i].clampLive)
+                        if (clamps[i] != null && clamps[i].focusVert != -1 && clamps[i].ClampLive)
                         {
-                            clampValues[i] = new Tuple<int, double>(clamps[i].focusVert, clamps[i].clampPower);
+                            clampValues[i] = new Tuple<int, double>(clamps[i].focusVert, clamps[i].ClampPower);
                         }
                         else
                         {
@@ -305,24 +263,52 @@ namespace C2M2.NeuronalDynamics.Simulation {
             }
         }
 
+        protected override void OnAwakePost(Mesh viz)
+        {
+            base.OnAwakePost(viz);
+            infoPanelPrefab = (GameObject)Resources.Load("Prefabs" + Path.DirectorySeparatorChar + "NeuronalDynamics" + Path.DirectorySeparatorChar + "HoverInfo");
 
+            defaultRaycastEvent.OnHover.AddListener((hit) =>
+            {
+                ShowInfoPanel(true, hit);
+            });
+            defaultRaycastEvent.OnHoverEnd.AddListener((hit) =>
+            {
+                ShowInfoPanel(false, hit);
+            });
+            defaultRaycastEvent.OnHoldPress.AddListener((hit) =>
+            {
+                ShowInfoPanel(true, hit);
+            });
+            defaultRaycastEvent.OnEndPress.AddListener((hit) =>
+            {
+                ShowInfoPanel(false, hit);
+            });
+        }
         /// <summary>
         /// Translate 1D vertex values to 3D values and pass them upwards for visualization
         /// </summary>
         /// <returns> One scalar value for each 3D vertex based on its 1D vert's scalar value </returns>
         public sealed override double[] GetValues () {
-            double[] scalars1D = Get1DValues ();
+            vals1D = Get1DValues ();
 
-            if (scalars1D == null) { return null; }
-            //double[] scalars3D = new double[map.Length];
+            if (vals1D == null) { return null; }
+            
             for (int i = 0; i < Map.Length; i++) { // for each 3D point,
 
                 // Take an weighted average using lambda
                 // Equivalent to [lambda * v2 + (1 - lambda) * v1]
-                double newVal = map[i].lambda * (scalars1D[map[i].v2] - scalars1D[map[i].v1]) + scalars1D[map[i].v1];
+                double newVal = map[i].lambda * (vals1D[map[i].v2] - vals1D[map[i].v1]) + vals1D[map[i].v1];
 
                 Scalars3D[i] = newVal;
             }
+
+            // Update graphs
+            foreach(NDLineGraph graph in Graphs)
+            {
+                graph.AddValue(1000*GetSimulationTime(), (float)vals1D[graph.vert] * unitScaler);
+            }
+
             return Scalars3D;
         }
 
@@ -330,24 +316,16 @@ namespace C2M2.NeuronalDynamics.Simulation {
         /// Translate 3D vertex values to 1D values, and pass them downwards for interaction
         /// </summary>
         public sealed override void SetValues (RaycastHit hit) {
-            // We will have 3 new index/value pairings
-            Tuple<int, double>[] newValues = new Tuple<int, double>[3];
-            // Translate hit triangle index so we can index into triangles array
-            int triInd = hit.triangleIndex * 3;
-            MeshFilter mf = hit.transform.GetComponentInParent<MeshFilter>();
-            // Get mesh vertices from hit triangle
-            int v1 = mf.mesh.triangles[triInd];
-            int v2 = mf.mesh.triangles[triInd + 1];
-            int v3 = mf.mesh.triangles[triInd + 2];
-            // Attach new values to new vertices
-            newValues[0] = new Tuple<int, double>(v1, raycastHitValue);
-            newValues[1] = new Tuple<int, double>(v2, raycastHitValue);
-            newValues[2] = new Tuple<int, double>(v3, raycastHitValue);
-
-            SetValues (newValues);
+            int[] verts = HitToVertices(hit);
+            Tuple<int, double>[] newValues = new Tuple<int, double>[verts.Length];
+            for (int i = 0; i < verts.Length; i++)
+            {
+                newValues[i] = new Tuple<int, double>(verts[i], raycastHitValue);
+            }
+            SetValues(newValues);
         }
         /// <summary>
-        /// Translate 3D vertex values to 1D values, and pass them downwards for interaction
+        /// Translate 3D vertex values to 1D values, and store the values to be applied to simulation values
         /// </summary>
         public void SetValues (Tuple<int, double>[] newValues) {
             // Reserve space for new1DValuess
@@ -382,18 +360,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
             base.OnAwakePre();
         }
 
-        protected override void OnAwakePost(Mesh viz)
-        {
-            base.OnAwakePost(viz);
-            raycastEvents.OnEndPress.AddListener((hit) => ResetRacyastHits(hit));
-        }
-        protected override void OnStart()
-        {
-            base.OnStart();
-            raycastManager = GetComponent<RaycastEventManager>();
-
-            ClampMode = clampMode;
-        }
         /// <summary>
         /// Read in the cell and initialize 3D/1D visualization/interaction infrastructure
         /// </summary>
@@ -409,7 +375,8 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 Update2DGrid();
 
                 VisualMesh = Grid2D.Mesh;
-                VisualMesh.Rescale (transform, new Vector3 (4, 4, 4));
+ 
+                VisualMesh.Rescale(transform, new Vector3 (4, 4, 4));
                 VisualMesh.RecalculateNormals ();
 
                 // Pass blownupMesh upwards to MeshSimulation
@@ -424,72 +391,33 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 Grid geom1D = Mapping.ModelGeometry;
                 GameObject lines1D = gameObject.AddComponent<LinesRenderer> ().Draw (geom1D, color1D, lineWidth1D);
             }
-            void InitUI () {
+
+            void InitUI ()
+            {
+                GameObject gm = new GameObject();
+                gm.name = "LineGraphManager";
+                gm.transform.parent = transform;
+                graphManager = gm.AddComponent<NDGraphManager>();
+                graphManager.sim = this;
+
                 // Instantiate control panel prefab, announce active simulation to buttons
                 controlPanel = Resources.Load ("Prefabs/NeuronalDynamics/ControlPanel/NDControls") as GameObject;        
                 controlPanel = GameObject.Instantiate(controlPanel);
 
-                NDClampModeButtonController clampModeCont = controlPanel.GetComponentInChildren<NDClampModeButtonController>();
-                if(clampModeCont != null)
+                NDSimulationController controller = controlPanel.GetComponent<NDSimulationController>();
+                if(controller == null)
                 {
-                    clampModeCont.sim = this;
-                }
-                else
-                {
-                    Debug.LogError("No clamp mode button controller found!");
+                    Debug.LogWarning("No NDSimulationController found.");
+                    Destroy(controlPanel);
+                    return;
                 }
 
-                // Find the close button, report this simulation
-                CloseNDSimulation closeButton = controlPanel.GetComponentInChildren<CloseNDSimulation>();
-                if(closeButton != null)
-                {
-                    closeButton.sim = this;
-                }
+                controller.sim = this;
 
-                // Find gradient display and attach our values
-                GradientDisplay gradientDisplay = controlPanel.GetComponentInChildren<GradientDisplay>();
-                if (gradientDisplay != null)
-                {
-                    gradientDisplay.sim = this;
-                    if (colorLUT != null)
-                    {
-                        gradientDisplay.gradient = colorLUT.Gradient;
-                    }
-                    else if (colorLUT == null) { Debug.LogWarning("No ColorLUT found on MeshSimulation"); }
-                    gradientDisplay.unit = unit;
-                    gradientDisplay.scaler = unitScaler;
-                    gradientDisplay.precision = "F" + colorScalePrecision.ToString();
-                }
-                else if (gradientDisplay == null) { Debug.LogWarning("No GradientDisplay found on NDControls"); }
-
-                SimulationTimerLabel timeLabel = controlPanel.GetComponentInChildren<SimulationTimerLabel>();
-                if (timeLabel != null)
-                {
-                    timeLabel.sim = this;
-                }
             }
         }
 
-        // TODO: Obsolete
-        private Mesh CheckMeshCache(double inflation)
-        {
-            if (!meshCache.ContainsKey(inflation) || meshCache[inflation] == null)
-            {
-                string meshName = VrnReader.Retrieve2DMeshName(inflation);
-
-                Grid grid = new Grid(new Mesh(), meshName);
-                VrnReader.ReadUGX(meshName, ref grid);
-                meshCache[inflation] = grid.Mesh;
-            }
-            return meshCache[inflation];
-        }
-
-        public void SwitchColliderMesh (double inflation) {
-            inflation = Math.Clamp (inflation, 1, 5);
-            ColliderInflation = inflation;
-        }
-
-        public void SwitchMesh (double inflation) {
+        public void SwitchVisualMesh (double inflation) {
             inflation = Math.Clamp (inflation, 1, 5);
             VisualInflation = inflation;
         }
@@ -503,12 +431,12 @@ namespace C2M2.NeuronalDynamics.Simulation {
 
             VrnReader.ReadUGX(meshName1D, ref grid1D);
 
-            NeuronCell = new NeuronCell(grid1D);
+            Neuron = new Neuron(grid1D);
         }
         private void Update2DGrid()
         {
             /// Retrieve mesh names from archive
-            string meshName2D = VrnReader.Retrieve2DMeshName(VisualInflation);
+            string meshName2D = VrnReader.Retrieve2DMeshName(VisualInflation, RefinementLevel);
 
             /// Empty 2D grid which stores geometry + mapping data
             Grid2D = new Grid(new Mesh(), meshName2D);
@@ -516,9 +444,38 @@ namespace C2M2.NeuronalDynamics.Simulation {
             VrnReader.ReadUGX(meshName2D, ref grid2D);
         }
 
-        public void ResetRacyastHits(RaycastHit hit)
+        public int GetNearestPoint(RaycastHit hit)
         {
-            raycastHits = new Tuple<int, double>[0];
+            if (mf == null) return -1;
+
+            // Get 3D mesh vertices from hit triangle
+            int triInd = hit.triangleIndex * 3;
+            int v1 = mf.mesh.triangles[triInd];
+            int v2 = mf.mesh.triangles[triInd + 1];
+            int v3 = mf.mesh.triangles[triInd + 2];
+
+            // Find 1D verts belonging to these 3D verts
+            int[] verts1D = new int[]
+            {
+                Map[v1].v1, Map[v1].v2,
+                Map[v2].v1, Map[v2].v2,
+                Map[v3].v1, Map[v3].v2
+            };
+            Vector3 localHitPoint = transform.InverseTransformPoint(hit.point);
+
+            float nearestDist = float.PositiveInfinity;
+            int nearestVert1D = -1;
+            foreach (int vert in verts1D)
+            {
+                float dist = Vector3.Distance(localHitPoint, Verts1D[vert]);
+                if (dist < nearestDist)
+                {
+                    nearestDist = dist;
+                    nearestVert1D = vert;
+                }
+            }
+
+            return nearestVert1D;
         }
     }
 

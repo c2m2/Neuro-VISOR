@@ -162,14 +162,14 @@ namespace C2M2.NeuronalDynamics.UGX
         /// <summary>
         /// List all available attachments by name
         /// </summary>
-        public static void Available()
+        public static string Available()
         {
             string s = "Available attachments (Name/Type): ";
             foreach (var pair in attachments)
             {
                 s += $"\n\t{pair.Key} => {pair.Value}";
             }
-            Debug.Log(s);
+            return s;
         }
 
         /// Attachment Registry

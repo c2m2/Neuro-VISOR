@@ -1,13 +1,73 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 using C2M2.Utils;
+
 
 namespace C2M2.Visualization
 {
     public class LineGrapher : MonoBehaviour
     {
+        public RectTransform backgroundPanel = null;
+        public LineRenderer pointsRenderer;
+        public GraphCursor cursor = null;
+        public GraphPointer pointerLines = null;
+        public RectTransform closeButton = null;
+        public Color outlineColor;
+        public Color labelColor;
+
+        public RectTransform infoPanel = null;
+        public RectTransform infoPanelButton = null;
+        private LineRenderer outline;
+        public LineRenderer Outline
+        {
+            get
+            {
+                return outline;
+            }
+            set
+            {
+                outline = value;
+                outline.startColor = outlineColor;
+                outline.endColor = outlineColor;
+            }
+        }
+
+
+        private int maxSamples = 100;
+        public int MaxSamples
+        {
+            get
+            {
+                return maxSamples;
+            }
+            set
+            {
+                if (maxSamples == positions.Count) return;
+
+                if (maxSamples <= 0)
+                {
+                    Debug.LogError("Cannot have fewer than 1 point on graph");
+                    return;
+                }
+
+                maxSamples = value;
+                // If our current list is larger than the new capacity, reduce the list
+                if(positions.Count > maxSamples)
+                {
+                    int overage = positions.Count - maxSamples;
+                    positions.RemoveRange(0, overage);
+                }
+                positions.Capacity = maxSamples;
+            }
+        }
+
+        public float graphWidth = 500f;
+        public float localOriginX = 50f;
+        public float localOriginY = 50f;
+        public float globalLineWidth = 4f;
+
         #region GraphText
         public TextMeshProUGUI title;
         private string titleStr = "";
@@ -18,6 +78,7 @@ namespace C2M2.Visualization
             {
                 titleStr = value;
                 title.text = titleStr;
+                title.color = labelColor;
             }
         }
 
@@ -30,6 +91,7 @@ namespace C2M2.Visualization
             {
                 yLabelStr = value;
                 yLabel.text = yLabelStr;
+                yLabel.color = labelColor;
             }
         }
 
@@ -42,8 +104,33 @@ namespace C2M2.Visualization
             {
                 xLabelStr = value;
                 xLabel.text = xLabelStr;
+                xLabel.color = labelColor;
             }
         }
+
+        private int xPrecision = 3;
+        public int XPrecision
+        {
+            get
+            {
+                return xPrecision;
+            }
+            set
+            {
+                if (value > 0 && value <= maxXPrec)
+                {
+                    xPrecision = value;
+                    xPrecFormat = "F" + xPrecision;
+
+                    if (cursor != null)
+                    {
+                        cursor.UpdateFormatString(XPrecision, yPrecision);
+                    }
+                }
+            }
+        }
+        private string xPrecFormat = "F3";
+        private int maxXPrec = 6;
 
         private float xMin = float.PositiveInfinity;
         public float XMin
@@ -52,7 +139,7 @@ namespace C2M2.Visualization
             set
             {
                 xMin = value;
-                XMinStr = xMin.ToString("F2");
+                XMinStr = xMin.ToString(xPrecFormat);
             }
         }
         public TextMeshProUGUI xMinLabel;
@@ -65,11 +152,35 @@ namespace C2M2.Visualization
             set
             {
                 xMax = value;
-                XMaxStr = xMax.ToString("F2");
+                XMaxStr = xMax.ToString(xPrecFormat);
             }
         }
         public TextMeshProUGUI xMaxLabel;
         private string XMaxStr { set { if (xMaxLabel != null) xMaxLabel.text = value; } }
+
+        private int yPrecision = 3;
+        public int YPrecision
+        {
+            get
+            {
+                return yPrecision;
+            }
+            set
+            {
+                if (value > 0 && value <= maxYPrec)
+                {
+                    yPrecision = value;
+                    yPrecFormat = "F" + yPrecision;
+
+                    if (cursor != null)
+                    {
+                        cursor.UpdateFormatString(XPrecision, yPrecision);
+                    }
+                }
+            }
+        }
+        private string yPrecFormat = "F3";
+        private int maxYPrec = 6;
 
         private float yMin = float.PositiveInfinity;
         public float YMin
@@ -78,7 +189,7 @@ namespace C2M2.Visualization
             set
             {
                 yMin = value;
-                YMinStr = yMin.ToString();
+                YMinStr = yMin.ToString(yPrecFormat);
             }
         }
         public TextMeshProUGUI yMinLabel;
@@ -91,84 +202,172 @@ namespace C2M2.Visualization
             set
             {
                 yMax = value;
-                YMaxStr = yMax.ToString();
+                YMaxStr = yMax.ToString(yPrecFormat);
             }
         }
         public TextMeshProUGUI yMaxLabel;
         private string YMaxStr { set { if (yMaxLabel != null) yMaxLabel.text = value; } }
         #endregion
 
-        public RectTransform backgroundPanel = null;
+        // Keeping one list of Vector3's saves list operation time over storing a separate x and y list
+        public List<Vector3> positions;
 
-        public float graphWidth = 500f;
-        public LineRenderer pointsRenderer;
-        public int numSamples = 20;
-        public List<float> xValues;
-        public List<float> yValues;
+        public RectTransform rt { get; private set; }
 
-        private void Start()
+        private void Awake()
         {
-            if (pointsRenderer == null)
+            rt = (RectTransform)transform;
+
+            NullChecks();
+
+            InitInfoPanel();
+
+            InitOutline();
+
+            InitInfoPanelButton();
+        
+            MaxSamples = maxSamples;
+
+            void InitInfoPanel()
             {
-                Debug.LogError("No renderer given for plot points!");
-                Destroy(this);
-            }
-            xValues = new List<float>(numSamples);
-            yValues = new List<float>(numSamples);
+                float buttonWidth = graphWidth / 10;
+                float margin = buttonWidth / 2.5f;
+                closeButton.sizeDelta = new Vector2(buttonWidth - margin, buttonWidth - margin);
+                closeButton.anchoredPosition = new Vector3(-(graphWidth / 2) - (buttonWidth / 2), (graphWidth / 2) + (buttonWidth / 2));
+                closeButton.GetComponent<BoxCollider>().size = new Vector3(buttonWidth, buttonWidth);
 
-            for (int i = 0; i < numSamples; i++)
+                infoPanel.sizeDelta = new Vector2(graphWidth / 2, rt.sizeDelta.y);
+
+                Vector3 lwh = infoPanel.sizeDelta;
+
+                infoPanel.anchoredPosition = new Vector2((rt.sizeDelta.x + lwh.x) / 2, 0f);
+
+                Image backgroundImg = infoPanel.GetComponentInChildren<Image>();
+                backgroundImg.rectTransform.sizeDelta = lwh;
+
+                var infoOutline = infoPanel.GetComponent<LineRenderer>();
+                if(infoOutline != null)
+                {
+                    infoOutline.startColor = outlineColor;
+                    infoOutline.endColor = outlineColor;
+                }
+                foreach(var text in infoOutline.GetComponentsInChildren<TextMeshProUGUI>())
+                {
+                    text.color = labelColor;
+                }
+            }
+            void InitInfoPanelButton()
             {
-                xValues.Add(0);
-                yValues.Add(0);
+                float buttonWidth = graphWidth / 10;
+                float margin = buttonWidth / 2.5f;
+                infoPanelButton.sizeDelta = new Vector2(buttonWidth - margin, buttonWidth - margin);
+                infoPanelButton.anchoredPosition = new Vector3((graphWidth / 2) + (buttonWidth / 2), (graphWidth / 2) + (buttonWidth / 2));
+                foreach (BoxCollider receiver in infoPanel.GetComponentsInChildren<BoxCollider>())
+                {
+                    receiver.size = new Vector3(buttonWidth, buttonWidth);
+                }
             }
-
-            pointsRenderer.positionCount = numSamples;
-
-            XMin = xValues[0];
-            XMax = xValues[xValues.Count - 1];
+            void InitOutline()
+            {
+                Outline = infoPanel.GetComponent<LineRenderer>();
+                Vector3 lwh = infoPanel.sizeDelta;
+                Outline.positionCount = 4;
+                Outline.SetPositions(new Vector3[] {
+                new Vector3(-lwh.x / 2, -lwh.y / 2),
+                new Vector3(-lwh.x / 2, lwh.y / 2),
+                new Vector3(lwh.x / 2, lwh.y / 2),
+                new Vector3(lwh.x / 2, -lwh.y / 2) });
+                Outline.loop = true;
+                outline.startColor = outlineColor;
+                outline.endColor = outlineColor;
+            }
+            void NullChecks()
+            {
+                if (pointsRenderer == null)
+                {
+                    Debug.LogError("No renderer given for plot points!");
+                    Destroy(this);
+                }
+                if (cursor == null)
+                {
+                    cursor = GetComponentInChildren<GraphCursor>();
+                    if (cursor == null)
+                    {
+                        Debug.LogError("No cursor found for LineGrapher.");
+                        Destroy(this);
+                    }
+                    cursor.cursorLabel.color = labelColor;
+                }
+                if (pointerLines == null)
+                {
+                    pointerLines = GetComponentInChildren<GraphPointer>();
+                    if (pointerLines == null)
+                    {
+                        Debug.LogError("No pointer lines found for LineGrapher.");
+                        Destroy(this);
+                    }
+                }
+                if (closeButton == null)
+                {
+                    Debug.LogError("No Close Button found.");
+                    Destroy(this);
+                }
+                if (infoPanel == null)
+                {
+                    Debug.LogError("No info panel found.");
+                    Destroy(this);
+                }
+                if (infoPanelButton == null)
+                {
+                    Debug.LogError("No info panel open/close button found.");
+                    Destroy(this);
+                }
+            }
         }
 
-        public float ChangeMax(float newMax) => YMax = newMax;
-        public void ChangeMin(float newMin) => YMin = newMin;
-
-        public void AddValue(float y, float x = -1f)
+        public virtual void AddValue(float x, float y)
         {
-            if(x == -1f)
+            if (positions.Count > MaxSamples)
             {
-                x = numSamples;
-                xValues[xValues.Count - 2] -= (graphWidth / (numSamples - 1));
+                // RemoveAt(0) is an O(n) operation and should be removed if possible
+                positions.RemoveAt(0);
             }
 
-            xValues.RemoveAt(0);
-            xValues.Add(x);
+            positions.Add(new Vector3(x, y));
 
-            XMin = xValues[0];
-            XMax = xValues[xValues.Count - 1];
-
-            yValues.RemoveAt(0);
-            yValues.Add(y);
+            // Update max and min
+            XMin = positions[0].x;
+            XMax = positions[positions.Count - 1].x;
 
             if (y < YMin) YMin = y;
-            else if (y > YMax) YMax = y;
+            else if(y > YMax) YMax = y;
 
-            UpdateRender();
+            UpdateScale();
+
+            pointsRenderer.positionCount = positions.Count;
+
+            // Our local ToArray function should be faster than Enumerable's default function
+            pointsRenderer.SetPositions(Array.ToArray(positions));
         }
-        private void UpdateRender()
+
+        private void UpdateScale()
         {
-            if (pointsRenderer == null) return;
+            if (XMax == XMin || YMax == YMin) return;
 
-            // TODO: Can speed this up by checking new values to resolve rolling max/min
-           /* List<float> y = yValues.Rescale(0, graphWidth, YMin, YMax);
-            List<float> x = xValues.Rescale(0, graphWidth, XMin, XMax);
-            Vector3[] points = new Vector3[numSamples];
+            /// Instead of rescaling the entire array of values each frame, 
+            /// this scales the line renderer's transform, 
+            /// saving tons of performance over rescaling each point individually
+            float xScaler = graphWidth / (XMax - XMin);
+            float yScaler = graphWidth / (YMax - YMin);
 
-            for (int i = 0; i < numSamples; i++)
-            {
-                points[i] = new Vector3(x[i], y[i], 0f);
-            }
+            float xOrigin = localOriginX - (XMin * xScaler);
+            float yOrigin = localOriginY - (YMin * yScaler);
 
-            pointsRenderer.SetPositions(points);
-            */
+            pointsRenderer.transform.localScale = new Vector3(xScaler, yScaler, 1f);
+            pointsRenderer.transform.localPosition = new Vector3(xOrigin, yOrigin, 0f);
+
+            float lineWidth = globalLineWidth / Math.Max(xScaler, yScaler);
+            pointsRenderer.startWidth = lineWidth;      
         }
 
         public void SetLabels(string title = "", string xLabel = "", string yLabel = "")
@@ -176,8 +375,6 @@ namespace C2M2.Visualization
             if (title != "") TitleStr = title;
             if (xLabel != "") XLabelStr = xLabel;
             if (yLabel != "") YLabelStr = yLabel;
-
-
         }
 
         public void DestroyPlot()

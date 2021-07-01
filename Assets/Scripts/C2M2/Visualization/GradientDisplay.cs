@@ -4,23 +4,71 @@ using System.Collections.Generic;
 using UnityEngine;
 using C2M2.Simulation;
 using TMPro;
-namespace C2M2.Visualization
+using C2M2.NeuronalDynamics.Simulation;
+namespace C2M2.NeuronalDynamics.Interaction.UI
 {
     public class GradientDisplay : MonoBehaviour
     {
-        public LineRenderer linerend = null;
-        public Gradient gradient;
+        public NDSimulationController simController = null;
+        public MeshSimulation Sim
+        {
+            get { return simController.sim; }
+        }
+        public Gradient Gradient
+        {
+            get
+            {
+                return Sim.ColorLUT.Gradient;
+            }
+            set
+            {
+                Sim.ColorLUT.Gradient = value;
+            }
+        }
+        public LineRenderer gradientLine = null;
         public float displayLength = 75;
         public float displayHeight = 10;
         public int numTextMarkers = 5;
-        public MeshSimulation sim = null;
         public GameObject textMarkerPrefab = null;
         public GameObject textMarkerHolder = null;
         public TextMeshProUGUI unitText = null;
         public LineRenderer outline = null;
-        public float scaler = 1;
-        public string unit = "unit";
-        public string precision = "F4";
+
+        public float originalMin { get; private set; } = float.PositiveInfinity;
+        public float originalMax { get; private set; } = float.NegativeInfinity;
+
+        public TextMarker[] textMarkers = new TextMarker[0];
+
+        public float UnitScaler
+        {
+            get
+            {
+                return Sim.unitScaler;
+            }
+            set
+            {
+                Sim.unitScaler = value;
+            }
+        }
+        public string Unit
+        {
+            get
+            {
+                return Sim.unit;
+            }
+            set
+            {
+                Sim.unit = value;
+            }
+        }
+
+        public string Precision
+        {
+            get
+            {
+                return "F" + Sim.colorMarkerPrecision;
+            }
+        }
 
         private float LineWidth
         {
@@ -32,11 +80,20 @@ namespace C2M2.Visualization
 
         private void Awake()
         {
-            // Init gradient display
-            if(linerend == null)
+            if(simController == null)
             {
-                linerend = GetComponent<LineRenderer>();
-                if(linerend == null)
+                simController = GetComponentInParent<NDSimulationController>();
+                if(simController == null)
+                {
+                    Debug.LogError("No simulation controller found.");
+                    Destroy(this);
+                }
+            }
+            // Init gradient display
+            if(gradientLine == null)
+            {
+                gradientLine = GetComponent<LineRenderer>();
+                if(gradientLine == null)
                 {
                     Debug.LogError("No line renderer found on " + name);
                     Destroy(this);
@@ -44,6 +101,12 @@ namespace C2M2.Visualization
             }
 
             StartCoroutine(UpdateDisplayRoutine());
+        }
+
+        private void Start()
+        {
+            originalMin = Sim.ColorLUT.GlobalMin;
+            originalMax = Sim.ColorLUT.GlobalMax;
         }
 
         private IEnumerator UpdateDisplayRoutine()
@@ -60,9 +123,9 @@ namespace C2M2.Visualization
                 {
                     Debug.LogError(e);
                     // We set hasChanged to be true so that it tries to update the display again
-                    sim.colorLUT.hasChanged = true;
+                    Sim.ColorLUT.hasChanged = true;
                 }
-                yield return new WaitUntil(() => sim.colorLUT.hasChanged == true);
+                yield return new WaitUntil(() => Sim.ColorLUT.hasChanged == true);
             }
         }
 
@@ -88,82 +151,135 @@ namespace C2M2.Visualization
         private void UpdateDisplay()
         {
             // Fetch graddient from simulation's colorLUT
-            if (sim.colorLUT.hasChanged)
+            if (Sim.ColorLUT.hasChanged)
             {
-                Debug.Log("Updating GradientDisplay...");
+                GradientColorKey[] colorKeys = Gradient.colorKeys;
 
-                gradient = sim.colorLUT.Gradient;
-
-                GradientColorKey[] colorKeys = gradient.colorKeys;
-
-                linerend.positionCount = colorKeys.Length;
+                gradientLine.positionCount = colorKeys.Length;
                 Vector3[] positions = new Vector3[colorKeys.Length];
                 for (int i = 0; i < colorKeys.Length; i++)
                 {
                     positions[i] = new Vector3(colorKeys[i].time * displayLength, 0f, 0f);
                 }
 
-                linerend.SetPositions(positions);
+                gradientLine.SetPositions(positions);
 
-                linerend.colorGradient = gradient;
+                gradientLine.colorGradient = Gradient;
 
-                linerend.startWidth = displayHeight;
-                linerend.endWidth = displayHeight;
+                gradientLine.startWidth = displayHeight;
+                gradientLine.endWidth = displayHeight;
 
                 DrawOutline();
 
-                UpdateText();
+                UpdateTextMarkers();
 
-                sim.colorLUT.hasChanged = false;
+                Sim.ColorLUT.hasChanged = false;
             }
         }
-        private void UpdateText()
+        public void UpdateTextMarkers()
         {
             if (textMarkerHolder == null) { Debug.LogError("No text marker holder object found."); return; }
             if (textMarkerPrefab == null) { Debug.LogError("No text marker prefab found."); return; }
 
-            // Clear old text markers
-            foreach (TextMeshProUGUI marker in textMarkerHolder.GetComponentsInChildren<TextMeshProUGUI>())
+            float max = UnitScaler * Sim.ColorLUT.GlobalMax;
+            float min = UnitScaler * Sim.ColorLUT.GlobalMin;
+            float valueStep = (max - min) / (numTextMarkers - 1);
+            float placementStep = displayLength / (numTextMarkers - 1);
+
+            if (textMarkers.Length != numTextMarkers)
             {
-                Destroy(marker.gameObject);
+                // Destroy old markers if there are any
+                if(textMarkers.Length > 0)
+                {
+                    foreach(TextMarker tm in textMarkers)
+                    {
+                        Destroy(tm.gameObject);
+                    }
+                }
+
+                BuildNewMarkers();
+            }
+            else
+            {
+                UpdateLabels();
             }
 
-            BuildNewMarkers();
-
-            if (unitText != null)
-            {
-                unitText.text = unit;
-            }
-
+            if (unitText != null) unitText.text = Unit;
+            
             void BuildNewMarkers()
             {
-                float max = scaler * sim.colorLUT.GlobalMax;
-                float min = scaler * sim.colorLUT.GlobalMin;
-                float valueStep = (max - min) / (numTextMarkers - 1);
-                float placementStep = displayLength / (numTextMarkers - 1);
+
+                textMarkers = new TextMarker[numTextMarkers];
+
                 for (int i = 0; i < numTextMarkers; i++)
                 {
                     GameObject newMarker = Instantiate(textMarkerPrefab, textMarkerHolder.transform);
-                    newMarker.transform.localPosition = new Vector3(i * placementStep, -displayHeight, 0f);
-                    newMarker.GetComponent<TextMeshProUGUI>().text = (min + (i * valueStep)).ToString(precision);
-                    LineRenderer lineMarker = newMarker.GetComponentInChildren<LineRenderer>();
-                    if (lineMarker != null)
+                    newMarker.transform.localPosition = new Vector3(i * placementStep, 0, 0f);
+
+                    textMarkers[i] = newMarker.GetComponent<TextMarker>();
+                    if (textMarkers[i] == null) Debug.LogError("No TextMarker found on Prefab");
+
+                    textMarkers[i].gradDisplay = this;
+
+                    DrawLR(textMarkers[i]);
+
+                    InitExtremaController(textMarkers[i], (i == numTextMarkers-1), (i == 0));
+                }
+
+                UpdateLabels();
+
+                void DrawLR(TextMarker tm)
+                {
+
+                    tm.line.transform.localPosition = new Vector3(0f, displayHeight / tm.transform.localScale.y / 2, 0f);
+                    tm.line.positionCount = 2;
+                    tm.line.SetPositions(new Vector3[] {
+                        new Vector3(0f, 0f, 0f),
+                        new Vector3(0f, -displayHeight, 0f) });
+
+                    // Draw marker line in front of the gradient
+                    tm.line.sortingOrder = gradientLine.sortingOrder + 1;
+
+                    tm.line.startWidth = LineWidth;
+                    tm.line.endWidth = LineWidth;
+                }
+                void InitExtremaController(TextMarker tm, bool isMax = false, bool isMin = false)
+                {
+                    var extrema = tm.extremaController;
+                    if (extrema != null)
                     {
-                        lineMarker.transform.localPosition = new Vector3(0f, displayHeight / newMarker.transform.localScale.y / 2, 0f);
-                        lineMarker.positionCount = 2;
-                        lineMarker.SetPositions(new Vector3[] {
-                        new Vector3(0f, displayHeight, 0f),
-                        new Vector3(0f, -displayHeight/4, 0f) });
-                        //   lineMarker.SetPosition(0, Vector3.zero);
-                        //  lineMarker.SetPosition(1, new Vector3(displayLength * 1.5f, 0f, 0f));
-                        lineMarker.startWidth = LineWidth;
-                        lineMarker.endWidth = LineWidth;
-                    }
-                    else
-                    {
-                        Debug.LogWarning("No line marker found on text marker prefab!");
+                        if (isMin)
+                        {
+                            extrema.gameObject.SetActive(true);
+                            extrema.affectMax = false;
+                            tm.name = "MinMarker (" + tm.label.text + ")";
+                        }
+                        else if (isMax)
+                        {
+                            extrema.gameObject.SetActive(true);
+                            extrema.affectMax = true;
+                            tm.name = "MaxMarker (" + tm.label.text + ")";
+                        }
+                        else
+                        {
+                            Destroy(extrema.gameObject);
+                          //  extrema.gameObject.SetActive(false);
+                        }
                     }
                 }
+            }
+            void UpdateLabels()
+            {
+                for (int i = 0; i < numTextMarkers; i++)
+                {
+                    SetLabel(textMarkers[i], min + (i * valueStep));
+                }
+            }
+
+            void SetLabel(TextMarker tm, float val)
+            {
+                tm.label.text = (val).ToString(Precision);
+                tm.name = "Marker (" + tm.label.text + ")";
             }
         }
     }

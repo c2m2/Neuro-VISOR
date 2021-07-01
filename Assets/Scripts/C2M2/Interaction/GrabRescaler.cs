@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using C2M2.Interaction.VR;
+using C2M2.Utils;
 
 namespace C2M2.Interaction
 {
@@ -14,11 +15,16 @@ namespace C2M2.Interaction
         private Vector3 minScale;
         private Vector3 maxScale;
         public float scaler = 0.2f;
-        public float minPercentage = 0.25f;
-        public float maxPercentage = 4f;
+        public float minPercentage = 0.5f;
+        public float maxPercentage = 3f;
         public bool xScale = true;
         public bool yScale = true;
         public bool zScale = true;
+        public OVRInput.Button vrThumbstick = OVRInput.Button.PrimaryThumbstick;
+        public OVRInput.Button vrThumbstickS = OVRInput.Button.SecondaryThumbstick;
+        public KeyCode incKey = KeyCode.UpArrow;
+        public KeyCode decKey = KeyCode.DownArrow;
+        public KeyCode resetKey = KeyCode.R;
         private PublicOVRGrabber grabber;
 
         ///<returns>A float between -1 and 1, where -1 means the thumbstick y axis is completely down and 1 implies it is all the way up</returns>
@@ -26,23 +32,26 @@ namespace C2M2.Interaction
         {
             get
             {
-                return OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick, grabber.Controller).y;
+                if (GameManager.instance.vrDeviceManager.VRActive) return (OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick).y + OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick).y);
+                else if (Input.GetKey(incKey)) return 1;
+                else if (Input.GetKey(decKey)) return -1;
+                return 0;
             }
         }
+
 
         ///<returns>A boolean of whether the joystick is pressed</returns>
         private bool ThumbstickPressed
         {
             get
             {
-                return OVRInput.Get(OVRInput.Button.PrimaryThumbstick, grabber.Controller);
+                if (GameManager.instance.vrDeviceManager.VRActive) return (OVRInput.Get(vrThumbstick) || OVRInput.Get(vrThumbstickS));
+                else return Input.GetKey(resetKey);
             }
         }
 
         private void Start()
         {
-            if (!GameManager.instance.VrIsActive) Destroy(this);
-
             grabbable = GetComponent<OVRGrabbable>();
 
             // Use this to determine how to scale at runtime
@@ -53,30 +62,36 @@ namespace C2M2.Interaction
 
         void Update()
         {
+            if (!GameManager.instance.vrDeviceManager.VRActive) return;
+
             grabber = (PublicOVRGrabber)grabbable.grabbedBy;
             if (grabbable.isGrabbed)
             {
-                // if joystick is pressed in, it resets the scale to the original scale
-                if (ThumbstickPressed)
-                {
-                    transform.localScale = origScale;
-                }
-                else
-                { // Otherwise resolve our new scale
-                    Vector3 scaleValue = scaler * ThumbstickScaler * origScale;
-                    Vector3 newLocalScale = transform.localScale + scaleValue;
+                Rescale();
+            }
+        }
 
-                    // Makes sure the new scale is within the determined range
-                    if (newLocalScale.x < minScale.x || newLocalScale.y < minScale.y || newLocalScale.z < minScale.z) newLocalScale = minScale;
-                    if (newLocalScale.x > maxScale.x || newLocalScale.y > maxScale.y || newLocalScale.z > maxScale.z) newLocalScale = maxScale;
-                    
-                    // Only scales the proper dimensions
-                    if (!xScale) newLocalScale.x = transform.localScale.x;
-                    if (!yScale) newLocalScale.y = transform.localScale.y;
-                    if (!zScale) newLocalScale.z = transform.localScale.z;
+        public void Rescale()
+        {
+            // if joystick is pressed in, it resets the scale to the original scale
+            if (ThumbstickPressed)
+            {
+                transform.localScale = origScale;
+            }
+            else if(ThumbstickScaler != 0)
+            { // Otherwise resolve our new scale
+                Vector3 scaleValue = scaler * ThumbstickScaler * origScale;
+                Vector3 newLocalScale = transform.localScale + scaleValue;
 
-                    transform.localScale = newLocalScale;
-                }
+                // Makes sure the new scale is within the determined range
+                newLocalScale = Math.Clamp(newLocalScale, minScale, maxScale);
+
+                // Only scales the proper dimensions
+                if (!xScale) newLocalScale.x = transform.localScale.x;
+                if (!yScale) newLocalScale.y = transform.localScale.y;
+                if (!zScale) newLocalScale.z = transform.localScale.z;
+
+                transform.localScale = newLocalScale;
             }
         }
     }

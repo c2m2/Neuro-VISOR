@@ -6,16 +6,14 @@ using System.Threading;
 
 namespace C2M2
 {
-    using Interaction;
-    using Interaction.UI;
     using Interaction.VR;
     using NeuronalDynamics.Interaction;
+    using NeuronalDynamics.Interaction.UI;
     using Simulation;
-    using Visualization;
+
     /// <summary>
     /// Stores many global variables, handles pregame initializations
     /// </summary>
-    [RequireComponent(typeof(NeuronClampManager))]
     public class GameManager : MonoBehaviour
     {
         public static GameManager instance = null;
@@ -23,20 +21,13 @@ namespace C2M2
         public int mainThreadId { get; private set; } = -1;
 
         public VRDeviceManager vrDeviceManager = null;
-        public bool VrIsActive {
-            get
-            {
-                if (vrDeviceManager == null) Debug.LogError("No VR Device Manager Found!");
-                return vrDeviceManager.VrIsActive;
-            }
-        }
+        public bool VRActive { get { return vrDeviceManager.VRActive; } }
 
         public GameObject cellPreviewer = null;
         public Interactable activeSim = null;
-        public List<SimulationTimerLabel> timerLabels = new List<SimulationTimerLabel>();
 
         public NeuronClampManager ndClampManager = null;
-        //  public GameObject[] clampControllers = new GameObject[0];
+        public NDGraphManager ndGraphManager = null;
 
         [Header("Environment")]
         public int roomSelected = 0;
@@ -63,14 +54,6 @@ namespace C2M2
         public Utils.DebugUtils.FPSCounter fpsCounter;
         private bool isRunning = false;
 
-        [Header("Obsolete")]
-        public RaycastForward rightRaycaster;
-        public RaycastForward leftRaycaster;
-        public GameObject menu = null;
-        public GameObject raycastKeyboardPrefab;
-        public RaycastKeyboard raycastKeyboard { get; set; }
-        public Transform menuSnapPosition;
-
         private void Awake()
         {
             // Initialize the GameManager
@@ -80,17 +63,13 @@ namespace C2M2
 
             mainThreadId = Thread.CurrentThread.ManagedThreadId;
 
-            ndClampManager = GetComponent<NeuronClampManager>();
-            if (ndClampManager == null) Debug.LogWarning("No neuron clamp manager found!");
-
             if(roomOptions != null && roomOptions.Length > 0)
             {
-                Mathf.Clamp(roomSelected, 0, (roomOptions.Length - 1));
+                Mathf.Clamp(roomSelected, 0, roomOptions.Length - 1);
                 // Only enable selected room, disable all others
                 for(int i = 0; i < roomOptions.Length; i++)
                 {
-                    bool selected = (i == roomSelected) ? true : false;
-                    roomOptions[i].gameObject.SetActive(selected);
+                    roomOptions[i].gameObject.SetActive(i == roomSelected);
                 }
                 // Apply wall color to selected room's walls
                 if (roomOptions[roomSelected].walls != null && roomOptions[roomSelected].walls.Length > 0)
@@ -123,9 +102,6 @@ namespace C2M2
                 eLogQ.Clear();
             }
         }
-        public void RaycasterRightChangeColor(Color color) => rightRaycaster.ChangeStaticHandColor(color);
-        public void RaycasterLeftChangeColor(Color color) => leftRaycaster.ChangeStaticHandColor(color);
-
 
         private List<string> logQ = new List<string>();
         private readonly int logQCap = 100;
@@ -157,7 +133,7 @@ namespace C2M2
         /// </summary>
         /// <remarks>
         /// Making any Unity API call from another thread is not safe. This method is a quick hack
-        /// to avoid mkaing a Unity API call from another thread.
+        /// to avoid making a Unity API call from another thread.
         /// </remarks>
         public void DebugLogErrorSafe(string s)
         {

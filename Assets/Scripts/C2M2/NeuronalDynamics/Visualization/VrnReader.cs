@@ -9,7 +9,7 @@ using Grid = C2M2.NeuronalDynamics.UGX.Grid;
 
 namespace C2M2.NeuronalDynamics.Visualization.VRN
 {
-    sealed class VrnReader
+    public class VrnReader
     {
 
         /// <summary>
@@ -31,7 +31,8 @@ namespace C2M2.NeuronalDynamics.Visualization.VRN
                 this.description = description;
                 this.inflations = inflations;
             }
-        }
+
+        } 
 
         /// <summary>
         /// Stores the 2d geometries by name, inflation (factor), and description
@@ -43,6 +44,7 @@ namespace C2M2.NeuronalDynamics.Visualization.VRN
             public string name;
             public string description;
 
+
             public Geom2d(string inflation, string name, string description)
             {
                 this.inflation = inflation;
@@ -51,22 +53,43 @@ namespace C2M2.NeuronalDynamics.Visualization.VRN
             }
         }
 
+        public struct MetaInfo {
+            public string ARCHIVE;
+            public string SPECIES;
+            public string STRAIN;
+
+            public MetaInfo(string archive, string species, string strain)
+            {
+                this.ARCHIVE = archive;
+                this.SPECIES = species;
+                this.STRAIN = strain;
+            }
+        }
+
         /// <summary>
         /// Stores 1D and associated 2D geometries in the member geom1d
+        /// Additional metadata of the cell is stored in MetaInfo
         /// </summary>
         [Serializable]
         private class Geometry
         {
             public Geom1d[] geom1d;
+            public string ARCHIVE;
+            public string STRAIN;
+            public string SPECIES;
 
-            public Geometry(Geom1d[] geom1d)
+            public Geometry(Geom1d[] geom1d, string ARCHIVE, string SPECIES, string STRAIN)
             {
                 this.geom1d = geom1d;
+                this.ARCHIVE = ARCHIVE;
+                this.SPECIES = SPECIES;
+                this.STRAIN = STRAIN;
             }
         }
 
         private readonly string fileName;
         private Geometry geometry;
+        private MetaInfo metaInfo;
         private Boolean loaded;
 
         /// LOAD
@@ -91,11 +114,20 @@ namespace C2M2.NeuronalDynamics.Visualization.VRN
                         throw new CouldNotReadMeshFromVRNArchive(nameof(file));
                     geometry = JsonUtility.FromJson<Geometry>(new StreamReader(file.Open()).ReadToEnd());
                     loaded = true;
+                    metaInfo = new MetaInfo(geometry.ARCHIVE, geometry.SPECIES, geometry.STRAIN);
                 }
             }
         }
 
         ///<summary>
+        /// Returns the metainfo for the loaded cell geometry
+        /// </summary>
+        public MetaInfo? GetMetaInfo()
+        {
+            return metaInfo;
+        }
+
+        /// <summary>
         /// Print out a list of 1D and 2D geometries contained in .vrn archive
         /// </summary>
         public string List()
@@ -107,6 +139,22 @@ namespace C2M2.NeuronalDynamics.Visualization.VRN
                 s += $"{Environment.NewLine}#{geom.Index + 1} 1D geometry: {geom.Value.name} with refinement {geom.Value.refinement} ({geom.Value.description}).";
             }
             return s;
+        }
+
+        public int[] ListRefinements()
+        {
+            Load();
+            var geoms = geometry.geom1d.Select((x, i) => new { Value = x, Index = i });
+            int[] options = new int[geoms.Count()];
+
+            int j = 0;
+            foreach (var geom in geoms)
+            {
+                bool isParsable = Int32.TryParse(geom.Value.refinement, out options[j]);
+                j++;
+            }
+
+            return options;
         }
 
         /// READ_UGX
@@ -122,7 +170,7 @@ namespace C2M2.NeuronalDynamics.Visualization.VRN
             {
                 var file = archive.GetEntry(meshName);
                 _ = file ??
-                    throw new CouldNotReadMeshFromVRNArchive(nameof(file));
+                    throw new CouldNotReadMeshFromVRNArchive(this.fileName);
                 using (var stream = file.Open())
                 {
                     UGXReader.ReadUGX(stream, ref grid);
