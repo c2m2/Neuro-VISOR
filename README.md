@@ -129,7 +129,7 @@ Rotate camera | Look around! | (H) Left-Ctrl + move mouse cursor |
 | (H) | Hold button down |
 
 ### Selecting a cell
-<img src="https://i.imgur.com/knL8vTZ.png" alt="cell previewer" width="500">
+<img src="https://i.imgur.com/knL8vTZ.png" alt="cell previewer" width="500" align="right">
 
 1.  A cell previewer stands against the whiteboard near the window. It attempts to render the 1D mesh of any neuron `.vrn` cell file archives found in `Assets/StreamingAssets/NeuronalDynamics/Geometries`. Three example cells are included with this repo. Several more cells can be found [here](https://drive.google.com/drive/folders/1kyz8S-txISfarPegJSMzABrF_UprH3Y-?usp=sharing).
 
@@ -146,7 +146,7 @@ The cell can be grabbed by hovering your hand over the 3D geometry and pressing 
 While grabbing a cell, hold the thumbstick up or down on the hand that is being used to grab the cell to resize the cell in world space. Note: this does not affect the environment of the solver code: the cell can be scaled freely in world space without affecting the stored vertex positions of the 1D or 3D meshes.
 
 ### Board info and controls
-<img src="https://i.imgur.com/v7gbFza.png" alt="board controls" width="500"/>
+<img src="https://i.imgur.com/v7gbFza.png" alt="board controls" width="500" align="right">
 
 A large user interface is spawned upon selecting a cell. This board contains useful static information about the cell. 
 
@@ -156,8 +156,9 @@ The board contains a subpanel for selecting the type of interaction. The user ca
 
 The board also contains a play/pause button. The user can use this to pause solver code at the current time step. Beneath is displayed the current simulation time.
 
+<img src="https://i.imgur.com/acM7ogE.png" alt="ruler" width="75" align="right">
+
 ### Ruler controls
-<img src="https://i.imgur.com/acM7ogE.png" alt="ruler" width="75"/>
 A ruler is spawned with every cell geometry. The ruler can be used to understand the length scale of the cell in its local space. While grabbing the ruler, resize it by moving the thumbstick up or down on the hand that is being used to grab the ruler.
 
 The measurements on the ruler will adapt to the world-space size of the geometry so that it can always act as a translator between the size of the cell in the user's space and the local length scales of the neuron.
@@ -191,7 +192,7 @@ In addition to each clamp being individually interactable, the "finger clamps" m
 The user can highlight all clamps with a red sphere to clarify their position to the user. This is particularly useful on complicated geometries with many clamps attached. While pointing at the finger clamp and holding the Interact button, hold down the hand trigger to highlight all existing spheres.
 
 ## Point-plotter interaction
-<img src="https://i.imgur.com/LG0Xa2P.png" alt="clamps" width="400"/>
+<img src="https://i.imgur.com/LG0Xa2P.png" alt="clamps" width="400" align="right">
 The user is able to spawn line graphs that are attached to specific 1D vertices on the neuron cell. These graphs will show the voltage at that 1D point over time. 
 
 To spawn a graph panel, the user simply needs to toggle "Plot" on the [board UI](#board-info-and-controls). At this point the user can raycast onto the surface of the mesh and press the index trigger (or click with the mouse) in order to spawn a graph attached to the nearest 1D vertex. Panels are grabbable and resizeable in the same way that the cell or the ruler is.
