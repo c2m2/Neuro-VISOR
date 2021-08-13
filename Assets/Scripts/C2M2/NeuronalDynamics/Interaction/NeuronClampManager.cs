@@ -225,6 +225,17 @@ namespace C2M2.NeuronalDynamics.Interaction
             return true;
         }
 
+        public void MonitorHighlight()
+        {
+            // Highlight all clamps if either hand trigger is held down
+            HighlightAll(PressedHighlight);
+        }
+
+        public void EndHighlight()
+        {
+            HighlightAll(false);
+        }
+
         /// <summary>
         /// If the user holds a raycast down for X seconds on a clamp, it should destroy the clamp
         /// </summary>
@@ -234,9 +245,6 @@ namespace C2M2.NeuronalDynamics.Interaction
                 holdCount++;
             else
                 CheckInputResult();
-
-            // Highlight all clamps if either hand trigger is held down
-            HighlightAll(PressedHighlight);
 
             float power = PowerModifier;
             // If clamp power is modified while the user holds a click, don't let the click also toggle/destroy the clamp
