@@ -17,10 +17,7 @@ namespace C2M2.Interaction.VR
         private Camera[] vrCameras;
         private Camera desktopCamera;
 
-        //private OvrAvatar avatar;
-
         private readonly KeyCode switchModeKey = KeyCode.Space;
-        //private readonly OVRInput.Button switchModeButton = OVRInput.Button.Any;
 
         public bool VRActive { get; set; } = false;
         public bool VRDevicePresent { get { return !VRDevice.Equals(string.Empty); } }
@@ -41,8 +38,10 @@ namespace C2M2.Interaction.VR
 
         public void Update()
         {
-            if (Input.GetKeyDown(switchModeKey) && VRActive) SwitchState(false);
-            else if (Input.GetKeyDown(switchModeKey) && VRDevicePresent) SwitchState(true);
+            if (Input.GetKeyDown(switchModeKey)) {
+                if (VRActive) SwitchState(false);
+                else SwitchState(true);
+            }
         }
 
         private void CheckForVRDevice()
