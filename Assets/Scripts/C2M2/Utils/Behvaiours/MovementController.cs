@@ -1,7 +1,5 @@
 ﻿using System.Collections;
 using UnityEngine;
-using System.Collections.Generic;
-using C2M2.Interaction.UI;
 
 namespace C2M2.Utils
 {
@@ -27,25 +25,24 @@ namespace C2M2.Utils
         private float ScrollWheel { get { return Input.GetAxis("Mouse ScrollWheel"); } }
 
         private Coroutine moveRoutine = null;
-        public bool isMoving { get; private set; } = false;
+        public bool Moving { get; private set; } = false;
         public float speed = 0.1f;
         public Transform relativeTo = null;
 
         public float rotateSpeed = 5.0f;
 
-        private float x = 0.0f;
-        private float y = 0.0f;
+        private float x, y, z = 0.0f;
 
         public void EnableMovement()
         {
             moveRoutine = StartCoroutine(Movement());
-            isMoving = true;
+            Moving = true;
         }
         public void DisableMovement()
         {
             StopCoroutine(moveRoutine);
             moveRoutine = null;
-            isMoving = false;
+            Moving = false;
         }
 
         private IEnumerator Movement()
@@ -65,7 +62,7 @@ namespace C2M2.Utils
                     x += rotateSpeed * Input.GetAxis("Mouse X");  // Turn left and right
                     y -= rotateSpeed * Input.GetAxis("Mouse Y");  // Turn up and down
 
-                    transform.eulerAngles = new Vector3(y, x, 0.0f);
+                    transform.eulerAngles = new Vector3(y, x, z);
 
                     pos_y = ScrollWheel; // Move up and down
                 }
@@ -86,6 +83,9 @@ namespace C2M2.Utils
         private void OnEnable()
         {
             EnableMovement();
+            x = transform.eulerAngles.y;
+            y = transform.eulerAngles.x;
+            z = transform.eulerAngles.z;
         }
 
         private void OnDisable()
