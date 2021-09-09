@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using C2M2.Visualization;
 using C2M2.NeuronalDynamics.Simulation;
 namespace C2M2.NeuronalDynamics.Interaction.UI
@@ -8,7 +6,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
     public class NDLineGraph : LineGrapher
     {
         public NDGraphManager manager = null;
-        public NDSimulation Sim { get { return manager.sim; } }
+        public NDSimulation sim = null;
         public int vert = -1;
 
         /// <summary>
@@ -18,7 +16,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
         public bool obeyParentScale = false;
 
         // Worldspace position of the vertex
-        public Vector3 VertPos { get { return Sim.transform.TransformPoint(Sim.Verts1D[vert]); } }
+        public Vector3 VertPos { get { return sim.transform.TransformPoint(sim.Verts1D[vert]); } }
         private new RectTransform rt = null;
         // World space size of the graph
         private Vector3 GraphSize { get { return rt.sizeDelta * rt.localScale; } }
@@ -51,13 +49,13 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
             //UpdateSize();
             MaxSamples = 500;
 
-            name = "LineGraph(" + Sim.name + ")[vert" + vert + "]";
+            name = "LineGraph(" + sim.name + ")[vert" + vert + "]";
 
             void SetLabels()
             {
                 string title = "Voltage vs. Time (Vert " + vert + ")";
                 string xLabel = "Time (ms)";
-                string yLabel = "Voltage (" + Sim.unit + ")";
+                string yLabel = "Voltage (" + sim.unit + ")";
 
                 base.SetLabels(title, xLabel, yLabel);
             }
@@ -91,8 +89,8 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
 
         public override void AddValue(float x, float y)
         {
-            YMin = Sim.ColorLUT.GlobalMin * Sim.unitScaler;
-            YMax = Sim.ColorLUT.GlobalMax * Sim.unitScaler;
+            YMin = sim.ColorLUT.GlobalMin * sim.unitScaler;
+            YMax = sim.ColorLUT.GlobalMax * sim.unitScaler;
 
             // Add point to graph
             base.AddValue(x, y);
@@ -102,7 +100,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
         {
             get
             {
-                return Sim.transform.localScale;
+                return sim.transform.localScale;
             }
         }
         private void Update()
@@ -111,7 +109,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
             {
                 pointerLines.targetPos = VertPos;
             }
-            if(Sim == null || manager == null)
+            if(sim == null || manager == null)
             {
                 DestroyPlot();
             }
@@ -125,9 +123,9 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
         private void UpdateSize()
         {
             // Reset graph to match original worldspace size
-            transform.localScale = new Vector3(transform.localScale.x / Sim.transform.localScale.x,
-                transform.localScale.y / Sim.transform.localScale.y,
-                transform.localScale.z / Sim.transform.localScale.z);
+            transform.localScale = new Vector3(transform.localScale.x / sim.transform.localScale.x,
+                transform.localScale.y / sim.transform.localScale.y,
+                transform.localScale.z / sim.transform.localScale.z);
         }
     }
 }

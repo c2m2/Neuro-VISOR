@@ -211,6 +211,8 @@ namespace C2M2.NeuronalDynamics.Simulation {
             }
         }
 
+        private static bool NDUIPresent = false;
+
         void ShowInfoPanel(bool show, RaycastHit hit)
         {
             if (infoPanel == null)
@@ -382,7 +384,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 // Pass blownupMesh upwards to MeshSimulation
                 ColliderMesh = VisualMesh;
 
-                InitUI ();
+                if (!NDUIPresent) InitUI();
             }
 
             return VisualMesh;
@@ -392,17 +394,19 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 GameObject lines1D = gameObject.AddComponent<LinesRenderer> ().Draw (geom1D, color1D, lineWidth1D);
             }
 
-            void InitUI ()
+            void InitUI()
             {
-                GameObject gm = new GameObject();
-                gm.name = "LineGraphManager";
+                GameObject gm = new GameObject
+                {
+                    name = "LineGraphManager"
+                };
                 gm.transform.parent = transform;
                 graphManager = gm.AddComponent<NDGraphManager>();
-                graphManager.sim = this;
+                
 
                 // Instantiate control panel prefab, announce active simulation to buttons
                 controlPanel = Resources.Load ("Prefabs/NeuronalDynamics/ControlPanel/NDControls") as GameObject;        
-                controlPanel = GameObject.Instantiate(controlPanel);
+                controlPanel = Instantiate(controlPanel);
 
                 NDSimulationController controller = controlPanel.GetComponent<NDSimulationController>();
                 if(controller == null)
@@ -412,7 +416,9 @@ namespace C2M2.NeuronalDynamics.Simulation {
                     return;
                 }
 
-                controller.sim = this;
+                controller.sim = this; //GET RID OF THIS
+
+                //NDUIPresent = true;
 
             }
         }

@@ -1,7 +1,6 @@
 ﻿using System;
 using TMPro;
 using UnityEngine;
-using System.Runtime.Serialization;
 using C2M2.Simulation;
 
 namespace C2M2.NeuronalDynamics.Interaction.UI

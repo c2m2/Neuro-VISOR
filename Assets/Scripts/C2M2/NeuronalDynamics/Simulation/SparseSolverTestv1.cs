@@ -178,7 +178,7 @@ namespace C2M2.NeuronalDynamics.Simulation
                     /// define the current time slice to send and initialize it to the correct size which is the number of vertices in the geometry
                     /// initialize it to the current state of the voltage, this is the voltage we are sending back to vr simulation
                     Vector curTimeSlice = U.SubVector(0, Neuron.nodes.Count);
-                    curTimeSlice.Multiply(1, curTimeSlice);   
+                    //curTimeSlice.Multiply(1, curTimeSlice);   
                     /// convert the time slice to an Array
                     curVals = curTimeSlice.ToArray();
                 }

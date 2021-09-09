@@ -64,13 +64,8 @@ namespace C2M2.NeuronalDynamics.Interaction
             NDSimulation solver = (NDSimulation)solveObj.AddComponent(solverType);
             //NDSimulation solver = solveObj.AddComponent<SparseSolverTestv1>();
 
-            // Close current simulation, if any
-            if(GameManager.instance.activeSim != null)
-            {
-                Destroy(GameManager.instance.activeSim);
-            }
             // Store the new active simulation
-            GameManager.instance.activeSim = solver;
+            GameManager.instance.activeSims.Add(solver);
 
             TransferValues();
 

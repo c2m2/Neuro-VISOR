@@ -145,6 +145,8 @@ namespace C2M2.NeuronalDynamics.Visualization
             loader.vrnFileName = vrnFileName;
             loader.refinementLevel = refinement;
             loader.Load(hit);
+            //loader.Load(hit);
+            //loader.Load(hit);
         }
         public bool RemoveRefinement(int refinement)
         {

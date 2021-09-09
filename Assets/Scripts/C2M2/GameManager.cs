@@ -24,7 +24,7 @@ namespace C2M2
         public bool VRActive { get { return vrDeviceManager.VRActive; } }
 
         public GameObject cellPreviewer = null;
-        public Interactable activeSim = null;
+        public List<Interactable> activeSims = null;
 
         public NeuronClampManager ndClampManager = null;
         public NDGraphManager ndGraphManager = null;
