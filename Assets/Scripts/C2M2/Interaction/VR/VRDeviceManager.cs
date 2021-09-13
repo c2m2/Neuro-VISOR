@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 using UnityEngine.XR;
 
 namespace C2M2.Interaction.VR
@@ -16,6 +17,7 @@ namespace C2M2.Interaction.VR
 
         private Camera[] vrCameras;
         private Camera desktopCamera;
+        private GameObject loadingIcon;
 
         private readonly KeyCode switchModeKey = KeyCode.Space;
 
@@ -25,6 +27,7 @@ namespace C2M2.Interaction.VR
 
         private void Awake()
         {
+            loadingIcon = Resources.Load<GameObject>("Images/LoadingPrefab");
             vrController = transform.GetChild(0).gameObject;
             desktopController = transform.GetChild(1).gameObject;
 
@@ -39,6 +42,7 @@ namespace C2M2.Interaction.VR
         public void Update()
         {
             if (Input.GetKeyDown(switchModeKey)) {
+                Instantiate(loadingIcon);
                 if (VRActive) SwitchState(false);
                 else SwitchState(true);
             }
@@ -55,9 +59,12 @@ namespace C2M2.Interaction.VR
 
         private void SwitchState(bool vrActive)
         {
+
+            
+
             VRActive = vrActive;
 
-            XRSettings.enabled = vrActive;
+            XRSettings.enabled = true;//vrActive;
 
             vrController.SetActive(vrActive);
             desktopController.SetActive(!vrActive);
@@ -77,8 +84,9 @@ namespace C2M2.Interaction.VR
             foreach (Camera cam in vrCameras)
             {
                 cam.enabled = vrActive;
+                
             }
-            desktopCamera.enabled = !vrActive;
+            //desktopCamera.enabled = !vrActive;
         }
     }
 }
