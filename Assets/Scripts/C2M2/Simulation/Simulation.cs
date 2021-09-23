@@ -117,10 +117,8 @@ namespace C2M2.Simulation
             }
         }
 
-        public void FixedUpdate()
+        public void Update()
         {
-            OnUpdate();
-
             if (!paused && !dryRun)
             {
                 ValueType simulationValues = GetValues();
@@ -128,12 +126,11 @@ namespace C2M2.Simulation
                 if (simulationValues != null) UpdateVisualization(simulationValues);
             }
         }
-
+        
+        // Allow derived classes to run code in Awake/Start if they choose
         protected virtual void OnAwakePre() { }
-        // Allow derived classes to run code in Awake/Start/Update if they choose
         protected virtual void OnAwakePost(VizType viz) { }
         protected virtual void OnStart() { }
-        protected virtual void OnUpdate() { }
 
         // Don't allow threads to keep running when application pauses or quits
         private void OnApplicationPause(bool pause)
