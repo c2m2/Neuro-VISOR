@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using C2M2.NeuronalDynamics.UGX;
 using UnityEngine;
-using System.Threading;
 using DiameterAttachment = C2M2.NeuronalDynamics.UGX.IAttachment<C2M2.NeuronalDynamics.UGX.DiameterData>;
 using MappingAttachment = C2M2.NeuronalDynamics.UGX.IAttachment<C2M2.NeuronalDynamics.UGX.MappingData>;
 using Math = C2M2.Utils.Math;
@@ -15,7 +14,6 @@ using C2M2.NeuronalDynamics.Visualization.VRN;
 using C2M2.NeuronalDynamics.Interaction;
 using C2M2.NeuronalDynamics.Interaction.UI;
 using C2M2.Interaction.UI;
-using C2M2.Visualization;
 using System.Linq;
 namespace C2M2.NeuronalDynamics.Simulation {
 
@@ -73,7 +71,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
             }
         }
         public List<NeuronClamp> clamps = new List<NeuronClamp>();
-        public Mutex clampMutex { get; private set; } = new Mutex();
+        internal readonly object clampLock = new object();
         private static readonly Tuple<int, double> nullClamp = new Tuple<int, double>(-1, -1);
 
         public NDGraphManager graphManager { get; private set; } = null;
@@ -241,19 +239,21 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 if (clamps.Count > 0)
                 {
                     Tuple<int, double>[] clampValues = new Tuple<int, double>[clamps.Count];
-                    clampMutex.WaitOne();
-                    for (int i = 0; i < clamps.Count; i++)
+                    lock (clampLock)
                     {
-                        if (clamps[i] != null && clamps[i].focusVert != -1 && clamps[i].ClampLive)
+                        for (int i = 0; i < clamps.Count; i++)
                         {
-                            clampValues[i] = new Tuple<int, double>(clamps[i].focusVert, clamps[i].ClampPower);
-                        }
-                        else
-                        {
-                            clampValues[i] = nullClamp;
+                            if (clamps[i] != null && clamps[i].focusVert != -1 && clamps[i].ClampLive)
+                            {
+                                clampValues[i] = new Tuple<int, double>(clamps[i].focusVert, clamps[i].ClampPower);
+                            }
+                            else
+                            {
+                                clampValues[i] = nullClamp;
+                            }
                         }
                     }
-                    clampMutex.ReleaseMutex();
+                    
                     Set1DValues(clampValues);
                 }
 

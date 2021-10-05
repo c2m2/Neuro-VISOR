@@ -147,18 +147,13 @@ namespace C2M2.NeuronalDynamics.Interaction
             // If we haven't already created a preview clamp, create one
             if (previewClamp == null)
             {
-                currentSimulation.clampMutex.WaitOne();
                 previewClamp = BuildClamp(hit);
 
                 // If we couldn't build a preview clamp, don't try to preview the position hit
-                if (previewClamp == null)
-                {
-                    currentSimulation.clampMutex.ReleaseMutex();
-                    return;
-                }
+                if (previewClamp == null) return;
 
-                Clamps.Remove(previewClamp);
-                currentSimulation.clampMutex.ReleaseMutex();
+                lock (currentSimulation.clampLock) Clamps.Remove(previewClamp);
+
                 foreach (Collider col in previewClamp.GetComponentsInChildren<Collider>())
                 {
                     col.enabled = false;
@@ -293,14 +288,12 @@ namespace C2M2.NeuronalDynamics.Interaction
         {
             if (Clamps.Count > 0)
             {
-                currentSimulation.clampMutex.WaitOne();
+                
                 foreach (NeuronClamp clamp in Clamps)
                 {
                     if (clamp != null && clamp.focusVert != -1)
                         Destroy(clamp.transform.parent.gameObject);
                 }
-                Clamps.Clear();
-                currentSimulation.clampMutex.ReleaseMutex();
             }
         }
         public void HighlightAll(bool highlight)

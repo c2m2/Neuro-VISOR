@@ -27,7 +27,7 @@ namespace C2M2.Simulation
         /// <summary>
         /// Provide mutual exclusion to derived classes
         /// </summary>
-        protected Mutex mutex = new Mutex();
+        private protected readonly object ULock = new object();
 
         /// <summary>
         /// Thread that runs simulation code
@@ -135,8 +135,8 @@ namespace C2M2.Simulation
         // Don't allow threads to keep running when application pauses or quits
         private void OnApplicationPause(bool pause)
         {
-            OnPause();
-            if (pause) StopSimulation();
+            OnPause(pause);
+            if (pause) paused = true;
         }
         private void OnApplicationQuit()
         {
@@ -150,7 +150,7 @@ namespace C2M2.Simulation
             StopSimulation();
         }
         // Use OnPause and OnQuit to wrap up I/O or other processes if the application pauses or quits during solve code.
-        protected virtual void OnPause() { }
+        protected virtual void OnPause(bool pause) { }
         protected virtual void OnQuit() { }
         protected virtual void OnDest() { }
         #endregion
@@ -164,8 +164,6 @@ namespace C2M2.Simulation
         /// </summary>
         public void StartSimulation()
         {
-            // Stop previous simulation, if any
-            StopSimulation();
 
             solveStepSampler = CustomSampler.Create("SolveStep");
             
@@ -184,11 +182,6 @@ namespace C2M2.Simulation
             
             for (time = 0; time < nT; time++)
             {
-                while (paused) { }
-
-                // mutex guarantees mutual exclusion over simulation values
-                mutex.WaitOne();
-
                 PreSolveStep(time);
 
                 solveStepSampler.Begin();
@@ -196,14 +189,11 @@ namespace C2M2.Simulation
                 solveStepSampler.End();
 
                 PostSolveStep(time);
-
-                mutex.ReleaseMutex();
             }
 
             PostSolve();
 
             Profiler.EndThreadProfiling();
-            GameManager.instance.DebugLogSafe("Simulation Over.");
         }
 
         public sealed override float GetSimulationTime() => time * (float)timeStep;
@@ -227,9 +217,7 @@ namespace C2M2.Simulation
         {
             if (solveThread != null)
             {
-                mutex.WaitOne();
-                time = nT;           
-                mutex.ReleaseMutex();
+                solveThread.Abort();
                 solveThread = null;             
             }
         }
