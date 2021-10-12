@@ -25,7 +25,12 @@ namespace C2M2.Simulation
         public bool paused = false;
 
         /// <summary>
-        /// Provide mutual exclusion to derived classes
+        /// Cancellation token for thread
+        /// </summary>
+        private CancellationTokenSource cts = new CancellationTokenSource();
+
+        /// <summary>
+        /// Provides mutual exclusion to derived classes for U
         /// </summary>
         private protected readonly object ULock = new object();
 
@@ -36,6 +41,10 @@ namespace C2M2.Simulation
         protected CustomSampler solveStepSampler = null;
         public RaycastEventManager raycastEventManager = null;
         public RaycastPressEvents defaultRaycastEvent = null;
+        /// <summary>
+        /// Minimum time for each time step to run in milliseconds
+        /// </summary>
+        public int minTime = 1;
 
         /// <summary>
         /// Require derived classes to make simulation values available
@@ -158,13 +167,13 @@ namespace C2M2.Simulation
         public int time = -1;
         public double timeStep = 0.008 * 1e-3;
         public double endTime = 1.0;
-        public int nT { get; private set; } = -1;
+        public int nT => (int)(endTime / timeStep);
+
         /// <summary>
         /// Launch Solve thread
         /// </summary>
         public void StartSimulation()
         {
-
             solveStepSampler = CustomSampler.Create("SolveStep");
             
             solveThread = new Thread(Solve) { IsBackground = true };
@@ -178,10 +187,11 @@ namespace C2M2.Simulation
 
             PreSolve();
 
-            nT = (int)(endTime / timeStep);
-            
+            GameManager.instance.solveBarrier.AddParticipant();
+            var watch = new System.Diagnostics.Stopwatch();
             for (time = 0; time < nT; time++)
             {
+                watch.Start();
                 PreSolveStep(time);
 
                 solveStepSampler.Begin();
@@ -189,7 +199,17 @@ namespace C2M2.Simulation
                 solveStepSampler.End();
 
                 PostSolveStep(time);
+                watch.Stop();
+                if (watch.ElapsedMilliseconds < minTime)
+                {
+                    Thread.Sleep(minTime-(int)watch.ElapsedMilliseconds);
+                }
+                watch.Reset();
+                if (cts.Token.IsCancellationRequested) break;
+                GameManager.instance.solveBarrier.SignalAndWait();
             }
+            GameManager.instance.solveBarrier.RemoveParticipant();
+            cts.Dispose();
 
             PostSolve();
 
@@ -199,12 +219,8 @@ namespace C2M2.Simulation
         public sealed override float GetSimulationTime() => time * (float)timeStep;
 
         /// <summary>
-        /// Called on the main thread before the Solve thread is launched
+        /// Called on the solve thread before the simulation for loop is launched
         /// </summary>
-        /// <remarks>
-        /// This is useful if you need to initialize anything that makes use of Unity calls,
-        /// which are not available to be called from secondary threads.
-        /// </remarks>
         protected abstract void PreSolve();
         /// <summary>
         /// Called on the solve thread after the simulation for loop is completed
@@ -217,7 +233,7 @@ namespace C2M2.Simulation
         {
             if (solveThread != null)
             {
-                solveThread.Abort();
+                cts.Cancel();
                 solveThread = null;             
             }
         }
