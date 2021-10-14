@@ -1,23 +1,15 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Data;
-using System.IO;
 using System;
-using System.Diagnostics;
 using UnityEngine;
-using C2M2.NeuronalDynamics.Interaction;
 /// These libraries are for using the Vector data type
 using Vector = MathNet.Numerics.LinearAlgebra.Vector<double>;
-using MathNet.Numerics.LinearAlgebra.Double;
-using MathNet.Numerics.Data.Text;
 /// These are for the sparse solving functionality
 using CSparse.Storage;
 using CSparse.Double.Factorization;
 using CSparse;
 using C2M2.Utils;
 using C2M2.NeuronalDynamics.UGX;
-using Grid = C2M2.NeuronalDynamics.UGX.Grid;
 namespace C2M2.NeuronalDynamics.Simulation
 {
     /// <summary>
@@ -173,7 +165,7 @@ namespace C2M2.NeuronalDynamics.Simulation
             if (time > -1)
             {
                 Vector curTimeSlice;
-                lock (ULock)
+                lock (visualizationValuesLock)
                 {
                     /// define the current time slice to send and initialize it to the correct size which is the number of vertices in the geometry
                     /// initialize it to the current state of the voltage, this is the voltage we are sending back to vr simulation
@@ -206,7 +198,7 @@ namespace C2M2.NeuronalDynamics.Simulation
                     }
                 }
             }
-            lock (ULock)
+            lock (visualizationValuesLock)
             {
                 U = temp.Clone();
             }
@@ -288,7 +280,7 @@ namespace C2M2.NeuronalDynamics.Simulation
             r_csc.Multiply(U.ToArray(), b);
             lu.Solve(b, b);
             Vector bVector = Vector.Build.DenseOfArray(b);
-            lock (ULock)
+            lock (visualizationValuesLock)
             {
                 U.SetSubVector(0, Neuron.nodes.Count, bVector);
                 /// this part solves the reaction portion of the operator splitting \n
@@ -375,7 +367,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// </summary>
         private void InitializeNeuronCell()
         {
-            lock (ULock)
+            lock (visualizationValuesLock)
             {
                 U = Vector.Build.Dense(Neuron.nodes.Count, 0);
             }

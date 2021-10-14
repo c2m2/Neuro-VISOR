@@ -30,9 +30,9 @@ namespace C2M2.Simulation
         private CancellationTokenSource cts = new CancellationTokenSource();
 
         /// <summary>
-        /// Provides mutual exclusion to derived classes for U
+        /// Provides mutual exclusion to derived classes for whatever values are being used for visualization
         /// </summary>
-        private protected readonly object ULock = new object();
+        private protected readonly object visualizationValuesLock = new object();
 
         /// <summary>
         /// Thread that runs simulation code
