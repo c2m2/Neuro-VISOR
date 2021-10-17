@@ -26,18 +26,13 @@ public class emulatorMove : MonoBehaviour
             try
             {
                 parent = hit.collider.transform.parent.gameObject;
+                return parent;
             }
-            catch(NullReferenceException ex)
+            catch (NullReferenceException)
             {
                 target = hit.collider.gameObject;
                 return target;
             }
-            if(hit.collider.transform.parent.gameObject != null)
-            {
-                parent = hit.collider.transform.parent.gameObject;
-                return parent;
-            }
-            
         }
         return target;
     }
