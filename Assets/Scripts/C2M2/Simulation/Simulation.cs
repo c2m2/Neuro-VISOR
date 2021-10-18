@@ -25,6 +25,8 @@ namespace C2M2.Simulation
 
         public bool paused = false;
 
+        
+
         /// <summary>
         /// Cancellation token for thread
         /// </summary>
@@ -104,7 +106,6 @@ namespace C2M2.Simulation
             // Run child awake methods first
             OnAwakePost(Viz);
             StartCoroutine("updateVisulizationStep");
-
             return;
 
             void BuildInteraction()
@@ -128,14 +129,13 @@ namespace C2M2.Simulation
             }
         }
 
-        public void Update()
-        {
-            OnUpdate();
-        }
+        public void Update(){}
 
         IEnumerator updateVisulizationStep()
         {
             while (!paused && !dryRun)
+            while( !paused && !dryRun)
+            if (!paused && !dryRun)
             {
                 ValueType simulationValues = GetValues();
 

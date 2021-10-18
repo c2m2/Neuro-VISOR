@@ -11,7 +11,6 @@ namespace C2M2.Interaction
     {
         [Serializable]
         public class RaycastHitEvent : UnityEvent<RaycastHit> { }
-        public bool triggeredRayCastHit = false;
         // Event for when we click on an object for the first time
         [SerializeField]
         private RaycastHitEvent onHover = new RaycastHitEvent();
@@ -26,22 +25,16 @@ namespace C2M2.Interaction
         // Event for when we are holding a raycast click on an object
         [SerializeField]
         private RaycastHitEvent onHoldPress = new RaycastHitEvent();
-        public RaycastHitEvent OnHoldPress { get { return onHoldPress; } set {onHoldPress = value; } }
+        public RaycastHitEvent OnHoldPress { get { return onHoldPress; } set { onHoldPress = value; } }
         // Event for when we end a raycast click on an object
         [SerializeField]
         private RaycastHitEvent onEndPress = new RaycastHitEvent();
-        public RaycastHitEvent OnEndPress { get { return onEndPress; } set {
-                //triggeredRayCastHit = false;
-                onEndPress = value; } }
+        public RaycastHitEvent OnEndPress { get { return onEndPress; } set { onEndPress = value; } }
         // Calling these methods invokes the corresponding event
         public void Hover(RaycastHit hit) { OnHover.Invoke(hit); }
         public void EndHover(RaycastHit hit) { OnHoverEnd.Invoke(hit); }
         public void Press(RaycastHit hit) { OnPress.Invoke(hit); }
-        public void HoldPress(RaycastHit hit) {
-            triggeredRayCastHit = true;
-            OnHoldPress.Invoke(hit); }
-        public void EndPress(RaycastHit hit) {
-            triggeredRayCastHit = false;
-            OnEndPress.Invoke(hit); }
+        public void HoldPress(RaycastHit hit) { OnHoldPress.Invoke(hit); }
+        public void EndPress(RaycastHit hit) { OnEndPress.Invoke(hit); }
     }
 }
