@@ -1631,6 +1631,25 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 718669685}
   m_CullTransparentMesh: 0
+--- !u!1 &724846497 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3671467348768610599, guid: f49e57d0c1b71c4418326894ace9a9b5,
+    type: 3}
+  m_PrefabInstance: {fileID: 3671467347388522957}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &724846498
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 724846497}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1099190b09ed004c892376d154b4e1a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeSteps: 0.05
 --- !u!1 &726520547 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 806130742265277099, guid: b8e32f33023aba348a3a271448030708,
@@ -3158,6 +3177,7 @@ MonoBehaviour:
   clampControllerR: {fileID: 320645336}
   clampControllerL: {fileID: 835806272}
   allActive: 1
+  currentSimulation: {fileID: 0}
   hitEvent: {fileID: 1157977726}
   toggleDestroyOVR: 8192
   toggleDestroyOVRS: 2097152

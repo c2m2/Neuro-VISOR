@@ -3,6 +3,7 @@ using System.Threading;
 using System;
 using C2M2.Interaction;
 using UnityEngine.Profiling;
+using System.Collections;
 
 namespace C2M2.Simulation
 {
@@ -102,6 +103,7 @@ namespace C2M2.Simulation
 
             // Run child awake methods first
             OnAwakePost(Viz);
+            StartCoroutine("updateVisulizationStep");
 
             return;
 
@@ -128,18 +130,29 @@ namespace C2M2.Simulation
 
         public void Update()
         {
-            if (!paused && !dryRun)
+            OnUpdate();
+        }
+
+        IEnumerator updateVisulizationStep()
+        {
+            while (!paused && !dryRun)
             {
                 ValueType simulationValues = GetValues();
 
                 if (simulationValues != null) UpdateVisualization(simulationValues);
+                float timeStep = 0.02f;
+                if (StaticTimeSteps.updateVisualizationTime > 0.0)
+                    timeStep = StaticTimeSteps.updateVisualizationTime;
+                yield return new WaitForSeconds(timeStep);
             }
+
         }
-        
+
         // Allow derived classes to run code in Awake/Start if they choose
         protected virtual void OnAwakePre() { }
         protected virtual void OnAwakePost(VizType viz) { }
         protected virtual void OnStart() { }
+        protected virtual void OnUpdate() { }
 
         // Don't allow threads to keep running when application pauses or quits
         private void OnApplicationPause(bool pause)
