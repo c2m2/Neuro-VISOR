@@ -26,6 +26,11 @@ namespace C2M2
         public GameObject cellPreviewer = null;
         public List<Interactable> activeSims = null;
 
+        /// <summary>
+        /// Allows solver threads to be synched
+        /// </summary>
+        public Barrier solveBarrier = new Barrier(0);
+
         public NeuronClampManager ndClampManager = null;
         public NDGraphManager ndGraphManager = null;
 

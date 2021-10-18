@@ -29,8 +29,8 @@ namespace C2M2.Interaction
         {
             OnStart();
         }
-        // FixedUpdate is called once per phsyics frame
-        private void FixedUpdate()
+
+        private void Update()
         {          
             // If a raycast is requested (button one on Oculus, constant for mouse)
             if (RaycastRequested())

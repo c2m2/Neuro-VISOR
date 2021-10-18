@@ -22,7 +22,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
         /// <summary>
         /// Current time in simulation
         /// </summary>
-        public double time;
+        private float time;
 
         private void Awake()
         {
@@ -44,7 +44,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
             if (fatal) Destroy(this);
         }
 
-        private void FixedUpdate()
+        private void Update()
         {
             time = Sim.GetSimulationTime();
             timerText.text = ToString();
