@@ -3,6 +3,7 @@ using System.Threading;
 using System;
 using C2M2.Interaction;
 using UnityEngine.Profiling;
+using System.Collections;
 
 namespace C2M2.Simulation
 {
@@ -23,6 +24,8 @@ namespace C2M2.Simulation
         public bool dryRun = false;
 
         public bool paused = false;
+
+        
 
         /// <summary>
         /// Provide mutual exclusion to derived classes
@@ -93,7 +96,7 @@ namespace C2M2.Simulation
 
             // Run child awake methods first
             OnAwakePost(Viz);
-
+            StartCoroutine("updateVisulizationStep");
             return;
 
             void BuildInteraction()
@@ -117,16 +120,26 @@ namespace C2M2.Simulation
             }
         }
 
-        public void FixedUpdate()
+        public void Update()
         {
             OnUpdate();
 
-            if (!paused && !dryRun)
+
+        }
+
+        IEnumerator updateVisulizationStep()
+        {
+            while( !paused && !dryRun)
             {
                 ValueType simulationValues = GetValues();
 
                 if (simulationValues != null) UpdateVisualization(simulationValues);
+                float timeStep = 0.02f;
+                if (StaticTimeSteps.updateVisualizationTime > 0.0)
+                    timeStep = StaticTimeSteps.updateVisualizationTime;
+                yield return new WaitForSeconds(timeStep);
             }
+
         }
 
         protected virtual void OnAwakePre() { }
