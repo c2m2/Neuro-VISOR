@@ -15,6 +15,8 @@ using C2M2.NeuronalDynamics.Interaction;
 using C2M2.NeuronalDynamics.Interaction.UI;
 using C2M2.Interaction.UI;
 using System.Linq;
+using C2M2.Utils;
+
 namespace C2M2.NeuronalDynamics.Simulation {
 
     /// <summary>
@@ -291,7 +293,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
         /// Translate 1D vertex values to 3D values and pass them upwards for visualization
         /// </summary>
         /// <returns> One scalar value for each 3D vertex based on its 1D vert's scalar value </returns>
-        public sealed override double[] GetValues () {
+        public sealed override float[] GetValues () {
             vals1D = Get1DValues();
 
             if (vals1D == null) { return null; }
@@ -311,7 +313,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 graph.AddValue(1000*GetSimulationTime(), (float)vals1D[graph.vert] * unitScaler);
             }
 
-            return Scalars3D;
+            return Scalars3D.ToFloat();
         }
 
         /// <summary>

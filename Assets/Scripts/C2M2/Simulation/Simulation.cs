@@ -4,6 +4,7 @@ using System;
 using C2M2.Interaction;
 using UnityEngine.Profiling;
 using System.Collections;
+using System.Threading.Tasks;
 
 namespace C2M2.Simulation
 {
@@ -180,7 +181,7 @@ namespace C2M2.Simulation
             Debug.Log("Solve() launched on thread " + solveThread.ManagedThreadId);
         }
 
-        private void Solve()
+        private async void Solve()
         {
             Profiler.BeginThreadProfiling("Solve Threads", "Solve Thread");
 
@@ -206,9 +207,8 @@ namespace C2M2.Simulation
                 }
                 
                 GameManager.instance.solveBarrier.SignalAndWait();
-                watch.Stop();
                 resourceUsage = watch.ElapsedMilliseconds / minTime;
-                if (watch.ElapsedMilliseconds < minTime) Thread.Sleep(minTime-(int)watch.ElapsedMilliseconds);
+                if (watch.ElapsedMilliseconds < minTime) await Task.Delay(minTime-(int)watch.ElapsedMilliseconds);
                 if (cts.Token.IsCancellationRequested) break;
                 watch.Restart();
             }
