@@ -20,7 +20,7 @@ using C2M2.Utils;
 using C2M2.NeuronalDynamics.UGX;
 using Grid = C2M2.NeuronalDynamics.UGX.Grid;
 using Debug = UnityEngine.Debug;
-
+//Hi
 namespace C2M2.NeuronalDynamics.Simulation
 {
     /// <summary>
