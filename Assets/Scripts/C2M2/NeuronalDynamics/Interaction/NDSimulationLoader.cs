@@ -62,7 +62,6 @@ namespace C2M2.NeuronalDynamics.Interaction
             solveObj.name = "(Solver)" + solverName.Substring(solverName.LastIndexOf('.') + 1);
 
             NDSimulation solver = (NDSimulation)solveObj.AddComponent(solverType);
-            //NDSimulation solver = solveObj.AddComponent<SparseSolverTestv1>();
 
             // Store the new active simulation
             GameManager.instance.activeSims.Add(solver);

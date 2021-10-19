@@ -292,7 +292,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
         /// </summary>
         /// <returns> One scalar value for each 3D vertex based on its 1D vert's scalar value </returns>
         public sealed override double[] GetValues () {
-            vals1D = Get1DValues ();
+            vals1D = Get1DValues();
 
             if (vals1D == null) { return null; }
             

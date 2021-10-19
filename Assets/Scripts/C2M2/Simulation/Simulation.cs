@@ -25,12 +25,15 @@ namespace C2M2.Simulation
 
         public bool paused = false;
 
-        
-
         /// <summary>
         /// Cancellation token for thread
         /// </summary>
         private CancellationTokenSource cts = new CancellationTokenSource();
+
+        /// <summary>
+        /// Percentage of minTime taken to run a time step
+        /// </summary>
+        public float resourceUsage = 0;
 
         /// <summary>
         /// Provides mutual exclusion to derived classes for whatever values are being used for visualization
@@ -44,10 +47,11 @@ namespace C2M2.Simulation
         protected CustomSampler solveStepSampler = null;
         public RaycastEventManager raycastEventManager = null;
         public RaycastPressEvents defaultRaycastEvent = null;
+
         /// <summary>
         /// Minimum time for each time step to run in milliseconds
         /// </summary>
-        public int minTime = 1;
+        public int minTime = 20;
 
         /// <summary>
         /// Require derived classes to make simulation values available
@@ -105,7 +109,7 @@ namespace C2M2.Simulation
 
             // Run child awake methods first
             OnAwakePost(Viz);
-            StartCoroutine("updateVisulizationStep");
+            StartCoroutine("UpdateVisulizationStep");
             return;
 
             void BuildInteraction()
@@ -129,21 +133,19 @@ namespace C2M2.Simulation
             }
         }
 
-        public void Update(){}
-
-        IEnumerator updateVisulizationStep()
+        IEnumerator UpdateVisulizationStep()
         {
-            while (!paused && !dryRun)
-            while( !paused && !dryRun)
-            if (!paused && !dryRun)
+            while (!dryRun)
             {
-                ValueType simulationValues = GetValues();
-
-                if (simulationValues != null) UpdateVisualization(simulationValues);
+                if (!paused)
+                {
+                    ValueType simulationValues = GetValues();
+                    if (simulationValues != null) UpdateVisualization(simulationValues);
+                }
                 float timeStep = 0.02f;
-                if (StaticTimeSteps.updateVisualizationTime > 0.0)
-                    timeStep = StaticTimeSteps.updateVisualizationTime;
+                if (StaticTimeSteps.updateVisualizationTime > 0.0) timeStep = StaticTimeSteps.updateVisualizationTime;
                 yield return new WaitForSeconds(timeStep);
+
             }
 
         }
@@ -154,27 +156,11 @@ namespace C2M2.Simulation
         protected virtual void OnStart() { }
         protected virtual void OnUpdate() { }
 
-        // Don't allow threads to keep running when application pauses or quits
-        private void OnApplicationPause(bool pause)
-        {
-            OnPause(pause);
-            if (pause) paused = true;
-        }
-        private void OnApplicationQuit()
-        {
-            OnQuit();
-            StopSimulation();
-        }
-
         protected void OnDestroy()
         {
-            OnDest();
+            StopCoroutine("updateVisulizationStep");
             StopSimulation();
         }
-        // Use OnPause and OnQuit to wrap up I/O or other processes if the application pauses or quits during solve code.
-        protected virtual void OnPause(bool pause) { }
-        protected virtual void OnQuit() { }
-        protected virtual void OnDest() { }
         #endregion
 
         public int time = -1;
@@ -202,24 +188,29 @@ namespace C2M2.Simulation
 
             GameManager.instance.solveBarrier.AddParticipant();
             var watch = new System.Diagnostics.Stopwatch();
-            for (time = 0; time < nT; time++)
+            watch.Start();
+            time = 0;
+            while (time < nT)
             {
-                watch.Start();
-                PreSolveStep(time);
-
-                solveStepSampler.Begin();
-                SolveStep(time);
-                solveStepSampler.End();
-
-                PostSolveStep(time);
-                watch.Stop();
-                if (watch.ElapsedMilliseconds < minTime)
+                if (!paused)
                 {
-                    Thread.Sleep(minTime-(int)watch.ElapsedMilliseconds);
+                    PreSolveStep(time);
+
+                    solveStepSampler.Begin();
+                    SolveStep(time);
+                    solveStepSampler.End();
+
+                    PostSolveStep(time);
+                    
+                    time++;
                 }
-                watch.Reset();
-                if (cts.Token.IsCancellationRequested) break;
+                
                 GameManager.instance.solveBarrier.SignalAndWait();
+                watch.Stop();
+                resourceUsage = watch.ElapsedMilliseconds / minTime;
+                if (watch.ElapsedMilliseconds < minTime) Thread.Sleep(minTime-(int)watch.ElapsedMilliseconds);
+                if (cts.Token.IsCancellationRequested) break;
+                watch.Restart();
             }
             GameManager.instance.solveBarrier.RemoveParticipant();
             cts.Dispose();
