@@ -238,6 +238,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         private SparseLU lu;                                //Initialize the LU factorizaation
 
         // Start some threads???
+        // I was originally trying to initialize and set aside my own threads but I could not get this to work.
         //private Thread thrN1, thrN2;
         //private Thread thrM1, thrM2;
         //private Thread thrH1, thrH2;
@@ -246,33 +247,40 @@ namespace C2M2.NeuronalDynamics.Simulation
         private AutoResetEvent done = new AutoResetEvent(false);
         private List<List<int>> partindset = new List<List<int>>();
         private int [] indsets;
-        private int nthreads=4;
 
-        private Stopwatch stopwatch;
-        private TimeSpan ts;
-        private string path = @"\Users\jaros\Desktop\timelogs\times.txt";
-        private StreamWriter sw;
+        // Specify the number of threads, I use this for finding partitions of the vector n,m,h
+        private int nthreads=2;
+
+        // this is used for logging the time it takes using the stopwatch
+        // if you choose to use this you will need to update the path to where you want to save the .txt file
+        //private Stopwatch stopwatch;
+        //private TimeSpan ts;
+        //private string path = @"\<your path>\times.txt";
+        //private StreamWriter sw;
+
         /// <summary>
         /// This is a small routine call to initialize the Neuron Cell
         /// this will initialize the solution vectors which are <c>U</c>, <c>M</c>, <c>N</c>, and <c>H</c>
         /// </summary>
         protected override void PreSolve()
         {
-            if (!File.Exists(path))
-            {
+            // uncomment to initialize the writing of the time steps to an output file
+            //if (!File.Exists(path))
+            //{
                 // Create a file to write to.
-                using (StreamWriter sw = File.CreateText(path)) { } ;
-            }
-            sw = File.AppendText(path);
+            //    using (StreamWriter sw = File.CreateText(path)) { } ;
+            //}
+            //sw = File.AppendText(path);
 
             InitializeNeuronCell();
             
 
-            ThreadPool.SetMaxThreads(14, 14);
-            ThreadPool.SetMinThreads(12, 12);
+            //ThreadPool.SetMaxThreads(14, 14);
+            //ThreadPool.SetMinThreads(12, 12);
 
             indsets = Enumerable.Range(0, U.Count).ToArray();
   
+            // this function find the partitions of the n,m,h vectors
             partindset = partition(indsets, nthreads);
 
             Debug.Log("Length = " + partindset.Count());
@@ -329,8 +337,8 @@ namespace C2M2.NeuronalDynamics.Simulation
         //For equation the diffusion we use a Crank-Nicolson scheme
         protected override void SolveStep(int t)
         {
-            Stopwatch stopWatch = new Stopwatch();
-            stopWatch.Start();
+            //Stopwatch stopWatch = new Stopwatch();
+            //stopWatch.Start();
 
             if (mthd == 0)
             {
@@ -360,11 +368,19 @@ namespace C2M2.NeuronalDynamics.Simulation
                 //stateHEUN(U, N, timeStep / 2, an, bn);
                 //stateHEUN(U, M, timeStep / 2, am, bm);
                 //stateHEUN(U, H, timeStep / 2, ah, bh);
-                                
+
+                // This is where I send the state variable to a thread
+                // I had to make a function stateHEUN_POOL that requires you to send the index of the start of the partition and the length of the partition
+                //
+                // Questions:
+                // 1) How can I call ThreadPool in a for loop? So for instance if I wanted to use 8 threads right now I have to type out each threadpool like below. When I tried using a for-loop the simulation gets 'hung-up'
+                // 2) Is there a more efficient way of passing the vectors U,N and functions an,bn? I am not too sure on how to use pointers in C# but I would like send the address instead when  updating the state vectors
+                // 3) In the examples I found on thread pooling, the thread pooling is put in a for loop; however, in our project I would like to call the thread pool once in the pre-solve step  instead of calling the threadpool every solvestep--> is there a way to do this?
+
                 ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, N, timeStep / 2, an, bn, partindset[0][0], partindset[0].Count()); done.Set(); }), null);
                 ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, N, timeStep / 2, an, bn, partindset[1][0], partindset[1].Count()); done.Set(); }), null);
-                ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, N, timeStep / 2, an, bn, partindset[2][0], partindset[2].Count()); done.Set(); }), null);
-                ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, N, timeStep / 2, an, bn, partindset[3][0], partindset[3].Count()); done.Set(); }), null);
+                //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, N, timeStep / 2, an, bn, partindset[2][0], partindset[2].Count()); done.Set(); }), null);
+                //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, N, timeStep / 2, an, bn, partindset[3][0], partindset[3].Count()); done.Set(); }), null);
                 //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, N, timeStep / 2, an, bn, partindset[4][0], partindset[4].Count()); done.Set(); }), null);
                 //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, N, timeStep / 2, an, bn, partindset[5][0], partindset[5].Count()); done.Set(); }), null);
                 //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, N, timeStep / 2, an, bn, partindset[6][0], partindset[6].Count()); done.Set(); }), null);
@@ -372,8 +388,8 @@ namespace C2M2.NeuronalDynamics.Simulation
 
                 ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, M, timeStep / 2, am, bm, partindset[0][0], partindset[0].Count()); done.Set(); }), null);
                 ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, M, timeStep / 2, am, bm, partindset[1][0], partindset[1].Count()); done.Set(); }), null);
-                ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, M, timeStep / 2, am, bm, partindset[2][0], partindset[2].Count()); done.Set(); }), null);
-                ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, M, timeStep / 2, am, bm, partindset[3][0], partindset[3].Count()); done.Set(); }), null);
+                //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, M, timeStep / 2, am, bm, partindset[2][0], partindset[2].Count()); done.Set(); }), null);
+                //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, M, timeStep / 2, am, bm, partindset[3][0], partindset[3].Count()); done.Set(); }), null);
                 //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, M, timeStep / 2, am, bm, partindset[4][0], partindset[4].Count()); done.Set(); }), null);
                 //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, M, timeStep / 2, am, bm, partindset[5][0], partindset[5].Count()); done.Set(); }), null);
                 //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, M, timeStep / 2, am, bm, partindset[6][0], partindset[6].Count()); done.Set(); }), null);
@@ -381,8 +397,8 @@ namespace C2M2.NeuronalDynamics.Simulation
 
                 ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, H, timeStep / 2, ah, bh, partindset[0][0], partindset[0].Count()); done.Set(); }), null);
                 ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, H, timeStep / 2, ah, bh, partindset[1][0], partindset[1].Count()); done.Set(); }), null);
-                ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, H, timeStep / 2, ah, bh, partindset[2][0], partindset[2].Count()); done.Set(); }), null);
-                ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, H, timeStep / 2, ah, bh, partindset[3][0], partindset[3].Count()); done.Set(); }), null);
+                //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, H, timeStep / 2, ah, bh, partindset[2][0], partindset[2].Count()); done.Set(); }), null);
+                //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, H, timeStep / 2, ah, bh, partindset[3][0], partindset[3].Count()); done.Set(); }), null);
                 //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, H, timeStep / 2, ah, bh, partindset[4][0], partindset[4].Count()); done.Set(); }), null);
                 //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, H, timeStep / 2, ah, bh, partindset[5][0], partindset[5].Count()); done.Set(); }), null);
                 //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, H, timeStep / 2, ah, bh, partindset[6][0], partindset[6].Count()); done.Set(); }), null);
@@ -394,6 +410,7 @@ namespace C2M2.NeuronalDynamics.Simulation
                 //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN(U, H, timeStep / 2, ah, bh); done.Set(); }), null);
                 done.WaitOne();
 
+                //This was the first way I was trying to pass a call to a thread, but I could not get this work --> this needs to be investigated.
                 // Heun method on state variables
                 //thrN1 = new Thread(() => stateHEUN(U, N, timeStep / 2, an, bn));
                 //thrM1 = new Thread(() => stateHEUN(U, M, timeStep / 2, am, bm));
@@ -466,8 +483,8 @@ namespace C2M2.NeuronalDynamics.Simulation
 
                 ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, N, timeStep / 2, an, bn, partindset[0][0], partindset[0].Count()); done.Set(); }), null);
                 ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, N, timeStep / 2, an, bn, partindset[1][0], partindset[1].Count()); done.Set(); }), null);
-                ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, N, timeStep / 2, an, bn, partindset[2][0], partindset[2].Count()); done.Set(); }), null);
-                ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, N, timeStep / 2, an, bn, partindset[3][0], partindset[3].Count()); done.Set(); }), null);
+                //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, N, timeStep / 2, an, bn, partindset[2][0], partindset[2].Count()); done.Set(); }), null);
+                //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, N, timeStep / 2, an, bn, partindset[3][0], partindset[3].Count()); done.Set(); }), null);
                 //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, N, timeStep / 2, an, bn, partindset[4][0], partindset[4].Count()); done.Set(); }), null);
                 //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, N, timeStep / 2, an, bn, partindset[5][0], partindset[5].Count()); done.Set(); }), null);
                 //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, N, timeStep / 2, an, bn, partindset[6][0], partindset[6].Count()); done.Set(); }), null);
@@ -475,8 +492,8 @@ namespace C2M2.NeuronalDynamics.Simulation
 
                 ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, M, timeStep / 2, am, bm, partindset[0][0], partindset[0].Count()); done.Set(); }), null);
                 ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, M, timeStep / 2, am, bm, partindset[1][0], partindset[1].Count()); done.Set(); }), null);
-                ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, M, timeStep / 2, am, bm, partindset[2][0], partindset[2].Count()); done.Set(); }), null);
-                ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, M, timeStep / 2, am, bm, partindset[3][0], partindset[3].Count()); done.Set(); }), null);
+                //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, M, timeStep / 2, am, bm, partindset[2][0], partindset[2].Count()); done.Set(); }), null);
+                //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, M, timeStep / 2, am, bm, partindset[3][0], partindset[3].Count()); done.Set(); }), null);
                 //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, M, timeStep / 2, am, bm, partindset[4][0], partindset[4].Count()); done.Set(); }), null);
                 //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, M, timeStep / 2, am, bm, partindset[5][0], partindset[5].Count()); done.Set(); }), null);
                 //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, M, timeStep / 2, am, bm, partindset[6][0], partindset[6].Count()); done.Set(); }), null);
@@ -484,8 +501,8 @@ namespace C2M2.NeuronalDynamics.Simulation
 
                 ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, H, timeStep / 2, ah, bh, partindset[0][0], partindset[0].Count()); done.Set(); }), null);
                 ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, H, timeStep / 2, ah, bh, partindset[1][0], partindset[1].Count()); done.Set(); }), null);
-                ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, H, timeStep / 2, ah, bh, partindset[2][0], partindset[2].Count()); done.Set(); }), null);
-                ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, H, timeStep / 2, ah, bh, partindset[3][0], partindset[3].Count()); done.Set(); }), null);
+                //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, H, timeStep / 2, ah, bh, partindset[2][0], partindset[2].Count()); done.Set(); }), null);
+                //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, H, timeStep / 2, ah, bh, partindset[3][0], partindset[3].Count()); done.Set(); }), null);
                 //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, H, timeStep / 2, ah, bh, partindset[4][0], partindset[4].Count()); done.Set(); }), null);
                 //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, H, timeStep / 2, ah, bh, partindset[5][0], partindset[5].Count()); done.Set(); }), null);
                 //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, H, timeStep / 2, ah, bh, partindset[6][0], partindset[6].Count()); done.Set(); }), null);
@@ -517,11 +534,10 @@ namespace C2M2.NeuronalDynamics.Simulation
                                 
             }
 
-            stopWatch.Stop();
-            //ts = stopWatch.Elapsed;
-            //Debug.Log("Solve Step time: " + ts.Milliseconds);
-            long microseconds = stopWatch.ElapsedTicks / (Stopwatch.Frequency / (1000L * 1000L));
-            sw.WriteLine((microseconds).ToString());
+            //stopWatch.Stop();
+           
+            //long microseconds = stopWatch.ElapsedTicks / (Stopwatch.Frequency / (1000L * 1000L));
+            //sw.WriteLine((microseconds).ToString());
             ///<c>if ((i * k >= 0.015) && SomaOn) { U[0] = vstart; }</c> this checks of the somaclamp is on and sets the soma location to <c>vstart</c>
             ///if ((t * k >= 0.015) && SomaOn) { U[0] = vstart; }      
         }
