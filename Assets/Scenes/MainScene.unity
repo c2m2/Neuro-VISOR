@@ -306,7 +306,7 @@ MonoBehaviour:
   globalMax: 0.05
   lengthScale: "\u03BCm"
   refinementLevel: 1
-  timestepSize: 0.000006
+  timestepSize: 0.0002
   endTime: 100
   raycastHitValue: 0.05
   unit: mV
