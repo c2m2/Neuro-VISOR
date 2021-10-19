@@ -5,6 +5,7 @@ using System.Data;
 using System.IO;
 using System;
 using System.Diagnostics;
+using System.Threading;
 using UnityEngine;
 using C2M2.NeuronalDynamics.Interaction;
 /// These libraries are for using the Vector data type
@@ -18,6 +19,8 @@ using CSparse;
 using C2M2.Utils;
 using C2M2.NeuronalDynamics.UGX;
 using Grid = C2M2.NeuronalDynamics.UGX.Grid;
+using Debug = UnityEngine.Debug;
+
 namespace C2M2.NeuronalDynamics.Simulation
 {
     /// <summary>
@@ -82,7 +85,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// [ohm.m] resistance.length, this is the axial resistence of the neuron, increasing this value has the effect of making the AP waves more localized and slower conduction speed
         /// decreasing this value has the effect of make the AP waves larger and have a faster conduction speed
         /// </summary>
-        private double res = 300.0 * 1.0E-2;
+        private double res = 5000.0 * 1.0E-2;
         /// <summary>
         /// [F/m2] capacitance per unit area, this is the plasma membrane capacitance, this a standard value for the capacitance
         /// </summary>
@@ -226,6 +229,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         }
 
         private Vector R;                                 //This is a vector for the reaction solve 
+        private int mthd = 2;                                 // numerical method to use 0 = FE; 1 = BE; 2 = HEUN; 3 = RK4;
         private double[] b;                               //This is the right hand side vector when solving Ax = b
         List<double> reactConst;                            //This is for passing the reaction function constants
         List<CoordinateStorage<double>> sparse_stencils;    
@@ -233,20 +237,53 @@ namespace C2M2.NeuronalDynamics.Simulation
         CompressedColumnStorage<double> l_csc;              //This is for the lhs sparse matrix
         private SparseLU lu;                                //Initialize the LU factorizaation
 
+        // Start some threads???
+        //private Thread thrN1, thrN2;
+        //private Thread thrM1, thrM2;
+        //private Thread thrH1, thrH2;
+
+        //private ManualResetEvent resetEvent = new ManualResetEvent(false);
+        private AutoResetEvent done = new AutoResetEvent(false);
+        private List<List<int>> partindset = new List<List<int>>();
+        private int [] indsets;
+        private int nthreads=4;
+
+        private Stopwatch stopwatch;
+        private TimeSpan ts;
+        private string path = @"\Users\jaros\Desktop\timelogs\times.txt";
+        private StreamWriter sw;
         /// <summary>
         /// This is a small routine call to initialize the Neuron Cell
         /// this will initialize the solution vectors which are <c>U</c>, <c>M</c>, <c>N</c>, and <c>H</c>
         /// </summary>
         protected override void PreSolve()
         {
+            if (!File.Exists(path))
+            {
+                // Create a file to write to.
+                using (StreamWriter sw = File.CreateText(path)) { } ;
+            }
+            sw = File.AppendText(path);
+
             InitializeNeuronCell();
+            
+
+            ThreadPool.SetMaxThreads(14, 14);
+            ThreadPool.SetMinThreads(12, 12);
+
+            indsets = Enumerable.Range(0, U.Count).ToArray();
+  
+            partindset = partition(indsets, nthreads);
+
+            Debug.Log("Length = " + partindset.Count());
+
             ///<c>R</c> this is the reaction vector for the reaction solve
             R = Vector.Build.Dense(Neuron.nodes.Count);
             ///<c>reactConst</c> this is a small list for collecting the conductances and reversal potential which is sent to the reaction solve routine
             reactConst = new List<double> { gk, gna, gl, ek, ena, el };
 
             /// this sets the target time step size
-            timeStep = SetTargetTimeStep(cap, 2 * Neuron.MaxRadius, Neuron.TargetEdgeLength, gna, gk, res, Rmemscf,cfl);
+            //timeStep = SetTargetTimeStep(cap, 2 * Neuron.MaxRadius, Neuron.TargetEdgeLength, gna, gk, res, Rmemscf,cfl);
             ///UnityEngine.Debug.Log("Target Time Step = " + timeStep);
             
             ///<c>List<CoordinateStorage<double>> sparse_stencils = makeSparseStencils(Neuron, res, cap, k);</c> Construct sparse RHS and LHS in coordinate storage format, no zeros are stored \n
@@ -291,7 +328,96 @@ namespace C2M2.NeuronalDynamics.Simulation
         //$\frac{dV^{**}}{dt}=r(V^{**})$ with initial condition $V_0^{**}=V^*$ to get $V^{**}$, and $V_{n+1}=V(t_{n+1})=V^{**}$ the voltage at the end of the time step.
         //For equation the diffusion we use a Crank-Nicolson scheme
         protected override void SolveStep(int t)
-        {              
+        {
+            Stopwatch stopWatch = new Stopwatch();
+            stopWatch.Start();
+
+            if (mthd == 0)
+            {
+                // FE on State Variables at half time step
+                stateFE(U, N, timeStep / 2, fN);
+                stateFE(U, M, timeStep / 2, fM);
+                stateFE(U, H, timeStep / 2, fH);
+
+                // FE on reaction term at half time step
+                R.SetSubVector(0, Neuron.nodes.Count, reactF(reactConst, U, N, M, H, cap));
+                R.Multiply(timeStep/2, R);
+                U.Add(R, U);
+            }
+            else if (mthd == 1)
+            {
+                // BE on State Variables and Reaction Solve for half timestep
+                stateBE(U, N, timeStep / 2, an, bn);
+                stateBE(U, M, timeStep / 2, am, bm);
+                stateBE(U, H, timeStep / 2, ah, bh);
+                // BE on Reaction term
+                reactBE(U, N, M, H, timeStep / 2, cap, reactConst);
+            }
+            else if (mthd ==2)
+            {
+
+                // Heun method on state variables
+                //stateHEUN(U, N, timeStep / 2, an, bn);
+                //stateHEUN(U, M, timeStep / 2, am, bm);
+                //stateHEUN(U, H, timeStep / 2, ah, bh);
+                                
+                ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, N, timeStep / 2, an, bn, partindset[0][0], partindset[0].Count()); done.Set(); }), null);
+                ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, N, timeStep / 2, an, bn, partindset[1][0], partindset[1].Count()); done.Set(); }), null);
+                ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, N, timeStep / 2, an, bn, partindset[2][0], partindset[2].Count()); done.Set(); }), null);
+                ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, N, timeStep / 2, an, bn, partindset[3][0], partindset[3].Count()); done.Set(); }), null);
+                //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, N, timeStep / 2, an, bn, partindset[4][0], partindset[4].Count()); done.Set(); }), null);
+                //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, N, timeStep / 2, an, bn, partindset[5][0], partindset[5].Count()); done.Set(); }), null);
+                //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, N, timeStep / 2, an, bn, partindset[6][0], partindset[6].Count()); done.Set(); }), null);
+                //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, N, timeStep / 2, an, bn, partindset[7][0], partindset[7].Count()); done.Set(); }), null);
+
+                ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, M, timeStep / 2, am, bm, partindset[0][0], partindset[0].Count()); done.Set(); }), null);
+                ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, M, timeStep / 2, am, bm, partindset[1][0], partindset[1].Count()); done.Set(); }), null);
+                ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, M, timeStep / 2, am, bm, partindset[2][0], partindset[2].Count()); done.Set(); }), null);
+                ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, M, timeStep / 2, am, bm, partindset[3][0], partindset[3].Count()); done.Set(); }), null);
+                //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, M, timeStep / 2, am, bm, partindset[4][0], partindset[4].Count()); done.Set(); }), null);
+                //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, M, timeStep / 2, am, bm, partindset[5][0], partindset[5].Count()); done.Set(); }), null);
+                //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, M, timeStep / 2, am, bm, partindset[6][0], partindset[6].Count()); done.Set(); }), null);
+                //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, M, timeStep / 2, am, bm, partindset[7][0], partindset[7].Count()); done.Set(); }), null);
+
+                ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, H, timeStep / 2, ah, bh, partindset[0][0], partindset[0].Count()); done.Set(); }), null);
+                ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, H, timeStep / 2, ah, bh, partindset[1][0], partindset[1].Count()); done.Set(); }), null);
+                ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, H, timeStep / 2, ah, bh, partindset[2][0], partindset[2].Count()); done.Set(); }), null);
+                ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, H, timeStep / 2, ah, bh, partindset[3][0], partindset[3].Count()); done.Set(); }), null);
+                //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, H, timeStep / 2, ah, bh, partindset[4][0], partindset[4].Count()); done.Set(); }), null);
+                //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, H, timeStep / 2, ah, bh, partindset[5][0], partindset[5].Count()); done.Set(); }), null);
+                //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, H, timeStep / 2, ah, bh, partindset[6][0], partindset[6].Count()); done.Set(); }), null);
+                //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, H, timeStep / 2, ah, bh, partindset[7][0], partindset[7].Count()); done.Set(); }), null);
+
+
+                //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN(U, N, timeStep / 2, an, bn); done.Set(); }), null);
+                //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN(U, M, timeStep / 2, am, bm); done.Set(); }), null);
+                //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN(U, H, timeStep / 2, ah, bh); done.Set(); }), null);
+                done.WaitOne();
+
+                // Heun method on state variables
+                //thrN1 = new Thread(() => stateHEUN(U, N, timeStep / 2, an, bn));
+                //thrM1 = new Thread(() => stateHEUN(U, M, timeStep / 2, am, bm));
+                //thrH1 = new Thread(() => stateHEUN(U, H, timeStep / 2, ah, bh));
+
+                //thrN1.Start(); thrM1.Start(); thrH1.Start();
+                //done.WaitOne();
+                //thrN1.Abort(); thrM1.Abort(); thrH1.Abort();
+
+                // HEUN method on Reaction term
+                reactHEUN(U, N, M, H, timeStep / 2, cap, reactConst);
+            }
+            else
+            {
+                // RK4 methd on State variables
+                stateRK4(U, N, timeStep / 2, fN);
+                stateRK4(U, M, timeStep / 2, fM);
+                stateRK4(U, H, timeStep / 2, fH);
+
+                
+                // HEUN method on Reaction term
+                reactHEUN(U, N, M, H, timeStep / 2, cap, reactConst);
+            }
+
             ///<c>if ((i * k >= 0.015) && SomaOn) { U[0] = vstart; }</c> this checks of the somaclamp is on and sets the soma location to <c>vstart</c>
             ///if ((t * k >= 0.015) && SomaOn) { U[0] = vstart; }
             ///This part does the diffusion solve \n
@@ -305,22 +431,229 @@ namespace C2M2.NeuronalDynamics.Simulation
             /// <c>R.SetSubVector(0, Neuron.vertCount, reactF(reactConst, U, N, M, H, cap));</c> this first evaluates at the reaction function \f$r(V)\f$ \n
             /// <c>R.Multiply(k, R); </c> this multiplies by the time step size \n
             /// <c>U.add(R,U)</c> adds it back to U to finish off the operator splitting
-            /// For the reaction solve we are solving
-            /// \f[\frac{U_{next}-U_{curr}}{k} = R(U_{curr})\f]
-            R.SetSubVector(0, Neuron.nodes.Count, reactF(reactConst, U, N, M, H, cap));
-            R.Multiply(timeStep, R);
-            U.Add(R, U);
-            /// this part solve the state variables using Forward Euler
-            /// the general rule is \f$N_{next} = N_{curr}+k\cdot f_N(U_{curr},N_{curr})\f$
-            N.Add(fN(U, N).Multiply(timeStep), N);
-            M.Add(fM(U, M).Multiply(timeStep), M);
-            H.Add(fH(U, H).Multiply(timeStep), H);
+
+            if (mthd == 0)
+            {
+                // FE on State Variables and Reaction Solve for half timestep
+                R.SetSubVector(0, Neuron.nodes.Count, reactF(reactConst, U, N, M, H, cap));
+                R.Multiply(timeStep / 2, R);
+                U.Add(R, U);
+
+                // FE on State Variables
+                stateFE(U, N, timeStep/2, fN);
+                stateFE(U, M, timeStep/2, fM);
+                stateFE(U, H, timeStep/2, fH);                
+            }
+            else if (mthd == 1)
+            {
+                // BE on Reaction term
+                reactBE(U, N, M, H, timeStep / 2, cap, reactConst);
+                // BE method on State Variables
+                stateBE(U, N, timeStep / 2, an, bn);
+                stateBE(U, M, timeStep / 2, am, bm);
+                stateBE(U, H, timeStep / 2, ah, bh);
+            }
+            else if (mthd ==2)
+            {
+                
+                // HEUN method on Reaction term
+                reactHEUN(U, N, M, H, timeStep / 2, cap, reactConst);
+
+                // Heun method on state variables
+                //stateHEUN(U, N, timeStep / 2, an, bn);
+                //stateHEUN(U, M, timeStep / 2, am, bm);
+                //stateHEUN(U, H, timeStep / 2, ah, bh);
+
+                ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, N, timeStep / 2, an, bn, partindset[0][0], partindset[0].Count()); done.Set(); }), null);
+                ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, N, timeStep / 2, an, bn, partindset[1][0], partindset[1].Count()); done.Set(); }), null);
+                ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, N, timeStep / 2, an, bn, partindset[2][0], partindset[2].Count()); done.Set(); }), null);
+                ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, N, timeStep / 2, an, bn, partindset[3][0], partindset[3].Count()); done.Set(); }), null);
+                //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, N, timeStep / 2, an, bn, partindset[4][0], partindset[4].Count()); done.Set(); }), null);
+                //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, N, timeStep / 2, an, bn, partindset[5][0], partindset[5].Count()); done.Set(); }), null);
+                //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, N, timeStep / 2, an, bn, partindset[6][0], partindset[6].Count()); done.Set(); }), null);
+                //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, N, timeStep / 2, an, bn, partindset[7][0], partindset[7].Count()); done.Set(); }), null);
+
+                ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, M, timeStep / 2, am, bm, partindset[0][0], partindset[0].Count()); done.Set(); }), null);
+                ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, M, timeStep / 2, am, bm, partindset[1][0], partindset[1].Count()); done.Set(); }), null);
+                ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, M, timeStep / 2, am, bm, partindset[2][0], partindset[2].Count()); done.Set(); }), null);
+                ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, M, timeStep / 2, am, bm, partindset[3][0], partindset[3].Count()); done.Set(); }), null);
+                //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, M, timeStep / 2, am, bm, partindset[4][0], partindset[4].Count()); done.Set(); }), null);
+                //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, M, timeStep / 2, am, bm, partindset[5][0], partindset[5].Count()); done.Set(); }), null);
+                //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, M, timeStep / 2, am, bm, partindset[6][0], partindset[6].Count()); done.Set(); }), null);
+                //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, M, timeStep / 2, am, bm, partindset[7][0], partindset[7].Count()); done.Set(); }), null);
+
+                ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, H, timeStep / 2, ah, bh, partindset[0][0], partindset[0].Count()); done.Set(); }), null);
+                ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, H, timeStep / 2, ah, bh, partindset[1][0], partindset[1].Count()); done.Set(); }), null);
+                ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, H, timeStep / 2, ah, bh, partindset[2][0], partindset[2].Count()); done.Set(); }), null);
+                ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, H, timeStep / 2, ah, bh, partindset[3][0], partindset[3].Count()); done.Set(); }), null);
+                //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, H, timeStep / 2, ah, bh, partindset[4][0], partindset[4].Count()); done.Set(); }), null);
+                //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, H, timeStep / 2, ah, bh, partindset[5][0], partindset[5].Count()); done.Set(); }), null);
+                //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, H, timeStep / 2, ah, bh, partindset[6][0], partindset[6].Count()); done.Set(); }), null);
+                //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN_POOL(U, H, timeStep / 2, ah, bh, partindset[7][0], partindset[7].Count()); done.Set(); }), null);
+
+                //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN(U, N, timeStep / 2, an, bn); done.Set(); }), null);
+                //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN(U, M, timeStep / 2, am, bm); done.Set(); }), null);
+                //ThreadPool.QueueUserWorkItem(new WaitCallback(delegate (object state) { stateHEUN(U, H, timeStep / 2, ah, bh); done.Set(); }), null);
+                done.WaitOne();
+
+                // Heun method on state variables
+                //thrN2 = new Thread(() => stateHEUN(U, N, timeStep / 2, an, bn));
+                //thrM2 = new Thread(() => stateHEUN(U, M, timeStep / 2, am, bm));
+                //thrH2 = new Thread(() => stateHEUN(U, H, timeStep / 2, ah, bh));
+
+                //thrN2.Start(); thrM2.Start(); thrH2.Start();
+                //done.WaitOne();
+                //thrN2.Abort(); thrM2.Abort(); thrH2.Abort();
+            }
+            else
+            {
+                // HEUN method on Reaction term
+                reactHEUN(U, N, M, H, timeStep / 2, cap, reactConst);
+
+                // RK4 methd on State variables
+                stateRK4(U, N, timeStep / 2, fN);
+                stateRK4(U, M, timeStep / 2, fM);
+                stateRK4(U, H, timeStep / 2, fH);
+                                
+            }
+
+            stopWatch.Stop();
+            //ts = stopWatch.Elapsed;
+            //Debug.Log("Solve Step time: " + ts.Milliseconds);
+            long microseconds = stopWatch.ElapsedTicks / (Stopwatch.Frequency / (1000L * 1000L));
+            sw.WriteLine((microseconds).ToString());
             ///<c>if ((i * k >= 0.015) && SomaOn) { U[0] = vstart; }</c> this checks of the somaclamp is on and sets the soma location to <c>vstart</c>
             ///if ((t * k >= 0.015) && SomaOn) { U[0] = vstart; }      
         }
 
         #region Local Functions
+        static void reactHEUN(Vector V, Vector N, Vector M, Vector H, double k, double cap, List<double> reactConst)
+        {
+            // temporary vectors
+            Vector R3 ,R2, R1, R0;
+            R3 = Vector.Build.Dense(V.Count);
+            R2 = Vector.Build.Dense(V.Count);
+            R1 = Vector.Build.Dense(V.Count);
+            R0 = Vector.Build.Dense(V.Count);
 
+            double ek, ena, el, gk, gna, gl;
+            /// this sets the constants for the conductances \n
+            /// <c>gk = reactConst[0]; gna = reactConst[1]; gl = reactConst[2];</c>
+            gk = reactConst[0]; gna = reactConst[1]; gl = reactConst[2];
+            /// this sets constants for reversal potentials \n
+            /// <c>ek = reactConst[3]; ena = reactConst[4]; el = reactConst[5];</c>
+            ek = reactConst[3]; ena = reactConst[4]; el = reactConst[5];
+
+            N.PointwisePower(4, R1); R1.Multiply(-1 * gk / cap, R1);
+            M.PointwisePower(3, R2); R2.PointwiseMultiply(H, R2); R2.Multiply(-1 * gna / cap, R2);
+            R1.Add(R2, R1); R1.Add(-1 * gl / cap, R1);
+
+            N.PointwisePower(4, R0); R0.Multiply(gk * ek / cap, R0);
+            M.PointwisePower(3, R2); R2.PointwiseMultiply(H, R2); R2.Multiply(gna * ena / cap, R2);
+            R0.Add(R2, R0); R0.Add(gl * el / cap, R0);
+
+            ((R1.Multiply(-1 * k / 2)).Add(1)).PointwisePower(-1, R2);
+            (R1.Multiply(k / 2)).Add(1, R3);
+            R3.PointwiseMultiply(V, R3); R3.Add(R0.Multiply(k), R3);
+            R3.PointwiseMultiply(R2, V);
+        }
+        static void stateFE(Vector V,Vector S,double k, Func<Vector,Vector,Vector> f)
+        {
+            S.Add(f(V, S).Multiply(k), S);
+        }
+
+        static void stateBE(Vector V,Vector S,double k, Func<Vector,Vector> a, Func<Vector,Vector> b)
+        {
+            // temporary vectors
+            Vector T1,T2;
+            T1 = Vector.Build.Dense(V.Count);
+            T2 = Vector.Build.Dense(V.Count);
+
+            b(V).Add(a(V), T1); T1.Multiply(k, T1); T1.Add(1, T1);
+            T1.PointwisePower(-1, T1);
+            a(V).Multiply(k, T2); T2.Add(S, T2); T1.PointwiseMultiply(T2, S);
+        }
+
+        static void reactBE(Vector V, Vector N, Vector M, Vector H, double k,double cap, List<double> reactConst)
+        {
+            Vector T1, T2, T3, T4;
+            T1 = Vector.Build.Dense(V.Count);
+            T2 = Vector.Build.Dense(V.Count);
+            T3 = Vector.Build.Dense(V.Count);
+            T4 = Vector.Build.Dense(V.Count);
+
+            double ek, ena, el, gk, gna, gl;
+            /// this sets the constants for the conductances \n
+            /// <c>gk = reactConst[0]; gna = reactConst[1]; gl = reactConst[2];</c>
+            gk = reactConst[0]; gna = reactConst[1]; gl = reactConst[2];
+            /// this sets constants for reversal potentials \n
+            /// <c>ek = reactConst[3]; ena = reactConst[4]; el = reactConst[5];</c>
+            ek = reactConst[3]; ena = reactConst[4]; el = reactConst[5];
+
+            // BE on Reaction term
+            N.PointwisePower(4, T1); T1.Multiply(-1 * gk / cap, T1);
+            M.PointwisePower(3, T2); T2.PointwiseMultiply(H, T2); T2.Multiply(-1 * gna / cap, T2);
+            T1.Add(T2, T3); T3.Add(-1 * gl / cap, T3); T3.Multiply(-1 * k, T3); T3.Add(1, T3); T3.PointwisePower(-1, T3);
+            T1.Multiply(ek, T4); T4.Add(T2.Multiply(ena), T4); T4.Add((-1 * gl / cap) + el, T4);
+            T4.Multiply(-1 * k, T4); T4.Add(V, T4);
+            T4.PointwiseMultiply(T3, V);
+        }
+
+        static void stateHEUN(Vector V, Vector S, double k, Func<Vector, Vector> a, Func<Vector,Vector> b)
+        {
+            Vector T1, T2;
+            T1 = Vector.Build.Dense(V.Count);
+            T2 = Vector.Build.Dense(V.Count);
+
+            a(V).Add(b(V), T1); T1.Multiply(k / 2, T1); T1.Add(-1, T1); T1.PointwiseMultiply(S, T1); T1.Multiply(-1, T1);
+            a(V).Multiply(k, T2); T1.Add(T2, T1);
+
+            a(V).Add(b(V), T2); T2.Multiply(k / 2, T2); T2.Add(1, T2); T2.PointwisePower(-1, T2);
+            T1.PointwiseMultiply(T2, S);
+
+            //Thread thread = Thread.CurrentThread;
+            //string message = $"Background: {thread.IsBackground}, Thread Pool: {thread.IsThreadPoolThread}, Thread ID: {thread.ManagedThreadId}";
+            //Debug.Log(message);
+        }
+
+        static void stateHEUN_POOL(Vector V, Vector S, double k, Func<Vector, Vector> a, Func<Vector, Vector> b, int index, int count)
+        {
+            Vector Vtmp, Stmp;
+            Vector T1, T2;
+            T1 = Vector.Build.Dense(count);
+            T2 = Vector.Build.Dense(count);
+
+            Vtmp = V.SubVector(index, count);
+            Stmp = S.SubVector(index, count);
+
+            a(Vtmp).Add(b(Vtmp), T1); T1.Multiply(k / 2, T1); T1.Add(-1, T1); T1.PointwiseMultiply(Stmp, T1); T1.Multiply(-1, T1);
+            a(Vtmp).Multiply(k, T2); T1.Add(T2, T1);
+
+            a(Vtmp).Add(b(Vtmp), T2); T2.Multiply(k / 2, T2); T2.Add(1, T2); T2.PointwisePower(-1, T2);
+            T1.PointwiseMultiply(T2, Stmp);
+
+            S.SetSubVector(index, count, Stmp);
+
+            //Thread thread = Thread.CurrentThread;
+            //string message = $"Background: {thread.IsBackground}, Thread Pool: {thread.IsThreadPoolThread}, Thread ID: {thread.ManagedThreadId}";
+            //Debug.Log(message);
+        }
+
+
+
+        static void stateRK4(Vector V, Vector S, double k, Func<Vector, Vector, Vector> f)
+        {
+            Vector Y1, Y2, Y3;
+            Y1 = Vector.Build.Dense(V.Count);
+            Y2 = Vector.Build.Dense(V.Count);
+            Y3 = Vector.Build.Dense(V.Count);
+
+            S.Add(f(V, S).Multiply(k / 2), Y1);
+            S.Add(f(V, Y1).Multiply(k / 2), Y2);
+            S.Add(f(V, Y2).Multiply(k), Y3);
+
+            ((((f(V, S).Add(f(V, Y1).Multiply(2))).Add(f(V, Y2).Multiply(2))).Add(f(V, Y3))).Multiply(k / 2)).Add(S, S);
+        }
         /// <summary>
         /// This function sets the target time step size, below is the formula for the conduction speed of the action potential (wave speed)
         ///
@@ -633,6 +966,25 @@ namespace C2M2.NeuronalDynamics.Simulation
             Vector Vin = Vector.Build.DenseOfVector(V);
             Vin.Multiply(1.0E3, Vin);
             return (1.0E3) * 4.0 / (((40.0 - Vin) / 5.0).PointwiseExp() + 1.0);
+        }
+
+        private static List<List<int>> partition(int [] array,int nparts)
+        {
+            List<List<int>> parlist = new List<List<int>>();
+            List<int> tlist = new List<int>();
+
+            int psize = (int)(array.Count() / nparts);
+            for(int i=0; i<array.Count(); i++)
+            {
+                tlist.Add(array[i]);
+                if (array[i] == 0){ continue;}
+                if( (array[i]%psize) == 0 || (i==array.Count()-1) )
+                {                    
+                    parlist.Add(tlist);
+                    tlist = new List<int>();   
+                }   
+            }
+            return parlist;
         }
         #endregion
     }
