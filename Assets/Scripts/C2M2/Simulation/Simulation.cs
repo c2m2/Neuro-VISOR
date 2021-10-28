@@ -52,7 +52,12 @@ namespace C2M2.Simulation
         /// <summary>
         /// Minimum time for each time step to run in milliseconds
         /// </summary>
-        public int minTime = 20;
+        readonly int minTimeStep = 20;
+
+        /// <summary>
+        /// How often the visualization should be updated in milliseconds. Should never be less than minTime
+        /// </summary>
+        readonly float visualizationTimeStep = 20f;
 
         /// <summary>
         /// Require derived classes to make simulation values available
@@ -143,9 +148,7 @@ namespace C2M2.Simulation
                     ValueType simulationValues = GetValues();
                     if (simulationValues != null) UpdateVisualization(simulationValues);
                 }
-                float timeStep = 0.02f;
-                if (StaticTimeSteps.updateVisualizationTime > 0.0) timeStep = StaticTimeSteps.updateVisualizationTime;
-                yield return new WaitForSeconds(timeStep);
+                yield return new WaitForSeconds(visualizationTimeStep/1000); //converts milliseconds to seconds
 
             }
 
@@ -207,8 +210,8 @@ namespace C2M2.Simulation
                 }
                 
                 GameManager.instance.solveBarrier.SignalAndWait();
-                resourceUsage = watch.ElapsedMilliseconds / minTime;
-                if (watch.ElapsedMilliseconds < minTime) await Task.Delay(minTime-(int)watch.ElapsedMilliseconds);
+                resourceUsage = watch.ElapsedMilliseconds / minTimeStep;
+                if (resourceUsage < 1) await Task.Delay(minTimeStep-(int)watch.ElapsedMilliseconds);
                 if (cts.Token.IsCancellationRequested) break;
                 watch.Restart();
             }

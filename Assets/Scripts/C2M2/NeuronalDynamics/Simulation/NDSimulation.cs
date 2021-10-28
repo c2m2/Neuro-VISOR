@@ -236,7 +236,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
             void ApplyInteractionVals()
             {
                 ///<c>if (clamps != null && clamps.Count > 0)</c> this if statement is where we apply voltage clamps   
-                // Apply clamp values, if there are any clamps
+                /// Apply clamp values, if there are any clamps
 
                 if (clamps.Count > 0)
                 {

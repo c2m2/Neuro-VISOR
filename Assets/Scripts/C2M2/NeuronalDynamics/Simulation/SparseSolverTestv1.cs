@@ -367,10 +367,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// </summary>
         private void InitializeNeuronCell()
         {
-            lock (visualizationValuesLock)
-            {
-                U = Vector.Build.Dense(Neuron.nodes.Count, 0);
-            }
+            lock (visualizationValuesLock) U = Vector.Build.Dense(Neuron.nodes.Count, 0);
             M = Vector.Build.Dense(Neuron.nodes.Count, mi);
             N = Vector.Build.Dense(Neuron.nodes.Count, ni);
             H = Vector.Build.Dense(Neuron.nodes.Count, hi);
