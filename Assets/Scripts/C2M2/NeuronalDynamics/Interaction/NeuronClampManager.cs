@@ -115,6 +115,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         /// <param name="hit"></param>
         public void InstantiateClamp(RaycastHit hit)
         {
+            Debug.Log("Here");
             BuildClamp(hit);
         }
         private NeuronClamp BuildClamp(RaycastHit hit)

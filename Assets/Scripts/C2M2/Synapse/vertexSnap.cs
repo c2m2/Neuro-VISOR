@@ -4,18 +4,20 @@ using UnityEngine;
 using C2M2;
 using C2M2.NeuronalDynamics.UGX;
 using C2M2.NeuronalDynamics.Simulation;
+using C2M2.Interaction;
 
 public class vertexSnap : MonoBehaviour
 {
-    public float LatchDistance;
-    public Vector3 SynapseLocation;
-    List<Vector3> dendriteLocation = new List<Vector3>();
-    List<Vector3> NodeLocation = new List<Vector3>();
-    int count = 0;
+    public List<Vector3> SynapticNodeLocation = new List<Vector3>();
     bool temp = true;
-    GameObject PreSynapse;
-    public GameObject PostSynapse;
-    private LineRenderer line;
+    public GameObject PrefabPreSynapse;
+    public GameObject PrefabPostSynapse;
+    private int count = 0;
+    public List<Synapse> synapses = new List<Synapse>();
+    public Material material;
+    public List<Vector3> synapseLocations = new List<Vector3>();
+    public RaycastPressEvents hitEvent { get; private set; } = null;
+
 
     //Simulation refrence to get the attributes of the current cell
     public NDSimulation Simulation
@@ -27,11 +29,6 @@ public class vertexSnap : MonoBehaviour
         }
     }
 
-    //Accessing the end nodes of the neuron
-    public List<Neuron.NodeData> Dendrites
-    {
-        get { return Simulation.Neuron.boundaryNodes; }
-    }
 
     //Accessing the node data of the neuron
     public List<Neuron.NodeData> Nodes1D
@@ -39,159 +36,103 @@ public class vertexSnap : MonoBehaviour
         get { return Simulation.Neuron.nodes; }
     }
 
-    public int focusVert { get; private set; } = -1;
-    public Vector3 FocusPos
+    //Could possibly pass count as parameter instead and just inscrement count locally from update()
+    void preSynapticPlacement(RaycastHit hit)
     {
-        get { return Simulation.Verts1D[focusVert]; }
+        if(count == 0)
+        {
+            Synapse pre = gameObject.AddComponent<Synapse>();
+
+            pre.prefab = Instantiate(PrefabPreSynapse, new Vector3(0, 0, 0), Quaternion.identity) as GameObject;
+
+            int preSynapticIndex = Simulation.GetNearestPoint(hit);
+            pre.nodeIndex = preSynapticIndex;
+
+            synapses.Add(pre);
+
+
+            pre.transformPoint();
+            synapseLocations.Add(pre.prefab.transform.localPosition);
+
+            count++;
+            
+        }
+        //if we have already placed the PreSynaptic synapse place the post instead
+        else if(count == 1)
+        {
+            postSynapticPlacement(hit);
+        }
     }
 
 
-    void Start()
+    void postSynapticPlacement(RaycastHit hit)
     {
-        SynapseLocation = this.gameObject.transform.position;
-        PreSynapse = this.gameObject;
+        if(count == 1)
+        {
+            Synapse post = PrefabPostSynapse.AddComponent<Synapse>();
 
-        // Add a Line Renderer to the GameObject
-        line = this.gameObject.AddComponent<LineRenderer>();
-        // Set the width of the Line Renderer
-        line.SetWidth(0.03F, 0.03F);
-        // Set the number of vertex fo the Line Renderer
-        line.SetVertexCount(2);
+            post.prefab = Instantiate(PrefabPostSynapse, new Vector3(0, 0, 0), Quaternion.identity) as GameObject;
+
+            int postSynapticIndex = Simulation.GetNearestPoint(hit);
+            post.nodeIndex = postSynapticIndex;
+
+            synapses.Add(post);
+
+            post.transformPoint();
+            synapseLocations.Add(post.prefab.transform.localPosition);
+
+            count++;
+        } 
     }
 
-    //Getting the boundary nodes (Dendrites) into a Vector3 List
-    List<Vector3> getBoundaryNodes()
+    private void Awake()
     {
-        List<Vector3> getDendriteLocations = new List<Vector3>();
-        if (GameManager.instance.activeSim != null)
-        {
-            for (int i = 0; i < Dendrites.Count; i++)
-            {
-                getDendriteLocations.Add(new Vector3((float)Dendrites[i].Xcoords, (float)Dendrites[i].Ycoords, (float)Dendrites[i].Zcoords));
-            }
-
-        }
-        return getDendriteLocations;
-    }
-
-    //Get the vertices of the current neuron
-    List<Vector3> getNodeData()
-    {
-        List<Vector3> Nodes = new List<Vector3>();
-        if (GameManager.instance.activeSim != null)
-        {
-            //For all vertices make a new Vector3 list of them so I can tranform it into 3d space
-            for (int i = 0; i < Nodes1D.Count; i++)
-            {
-                Nodes.Add(new Vector3(((float)Nodes1D[i].Xcoords), ((float)Nodes1D[i].Ycoords), ((float)Nodes1D[i].Zcoords)));
-            }
-        }
-        return Nodes;
-    }
-
-    //TODO MAKE A LIST OF THE SYNAPSES AND ALLOW USER TO PLACE TWO THAT DRAW A LINE AND CONNECT THEM
-
-    void preSynapsePlace()
-    {
-        RaycastHit hit;
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out hit))
-        {
-            try
-            {
-                if (hit.collider.transform.parent.gameObject == GameObject.Find("(Solver)SparseSolverTestv1"))
-                {
-                    PreSynapse.transform.position = hit.point;
-                }
-            }
-            catch (System.NullReferenceException)
-            {
-                //TODO MAKE CATCH THEN RETURN THE POSITION OF THE GAMEOBJECT IS THE NEURON (do not look for parent)
-                Debug.Log("Did not find Nueron");
-            }
-
-        }
-        PreSynapse.transform.SetParent(Simulation.transform);
-        for (int i = 0; i < NodeLocation.Count; i++)
-        {
-            Debug.Log(Vector3.Distance(PreSynapse.transform.localPosition, NodeLocation[i]));
-            if (Vector3.Distance(PreSynapse.transform.localPosition, NodeLocation[i]) <= 5.0f)
-            {
-                Debug.Log(NodeLocation[i]);
-                PreSynapse.transform.localPosition = NodeLocation[i];
-                break;
-            }
-        }
-        PreSynapse.transform.parent = null;
-    }
-
-    void postSynapsePlace()
-    {
-        RaycastHit hit;
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out hit))
-        {
-            try
-            {
-                if (hit.collider.transform.parent.gameObject == GameObject.Find("(Solver)SparseSolverTestv1"))
-                {
-                    PostSynapse.transform.position = hit.point;
-                }
-            }
-            catch (System.NullReferenceException)
-            {
-                //TODO MAKE CATCH THEN RETURN THE POSITION OF THE GAMEOBJECT IS THE NEURON (do not look for parent)
-                Debug.Log("Did not find Nueron");
-            }
-
-        }
-        PostSynapse.transform.SetParent(Simulation.transform);
-        for (int i = 0; i < NodeLocation.Count; i++)
-        {
-            //Debug.Log(Vector3.Distance(PreSynapse.transform.localPosition, NodeLocation[i]));
-            if (Vector3.Distance(PostSynapse.transform.localPosition, NodeLocation[i]) <= 5.0f)
-            {
-                Debug.Log(NodeLocation[i]);
-                PostSynapse.transform.localPosition = NodeLocation[i];
-                break;
-            }
-        }
-        PostSynapse.transform.parent = null;
+        //Trigger events used for raycasting to the neuron
+        hitEvent = gameObject.AddComponent<RaycastPressEvents>();
+        Simulation.raycastEventManager.LRTrigger = this.hitEvent;
+        hitEvent.OnPress.AddListener((hit) => preSynapticPlacement(hit));
     }
 
     void Update()
     {
         if (GameManager.instance.activeSim != null)
         {
-            //Find the Nodes just once per simulation or else this leads to very bad locations
-            if (temp)
+
+            if (Input.GetKeyDown(KeyCode.G))
             {
-                //dendriteLocation = getBoundaryNodes();
-                NodeLocation = getNodeData();
-                temp = false;
+                for(int i = 0; i < synapses.Count; i++)
+                {
+                    Debug.Log(synapses[i].ToString());
+                }
+            }
+            
+
+            if (count == 2)
+            {
+               
+
+                for(int i = 0; i < synapses.Count - 1; i++)
+                {
+                    //TODO NEED TO OPTIMIZE THIS
+                    if(synapses[i].prefab.GetComponent<LineRenderer>() == null)
+                    {
+                        LineRenderer line;
+                        
+                        line = synapses[i].prefab.AddComponent<LineRenderer>();
+                        synapses[i + 1].prefab.AddComponent<LineRenderer>().SetVertexCount(0);
+                        line.SetWidth(0.03F, 0.03F);
+                        line.SetVertexCount(2);
+                        line.material = material;
+
+                        line.SetPosition(0, synapses[i].prefab.transform.position);
+                        line.SetPosition(1, synapses[i + 1].prefab.transform.position);
+                    }
+
+                }
+
+                count = 0;
             }
 
-            if (Input.GetMouseButtonDown(0))
-            {
-                preSynapsePlace();
-                line.SetPosition(0, PreSynapse.transform.position);
-                line.SetPosition(1, PostSynapse.transform.position);
-            }
-            if (Input.GetMouseButtonDown(1))
-            {
-                postSynapsePlace();
-                line.SetPosition(0, PreSynapse.transform.position);
-                line.SetPosition(1, PostSynapse.transform.position);
-            }
-
-        }
-
-        //If the simulation is ended put back to original location
-        if (GameManager.instance.activeSim == null)
-        {
-            PreSynapse.transform.parent = null;
-            transform.position = Vector3.MoveTowards(transform.position, SynapseLocation, (float).03);
-            temp = true;
         }
 
     }
