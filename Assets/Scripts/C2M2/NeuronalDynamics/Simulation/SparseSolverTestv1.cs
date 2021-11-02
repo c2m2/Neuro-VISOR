@@ -137,6 +137,10 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// </summary>
         private Vector U;
         /// <summary>
+        /// This is the U that gets modified during the step before U is set to it. TODO remove this when U is moved to NDSimulation
+        /// </summary>
+        private Vector U_Active;
+        /// <summary>
         /// These are the solution vectors for the voltage <code>U</code>
         /// the state <c>M</c>, state <c>N</c>, and state <c>H</c>
         /// </summary>
@@ -162,7 +166,7 @@ namespace C2M2.NeuronalDynamics.Simulation
             /// this initialize the curvals which will be sent back to the VR simulation
             double[] curVals = null;
             /// check if this beginning of the simulation
-            if (time > -1)
+            if (curentTimeStep > -1)
             {
                 Vector curTimeSlice;
                 lock (visualizationValuesLock)
@@ -186,7 +190,6 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// <param name="newValues"></param>
         public override void Set1DValues(Tuple<int, double>[] newValues)
         {
-            Vector temp = U.Clone();
             foreach (Tuple<int, double> newVal in newValues)
             {
                 if (newVal != null)
@@ -194,13 +197,9 @@ namespace C2M2.NeuronalDynamics.Simulation
                     /// here we set the voltage at the location, notice that we multiply by 0.0001 to convert to volts [V]
                     if (newVal.Item1 >= 0 && newVal.Item1 < Neuron.nodes.Count)
                     {
-                        temp[newVal.Item1] = newVal.Item2;
+                        U_Active[newVal.Item1] = newVal.Item2;
                     }
                 }
-            }
-            lock (visualizationValuesLock)
-            {
-                U = temp.Clone();
             }
         }
 
@@ -277,29 +276,32 @@ namespace C2M2.NeuronalDynamics.Simulation
             /// <c>r_csc.Multiply(U.ToArray(), b);</c> the performs the RHS*Ucurr and stores it in <c>b</c> \n
             /// <c>lu.Solve(b, b);</c> this does the forward/backward substitution of the LU solve and sovles LHS = b \n
             /// <c>U.SetSubVector(0, Neuron.vertCount, Vector.Build.DenseOfArray(b));</c> this sets the U vector to the voltage at the end of the diffusion solve
-            r_csc.Multiply(U.ToArray(), b);
+            r_csc.Multiply(U_Active.ToArray(), b);
             lu.Solve(b, b);
             Vector bVector = Vector.Build.DenseOfArray(b);
-            lock (visualizationValuesLock)
-            {
-                U.SetSubVector(0, Neuron.nodes.Count, bVector);
-                /// this part solves the reaction portion of the operator splitting \n
-                /// <c>R.SetSubVector(0, Neuron.vertCount, reactF(reactConst, U, N, M, H, cap));</c> this first evaluates at the reaction function \f$r(V)\f$ \n
-                /// <c>R.Multiply(k, R); </c> this multiplies by the time step size \n
-                /// <c>U.add(R,U)</c> adds it back to U to finish off the operator splitting
-                /// For the reaction solve we are solving
-                /// \f[\frac{U_{next}-U_{curr}}{k} = R(U_{curr})\f]
-                R.SetSubVector(0, Neuron.nodes.Count, reactF(reactConst, U, N, M, H, cap));
-                R.Multiply(timeStep, R);
-                U.Add(R, U);
-            }
+            U_Active.SetSubVector(0, Neuron.nodes.Count, bVector);
+            /// this part solves the reaction portion of the operator splitting \n
+            /// <c>R.SetSubVector(0, Neuron.vertCount, reactF(reactConst, U, N, M, H, cap));</c> this first evaluates at the reaction function \f$r(V)\f$ \n
+            /// <c>R.Multiply(k, R); </c> this multiplies by the time step size \n
+            /// <c>U.add(R,U)</c> adds it back to U to finish off the operator splitting
+            /// For the reaction solve we are solving
+            /// \f[\frac{U_{next}-U_{curr}}{k} = R(U_{curr})\f]
+            R.SetSubVector(0, Neuron.nodes.Count, reactF(reactConst, U_Active, N, M, H, cap));
+            R.Multiply(timeStep, R);
+            U_Active.Add(R, U_Active);
             /// this part solve the state variables using Forward Euler
             /// the general rule is \f$N_{next} = N_{curr}+k\cdot f_N(U_{curr},N_{curr})\f$
-            N.Add(fN(U, N).Multiply(timeStep), N);
-            M.Add(fM(U, M).Multiply(timeStep), M);
-            H.Add(fH(U, H).Multiply(timeStep), H);
+            N.Add(fN(U_Active, N).Multiply(timeStep), N);
+            M.Add(fM(U_Active, M).Multiply(timeStep), M);
+            H.Add(fH(U_Active, H).Multiply(timeStep), H);
             ///<c>if ((i * k >= 0.015) && SomaOn) { U[0] = vstart; }</c> this checks of the somaclamp is on and sets the soma location to <c>vstart</c>
             ///if ((t * k >= 0.015) && SomaOn) { U[0] = vstart; }
+        }
+
+        internal override void SetOutputValues()
+        {
+            lock (visualizationValuesLock) U = U_Active.Clone();
+
         }
 
         #region Local Functions
@@ -368,6 +370,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         private void InitializeNeuronCell()
         {
             lock (visualizationValuesLock) U = Vector.Build.Dense(Neuron.nodes.Count, 0);
+            U_Active = U.Clone();
             M = Vector.Build.Dense(Neuron.nodes.Count, mi);
             N = Vector.Build.Dense(Neuron.nodes.Count, ni);
             H = Vector.Build.Dense(Neuron.nodes.Count, hi);

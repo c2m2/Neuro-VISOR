@@ -77,7 +77,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
         // Don't allow threads to keep running when application pauses or quits
         private void OnApplicationPause(bool pause)
         {
-            if (!Sim.paused) TogglePause();
+            if (pause != Sim.paused) TogglePause();
         }
 
         public void TogglePause()

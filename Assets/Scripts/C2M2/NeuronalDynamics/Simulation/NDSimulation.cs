@@ -233,6 +233,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
         protected override void PostSolveStep(int t)
         {
             ApplyInteractionVals();
+            SetOutputValues();
             void ApplyInteractionVals()
             {
                 ///<c>if (clamps != null && clamps.Count > 0)</c> this if statement is where we apply voltage clamps   
@@ -266,6 +267,8 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 }
             }
         }
+
+        internal abstract void SetOutputValues();
 
         protected override void OnAwakePost(Mesh viz)
         {

@@ -9,10 +9,11 @@ namespace C2M2.NeuronalDynamics.Simulation
     {
         // One value for each 1D vertex
         double[] vals;
+        double[] vals_active; // TODO will eventually be removed
 
         public override double[] Get1DValues()
         {
-            return vals;
+            lock (visualizationValuesLock) return vals;
         }
         public override void Set1DValues(Tuple<int, double>[] newValues)
         {
@@ -20,13 +21,14 @@ namespace C2M2.NeuronalDynamics.Simulation
             {
                 int index = val.Item1;
                 double value = val.Item2;
-                vals[index] = value;
+                vals_active[index] = value;
             }
         }
         double diffusionConst = 0.05f;
         protected override void PreSolve()
         {
-            vals = new double[Neuron.nodes.Count];
+            lock (visualizationValuesLock) vals = new double[Neuron.nodes.Count];
+            vals_active = new double[Neuron.nodes.Count];
         }
         protected override void SolveStep(int t)
         {
@@ -34,18 +36,23 @@ namespace C2M2.NeuronalDynamics.Simulation
             {
                 foreach(var n in Neuron.nodes[i].Neighbors)
                 {
-                    double diffusionAmt = diffusionConst * vals[n.id];
-                    vals[i] += diffusionAmt;
-                    vals[n.id] -= diffusionAmt;
+                    double diffusionAmt = diffusionConst * vals_active[n.id];
+                    vals_active[i] += diffusionAmt;
+                    vals_active[n.id] -= diffusionAmt;
                 }
             }
 
             // Remove value from dendrite caps
             foreach(var node in Neuron.boundaryNodes)
             {
-                vals[node.Id] -= diffusionConst * vals[node.Id];
+                vals_active[node.Id] -= diffusionConst * vals_active[node.Id];
             }
             
+        }
+
+        internal override void SetOutputValues()
+        {
+            lock (visualizationValuesLock) vals = (double[])vals_active.Clone();
         }
     }
 }

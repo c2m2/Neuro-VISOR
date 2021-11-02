@@ -167,7 +167,7 @@ namespace C2M2.Simulation
         }
         #endregion
 
-        public int time = -1;
+        public int curentTimeStep = -1;
         public double timeStep = 0.008 * 1e-3;
         public double endTime = 1.0;
         public int nT => (int)(endTime / timeStep);
@@ -193,20 +193,20 @@ namespace C2M2.Simulation
             GameManager.instance.solveBarrier.AddParticipant();
             var watch = new System.Diagnostics.Stopwatch();
             watch.Start();
-            time = 0;
-            while (time < nT)
+            curentTimeStep = 0;
+            while (curentTimeStep < nT)
             {
                 if (!paused)
                 {
-                    PreSolveStep(time);
+                    PreSolveStep(curentTimeStep);
 
                     solveStepSampler.Begin();
-                    SolveStep(time);
+                    SolveStep(curentTimeStep);
                     solveStepSampler.End();
 
-                    PostSolveStep(time);
+                    PostSolveStep(curentTimeStep);
                     
-                    time++;
+                    curentTimeStep++;
                 }
                 
                 GameManager.instance.solveBarrier.SignalAndWait();
@@ -223,7 +223,7 @@ namespace C2M2.Simulation
             Profiler.EndThreadProfiling();
         }
 
-        public sealed override float GetSimulationTime() => time * (float)timeStep;
+        public sealed override float GetSimulationTime() => curentTimeStep * (float)timeStep;
 
         /// <summary>
         /// Called on the solve thread before the simulation for loop is launched

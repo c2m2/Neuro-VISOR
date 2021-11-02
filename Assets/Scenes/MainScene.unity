@@ -1631,25 +1631,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 718669685}
   m_CullTransparentMesh: 0
---- !u!1 &724846497 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 3671467348768610599, guid: f49e57d0c1b71c4418326894ace9a9b5,
-    type: 3}
-  m_PrefabInstance: {fileID: 3671467347388522957}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &724846498
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 724846497}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c1099190b09ed004c892376d154b4e1a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  timeSteps: 0.05
 --- !u!1 &726520547 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 806130742265277099, guid: b8e32f33023aba348a3a271448030708,
@@ -1730,50 +1711,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 728476832}
   m_CullTransparentMesh: 0
---- !u!1 &730516962
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 730516964}
-  - component: {fileID: 730516963}
-  m_Layer: 0
-  m_Name: StaticTimeStepController
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &730516963
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 730516962}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c1099190b09ed004c892376d154b4e1a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  timeSteps: 0.002
---- !u!4 &730516964
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 730516962}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.102021486, y: -0.21621925, z: -1.0854785}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 7
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &735852099
 GameObject:
   m_ObjectHideFlags: 0
@@ -5876,11 +5813,6 @@ PrefabInstance:
       propertyPath: rightRaycaster
       value: 
       objectReference: {fileID: 0}
-    - target: {fileID: 3671467348768610598, guid: f49e57d0c1b71c4418326894ace9a9b5,
-        type: 3}
-      propertyPath: defaultMaterial
-      value: 
-      objectReference: {fileID: 2100000, guid: 7098700683643d14ab451f0982308301, type: 3}
     - target: {fileID: 3671467348768610598, guid: f49e57d0c1b71c4418326894ace9a9b5,
         type: 3}
       propertyPath: vrDeviceManager
