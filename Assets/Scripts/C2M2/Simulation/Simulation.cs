@@ -50,14 +50,14 @@ namespace C2M2.Simulation
         public RaycastPressEvents defaultRaycastEvent = null;
 
         /// <summary>
-        /// Minimum time for each time step to run in milliseconds
+        /// Minimum time for each time step to run in seconds
         /// </summary>
-        readonly int minTimeStep = 20;
+        readonly float minTimeStep = .02f;
 
         /// <summary>
-        /// How often the visualization should be updated in milliseconds. Should never be less than minTime
+        /// How often the visualization should be updated in seconds. Should never be less than minTime
         /// </summary>
-        readonly float visualizationTimeStep = 20f;
+        readonly float visualizationTimeStep = .02f;
 
         /// <summary>
         /// Require derived classes to make simulation values available
@@ -148,7 +148,7 @@ namespace C2M2.Simulation
                     ValueType simulationValues = GetValues();
                     if (simulationValues != null) UpdateVisualization(simulationValues);
                 }
-                yield return new WaitForSeconds(visualizationTimeStep/1000); //converts milliseconds to seconds
+                yield return new WaitForSeconds(visualizationTimeStep);
 
             }
 
@@ -191,8 +191,7 @@ namespace C2M2.Simulation
             PreSolve();
 
             GameManager.instance.solveBarrier.AddParticipant();
-            var watch = new System.Diagnostics.Stopwatch();
-            watch.Start();
+            DateTime startStepTime = DateTime.Now;
             curentTimeStep = 0;
             while (curentTimeStep < nT)
             {
@@ -210,10 +209,15 @@ namespace C2M2.Simulation
                 }
                 
                 GameManager.instance.solveBarrier.SignalAndWait();
-                resourceUsage = watch.ElapsedMilliseconds / minTimeStep;
-                if (resourceUsage < 1) await Task.Delay(minTimeStep-(int)watch.ElapsedMilliseconds);
+                float timeChange = (float)(DateTime.Now - startStepTime).TotalSeconds;
+                resourceUsage = timeChange / minTimeStep;
+                if (resourceUsage < 1)
+                {
+                    int millisecondsToWait = (int)(1000 * (minTimeStep-timeChange));
+                    await Task.Delay(millisecondsToWait);
+                }
                 if (cts.Token.IsCancellationRequested) break;
-                watch.Restart();
+                startStepTime = DateTime.Now;
             }
             GameManager.instance.solveBarrier.RemoveParticipant();
             cts.Dispose();
