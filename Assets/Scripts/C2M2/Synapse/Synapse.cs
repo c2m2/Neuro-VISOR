@@ -48,16 +48,18 @@ public class Synapse : MonoBehaviour
     //Contructor to intilizae some values
     public GameObject prefab;
     public int nodeIndex;
-    public Synapse(GameObject prefab, int nodeIndex)
+    public double voltage;
+    public Synapse(GameObject prefab, int nodeIndex, double voltage)
     {
         this.prefab = prefab;
         this.nodeIndex = nodeIndex;
+        this.voltage = voltage;
     }
 
     override
     public string ToString()
     {
-        return this.prefab.name + " " + this.nodeIndex;
+        return this.prefab.name + " " + this.nodeIndex + " " + voltage;
     }
 
     // This method will place the synapse on the point we clicked on the neuron

@@ -5,11 +5,11 @@ using C2M2;
 using C2M2.NeuronalDynamics.UGX;
 using C2M2.NeuronalDynamics.Simulation;
 using C2M2.Interaction;
+using System;
 
 public class vertexSnap : MonoBehaviour
 {
     public List<Vector3> SynapticNodeLocation = new List<Vector3>();
-    bool temp = true;
     public GameObject PrefabPreSynapse;
     public GameObject PrefabPostSynapse;
     private int count = 0;
@@ -17,7 +17,8 @@ public class vertexSnap : MonoBehaviour
     public Material material;
     public List<Vector3> synapseLocations = new List<Vector3>();
     public RaycastPressEvents hitEvent { get; private set; } = null;
-
+    public SynapseManager SynapseManager;
+    public GameObject arrow;
 
     //Simulation refrence to get the attributes of the current cell
     public NDSimulation Simulation
@@ -29,14 +30,15 @@ public class vertexSnap : MonoBehaviour
         }
     }
 
-
     //Accessing the node data of the neuron
     public List<Neuron.NodeData> Nodes1D
     {
         get { return Simulation.Neuron.nodes; }
     }
 
-    //Could possibly pass count as parameter instead and just inscrement count locally from update()
+
+
+    //Could possibly pass count as parameter instead and just increment count locally from update()
     void preSynapticPlacement(RaycastHit hit)
     {
         if(count == 0)
@@ -85,39 +87,38 @@ public class vertexSnap : MonoBehaviour
         } 
     }
 
-    private void Awake()
+
+    void deleteSynapseHit(RaycastHit hit)
     {
-        //Trigger events used for raycasting to the neuron
+        
+    }
+
+    private void OnEnable()
+    {
+        // Trigger events used for raycasting to the neuron
         hitEvent = gameObject.AddComponent<RaycastPressEvents>();
         Simulation.raycastEventManager.LRTrigger = this.hitEvent;
         hitEvent.OnPress.AddListener((hit) => preSynapticPlacement(hit));
+        //hitEvent.OnHoldPress.AddListener((hit) => deleteSynapseHit(hit));
+    }
+
+    private void OnDisable()
+    {
+        SynapseManager.synapsesList = synapses;
     }
 
     void Update()
     {
         if (GameManager.instance.activeSim != null)
         {
-
-            if (Input.GetKeyDown(KeyCode.G))
-            {
-                for(int i = 0; i < synapses.Count; i++)
-                {
-                    Debug.Log(synapses[i].ToString());
-                }
-            }
-            
-
             if (count == 2)
-            {
-               
-
+            {  
                 for(int i = 0; i < synapses.Count - 1; i++)
                 {
-                    //TODO NEED TO OPTIMIZE THIS
-                    if(synapses[i].prefab.GetComponent<LineRenderer>() == null)
+                    if(synapses[i].prefab.GetComponent<LineRenderer>() == null && i % 2 == 0)
                     {
                         LineRenderer line;
-                        
+
                         line = synapses[i].prefab.AddComponent<LineRenderer>();
                         synapses[i + 1].prefab.AddComponent<LineRenderer>().SetVertexCount(0);
                         line.SetWidth(0.03F, 0.03F);
@@ -127,13 +128,9 @@ public class vertexSnap : MonoBehaviour
                         line.SetPosition(0, synapses[i].prefab.transform.position);
                         line.SetPosition(1, synapses[i + 1].prefab.transform.position);
                     }
-
                 }
-
                 count = 0;
             }
-
         }
-
     }
 }

@@ -2721,6 +2721,17 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3408630298987087350, guid: 2f0923ceccc20d14596cfdf211bc5ef6,
         type: 3}
+      propertyPath: pass
+      value: 
+      objectReference: {fileID: 1162354723}
+    - target: {fileID: 3408630298987087350, guid: 2f0923ceccc20d14596cfdf211bc5ef6,
+        type: 3}
+      propertyPath: arrow
+      value: 
+      objectReference: {fileID: 5954688046854600746, guid: 4f3ad9ad58453a849a6b5c23e68e4860,
+        type: 3}
+    - target: {fileID: 3408630298987087350, guid: 2f0923ceccc20d14596cfdf211bc5ef6,
+        type: 3}
       propertyPath: material
       value: 
       objectReference: {fileID: 2100000, guid: 3fcb633593a8eff4c82f6e9f2e3df6da, type: 2}
@@ -2735,6 +2746,11 @@ PrefabInstance:
       propertyPath: LatchDistance
       value: 5
       objectReference: {fileID: 0}
+    - target: {fileID: 3408630298987087350, guid: 2f0923ceccc20d14596cfdf211bc5ef6,
+        type: 3}
+      propertyPath: SynapseManager
+      value: 
+      objectReference: {fileID: 1162354723}
     - target: {fileID: 3408630298987087350, guid: 2f0923ceccc20d14596cfdf211bc5ef6,
         type: 3}
       propertyPath: PrefabPreSynapse
@@ -3309,6 +3325,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   synapse: {fileID: 1071786429}
+  synapsesList: []
 --- !u!4 &1162354724
 Transform:
   m_ObjectHideFlags: 0
