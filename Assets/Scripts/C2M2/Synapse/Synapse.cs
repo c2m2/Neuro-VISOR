@@ -5,7 +5,6 @@ using C2M2.Simulation;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static C2M2.Interaction.RaycastPressEvents;
 
 [RequireComponent(typeof(MeshRenderer))]
 public class Synapse : MonoBehaviour
@@ -22,7 +21,13 @@ public class Synapse : MonoBehaviour
         }
     }
 
+    public int focusVert { get; private set; } = -1;
 
+
+    public Vector3 FocusPos
+    {
+        get { return Simulation.Verts1D[focusVert]; }
+    }
 
     public List<Neuron.NodeData> Nodes1D
     {
@@ -62,7 +67,24 @@ public class Synapse : MonoBehaviour
         return this.prefab.name + " " + this.nodeIndex + " " + voltage;
     }
 
-    // This method will place the synapse on the point we clicked on the neuron
+
+    public void transformRayCast(RaycastHit hit)
+    {
+        //TODO NEED FIXED FOR SOMA PLACEMENT / VOLTAGE
+        if (Simulation.Neuron.somaIDs.Contains(nodeIndex))
+        {
+            this.prefab.transform.position = hit.point;
+        }
+        else
+        {
+            this.prefab.transform.SetParent(Simulation.transform);
+            focusVert = nodeIndex;
+            this.prefab.transform.localPosition = FocusPos;
+        }
+    }
+
+
+    // This method will place the synapse on the point we clicked on the neuron(NOTE: works only on desktop version)
     public void transformPoint()
     {
         List<Vector3> nodes = getNodeData();

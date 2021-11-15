@@ -19,6 +19,7 @@ public class vertexSnap : MonoBehaviour
     public RaycastPressEvents hitEvent { get; private set; } = null;
     public SynapseManager SynapseManager;
     public GameObject arrow;
+    private int holdCount = 0;
 
     //Simulation refrence to get the attributes of the current cell
     public NDSimulation Simulation
@@ -43,19 +44,28 @@ public class vertexSnap : MonoBehaviour
     {
         if(count == 0)
         {
+            int preSynapticIndex = Simulation.GetNearestPoint(hit);
+
+            for (int i = 0; i < synapses.Count; i++)
+            {
+                if(synapses[i].nodeIndex == preSynapticIndex)
+                {
+                    return;
+                }
+            }
+
             Synapse pre = gameObject.AddComponent<Synapse>();
 
             pre.prefab = Instantiate(PrefabPreSynapse, new Vector3(0, 0, 0), Quaternion.identity) as GameObject;
 
-            int preSynapticIndex = Simulation.GetNearestPoint(hit);
             pre.nodeIndex = preSynapticIndex;
 
             synapses.Add(pre);
 
-
-            pre.transformPoint();
+            pre.transformRayCast(hit);
             synapseLocations.Add(pre.prefab.transform.localPosition);
 
+            holdCount = 0;
             count++;
             
         }
@@ -71,7 +81,7 @@ public class vertexSnap : MonoBehaviour
     {
         if(count == 1)
         {
-            Synapse post = PrefabPostSynapse.AddComponent<Synapse>();
+            Synapse post = gameObject.AddComponent<Synapse>();
 
             post.prefab = Instantiate(PrefabPostSynapse, new Vector3(0, 0, 0), Quaternion.identity) as GameObject;
 
@@ -80,7 +90,7 @@ public class vertexSnap : MonoBehaviour
 
             synapses.Add(post);
 
-            post.transformPoint();
+            post.transformRayCast(hit);
             synapseLocations.Add(post.prefab.transform.localPosition);
 
             count++;
@@ -90,8 +100,43 @@ public class vertexSnap : MonoBehaviour
 
     void deleteSynapseHit(RaycastHit hit)
     {
-        
+        holdCount++;
+        if(holdCount >= 50)
+        {
+            int hitIndex = Simulation.GetNearestPoint(hit);
+            for(int i = 0; i < synapses.Count; i++)
+            {
+                //Add if synapses.count % 2 != 0 mean its not even dont delete
+                if(synapses[i].nodeIndex == hitIndex && i % 2 == 0)
+                {
+                    //try catch(argumentoutofrangeexception)
+                    Destroy(synapses[i]);
+                    Destroy(synapses[i].prefab);
+                    Destroy(synapses[i + 1]);
+                    Destroy(synapses[i + 1].prefab);
+                    synapses.RemoveAt(i);
+                    synapses.RemoveAt(i);
+                    //i -= 2;
+                    holdCount = 0;
+                    return;
+                }
+                else if(synapses[i].nodeIndex == hitIndex && i % 2 != 0)
+                {
+                    Destroy(synapses[i]);
+                    Destroy(synapses[i].prefab);
+                    Destroy(synapses[i - 1]);
+                    Destroy(synapses[i - 1].prefab);
+                    synapses.RemoveAt(i);
+                    synapses.RemoveAt(i - 1);
+                    //i -= 2;
+                    holdCount = 0;
+                    return;
+                }
+            }
+            holdCount = 0;
+        }
     }
+
 
     private void OnEnable()
     {
@@ -99,12 +144,13 @@ public class vertexSnap : MonoBehaviour
         hitEvent = gameObject.AddComponent<RaycastPressEvents>();
         Simulation.raycastEventManager.LRTrigger = this.hitEvent;
         hitEvent.OnPress.AddListener((hit) => preSynapticPlacement(hit));
-        //hitEvent.OnHoldPress.AddListener((hit) => deleteSynapseHit(hit));
+        hitEvent.OnHoldPress.AddListener((hit) => deleteSynapseHit(hit));
     }
 
     private void OnDisable()
     {
         SynapseManager.synapsesList = synapses;
+        Destroy(GetComponent<RaycastPressEvents>());
     }
 
     void Update()
@@ -113,20 +159,23 @@ public class vertexSnap : MonoBehaviour
         {
             if (count == 2)
             {  
-                for(int i = 0; i < synapses.Count - 1; i++)
+                for(int i = synapses.Count - 2; i < synapses.Count - 1; i++)
                 {
-                    if(synapses[i].prefab.GetComponent<LineRenderer>() == null && i % 2 == 0)
+                    if(i % 2 == 0)
                     {
-                        LineRenderer line;
+                        GameObject arrowHead;
 
-                        line = synapses[i].prefab.AddComponent<LineRenderer>();
-                        synapses[i + 1].prefab.AddComponent<LineRenderer>().SetVertexCount(0);
-                        line.SetWidth(0.03F, 0.03F);
-                        line.SetVertexCount(2);
-                        line.material = material;
+                        // Create a new arrow in 3D space
+                        arrowHead = Instantiate(arrow, new Vector3(0, 0, 0), Quaternion.identity) as GameObject;
+                        
+                        // Use Vector3 lerp so the position does not set it to the middle of the pre synapse but rather between the two
+                        arrowHead.transform.position = Vector3.Lerp(synapses[i].prefab.transform.position, synapses[i + 1].prefab.transform.position, 0.5f);
+                        arrowHead.transform.LookAt(synapses[i + 1].prefab.transform.position);
 
-                        line.SetPosition(0, synapses[i].prefab.transform.position);
-                        line.SetPosition(1, synapses[i + 1].prefab.transform.position);
+                        // Adjust the z scale of the arrow so we can point correctly to the post-synapse
+                        // Also the -0.08f on the distance z variable is just the offset of the size of the synapse
+                        arrowHead.transform.localScale = new Vector3(0.02f, 0.01f, Vector3.Distance(synapses[i].prefab.transform.position, synapses[i + 1].prefab.transform.position) - 0.08f);
+                        arrowHead.transform.SetParent(synapses[i].prefab.transform);
                     }
                 }
                 count = 0;

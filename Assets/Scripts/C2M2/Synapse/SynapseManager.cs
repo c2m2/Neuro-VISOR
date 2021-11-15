@@ -96,6 +96,13 @@ public class SynapseManager : MonoBehaviour
         {
             synapse.SetActive(false);
             activeSynapse = false;
+            
+            // Remove all synapse componets attached to this object
+            for(int i = 0; i < synapse.GetComponent<vertexSnap>().synapses.Count; i++)
+            {
+                Destroy(synapse.GetComponent<vertexSnap>().synapses[i]);
+            }
+
             synapse.GetComponent<vertexSnap>().synapses = new List<Synapse>();
             synapsesList = synapse.GetComponent<vertexSnap>().synapses;
         }
