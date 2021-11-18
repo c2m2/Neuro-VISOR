@@ -112,20 +112,20 @@ namespace C2M2.Visualization
             if (poolMemory)
             {
                 // Initialize the memory pool if necessary
-                if(memPool == null || memPool.Length != unscaledTimes.Length)
+                if(memPool == null || memPool.Length != scaledTimes.Length)
                 {
-                    memPool = new Color32[unscaledTimes.Length];
+                    memPool = new Color32[scaledTimes.Length];
                 }
                 cols = memPool;
             }
             else
             {
-                cols = new Color32[unscaledTimes.Length];
+                cols = new Color32[scaledTimes.Length];
             }
 
-            for (int i = 0; i < unscaledTimes.Length; i++)
+            for (int i = 0; i < scaledTimes.Length; i++)
             {
-                cols[i] = lut[(int)unscaledTimes[i]];
+                cols[i] = lut[(int)scaledTimes[i]];
             }
 
             return cols;
