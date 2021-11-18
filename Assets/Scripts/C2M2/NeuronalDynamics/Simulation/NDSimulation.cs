@@ -305,9 +305,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
 
                 // Take an weighted average using lambda
                 // Equivalent to [lambda * v2 + (1 - lambda) * v1]
-                double newVal = map[i].lambda * (vals1D[map[i].v2] - vals1D[map[i].v1]) + vals1D[map[i].v1];
-
-                Scalars3D[i] = newVal;
+                Scalars3D[i] = map[i].lambda * (vals1D[map[i].v2] - vals1D[map[i].v1]) + vals1D[map[i].v1];
             }
 
             // Update graphs
