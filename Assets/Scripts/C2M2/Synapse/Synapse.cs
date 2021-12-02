@@ -14,8 +14,7 @@ public class Synapse : MonoBehaviour
     {
         get
         {
-            if (GameManager.instance.activeSim != null) return (NDSimulation)GameManager.instance.activeSim;
-            else return GetComponentInParent<NDSimulation>();
+            return (NDSimulation)GameManager.instance.activeSims[0];
         }
     }
 

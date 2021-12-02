@@ -31,8 +31,7 @@ public class vertexSnap : MonoBehaviour
     {
         get
         {
-            if (GameManager.instance.activeSim != null) return (NDSimulation)GameManager.instance.activeSim;
-            else return GetComponentInParent<NDSimulation>();
+            return (NDSimulation)GameManager.instance.activeSims[0];
         }
     }
 
@@ -211,7 +210,7 @@ public class vertexSnap : MonoBehaviour
     /// </summary>
     void placeArrow()
     {
-        if (GameManager.instance.activeSim != null)
+        if (Simulation != null)
         {
             // Only true if we have placed the post-synapse
             if (count == 2)
