@@ -1,8 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using System;
-using System.Text;
 namespace C2M2.Visualization
 {
     using Utils;
@@ -109,26 +106,26 @@ namespace C2M2.Visualization
             if (lut == null)
                 lut = BuildLUT(gradient, lutRes);
             // Rescale array based on extrema values
-            unscaledTimes = RescaleArray(unscaledTimes, extremaMethod);
+            float[] scaledTimes = RescaleArray(unscaledTimes, extremaMethod);
 
             Color32[] cols;
             if (poolMemory)
             {
                 // Initialize the memory pool if necessary
-                if(memPool == null || memPool.Length != unscaledTimes.Length)
+                if(memPool == null || memPool.Length != scaledTimes.Length)
                 {
-                    memPool = new Color32[unscaledTimes.Length];
+                    memPool = new Color32[scaledTimes.Length];
                 }
                 cols = memPool;
             }
             else
             {
-                cols = new Color32[unscaledTimes.Length];
+                cols = new Color32[scaledTimes.Length];
             }
 
-            for (int i = 0; i < unscaledTimes.Length; i++)
+            for (int i = 0; i < scaledTimes.Length; i++)
             {
-                cols[i] = lut[Math.Clamp((int)unscaledTimes[i], 0, lutRes - 1)];
+                cols[i] = lut[(int)scaledTimes[i]];
             }
 
             return cols;
@@ -147,7 +144,7 @@ namespace C2M2.Visualization
             // Todo: this only rescales based on global extrema method
             scalars.RescaleArray(0f, (lutRes - 1), GlobalMin, GlobalMax);
 
-            return lut[Math.Clamp((int)scalars[1], 0, lutRes-1)];
+            return lut[(int)scalars[1]];
         }
 
         // Build a LUT without a gradient object by manually assigning color keys
@@ -165,11 +162,10 @@ namespace C2M2.Visualization
             }
 
             Color32[] gradientLUT = new Color32[lutRes];
-            int maxInd = lutRes;
             // Subtract one from lutRes so we can divide across the gradient's range
             lutRes--;
 
-            for (int i = 0; i < maxInd; i++)
+            for (int i = 0; i < lutRes+1; i++)
             {
                 gradientLUT[i] = gradient.Evaluate((float)i / lutRes);
             }
@@ -185,7 +181,7 @@ namespace C2M2.Visualization
             oldMax = 0;
             GetMinMax(scalars, extremaMethod);
             // Rescale based on extrema
-            scalars.RescaleArray(0f, (lutRes - 1), oldMin, oldMax);
+            scalars.RescaleArray(0f, lutRes - 1, oldMin, oldMax);
             return scalars;
         }
 

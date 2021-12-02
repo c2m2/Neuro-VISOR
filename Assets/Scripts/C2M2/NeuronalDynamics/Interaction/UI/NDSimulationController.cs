@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using C2M2.NeuronalDynamics.Simulation;
 using TMPro;

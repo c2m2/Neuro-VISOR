@@ -12,7 +12,7 @@ namespace C2M2.Simulation
     /// </summary>
     [RequireComponent(typeof(MeshFilter))]
     [RequireComponent(typeof(MeshRenderer))]
-    public abstract class MeshSimulation : Simulation<double[], Mesh, VRRaycastableMesh, VRGrabbableMesh>
+    public abstract class MeshSimulation : Simulation<float[], Mesh, VRRaycastableMesh, VRGrabbableMesh>
     {
         #region Variables
 
@@ -99,15 +99,14 @@ namespace C2M2.Simulation
         /// <summary>
         /// Update vertex colors based on simulation values
         /// </summary>
-        private void UpdateVisualization(in float[] scalars3D)
+        protected override void UpdateVisualization(in float[] newValues)
         {
-            Color32[] newCols = ColorLUT.Evaluate(scalars3D);
+            Color32[] newCols = ColorLUT.Evaluate(newValues);
             if(newCols != null)
             {
                 mf.mesh.colors32 = newCols;
             }
         }
-        protected override void UpdateVisualization(in double[] newValues) => UpdateVisualization(newValues.ToFloat());
 
         protected override void OnAwakePost(Mesh viz) //refactor
         {

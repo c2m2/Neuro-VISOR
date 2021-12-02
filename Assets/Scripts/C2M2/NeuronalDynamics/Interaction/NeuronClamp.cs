@@ -86,7 +86,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         {
             ClampPower = (MaxPower - MinPower) / 2;
         }
-        private void FixedUpdate()
+        private void Update()
         {
             if(simulation != null)
             {
@@ -99,9 +99,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         }
         private void OnDestroy()
         {
-            simulation.clampMutex.WaitOne();
-            simulation.clamps.Remove(this);
-            simulation.clampMutex.ReleaseMutex();
+            lock (simulation.clampLock) simulation.clamps.Remove(this);
         }
         #endregion
 
@@ -257,9 +255,8 @@ namespace C2M2.NeuronalDynamics.Interaction
                 this.simulation.OnVisualInflationChange += VisualInflationChangeHandler;
 
                 // wait for clamp list access, add to list
-                this.simulation.clampMutex.WaitOne();
-                this.simulation.clamps.Add(this);
-                this.simulation.clampMutex.ReleaseMutex();
+                lock (simulation.clampLock) this.simulation.clamps.Add(this);
+                
             }
 
             return this.simulation;
@@ -320,7 +317,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             {
                 holdCount++;
 
-                // If we've held the button long enough to destory, color caps red until user releases button
+                // If we've held the button long enough to destroy, color caps red until user releases button
                 if(holdCount > ClampManager.destroyCount && !powerClick) SwitchCaps(false);
                 else if (powerClick) SwitchCaps(true);
             }

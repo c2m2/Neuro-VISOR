@@ -3285,6 +3285,7 @@ MonoBehaviour:
   clampControllerR: {fileID: 320645336}
   clampControllerL: {fileID: 835806272}
   allActive: 1
+  currentSimulation: {fileID: 0}
   hitEvent: {fileID: 1157977726}
   toggleDestroyOVR: 8192
   toggleDestroyOVRS: 2097152
@@ -5985,11 +5986,6 @@ PrefabInstance:
       propertyPath: rightRaycaster
       value: 
       objectReference: {fileID: 0}
-    - target: {fileID: 3671467348768610598, guid: f49e57d0c1b71c4418326894ace9a9b5,
-        type: 3}
-      propertyPath: defaultMaterial
-      value: 
-      objectReference: {fileID: 2100000, guid: 7098700683643d14ab451f0982308301, type: 3}
     - target: {fileID: 3671467348768610598, guid: f49e57d0c1b71c4418326894ace9a9b5,
         type: 3}
       propertyPath: vrDeviceManager

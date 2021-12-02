@@ -26,7 +26,7 @@ namespace C2M2.Utils
 
         private Coroutine moveRoutine = null;
         public bool Moving { get; private set; } = false;
-        public float speed = 0.1f;
+        private static float speedModifier = 2.5f;
         public Transform relativeTo = null;
 
         public float rotateSpeed = 5.0f;
@@ -49,6 +49,7 @@ namespace C2M2.Utils
         {
             while (true)
             {
+                float speed = speedModifier * Time.deltaTime;
                 float pos_x = 0f, pos_y = 0f, pos_z = 0f;
                 if (ForwardPress) pos_z += speed;             // Move forward
                 if (BackwardPress) pos_z -= speed;            // Move backward
@@ -76,7 +77,7 @@ namespace C2M2.Utils
 
                 if (limitPos) transform.position = transform.position.Clamp(minPos, maxPos);
 
-                yield return new WaitForFixedUpdate();
+                yield return null;
             }
         }
 

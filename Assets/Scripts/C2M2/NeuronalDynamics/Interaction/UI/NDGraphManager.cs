@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using C2M2.Interaction;
 using C2M2.NeuronalDynamics.Simulation;
@@ -9,7 +8,6 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
 {
     public class NDGraphManager : MonoBehaviour
     {
-        public NDSimulation sim = null;
         public GameObject graphPrefab { get; private set; } = null;
         public RaycastPressEvents hitEvent { get; private set; } = null;
         public List<NDLineGraph> graphs = new List<NDLineGraph>();
@@ -43,6 +41,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
             var graphObj = Instantiate(graphPrefab);
             NDLineGraph graph = graphObj.GetComponent<NDLineGraph>();
             graph.manager = this;
+            graph.sim = sim;
             AttachToSimulation(graph, sim, hit);
 
         }

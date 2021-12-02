@@ -24,7 +24,12 @@ namespace C2M2
         public bool VRActive { get { return vrDeviceManager.VRActive; } }
 
         public GameObject cellPreviewer = null;
-        public Interactable activeSim = null;
+        public List<Interactable> activeSims = null;
+
+        /// <summary>
+        /// Allows solver threads to be synched
+        /// </summary>
+        public Barrier solveBarrier = new Barrier(0);
 
         public NeuronClampManager ndClampManager = null;
         public NDGraphManager ndGraphManager = null;

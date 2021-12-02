@@ -3,6 +3,8 @@ using System.Threading;
 using System;
 using C2M2.Interaction;
 using UnityEngine.Profiling;
+using System.Collections;
+using System.Threading.Tasks;
 
 namespace C2M2.Simulation
 {
@@ -25,9 +27,19 @@ namespace C2M2.Simulation
         public bool paused = false;
 
         /// <summary>
-        /// Provide mutual exclusion to derived classes
+        /// Cancellation token for thread
         /// </summary>
-        protected Mutex mutex = new Mutex();
+        private CancellationTokenSource cts = new CancellationTokenSource();
+
+        /// <summary>
+        /// Percentage of minTime taken to run a time step
+        /// </summary>
+        public float resourceUsage = 0;
+
+        /// <summary>
+        /// Provides mutual exclusion to derived classes for whatever values are being used for visualization
+        /// </summary>
+        private protected readonly object visualizationValuesLock = new object();
 
         /// <summary>
         /// Thread that runs simulation code
@@ -36,6 +48,16 @@ namespace C2M2.Simulation
         protected CustomSampler solveStepSampler = null;
         public RaycastEventManager raycastEventManager = null;
         public RaycastPressEvents defaultRaycastEvent = null;
+
+        /// <summary>
+        /// Minimum time for each time step to run in seconds
+        /// </summary>
+        readonly float minTimeStep = .02f;
+
+        /// <summary>
+        /// How often the visualization should be updated in seconds. Should never be less than minTime
+        /// </summary>
+        readonly float visualizationTimeStep = .02f;
 
         /// <summary>
         /// Require derived classes to make simulation values available
@@ -93,7 +115,7 @@ namespace C2M2.Simulation
 
             // Run child awake methods first
             OnAwakePost(Viz);
-
+            StartCoroutine("UpdateVisulizationStep");
             return;
 
             void BuildInteraction()
@@ -119,59 +141,44 @@ namespace C2M2.Simulation
             }
         }
 
-        public void FixedUpdate()
+        IEnumerator UpdateVisulizationStep()
         {
-            OnUpdate();
-
-            if (!paused && !dryRun)
+            while (!dryRun)
             {
-                ValueType simulationValues = GetValues();
+                if (!paused)
+                {
+                    ValueType simulationValues = GetValues();
+                    if (simulationValues != null) UpdateVisualization(simulationValues);
+                }
+                yield return new WaitForSeconds(visualizationTimeStep);
 
-                if (simulationValues != null) UpdateVisualization(simulationValues);
             }
+
         }
 
+        // Allow derived classes to run code in Awake/Start if they choose
         protected virtual void OnAwakePre() { }
-        // Allow derived classes to run code in Awake/Start/Update if they choose
         protected virtual void OnAwakePost(VizType viz) { }
         protected virtual void OnStart() { }
         protected virtual void OnUpdate() { }
 
-        // Don't allow threads to keep running when application pauses or quits
-        private void OnApplicationPause(bool pause)
-        {
-            OnPause();
-            if (pause) StopSimulation();
-        }
-        private void OnApplicationQuit()
-        {
-            OnQuit();
-            StopSimulation();
-        }
-
         protected void OnDestroy()
         {
-            OnDest();
+            StopCoroutine("updateVisulizationStep");
             StopSimulation();
         }
-        // Use OnPause and OnQuit to wrap up I/O or other processes if the application pauses or quits during solve code.
-        protected virtual void OnPause() { }
-        protected virtual void OnQuit() { }
-        protected virtual void OnDest() { }
         #endregion
 
-        public int time = -1;
+        public int curentTimeStep = -1;
         public double timeStep = 0.008 * 1e-3;
         public double endTime = 1.0;
-        public int nT { get; private set; } = -1;
+        public int nT => (int)(endTime / timeStep);
+
         /// <summary>
         /// Launch Solve thread
         /// </summary>
         public void StartSimulation()
         {
-            // Stop previous simulation, if any
-            StopSimulation();
-
             solveStepSampler = CustomSampler.Create("SolveStep");
             
             solveThread = new Thread(Solve) { IsBackground = true };
@@ -179,47 +186,54 @@ namespace C2M2.Simulation
             Debug.Log("Solve() launched on thread " + solveThread.ManagedThreadId);
         }
 
-        private void Solve()
+        private async void Solve()
         {
             Profiler.BeginThreadProfiling("Solve Threads", "Solve Thread");
 
             PreSolve();
 
-            nT = (int)(endTime / timeStep);
-            
-            for (time = 0; time < nT; time++)
+            GameManager.instance.solveBarrier.AddParticipant();
+            DateTime startStepTime = DateTime.Now;
+            curentTimeStep = 0;
+            while (curentTimeStep < nT)
             {
-                while (paused) { }
+                if (!paused)
+                {
+                    PreSolveStep(curentTimeStep);
 
-                // mutex guarantees mutual exclusion over simulation values
-                mutex.WaitOne();
+                    solveStepSampler.Begin();
+                    SolveStep(curentTimeStep);
+                    solveStepSampler.End();
 
-                PreSolveStep(time);
-
-                solveStepSampler.Begin();
-                SolveStep(time);
-                solveStepSampler.End();
-
-                PostSolveStep(time);
-
-                mutex.ReleaseMutex();
+                    PostSolveStep(curentTimeStep);
+                    
+                    curentTimeStep++;
+                }
+                
+                GameManager.instance.solveBarrier.SignalAndWait();
+                float timeChange = (float)(DateTime.Now - startStepTime).TotalSeconds;
+                resourceUsage = timeChange / minTimeStep;
+                if (resourceUsage < 1)
+                {
+                    int millisecondsToWait = (int)(1000 * (minTimeStep-timeChange));
+                    await Task.Delay(millisecondsToWait);
+                }
+                if (cts.Token.IsCancellationRequested) break;
+                startStepTime = DateTime.Now;
             }
+            GameManager.instance.solveBarrier.RemoveParticipant();
+            cts.Dispose();
 
             PostSolve();
 
             Profiler.EndThreadProfiling();
-            GameManager.instance.DebugLogSafe("Simulation Over.");
         }
 
-        public sealed override float GetSimulationTime() => time * (float)timeStep;
+        public sealed override float GetSimulationTime() => curentTimeStep * (float)timeStep;
 
         /// <summary>
-        /// Called on the main thread before the Solve thread is launched
+        /// Called on the solve thread before the simulation for loop is launched
         /// </summary>
-        /// <remarks>
-        /// This is useful if you need to initialize anything that makes use of Unity calls,
-        /// which are not available to be called from secondary threads.
-        /// </remarks>
         protected abstract void PreSolve();
         /// <summary>
         /// Called on the solve thread after the simulation for loop is completed
@@ -232,9 +246,7 @@ namespace C2M2.Simulation
         {
             if (solveThread != null)
             {
-                mutex.WaitOne();
-                time = nT;           
-                mutex.ReleaseMutex();
+                cts.Cancel();
                 solveThread = null;             
             }
         }

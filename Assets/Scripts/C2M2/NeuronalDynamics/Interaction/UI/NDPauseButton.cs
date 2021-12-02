@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using C2M2.NeuronalDynamics.Simulation;
 using UnityEngine.UI;
 
@@ -74,6 +72,12 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
         private void Start()
         {
             UpdateDisplay();
+        }
+
+        // Don't allow threads to keep running when application pauses or quits
+        private void OnApplicationPause(bool pause)
+        {
+            if (pause != Sim.paused) TogglePause();
         }
 
         public void TogglePause()

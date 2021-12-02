@@ -467,6 +467,7 @@ MonoBehaviour:
   yScale: 0
   zScale: 1
   vrThumbstick: 32768
+  vrThumbstickS: 8388608
   incKey: 273
   decKey: 274
   resetKey: 114

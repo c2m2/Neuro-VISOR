@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using C2M2.NeuronalDynamics.UGX;
 using UnityEngine;
-using System.Threading;
 using DiameterAttachment = C2M2.NeuronalDynamics.UGX.IAttachment<C2M2.NeuronalDynamics.UGX.DiameterData>;
 using MappingAttachment = C2M2.NeuronalDynamics.UGX.IAttachment<C2M2.NeuronalDynamics.UGX.MappingData>;
 using Math = C2M2.Utils.Math;
@@ -15,8 +14,9 @@ using C2M2.NeuronalDynamics.Visualization.VRN;
 using C2M2.NeuronalDynamics.Interaction;
 using C2M2.NeuronalDynamics.Interaction.UI;
 using C2M2.Interaction.UI;
-using C2M2.Visualization;
 using System.Linq;
+using C2M2.Utils;
+
 namespace C2M2.NeuronalDynamics.Simulation {
 
     /// <summary>
@@ -83,7 +83,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
             }
         }
         public List<NeuronClamp> clamps = new List<NeuronClamp>();
-        public Mutex clampMutex { get; private set; } = new Mutex();
+        internal readonly object clampLock = new object();
         private static readonly Tuple<int, double> nullClamp = new Tuple<int, double>(-1, -1);
 
         public NDGraphManager graphManager { get; private set; } = null;
@@ -221,6 +221,8 @@ namespace C2M2.NeuronalDynamics.Simulation {
             }
         }
 
+        private static bool NDUIPresent = false;
+
         void ShowInfoPanel(bool show, RaycastHit hit)
         {
             if (infoPanel == null)
@@ -241,27 +243,30 @@ namespace C2M2.NeuronalDynamics.Simulation {
         protected override void PostSolveStep(int t)
         {
             ApplyInteractionVals();
+            SetOutputValues();
             void ApplyInteractionVals()
             {
                 ///<c>if (clamps != null && clamps.Count > 0)</c> this if statement is where we apply voltage clamps   
-                // Apply clamp values, if there are any clamps
+                /// Apply clamp values, if there are any clamps
 
                 if (clamps.Count > 0)
                 {
                     Tuple<int, double>[] clampValues = new Tuple<int, double>[clamps.Count];
-                    clampMutex.WaitOne();
-                    for (int i = 0; i < clamps.Count; i++)
+                    lock (clampLock)
                     {
-                        if (clamps[i] != null && clamps[i].focusVert != -1 && clamps[i].ClampLive)
+                        for (int i = 0; i < clamps.Count; i++)
                         {
-                            clampValues[i] = new Tuple<int, double>(clamps[i].focusVert, clamps[i].ClampPower);
-                        }
-                        else
-                        {
-                            clampValues[i] = nullClamp;
+                            if (clamps[i] != null && clamps[i].focusVert != -1 && clamps[i].ClampLive)
+                            {
+                                clampValues[i] = new Tuple<int, double>(clamps[i].focusVert, clamps[i].ClampPower);
+                            }
+                            else
+                            {
+                                clampValues[i] = nullClamp;
+                            }
                         }
                     }
-                    clampMutex.ReleaseMutex();
+                    
                     Set1DValues(clampValues);
                 }
 
@@ -319,6 +324,8 @@ namespace C2M2.NeuronalDynamics.Simulation {
             }
         }
 
+        internal abstract void SetOutputValues();
+
         protected override void OnAwakePost(Mesh viz)
         {
             base.OnAwakePost(viz);
@@ -345,8 +352,8 @@ namespace C2M2.NeuronalDynamics.Simulation {
         /// Translate 1D vertex values to 3D values and pass them upwards for visualization
         /// </summary>
         /// <returns> One scalar value for each 3D vertex based on its 1D vert's scalar value </returns>
-        public sealed override double[] GetValues () {
-            vals1D = Get1DValues ();
+        public sealed override float[] GetValues () {
+            vals1D = Get1DValues();
 
             if (vals1D == null) { return null; }
             
@@ -354,9 +361,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
 
                 // Take an weighted average using lambda
                 // Equivalent to [lambda * v2 + (1 - lambda) * v1]
-                double newVal = map[i].lambda * (vals1D[map[i].v2] - vals1D[map[i].v1]) + vals1D[map[i].v1];
-
-                Scalars3D[i] = newVal;
+                Scalars3D[i] = map[i].lambda * (vals1D[map[i].v2] - vals1D[map[i].v1]) + vals1D[map[i].v1];
             }
 
             // Update graphs
@@ -365,7 +370,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 graph.AddValue(1000*GetSimulationTime(), (float)vals1D[graph.vert] * unitScaler);
             }
 
-            return Scalars3D;
+            return Scalars3D.ToFloat();
         }
 
         /// <summary>
@@ -438,7 +443,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 // Pass blownupMesh upwards to MeshSimulation
                 ColliderMesh = VisualMesh;
 
-                InitUI ();
+                if (!NDUIPresent) InitUI();
             }
 
             return VisualMesh;
@@ -448,17 +453,19 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 GameObject lines1D = gameObject.AddComponent<LinesRenderer> ().Draw (geom1D, color1D, lineWidth1D);
             }
 
-            void InitUI ()
+            void InitUI()
             {
-                GameObject gm = new GameObject();
-                gm.name = "LineGraphManager";
+                GameObject gm = new GameObject
+                {
+                    name = "LineGraphManager"
+                };
                 gm.transform.parent = transform;
                 graphManager = gm.AddComponent<NDGraphManager>();
-                graphManager.sim = this;
+                
 
                 // Instantiate control panel prefab, announce active simulation to buttons
                 controlPanel = Resources.Load ("Prefabs/NeuronalDynamics/ControlPanel/NDControls") as GameObject;        
-                controlPanel = GameObject.Instantiate(controlPanel);
+                controlPanel = Instantiate(controlPanel);
 
                 NDSimulationController controller = controlPanel.GetComponent<NDSimulationController>();
                 if(controller == null)
@@ -468,7 +475,9 @@ namespace C2M2.NeuronalDynamics.Simulation {
                     return;
                 }
 
-                controller.sim = this;
+                controller.sim = this; //GET RID OF THIS
+
+                //NDUIPresent = true;
 
             }
         }
