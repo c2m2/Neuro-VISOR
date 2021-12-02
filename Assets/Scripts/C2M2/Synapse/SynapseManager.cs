@@ -10,9 +10,8 @@ public class SynapseManager : MonoBehaviour
 {
     public GameObject synapse;
     bool activeSynapse = false;
-    public RaycastPressEvents hitEvent { get; private set; } = null;
     public List<Synapse> synapsesList = new List<Synapse>();
-
+    public OVRInput.Button enableSynapse = OVRInput.Button.DpadDown;
 
     public NDSimulation Simulation
     {
@@ -23,55 +22,14 @@ public class SynapseManager : MonoBehaviour
         }
     }
 
-    // method to gather the voltage at the presynapse locations
-    public void getPreSynapsesVoltage()
-    {
-       if(synapsesList.Count > 0)
-        {
-            for (int i = 0; i < synapsesList.Count; i++)
-            {
-                if (i % 2 == 0)
-                {
-                    double[] curVoltage = Simulation.Get1DValues();
-                    synapsesList[i].voltage = curVoltage[synapsesList[i].nodeIndex];
-                }
-            }
-            setPost1DValues();
-        }
-    }
-
-    // after receiving the pre-synaptic voltage apply that to the post-synapse
-    public void setPost1DValues()
-    {
-        Tuple<int, double>[] new1Dvalues = new Tuple<int, double>[synapsesList.Count / 2];
-        List<Synapse> postSynapse = new List<Synapse>();
-        List<Synapse> preSynapse = new List<Synapse>();
-
-        for (int i = 0; i < synapsesList.Count; i++)
-        {
-            if (i % 2 != 0)
-            {
-                postSynapse.Add(synapsesList[i]);
-            }
-            else
-            {
-                preSynapse.Add(synapsesList[i]);
-            }
-        }
-
-        for (int i = 0; i < postSynapse.Count; i++)
-        {
-            new1Dvalues[i] = new Tuple<int, double>(postSynapse[i].nodeIndex, preSynapse[i].voltage);
-        }
-
-        Simulation.Set1DValues(new1Dvalues);
-    }
-
     void Update()
     {
+        #region Desktop inputs
+
         //If there is a current simulation and we press E then we can create a synapse
         if (Input.GetKeyDown(KeyCode.E) && GameManager.instance.activeSim != null && activeSynapse == false)
         {
+
             synapse.SetActive(true);
             activeSynapse = true;
         }
@@ -86,13 +44,31 @@ public class SynapseManager : MonoBehaviour
             Simulation.raycastEventManager.LRTrigger = Simulation.defaultRaycastEvent;
         }
 
-        if(GameManager.instance.activeSim != null)
+        #endregion
+
+        #region oculus inputs
+
+        // Check if the user has pressed a specified button on the right controller to activate
+        else if (OVRInput.Get(enableSynapse, OVRInput.Controller.RTouch) && GameManager.instance.activeSim != null && activeSynapse == false)
         {
-            getPreSynapsesVoltage();
+            synapse.SetActive(true);
+            activeSynapse = true;
         }
 
+        // If synapse is already activated deactivate the synapse
+        else if (OVRInput.Get(enableSynapse, OVRInput.Controller.RTouch) && GameManager.instance.activeSim != null && activeSynapse == false)
+        {
+            synapse.SetActive(false);
+            activeSynapse = false;
+
+            // when the synapse script is turned off revert the controls back to defualt
+            Simulation.raycastEventManager.LRTrigger = Simulation.defaultRaycastEvent;
+        }
+
+        #endregion
+
         //If there is no current simulation set the synapse to not active
-        else if(GameManager.instance.activeSim == null)
+        else if (GameManager.instance.activeSim == null)
         {
             synapse.SetActive(false);
             activeSynapse = false;

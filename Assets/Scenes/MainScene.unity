@@ -3326,6 +3326,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   synapse: {fileID: 1071786429}
   synapsesList: []
+  enableSynapse: 32
 --- !u!4 &1162354724
 Transform:
   m_ObjectHideFlags: 0
