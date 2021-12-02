@@ -98,15 +98,15 @@ namespace C2M2.Visualization
 
 
         /// <summary> Given the extrema method, color an entire array of scalers using the LUT </summary>
-        public Color32[] Evaluate(float[] unscaledTimes)
+        public Color32[] Evaluate(float[] unscaledValues) //TODO investigate this more. Performance is bad. Also extrema method and user controlling min and max are problematic
         {
-            if (unscaledTimes == null || unscaledTimes.Length == 0) return null;
+            if (unscaledValues == null || unscaledValues.Length == 0) return null;
 
             // If we haven't built the LUT yet, and we have a gradient, build the LUT
             if (lut == null)
                 lut = BuildLUT(gradient, lutRes);
             // Rescale array based on extrema values
-            float[] scaledTimes = RescaleArray(unscaledTimes, extremaMethod);
+            float[] scaledTimes = RescaleArray(unscaledValues, extremaMethod);
 
             Color32[] cols;
             if (poolMemory)
@@ -125,26 +125,26 @@ namespace C2M2.Visualization
 
             for (int i = 0; i < scaledTimes.Length; i++)
             {
-                cols[i] = lut[(int)scaledTimes[i]];
+                cols[i] = lut[Math.Clamp((int)scaledTimes[i], 0, lutRes - 1)];
             }
 
             return cols;
         }
         /// <summary>
-        /// Calculate color at a given time.
+        /// Calculate color of a single value
         /// </summary>
-        public Color32 Evaluate(float unscaledTime)
+        public Color32 Evaluate(float unscaledValue)
         {
             // If we haven't built the LUT yet, and we have a gradient, build the LUT
             if (lut == null)
                 lut = BuildLUT(gradient, lutRes);
 
-            float[] scalars = new float[] { GlobalMin, unscaledTime, GlobalMax };
+            float[] scalars = new float[] { unscaledValue };
 
             // Todo: this only rescales based on global extrema method
-            scalars.RescaleArray(0f, (lutRes - 1), GlobalMin, GlobalMax);
+            scalars.RescaleArray(0f, lutRes - 1, GlobalMin, GlobalMax);
 
-            return lut[(int)scalars[1]];
+            return lut[Math.Clamp((int)scalars[0], 0, lutRes - 1)];
         }
 
         // Build a LUT without a gradient object by manually assigning color keys
