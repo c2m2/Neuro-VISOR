@@ -30,6 +30,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
         {
             if(Sim != null)
             {
+                GameManager.instance.activeSims.Remove(Sim);
                 // Destroy the cell's ruler
                 Sim.CloseRuler();
 
