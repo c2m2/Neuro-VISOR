@@ -173,27 +173,21 @@ namespace C2M2.Visualization
             return gradientLUT;
         }
 
-        public float oldMin { get; private set; } = 0;
-        public float oldMax { get; private set; } = 0;
         private float[] RescaleArray(float[] scalars, ExtremaMethod extremaMethod)
         {
-            oldMin = 0;
-            oldMax = 0;
-            GetMinMax(scalars, extremaMethod);
             // Rescale based on extrema
-            scalars.RescaleArray(0f, lutRes - 1, oldMin, oldMax);
+            (float, float) minMax = GetMinMax(scalars, extremaMethod);
+            scalars.RescaleArray(0f, lutRes - 1, minMax.Item1, minMax.Item2);
             return scalars;
         }
 
-        public void GetMinMax(float[] scalars, ExtremaMethod extremaMethod)
+        public (float, float) GetMinMax(float[] scalars, ExtremaMethod extremaMethod)
         {
             switch (extremaMethod)
             {
-                case (ExtremaMethod.LocalExtrema):
-                    oldMin = scalars.Min();
-                    oldMax = scalars.Max();
-                    break;
-                case (ExtremaMethod.GlobalExtrema):
+                case ExtremaMethod.LocalExtrema:
+                    return (scalars.Min(), scalars.Max());
+                case ExtremaMethod.GlobalExtrema:
 
                     // The user requested a custom global max, but didn't set one.
                     if (GlobalMax == float.NegativeInfinity || GlobalMin == float.PositiveInfinity)
@@ -202,16 +196,14 @@ namespace C2M2.Visualization
                         GlobalMin = scalars.Min();
                         GlobalMax = scalars.Max();
                     }
-                    oldMin = GlobalMin;
-                    oldMax = GlobalMax;
-                    break;
-                case (ExtremaMethod.RollingExtrema):
+                    return (GlobalMin, GlobalMax);
+                case ExtremaMethod.RollingExtrema:
                     // If localMax > globalMax, replace globalMax
                     GlobalMax = Max(GlobalMax, scalars.Max());
                     GlobalMin = Min(GlobalMin, scalars.Min());
-                    oldMin = GlobalMin;
-                    oldMax = GlobalMax;
-                    break;
+                    return (GlobalMin, GlobalMax);
+                default:
+                    return (0, 0);
             }
         }
     }
