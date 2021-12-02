@@ -142,7 +142,6 @@ namespace C2M2.NeuronalDynamics.UGX
 
             somaIDs = grid.Subsets["soma"].Indices.ToList();
         }
-        
         /// <summary>
         /// This small routine writes the geometry file that is used to an output file in .swc format
         /// </summary>

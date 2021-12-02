@@ -120,8 +120,6 @@ namespace C2M2.Simulation
 
             void BuildInteraction()
             {
-                this.gameObject.AddComponent<emulatorMove>();
-
                 /// Add event child object for interaction scripts to find
                 GameObject child = new GameObject("DirectRaycastInteractionEvent");
                 child.transform.parent = transform;
