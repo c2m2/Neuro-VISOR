@@ -3312,7 +3312,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1162354723
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5891,6 +5891,11 @@ PrefabInstance:
       propertyPath: useVR
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3671467348768610598, guid: f49e57d0c1b71c4418326894ace9a9b5,
+        type: 3}
+      propertyPath: Synapse
+      value: 
+      objectReference: {fileID: 1071786429}
     - target: {fileID: 3671467348768610598, guid: f49e57d0c1b71c4418326894ace9a9b5,
         type: 3}
       propertyPath: c2m2Room

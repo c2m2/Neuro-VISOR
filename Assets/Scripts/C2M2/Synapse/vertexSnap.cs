@@ -6,6 +6,7 @@ using C2M2.NeuronalDynamics.UGX;
 using C2M2.NeuronalDynamics.Simulation;
 using C2M2.Interaction;
 using System;
+using C2M2.Simulation;
 
 public class vertexSnap : MonoBehaviour
 {
@@ -16,6 +17,7 @@ public class vertexSnap : MonoBehaviour
     public List<Synapse> synapses = new List<Synapse>();
     public List<Vector3> synapseLocations = new List<Vector3>();
     public RaycastPressEvents hitEvent { get; private set; } = null;
+    public RaycastPressEvents leftTrigger = null;
     public SynapseManager SynapseManager;
 
     public GameObject arrow;
@@ -27,22 +29,15 @@ public class vertexSnap : MonoBehaviour
     ///<summary> 
     ///Simulation refrence to get the attributes of the current cell
     ///</summary>
-    public NDSimulation Simulation
+    public List<Interactable> Simulation
     {
         get
         {
-            return (NDSimulation)GameManager.instance.activeSims[0];
+            return GameManager.instance.activeSims;
         }
     }
 
-    /// <summary>
-    /// Accessing the node data of the neuron
-    /// </summary>
-    public List<Neuron.NodeData> Nodes1D
-    {
-        get { return Simulation.Neuron.nodes; }
-    }
-
+    public NDSimulation curSimulation = null;
 
     /// <summary>
     /// Initial placement for the pre-synapse then calls post-synapse placement next
@@ -50,12 +45,14 @@ public class vertexSnap : MonoBehaviour
     /// <param name="hit"></param>
     void preSynapticPlacement(RaycastHit hit)
     {
+        curSimulation = hit.collider.GetComponentInParent<NDSimulation>();
+
         // count = the number of active synapses which is always 0 or 1
         // 0 meaning we can place the pre-synapse and 1 meaning we must place the post-synapse
         if(count == 0)
         {
             // from our raycast hit get the 1d node that we raycasted onto
-            int preSynapticIndex = Simulation.GetNearestPoint(hit);
+            int preSynapticIndex = curSimulation.GetNearestPoint(hit);
 
             focusVert = preSynapticIndex;
 
@@ -74,6 +71,8 @@ public class vertexSnap : MonoBehaviour
             pre.prefab = Instantiate(PrefabPreSynapse, new Vector3(0, 0, 0), Quaternion.identity) as GameObject;
 
             pre.nodeIndex = preSynapticIndex;
+
+            pre.attachedSim = curSimulation;
 
             // Add each synapes to our list that is used else where
             synapses.Add(pre);
@@ -99,17 +98,20 @@ public class vertexSnap : MonoBehaviour
     /// <param name="hit"></param>
     void postSynapticPlacement(RaycastHit hit)
     {
+        curSimulation = hit.collider.GetComponentInParent<NDSimulation>();
         if(count == 1)
         {
             Synapse post = gameObject.AddComponent<Synapse>();
 
             post.prefab = Instantiate(PrefabPostSynapse, new Vector3(0, 0, 0), Quaternion.identity) as GameObject;
 
-            int postSynapticIndex = Simulation.GetNearestPoint(hit);
+            int postSynapticIndex = curSimulation.GetNearestPoint(hit);
 
             focusVert = postSynapticIndex;
 
             post.nodeIndex = postSynapticIndex;
+
+            post.attachedSim = curSimulation;
 
             synapses.Add(post);
 
@@ -127,12 +129,14 @@ public class vertexSnap : MonoBehaviour
     /// <param name="hit"></param>
     void deleteSynapseHit(RaycastHit hit)
     {
+        curSimulation = hit.collider.GetComponentInParent<NDSimulation>();
+
         holdCount++;
         // Hold count threshhold to check if the user has pressed for x frames
         if(holdCount >= numOfDeletionFrames)
         {
             // Get the 1d vertex user has pressed
-            int hitIndex = Simulation.GetNearestPoint(hit);
+            int hitIndex = curSimulation.GetNearestPoint(hit);
 
             for(int i = 0; i < synapses.Count; i++)
             {
@@ -166,6 +170,7 @@ public class vertexSnap : MonoBehaviour
         }
     }
 
+
     /// <summary>
     /// When this script has been enabled through the game object it is attached to initiliaze some values
     /// </summary>
@@ -178,7 +183,7 @@ public class vertexSnap : MonoBehaviour
         hitEvent = gameObject.AddComponent<RaycastPressEvents>();
 
         // Switch default raycasting mode to our new hit event
-        Simulation.raycastEventManager.LRTrigger = this.hitEvent;
+        //Simulations.raycastEventManager.LRTrigger = this.hitEvent;
 
         hitEvent.OnPress.AddListener((hit) => preSynapticPlacement(hit));
         hitEvent.OnHoldPress.AddListener((hit) => deleteSynapseHit(hit));
@@ -193,12 +198,37 @@ public class vertexSnap : MonoBehaviour
 
         try
         {
-            Simulation.GetComponentInChildren<NDSimulation>().synapses = synapses;
+            //for(int i = 0; i < synapses.Count; i++)
+            //{
+            //    synapses[i].attachedSim.synapses = synapses;
+            //}
+
+            for(int i = 0; i < Simulation.Count; i++)
+            {
+                for(int j = 0; j < synapses.Count; j++)
+                {
+                    if(Simulation[i].GetComponent<NDSimulation>() == synapses[j].attachedSim)
+                    {
+                        if(j % 2 != 0)
+                        {
+                            //presynaptic 
+                            Simulation[i].GetComponent<NDSimulation>().synapses.Add(synapses[j - 1]);
+                            // postsynaptic
+                            Simulation[i].GetComponent<NDSimulation>().synapses.Add(synapses[j]);
+                        }
+                    }
+                }
+            }
+
+            //curSimulation.GetComponentInChildren<NDSimulation>().synapses = synapses;
         }
         catch (NullReferenceException)
         {
             Debug.Log("Synapses Disabled");
         }
+
+        // return original ray casting controls
+        //curSimulation.raycastEventManager.LRTrigger = curSimulation.defaultRaycastEvent;
 
         // This prevents adding many RaycastPressEvents scripts each time user enables() this script
         Destroy(GetComponent<RaycastPressEvents>());

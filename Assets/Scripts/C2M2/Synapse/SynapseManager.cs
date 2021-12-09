@@ -13,7 +13,7 @@ public class SynapseManager : MonoBehaviour
         #region Desktop inputs
 
         //If there is a current simulation and we press E then we can create a synapse
-        if (Input.GetKeyDown(KeyCode.E) && synapse.GetComponent<vertexSnap>().Simulation != null && activeSynapse == false)
+        if (Input.GetKeyDown(KeyCode.E) && synapse.GetComponent<vertexSnap>().Simulation.Count > 0 && activeSynapse == false)
         {
 
             synapse.SetActive(true);
@@ -21,13 +21,10 @@ public class SynapseManager : MonoBehaviour
         }
 
         //If we press E again set the synapse to false so we can no longer use it 
-        else if(Input.GetKeyDown(KeyCode.E) && synapse.GetComponent<vertexSnap>().Simulation != null && activeSynapse == true)
+        else if(Input.GetKeyDown(KeyCode.E) && synapse.GetComponent<vertexSnap>().Simulation.Count > 0 && activeSynapse == true)
         {
             synapse.SetActive(false);
             activeSynapse = false;
-
-            // when the synapse script is turned off revert the controls back to defualt
-            synapse.GetComponent<vertexSnap>().Simulation.raycastEventManager.LRTrigger = synapse.GetComponent<vertexSnap>().Simulation.defaultRaycastEvent;
         }
 
         #endregion
@@ -35,26 +32,26 @@ public class SynapseManager : MonoBehaviour
         #region oculus inputs
 
         // Check if the user has pressed a specified button on the right controller to activate
-        else if (OVRInput.Get(enableSynapse, OVRInput.Controller.RTouch) && synapse.GetComponent<vertexSnap>().Simulation != null && activeSynapse == false)
+        else if (OVRInput.Get(enableSynapse, OVRInput.Controller.RTouch) && synapse.GetComponent<vertexSnap>().Simulation.Count > 0 && activeSynapse == false)
         {
             synapse.SetActive(true);
             activeSynapse = true;
         }
 
         // If synapse is already activated deactivate the synapse
-        else if (OVRInput.Get(enableSynapse, OVRInput.Controller.RTouch) && synapse.GetComponent<vertexSnap>().Simulation != null && activeSynapse == false)
+        else if (OVRInput.Get(enableSynapse, OVRInput.Controller.RTouch) && synapse.GetComponent<vertexSnap>().Simulation.Count > 0 && activeSynapse == false)
         {
             synapse.SetActive(false);
             activeSynapse = false;
 
             // when the synapse script is turned off revert the controls back to defualt
-            synapse.GetComponent<vertexSnap>().Simulation.raycastEventManager.LRTrigger = synapse.GetComponent<vertexSnap>().Simulation.defaultRaycastEvent;
+            //synapse.GetComponent<vertexSnap>().Simulation.raycastEventManager.LRTrigger = synapse.GetComponent<vertexSnap>().Simulation.defaultRaycastEvent;
         }
 
         #endregion
 
         //If there is no current simulation set the synapse to not active
-        else if (synapse.GetComponent<vertexSnap>().Simulation == null)
+        else if (synapse.GetComponent<vertexSnap>().Simulation.Count == 0)
         {
             synapse.SetActive(false);
             activeSynapse = false;
