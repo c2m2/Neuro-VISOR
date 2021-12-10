@@ -281,16 +281,20 @@ namespace C2M2.NeuronalDynamics.Simulation {
                     {
                         if (i % 2 != 0)
                         {
-                            postSynapse.Add(synapses[i]);
+                            Synapse curPreSynaptic = synapses[i - 1];
+                            Synapse curPostSynaptic = synapses[i];
+
+                            postSynapse.Add(curPostSynaptic);
 
                             // i - 1 means the presynaptic since we store those first
-                            double[] curVoltage = synapses[i - 1].attachedSim.Get1DValues();
+                            double[] curVoltage = curPreSynaptic.attachedSim.Get1DValues();
                             // Set the synapse voltage to what the voltage is at the 1D vertex
-                            synapses[i - 1].voltage = curVoltage[synapses[i - 1].nodeIndex];
+                            curPreSynaptic.voltage = curVoltage[curPreSynaptic.nodeIndex];
 
-                            preSynapse.Add(synapses[i - 1]);
+                            preSynapse.Add(curPreSynaptic);
                         }
                     }
+
                     Tuple<int, double>[] new1Dvalues = new Tuple<int, double>[postSynapse.Count];
 
                     // apply the voltage from the pre-synapse and the node index from the post-synapse into a tuple

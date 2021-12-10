@@ -2723,7 +2723,7 @@ PrefabInstance:
         type: 3}
       propertyPath: pass
       value: 
-      objectReference: {fileID: 1162354723}
+      objectReference: {fileID: 0}
     - target: {fileID: 3408630298987087350, guid: 2f0923ceccc20d14596cfdf211bc5ef6,
         type: 3}
       propertyPath: arrow
@@ -2743,6 +2743,11 @@ PrefabInstance:
         type: 3}
     - target: {fileID: 3408630298987087350, guid: 2f0923ceccc20d14596cfdf211bc5ef6,
         type: 3}
+      propertyPath: updateArrow
+      value: 
+      objectReference: {fileID: 1201331502}
+    - target: {fileID: 3408630298987087350, guid: 2f0923ceccc20d14596cfdf211bc5ef6,
+        type: 3}
       propertyPath: LatchDistance
       value: 5
       objectReference: {fileID: 0}
@@ -2750,7 +2755,7 @@ PrefabInstance:
         type: 3}
       propertyPath: SynapseManager
       value: 
-      objectReference: {fileID: 1162354723}
+      objectReference: {fileID: 0}
     - target: {fileID: 3408630298987087350, guid: 2f0923ceccc20d14596cfdf211bc5ef6,
         type: 3}
       propertyPath: PrefabPreSynapse
@@ -2776,7 +2781,7 @@ PrefabInstance:
     - target: {fileID: 3408630298987087354, guid: 2f0923ceccc20d14596cfdf211bc5ef6,
         type: 3}
       propertyPath: m_RootOrder
-      value: 8
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 3408630298987087354, guid: 2f0923ceccc20d14596cfdf211bc5ef6,
         type: 3}
@@ -3296,7 +3301,7 @@ MonoBehaviour:
   cancelCommand: 2
   cancelCommandS: 8
   cancelKey: 8
---- !u!1 &1162354721
+--- !u!1 &1201331502
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -3304,43 +3309,41 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1162354724}
-  - component: {fileID: 1162354723}
+  - component: {fileID: 1201331504}
+  - component: {fileID: 1201331503}
   m_Layer: 0
-  m_Name: SynapseManager
+  m_Name: ArrowUpdate
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!114 &1162354723
+  m_IsActive: 1
+--- !u!114 &1201331503
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1162354721}
+  m_GameObject: {fileID: 1201331502}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6a88abe41ec92854cb921791a0e7ae0e, type: 3}
+  m_Script: {fileID: 11500000, guid: 5817af0b608528e42a6eb900abafd007, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  synapse: {fileID: 1071786429}
-  synapsesList: []
-  enableSynapse: 32
---- !u!4 &1162354724
+  Synapses: []
+--- !u!4 &1201331504
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1162354721}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.34699583, y: -0.35476005, z: 0.04104185}
+  m_GameObject: {fileID: 1201331502}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.07168901, y: -0.27228594, z: -1.3583424}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &1264370652 stripped
 Transform:

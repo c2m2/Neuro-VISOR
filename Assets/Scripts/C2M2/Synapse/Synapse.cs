@@ -79,11 +79,6 @@ public class Synapse : MonoBehaviour
             // Make sure to transform locally since we made the neuron the parent of the synapse
             this.prefab.transform.localPosition = FocusPos;
 
-            //float scaleRatio = this.prefab.transform.localScale.x / 2;
-            //float scaleRatio = Simulation.AverageDendriteRadius + (Simulation.AverageDendriteRadius / 2);
-
-            //this.prefab.transform.localScale = new Vector3((float)NodeData.NodeRadius + scaleRatio, (float)NodeData.NodeRadius + scaleRatio, (float)NodeData.NodeRadius + scaleRatio);
-
             float currentVisualizationScale = (float)curSimulation.VisualInflation;
 
             float radiusScalingValue = 3f * (float)NodeData.NodeRadius;

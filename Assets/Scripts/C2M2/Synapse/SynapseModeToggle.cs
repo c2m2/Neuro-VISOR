@@ -19,14 +19,9 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
                     Debug.LogError("No Synapse attached to GameManager");
                     return;
                 }
-                //if (GameManager.instance.Synapse.GetComponent<vertexSnap>().hitEvent == null)
-                //{
-                //    Debug.LogError("No hit event on Synapse");
-                //    return;
-                //}
 
                 GameManager.instance.Synapse.SetActive(true);
-                Sim.raycastEventManager.LRTrigger = GameManager.instance.Synapse.GetComponent<vertexSnap>().hitEvent;
+                Sim.raycastEventManager.LRTrigger = GameManager.instance.Synapse.GetComponent<SynapseManager>().hitEvent;
             }
             else if (!toggle)
             {
