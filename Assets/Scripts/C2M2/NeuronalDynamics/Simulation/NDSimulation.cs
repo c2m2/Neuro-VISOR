@@ -270,24 +270,9 @@ namespace C2M2.NeuronalDynamics.Simulation {
                     Set1DValues(clampValues);
                 }
 
-                ///<c> if we have active synapes apply the values </c>
+                ///<c> if we have active synapes apply the voltage values </c>
                 if (synapses.Count > 0)
                 {
-                    // First gather the voltages of the pre-synapse
-                    for (int i = 0; i < synapses.Count; i++)
-                    {
-                        if (i % 2 == 0)
-                        {
-                            double[] curVoltage = Get1DValues();
-
-                            // Set the synapse voltage to what the voltage is at the 1D vertex
-                            synapses[i].voltage = curVoltage[synapses[i].nodeIndex];
-                        }
-                    }
-
-                    // Next create a tuple of the node index of the post-synapse and the voltage from the pre-synapse
-                    // set the size to the amount of post-synapses i.e. the full list / 2
-                    Tuple<int, double>[] new1Dvalues = new Tuple<int, double>[synapses.Count / 2];
                     List<Synapse> postSynapse = new List<Synapse>();
                     List<Synapse> preSynapse = new List<Synapse>();
 
@@ -296,13 +281,21 @@ namespace C2M2.NeuronalDynamics.Simulation {
                     {
                         if (i % 2 != 0)
                         {
-                            postSynapse.Add(synapses[i]);
-                        }
-                        else
-                        {
-                            preSynapse.Add(synapses[i]);
+                            Synapse curPreSynaptic = synapses[i - 1];
+                            Synapse curPostSynaptic = synapses[i];
+
+                            postSynapse.Add(curPostSynaptic);
+
+                            // i - 1 means the presynaptic since we store those first
+                            double[] curVoltage = curPreSynaptic.attachedSim.Get1DValues();
+                            // Set the synapse voltage to what the voltage is at the 1D vertex
+                            curPreSynaptic.voltage = curVoltage[curPreSynaptic.nodeIndex];
+
+                            preSynapse.Add(curPreSynaptic);
                         }
                     }
+
+                    Tuple<int, double>[] new1Dvalues = new Tuple<int, double>[postSynapse.Count];
 
                     // apply the voltage from the pre-synapse and the node index from the post-synapse into a tuple
                     for (int i = 0; i < postSynapse.Count; i++)
@@ -313,7 +306,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
                     // Pass the tuple so we can set our new voltage value
                     Set1DValues(new1Dvalues);
                 }
-
 
 
                 // Apply raycast values
