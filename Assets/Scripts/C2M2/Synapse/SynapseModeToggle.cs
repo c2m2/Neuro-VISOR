@@ -27,18 +27,6 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
             {
                 GameManager.instance.Synapse.SetActive(false);
             }
-            //// Enable/Disable group clamp controllers
-            //if (GameManager.instance.vrDeviceManager.VRActive)
-            //{
-            //    if (GameManager.instance.ndClampManager.clampControllerL != null)
-            //    {
-            //        GameManager.instance.ndClampManager.clampControllerL.SetActive(toggle);
-            //    }
-            //    if (GameManager.instance.ndClampManager.clampControllerR != null)
-            //    {
-            //        GameManager.instance.ndClampManager.clampControllerR.SetActive(toggle);
-            //    }
-            //}
         }
     }
 }

@@ -1,8 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using C2M2;
-using C2M2.NeuronalDynamics.UGX;
 using C2M2.NeuronalDynamics.Simulation;
 using C2M2.Interaction;
 using System;
@@ -216,6 +214,10 @@ public class SynapseManager : MonoBehaviour
             }
         }
         catch (NullReferenceException)
+        {
+            Debug.Log("Synapses Disabled");
+        }
+        catch (MissingReferenceException)
         {
             Debug.Log("Synapses Disabled");
         }

@@ -2865,7 +2865,7 @@ MonoBehaviour:
   synapses: []
   synapseLocations: []
   arrow: {fileID: 5954688046854600746, guid: 4f3ad9ad58453a849a6b5c23e68e4860, type: 3}
-  numOfDeletionFrames: 50
+  numOfDeletionFrames: 75
   curSimulation: {fileID: 0}
 --- !u!1 &1098955826
 GameObject:
