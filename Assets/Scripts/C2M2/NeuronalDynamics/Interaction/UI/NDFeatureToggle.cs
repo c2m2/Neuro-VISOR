@@ -10,7 +10,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
         public NDSimulationController simController = null;
         public NDSimulation Sim
         {
-            get { return simController.sim; }
+            get { return simController.Sims[0]; }
         }
 
         private void Awake()

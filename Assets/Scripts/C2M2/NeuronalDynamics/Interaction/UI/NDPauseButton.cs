@@ -7,7 +7,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
     public class NDPauseButton : MonoBehaviour
     {
         public NDSimulationController simController = null;
-        public NDSimulation Sim { get { return simController.sim; } }
+        public NDSimulation Sim { get { return simController.Sims[0]; } }
         public Color defaultCol;
         public Color DefaultCol
         {

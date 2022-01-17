@@ -421,6 +421,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
         /// it is called after OnAwakePre and before OnAwakePost.
         /// If dryRun == true, Simulation will not call BuildVisualization. </remarks>
         protected override Mesh BuildVisualization () {
+
             if (!dryRun) {
 
                 if (visualize1D) Render1DCell ();
@@ -437,7 +438,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
 
                 if (!NDUIPresent) InitUI();
             }
-
+            GameManager.instance.activeSims.Add(this);
             return VisualMesh;
 
             void Render1DCell () {
@@ -467,7 +468,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
                     return;
                 }
 
-                controller.sim = this; //GET RID OF THIS
+                //controller.Sims.Add(this); //GET RID OF THIS
 
                 //NDUIPresent = true;
 

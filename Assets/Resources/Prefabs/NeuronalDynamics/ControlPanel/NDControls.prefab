@@ -463,7 +463,6 @@ GameObject:
   - component: {fileID: 7521927763559814631}
   - component: {fileID: 8722905438562113637}
   - component: {fileID: 4056609240448294111}
-  - component: {fileID: 1658986520328505222}
   - component: {fileID: 3512555819570995716}
   m_Layer: 8
   m_Name: CloseButton
@@ -617,8 +616,8 @@ MonoBehaviour:
   onPress:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1658986520328505222}
-        m_MethodName: CloseSimulation
+      - m_Target: {fileID: 7456093823756301612}
+        m_MethodName: CloseAllCells
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -634,19 +633,6 @@ MonoBehaviour:
   onEndPress:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &1658986520328505222
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 745564658660666455}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dae6ccf780f1e3148991bf559f80ffa4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  simController: {fileID: 7456093823756301612}
 --- !u!65 &3512555819570995716
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -5316,7 +5302,6 @@ GameObject:
   - component: {fileID: 489680850267740687}
   - component: {fileID: 1995012447734020625}
   - component: {fileID: 1633332415925253781}
-  - component: {fileID: 6177056373194789663}
   - component: {fileID: 82616905985110860}
   m_Layer: 8
   m_Name: AddButton
@@ -5470,8 +5455,8 @@ MonoBehaviour:
   onPress:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 6177056373194789663}
-        m_MethodName: CloseSimulation
+      - m_Target: {fileID: 7456093823756301612}
+        m_MethodName: AddSimulation
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -5487,19 +5472,6 @@ MonoBehaviour:
   onEndPress:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &6177056373194789663
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7885638561379196522}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dae6ccf780f1e3148991bf559f80ffa4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  simController: {fileID: 7456093823756301612}
 --- !u!65 &82616905985110860
 BoxCollider:
   m_ObjectHideFlags: 0
