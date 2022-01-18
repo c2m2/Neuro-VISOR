@@ -5,6 +5,9 @@ TagManager:
   serializedVersion: 2
   tags:
   - NeuronClamp
+  - ControlPanel
+  - Ruler
+  - NeuronContainer
   layers:
   - Default
   - TransparentFX

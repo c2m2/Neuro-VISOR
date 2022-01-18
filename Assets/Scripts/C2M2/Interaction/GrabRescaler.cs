@@ -55,9 +55,9 @@ namespace C2M2.Interaction
             grabbable = GetComponent<OVRGrabbable>();
 
             // Use this to determine how to scale at runtime
-            origScale = transform.localScale;
-            minScale = minPercentage * origScale;
-            maxScale = maxPercentage * origScale;
+            origScale = transform.parent.localScale;
+            minScale = Vector3.one * 0.25f;
+            maxScale = Vector3.one * 5f;
         }
 
         void Update()
@@ -81,17 +81,17 @@ namespace C2M2.Interaction
             else if(ThumbstickScaler != 0)
             { // Otherwise resolve our new scale
                 Vector3 scaleValue = scaler * ThumbstickScaler * origScale;
-                Vector3 newLocalScale = transform.localScale + scaleValue;
+                Vector3 newLocalScale = transform.parent.localScale + scaleValue;
 
                 // Makes sure the new scale is within the determined range
                 newLocalScale = Math.Clamp(newLocalScale, minScale, maxScale);
 
                 // Only scales the proper dimensions
-                if (!xScale) newLocalScale.x = transform.localScale.x;
-                if (!yScale) newLocalScale.y = transform.localScale.y;
-                if (!zScale) newLocalScale.z = transform.localScale.z;
+                if (!xScale) newLocalScale.x = transform.parent.localScale.x;
+                if (!yScale) newLocalScale.y = transform.parent.localScale.y;
+                if (!zScale) newLocalScale.z = transform.parent.localScale.z;
 
-                transform.localScale = newLocalScale;
+                transform.parent.localScale = newLocalScale;
             }
         }
     }

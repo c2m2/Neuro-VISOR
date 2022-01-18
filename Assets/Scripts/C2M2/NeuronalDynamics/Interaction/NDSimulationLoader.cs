@@ -49,6 +49,8 @@ namespace C2M2.NeuronalDynamics.Interaction
             GameObject solveObj = new GameObject();
             solveObj.AddComponent<MeshFilter>();
             solveObj.AddComponent<MeshRenderer>();
+            GameObject parent = GameObject.FindGameObjectWithTag("NeuronContainer");
+            solveObj.transform.parent = parent.transform;
 
             Type solverType = Type.GetType(solverName);
             if(solverType == null || !solverType.IsSubclassOf(typeof(NDSimulation)))
@@ -70,7 +72,7 @@ namespace C2M2.NeuronalDynamics.Interaction
 
             solver.Initialize();
 
-            transform.gameObject.SetActive(false);
+            //transform.gameObject.SetActive(false);
 
             void TransferValues()
             {

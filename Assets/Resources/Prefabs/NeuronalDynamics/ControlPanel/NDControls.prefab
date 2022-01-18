@@ -1876,7 +1876,7 @@ GameObject:
   - component: {fileID: 2807145917400434385}
   m_Layer: 12
   m_Name: NDControls
-  m_TagString: Untagged
+  m_TagString: ControlPanel
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1889,7 +1889,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3770969405504545789}
   m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 0, z: 0.909}
+  m_LocalPosition: {x: 0, y: 0, z: -0.925}
   m_LocalScale: {x: 0.01, y: 0.01, z: 0.01}
   m_Children:
   - {fileID: 412782408977793217}
@@ -1903,7 +1903,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: -1.2999878, y: 0.3999939}
+  m_AnchoredPosition: {x: -1.6309814, y: 0.5960083}
   m_SizeDelta: {x: 180, y: 120}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &7053620850517114880
@@ -2986,7 +2986,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   simController: {fileID: 6508458735308732278}
   timerText: {fileID: 8031795598220963719}
-  time: -1
 --- !u!1 &4896304462328877721
 GameObject:
   m_ObjectHideFlags: 0

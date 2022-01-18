@@ -173,7 +173,16 @@ namespace C2M2.Simulation
 
                 // Instantiate ruler
                 GameObject rulerObj = Resources.Load("Prefabs/Ruler") as GameObject;
-                ruler = GameObject.Instantiate(rulerObj).GetComponent<RulerMeasure>();
+                GameObject rulerGameObj = GameObject.FindGameObjectWithTag("Ruler");
+                if (rulerGameObj == null)
+                {
+                    ruler = GameObject.Instantiate(rulerObj).GetComponent<RulerMeasure>();
+                }
+                else
+                {
+                    ruler = rulerGameObj.GetComponent<RulerMeasure>();
+                }
+
                 ruler.sim = this;
                 rulerObj.transform.position = rulerInitPos;
                 rulerObj.transform.eulerAngles = rulerInitRot;

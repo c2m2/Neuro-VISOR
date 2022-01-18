@@ -312,7 +312,7 @@ GameObject:
   - component: {fileID: 9098607124181544640}
   m_Layer: 12
   m_Name: Ruler
-  m_TagString: Untagged
+  m_TagString: Ruler
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
