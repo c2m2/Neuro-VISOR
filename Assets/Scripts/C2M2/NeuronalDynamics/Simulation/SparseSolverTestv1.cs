@@ -440,13 +440,19 @@ namespace C2M2.NeuronalDynamics.Simulation
                 /// get the average edge lengths of neighbors \n
                 avgEdgeLengths = edgelengths.Average();
                 /// set main diagonal entries using <c>rhs.At()</c>
-                rhs.At(j, j, 1 - (k * sumRecip) / (2.0 * res * cap * avgEdgeLengths));
-                lhs.At(j, j, 1 + (k * sumRecip) / (2.0 * res * cap * avgEdgeLengths));
+                /// this is BE method, no oscillations but not as accurate!
+                rhs.At(j, j, 1.0);
+                lhs.At(j, j, 1 + (k * sumRecip) / (1.0 * res * cap * avgEdgeLengths));
+
+                /// This is for CN method, this will cause oscillations and flickering!
+                //rhs.At(j, j, 1 - (k * sumRecip) / (2.0 * res * cap * avgEdgeLengths));
+                //lhs.At(j, j, 1 + (k * sumRecip) / (2.0 * res * cap * avgEdgeLengths));
                 /// set off diagonal entries by going through the neighbor list, and using <c>rhs.At()</c>
                 for (int p = 0; p < nghbrLen; p++)
                 {
-                    rhs.At(j, nghbrlist[p], k / (2 * res * cap * tempRadius* avgEdgeLengths * edgelengths[p] * ((1 / (myCell.nodes[nghbrlist[p]].NodeRadius*scf * myCell.nodes[nghbrlist[p]].NodeRadius*scf)) + (1 / (tempRadius * tempRadius)))));
-                    lhs.At(j, nghbrlist[p], -1.0 * k / (2 * res * cap * tempRadius * avgEdgeLengths * edgelengths[p] * ((1 / (myCell.nodes[nghbrlist[p]].NodeRadius*scf * myCell.nodes[nghbrlist[p]].NodeRadius*scf)) + (1 / (tempRadius * tempRadius)))));
+                    // this is for CN method, notice the factor of 2
+                    //rhs.At(j, nghbrlist[p], k / (2 * res * cap * tempRadius* avgEdgeLengths * edgelengths[p] * ((1 / (myCell.nodes[nghbrlist[p]].NodeRadius*scf * myCell.nodes[nghbrlist[p]].NodeRadius*scf)) + (1 / (tempRadius * tempRadius)))));
+                    lhs.At(j, nghbrlist[p], -1.0 * k / (1.0 * res * cap * tempRadius * avgEdgeLengths * edgelengths[p] * ((1 / (myCell.nodes[nghbrlist[p]].NodeRadius*scf * myCell.nodes[nghbrlist[p]].NodeRadius*scf)) + (1 / (tempRadius * tempRadius)))));
                 }
             }
             //rhs.At(0, 0, 1);
