@@ -125,11 +125,11 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// the membrane resistance does not hit the theoretical maximum, it is approximately 65%
         /// but this may change depending on the rate functions that are used
         /// </summary>
-        private double Rmemscf = 0.65;
+        private double Rmemscf = 1.0;
         /// <summary>
         /// this is the scale factor for increasing the time step size if it is unnecessarily small
         /// </summary>
-        private double cfl = 1.5;        
+        private double cfl = 1.0;        
 
         /// <summary>
         /// These are the solution vectors for the voltage <code>U</code>
@@ -224,9 +224,9 @@ namespace C2M2.NeuronalDynamics.Simulation
             reactConst = new List<double> { gk, gna, gl, ek, ena, el };
 
             /// this sets the target time step size
-            timeStep = SetTargetTimeStep(cap, 2 * Neuron.MaxRadius, Neuron.TargetEdgeLength, gna, gk, res, Rmemscf,cfl);
+            timeStep = SetTargetTimeStep(cap, 2 * Neuron.MaxRadius,2*Neuron.MinRadius, Neuron.TargetEdgeLength, gna, gk,gl, res, Rmemscf, 1.0);
             ///UnityEngine.Debug.Log("Target Time Step = " + timeStep);
-            
+
             ///<c>List<CoordinateStorage<double>> sparse_stencils = makeSparseStencils(Neuron, res, cap, k);</c> Construct sparse RHS and LHS in coordinate storage format, no zeros are stored \n
             /// <c>sparse_stencils</c> this is a list which contains only two matrices the LHS and RHS matrices for the Crank-Nicolson solve
             sparse_stencils = makeSparseStencils(Neuron, res, cap, timeStep);
@@ -339,23 +339,29 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// <param name="res"></param> this is the axial resistance
         /// <param name="Rmemscf"></param> this is membrane resistance scale factor, since this is only a fraction of theoretical maximum
         /// <returns></returns>
-        public static double SetTargetTimeStep(double cap, double maxDiameter, double edgeLength ,double gna, double gk, double res, double Rmemscf, double cfl)
+        public static double SetTargetTimeStep(double cap, double maxDiameter, double minDiameter,double edgeLength ,double gna, double gk, double gl, double res, double Rmemscf, double cfl)
         {
             /// here we set the minimum time step size and maximum time step size
             /// the dtmin is based on prior numerical experiments that revealed that for each refinement level the 
             /// voltage profiles were visually accurate when compared to Yale Neuron for delta t at least 2 microseconds
-            double dtmin = 2e-6;  
-            double dtmax = 32e-6;        
-            /// this is where we compute the maximum conduction speed (wave speed) of the ap wave
-            /// set the maxDiameter to [m] by multiplying by 1e-6
-            double vmax = (1 / cap) * System.Math.Sqrt(maxDiameter * (1e-6) *Rmemscf* (gna + gk) / (res));
-            /// this is the target time step size, set to seconds by multiplying by 1e-6
-            double tstep = (edgeLength / vmax) * (1e-6);            
-            /// we use the loop incase the time step if it is unnecessarily small
-            while(tstep < dtmin){ tstep = tstep * cfl;}
-            /// this avoid making the time step too big will cause numerical instability
-            if (tstep > dtmax) { tstep = tstep * 0.5; }
-            return tstep;
+            /// we want to avoid using dtmin; therefore I compute the upper bound (and lower bound for reference)
+            //double dtmin = 2e-6;  
+            double dtmax = 50e-6;
+            double dt;
+
+            double gll = gl; double scf = 1E-6; // to convert to micrometer of edgelengths and radii don't forget this!!!!
+
+            // what happens if the leak conductance is 0
+            if (gll == 0.0) { gll = 1.0; }
+            
+            double upper_bound = cap * edgeLength*scf * System.Math.Sqrt(res / (gll*minDiameter*scf));
+            //double lower_bound = cap * edgeLength*scf * System.Math.Sqrt(res / (gna + gk + gl) * maxDiameter*scf);
+            //GameManager.instance.DebugLogSafe("upper_bound = " + upper_bound.ToString());
+
+            // some cells may have an upper bound that is too large for the solver, so choose the smaller of the two dtmax or upper_bound
+            dt = System.Math.Min(upper_bound,dtmax);
+            //GameManager.instance.DebugLogSafe("lower_bound = " + lower_bound.ToString());
+            return dt;       
         }
 
         /// <summary>
