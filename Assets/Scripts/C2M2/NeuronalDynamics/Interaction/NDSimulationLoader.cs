@@ -61,7 +61,8 @@ namespace C2M2.NeuronalDynamics.Interaction
                 return;
             }
 
-            solveObj.name = "(Solver)" + solverName.Substring(solverName.LastIndexOf('.') + 1);
+            // The name of the object should take the form "[cellName](solverType)"
+            solveObj.name = "[" + vrnFileName + "](" + solverName.Substring(solverName.LastIndexOf('.') + 1) + ")";
 
             NDSimulation solver = (NDSimulation)solveObj.AddComponent(solverType);
 
