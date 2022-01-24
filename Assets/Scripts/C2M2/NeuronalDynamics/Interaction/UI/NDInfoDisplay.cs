@@ -12,7 +12,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
         {
             get
             {
-                return simController.sim;
+                return (NDSimulation)GameManager.instance.activeSims[0];
             }
         }
 

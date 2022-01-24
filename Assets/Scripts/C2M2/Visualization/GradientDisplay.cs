@@ -12,7 +12,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
         public NDSimulationController simController = null;
         public MeshSimulation Sim
         {
-            get { return simController.sim; }
+            get { return (MeshSimulation)GameManager.instance.activeSims[0]; }
         }
         public Gradient Gradient
         {

@@ -8,6 +8,7 @@ TagManager:
   - ControlPanel
   - Ruler
   - NeuronContainer
+  - CellPreviewer
   layers:
   - Default
   - TransparentFX

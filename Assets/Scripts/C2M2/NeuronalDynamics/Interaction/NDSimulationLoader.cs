@@ -50,6 +50,12 @@ namespace C2M2.NeuronalDynamics.Interaction
             solveObj.AddComponent<MeshFilter>();
             solveObj.AddComponent<MeshRenderer>();
             GameObject parent = GameObject.FindGameObjectWithTag("NeuronContainer");
+            if(parent == null)
+            {
+                parent = new GameObject();
+                parent.name = "NeuronContainer";
+                parent.tag = "NeuronContainer";
+            }
             solveObj.transform.parent = parent.transform;
 
             Type solverType = Type.GetType(solverName);
@@ -62,7 +68,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             }
 
             // The name of the object should take the form "[cellName](solverType)"
-            solveObj.name = "[" + vrnFileName + "](" + solverName.Substring(solverName.LastIndexOf('.') + 1) + ")";
+            solveObj.name = "Cell:[" + vrnFileName + "] Solver:(" + solverName.Substring(solverName.LastIndexOf('.') + 1) + ")";
 
             NDSimulation solver = (NDSimulation)solveObj.AddComponent(solverType);
 
@@ -73,7 +79,7 @@ namespace C2M2.NeuronalDynamics.Interaction
 
             solver.Initialize();
 
-            //transform.gameObject.SetActive(false);
+            transform.gameObject.SetActive(false);
 
             void TransferValues()
             {

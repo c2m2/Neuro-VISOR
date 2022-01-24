@@ -13,7 +13,8 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
         {
             get
             {
-                return simController.sim;
+                // Use the first simulation instance to keep time
+                return GameManager.instance.activeSims[0];
             }
         }
 

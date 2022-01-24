@@ -211,8 +211,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
             }
         }
 
-        private static bool NDUIPresent = false;
-
         void ShowInfoPanel(bool show, RaycastHit hit)
         {
             if (infoPanel == null)
@@ -408,30 +406,20 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 gm.transform.parent = transform;
                 graphManager = gm.AddComponent<NDGraphManager>();
 
-
-                // Instantiate control panel prefab, announce active simulation to buttons
-                if (!NDUIPresent)
+                controlPanel = GameObject.FindGameObjectWithTag("ControlPanel");
+                if(controlPanel == null)
                 {
                     controlPanel = Resources.Load("Prefabs/NeuronalDynamics/ControlPanel/NDControls") as GameObject;
                     controlPanel = Instantiate(controlPanel);
                 }
-                else
-                {
-                    controlPanel = GameObject.FindGameObjectWithTag("ControlPanel");
-                }
 
                 NDSimulationController controller = controlPanel.GetComponent<NDSimulationController>();
-                if(controller == null)
+                if (controller == null)
                 {
                     Debug.LogWarning("No NDSimulationController found.");
                     Destroy(controlPanel);
                     return;
                 }
-
-                controller.sim = this; //GET RID OF THIS
-
-                NDUIPresent = true;
-
             }
         }
 

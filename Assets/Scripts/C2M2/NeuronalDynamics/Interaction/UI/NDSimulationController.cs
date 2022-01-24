@@ -8,7 +8,6 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
 {
     public class NDSimulationController : MonoBehaviour
     {
-        public NDSimulation sim = null;
         public Color defaultCol = new Color(1f, 0.75f, 0f);
         public Color highlightCol = new Color(1f, 0.85f, 0.4f);
         public Color pressedCol = new Color(1f, 0.9f, 0.6f);
@@ -18,13 +17,19 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
         public Image[] pressColTargets = new Image[0];
         public Image[] errColTargets = new Image[0];
 
+        public GameObject defaultBackground;
+        public GameObject minimizedBackground;
+
+        private bool Minimized
+        {
+            get
+            {
+                return !defaultBackground.activeSelf;
+            }
+        }
+
         private void Start()
         {
-            if(sim == null)
-            {
-                Debug.LogError("No simulation given.");
-                Destroy(gameObject);
-            }
             StartCoroutine(UpdateColRoutine(0.5f));
         }
 
@@ -32,23 +37,23 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
         {
             foreach (TextMeshProUGUI text in GetComponentsInChildren<TextMeshProUGUI>(true))
             {
-                text.color = defaultCol;
+                if(text != null) text.color = defaultCol;
             }
             foreach(Image i in defColTargets)
             {
-                i.color = defaultCol;
+                if(i != null) i.color = defaultCol;
             }
             foreach (Image i in hiColTargets)
             {
-                i.color = highlightCol;
+                if(i != null) i.color = highlightCol;
             }
             foreach (Image i in pressColTargets)
             {
-                i.color = pressedCol;
+                if(i != null) i.color = pressedCol;
             }
             foreach(Image i in errColTargets)
             {
-                i.color = errorCol;
+                if(i != null) i.color = errorCol;
             }
         }
 
@@ -59,6 +64,64 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
                 UpdateCols();
                 yield return new WaitForSeconds(waitTime);
             }
+        }
+
+        public void AddSimulation()
+        {
+            // Minimize control board if there is one
+
+
+            // Reactivate cell previewer
+            GameObject cellPreviewer = GameObject.FindGameObjectWithTag("CellPreviewer");
+            cellPreviewer.SetActive(true);
+        }
+
+        public void CloseAllSimulations()
+        {
+            for(int i = 0; i < GameManager.instance.activeSims.Count; i++)
+            {
+                CloseSimulation(i);
+            }
+        }
+
+        public void CloseSimulation(int simIndex)
+        {
+            simIndex = Mathf.Clamp(simIndex, 0, GameManager.instance.activeSims.Count - 1);
+            NDSimulation sim = (NDSimulation)GameManager.instance.activeSims[simIndex];
+            if (sim != null)
+            {
+                // Destroy the cell's ruler
+                sim.CloseRuler();
+
+                // Destroy the cell
+                Destroy(sim.gameObject);
+
+                // Destroy this control panel
+                Destroy(transform.root.gameObject);
+
+                if (GameManager.instance.cellPreviewer != null)
+                {
+                    // Reenable the cell previewer
+                    GameManager.instance.cellPreviewer.SetActive(true);
+                }
+            }
+        }
+
+        public void MinimizeBoard(bool minimize)
+        {
+            Debug.Log("Minimized state: " + Minimized);
+            if (defaultBackground == null || minimizedBackground == null)
+            {
+                Debug.LogWarning("Can't find minimize targets");
+                return;
+            }
+            defaultBackground.SetActive(!minimize);
+            minimizedBackground.SetActive(minimize);
+        }
+
+        public void MinimizeToggle()
+        {
+            MinimizeBoard(!Minimized);
         }
     }
 }

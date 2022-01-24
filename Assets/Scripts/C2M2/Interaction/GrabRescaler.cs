@@ -55,7 +55,7 @@ namespace C2M2.Interaction
             grabbable = GetComponent<OVRGrabbable>();
 
             // Use this to determine how to scale at runtime
-            origScale = transform.parent.localScale;
+            origScale = transform.localScale;
             minScale = Vector3.one * 0.25f;
             maxScale = Vector3.one * 5f;
         }
