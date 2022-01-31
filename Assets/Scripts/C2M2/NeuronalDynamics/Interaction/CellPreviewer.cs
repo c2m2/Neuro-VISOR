@@ -57,6 +57,12 @@ namespace C2M2.NeuronalDynamics.Interaction {
             FindSimulationLoader();
 
             // Get possible geometries from given direcrory
+            #if UNITY_STANDALONE_OSX
+                cellsPath = "NeuronalDynamics" + "/" + "Geometries";
+            #endif
+            #if UNITY_EDITOR_OSX
+                cellsPath = "NeuronalDynamics" + "/" + "Geometries";
+            #endif
             string fullPath = Application.streamingAssetsPath + Path.DirectorySeparatorChar + cellsPath;
             string[] geoms = GetGeometryNames(fullPath);
 
