@@ -109,7 +109,6 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
 
         public void MinimizeBoard(bool minimize)
         {
-            Debug.Log("Minimized state: " + Minimized);
             if (defaultBackground == null || minimizedBackground == null)
             {
                 Debug.LogWarning("Can't find minimize targets");
