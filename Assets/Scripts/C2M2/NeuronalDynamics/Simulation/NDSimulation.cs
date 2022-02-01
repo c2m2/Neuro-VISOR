@@ -64,24 +64,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
 
         private Dictionary<double, Mesh> meshCache = new Dictionary<double, Mesh>();
 
-        //public List<Synapse> synapses
-        //{
-        //    get
-        //    {
-        //        return GameObject.Find("SynapseTEST").GetComponent<vertexSnap>().synapses;
-        //    }
-        //}
-
         public List<Synapse> synapses = new List<Synapse>();
-
-        public NeuronClampManager clampManager = null;
-        public NeuronClampManager ClampManager
-        {
-            get
-            {
-                return GameManager.instance.ndClampManager;
-            }
-        }
         public List<NeuronClamp> clamps = new List<NeuronClamp>();
         internal readonly object clampLock = new object();
         private static readonly Tuple<int, double> nullClamp = new Tuple<int, double>(-1, -1);
@@ -281,15 +264,14 @@ namespace C2M2.NeuronalDynamics.Simulation {
                     {
                         if (i % 2 != 0)
                         {
+                            // i - 1 means the presynaptic since we store those first
                             Synapse curPreSynaptic = synapses[i - 1];
                             Synapse curPostSynaptic = synapses[i];
 
                             postSynapse.Add(curPostSynaptic);
-
-                            // i - 1 means the presynaptic since we store those first
-                            double[] curVoltage = curPreSynaptic.attachedSim.Get1DValues();
+                            
                             // Set the synapse voltage to what the voltage is at the 1D vertex
-                            curPreSynaptic.voltage = curVoltage[curPreSynaptic.nodeIndex];
+                            curPreSynaptic.voltage = curPreSynaptic.attachedSim.Get1DValues()[curPreSynaptic.nodeIndex];
 
                             preSynapse.Add(curPreSynaptic);
                         }

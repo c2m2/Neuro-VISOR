@@ -1,5 +1,4 @@
-﻿using C2M2;
-using C2M2.NeuronalDynamics.Simulation;
+﻿using C2M2.NeuronalDynamics.Simulation;
 using C2M2.NeuronalDynamics.UGX;
 using System;
 using UnityEngine;
@@ -51,7 +50,7 @@ public class Synapse : MonoBehaviour
     override
     public string ToString()
     {
-        return this.prefab.name + " " + this.nodeIndex + " " + voltage;
+        return prefab.name + " " + nodeIndex + " " + voltage;
     }
 
     /// <summary>
@@ -64,20 +63,20 @@ public class Synapse : MonoBehaviour
         if (curSimulation.Neuron.somaIDs.Contains(nodeIndex))
         {
             //Transform the position of the synapse to where we raycast onto
-            this.prefab.transform.SetParent(curSimulation.transform);
-            this.prefab.transform.position = hit.point;
+            prefab.transform.SetParent(curSimulation.transform);
+            prefab.transform.position = hit.point;
             focusVert = nodeIndex;
 
-            this.prefab.transform.localScale = new Vector3((float)NodeData.NodeRadius, (float)NodeData.NodeRadius, (float)NodeData.NodeRadius);
+            prefab.transform.localScale = new Vector3((float)NodeData.NodeRadius, (float)NodeData.NodeRadius, (float)NodeData.NodeRadius);
         }
         else
         {
             // Set the neuron as the parent of the synapse
-            this.prefab.transform.SetParent(curSimulation.transform);
+            prefab.transform.SetParent(curSimulation.transform);
             focusVert = nodeIndex;
 
             // Make sure to transform locally since we made the neuron the parent of the synapse
-            this.prefab.transform.localPosition = FocusPos;
+            prefab.transform.localPosition = FocusPos;
 
             float currentVisualizationScale = (float)curSimulation.VisualInflation;
 
@@ -87,7 +86,7 @@ public class Synapse : MonoBehaviour
             //Ensures synapse is always at least as wide as tall when Visual Inflation is 1
             float radiusLength = Math.Max(radiusScalingValue, heightScalingValue) * currentVisualizationScale;
 
-            this.prefab.transform.localScale = new Vector3(radiusLength, radiusLength, radiusLength);
+            prefab.transform.localScale = new Vector3(radiusLength, radiusLength, radiusLength);
         }
     }
 }
