@@ -10,7 +10,7 @@ Neuro-VISOR focuses on applications in computational neuroscience. Specifically,
 
 A key use case of this framework is that is can rapidly accelerate scientific discovery by providing an immediate and very intuitive feedback to the user about how changes to the simulated system affect the system's behavior. This insight, obtained from the simple and fast models used for VISOR, can then enable the computational scientist to devise significantly more targeted (non-interactive) simulations on large-scale HPC clusters of more complex models. In addition, in the context of neuroscience, the immersed 3D environment provides a more intuitive way to navigate and comprehend complex neuron geometries than traditional visualizations on computer screens.
 
-The Neuro-VISOR software can be run in a VR version (currently only for Oculus), as well as via a desktop version (without VR headset). While the desktop version does not provide the 3D visualization of the VR version, it does provide most of the same interactive real-time simulation capabilities.
+The Neuro-VISOR software can be run in a VR version (currently only for Oculus), as well as via a desktop version (without VR headset). While the desktop version does not provide the 3D visualization of the VR version, it does provide all of the same interactive real-time simulation capabilities.
 
 
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/ac2c4122b3174e4a8209ef2e791792b3)](https://www.codacy.com?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=c2m2/virtual-reality&amp;utm_campaign=Badge_Grade)
@@ -23,28 +23,28 @@ We use a modified version of the GNU LPGL v3. Our license can be found in LICENS
 
 This project is produced at the Center for Computational Mathematics and Modeling (C2M2) at Temple University.
 
-Project lead: [Dr. Benjamin Seibold](https://github.com/benjaminseibold), Dr. Gillian Queisser
+Project Leads: [Dr. Benjamin Seibold](https://math.temple.edu/~seibold/) [(Github)](https://github.com/benjaminseibold), [Dr. Gillian Queisser](https://math.temple.edu/~tug29557/about-gillian-queisser.html)
 
-Researchers and developers: [Craig Fox](https://github.com/CraigFox0) [(in)](https://www.linkedin.com/in/craig-fox-738951192/), [Stephan Grein](https://github.com/stephanmg) [(in)](https://www.linkedin.com/in/stephan-grein-8520ba101/), Bogdan Nagirniak, [James Rosado](https://github.com/jarosado0911) [(in)](https://www.linkedin.com/in/rosado-james-3239b2119/), [Jacob Wells](https://github.com/jacobwells97) [(in)](https://www.linkedin.com/in/jacob-wells/), Noah Williams.
+Researchers and Developers: Rujeko Chinomona, [Craig Fox](https://github.com/CraigFox0) [(in)](https://www.linkedin.com/in/craig-fox-738951192/), [Calin Pescaru](https://github.com/calin-pescaru), [Garret Quallet](https://github.com/Gquallet001), [James Rosado](https://github.com/jarosado0911) [(in)](https://www.linkedin.com/in/rosado-james-3239b2119/), [Jacob Wells](https://github.com/jacobwells97) [(in)](https://www.linkedin.com/in/jacob-wells/), [Wayne Zheng](https://github.com/WayneJWZLemon)
 
 ## Code Documentation
-We have [code documentation](https://c2m2.github.io/doxyhtml/index.html) generated using [Doxygen](https://www.doxygen.nl/index.html). The completeness of this documentation is dependent on code commenting, so there may be gaps and imperfections. If you notice issues with this documentation, please report it to jacob.wells@temple.edu.
+Our [code documentation](https://c2m2.github.io/doxyhtml/index.html) is generated using [Doxygen](https://www.doxygen.nl/index.html). The completeness of this documentation is dependent on code commenting, so there may be gaps and imperfections. If you notice issues with this documentation, please report it to <jacob.wells@temple.edu>.
 
-## Other code
+## Other Code
 We maintain a [separate project](https://github.com/stephanmg/vr-grids) for generating neuron grids.
 
 We have [another project](https://github.com/stephanmg/vr-utils) containing additional custom attributes which proved useful during development.
 
-## Connect with us
-We have a [blog](https://c2m2vr.wordpress.com/) where we go into finer detail about some of our past and current code solutions. While far from complete, we feel that this blog still has lots of interesting details about the areas of the project that it does cover.
+## Connect with Us
+Our [blog](https://c2m2vr.wordpress.com/) goes into finer detail about some of our past and current code solutions. This blog contains interesting details about various areas of the project.
 
-Inquiries about the project can be made to seibold@temple.edu.
+Inquiries about the project can be made to <seibold@temple.edu>.
 
-Performance issues and code-related questions can be sent to jacob.wells@temple.edu
+Performance issues and code-related questions can be sent to <jacob.wells@temple.edu>.
 
 # Use Guide
 
-## Recommended hardware
+## Recommended Hardware
 
 * **Oculus Rift, Rift S, or Quest Head Mounted Display (HMD)** - This project is currently tested on the Oculus Rift S and the Oculus Quest. It was previously developed on the original Rift headset. This project was developed using the Oculus SDK. We have not been able to run this project on other headsets, but have been working to make it more cross-compatible.
 
@@ -70,15 +70,19 @@ Performance issues and code-related questions can be sent to jacob.wells@temple.
 </table>
 
 
-## Recommended software
+## Recommended Software
 
-- Unity 2019.4.26f1 (LTS)
+### Recommended for Running as a Standalone Application and in Unity Editor
 
-- Windows 10 64-bit - This program may be functional on other operating systems, but its performance is not guaranteed. The emulator functions have been tested on Ubuntu 16.04 LTS.
+- Windows 10 or 11 64-bit - This program may be functional on other operating systems, but its performance is not guaranteed. The emulator functions have been tested on Ubuntu 16.04 LTS.
 
 - Relevant HMD software and drivers
 
-- We use the Oculus Desktop 2.38.4 package, but are planning to move to Unity's XR Plugin system soon.
+### Recommended for Running in Unity Editor
+
+- Unity 2019.4.26f1 (LTS)
+
+- We use the Oculus Desktop 2.38.4 package
 
 - Git version >= 2.7.0
 
@@ -91,11 +95,25 @@ Performance issues and code-related questions can be sent to jacob.wells@temple.
     - git: `git --version`
     - Unity: see UnityEditor
 
-## Starting the program
+## Starting the Program
 
 Make sure that your HMD is set up and that you have gone through the first-time setup. Ideally you have tested several other programs on your headset before using this software.
 
-1. Clone project to any location (NOTE: Downloading the zip archive of this Unity Project is problematic, as GitHub does not currently support archiving files versioned with Git LFS. Downloading static build releases still works as intended).
+### Running as a Standalone Application
+
+1. Download the latest build release.
+
+2. Place desired neuron cell files in `Neuro-VISOR_Data/StreamingAssets/NeuronalDynamics/Geometries`. Any cells found in this directory will be available at runtime.
+
+3. Start the application by running Neuro-VISOR.exe.
+
+4. Upon startup, the user is placed in a model of C2M2's lab. The application will detect a VR headset and launch in VR/keyboard emulator mode automatically.
+
+5. Our control scheme is outlined below. Try moving around and looking at your hands.
+
+### Running in Unity Editor
+
+1. Clone project to any location.
 
 2. Ensure the correct version of the Unity Editor is installed
 
@@ -107,7 +125,7 @@ Make sure that your HMD is set up and that you have gone through the first-time 
 
 6. Upon startup, the user is placed in a model of C2M2's lab. The application will detect a VR headset and launch in VR/keyboard emulator mode automatically.
 
-7. Our control scheme is outlined [below](#controls). Try moving around and looking at your hands.
+7. Our control scheme is outlined below. Try moving around and looking at your hands.
 
 ## Controls
 Oculus touch controller naming conventions can be found [here](https://docs.unity3d.com/2019.2/Documentation/Manual/OculusControllers.html). An instructional video demonstrating the controls can be found [here](https://drive.google.com/file/d/1tWS7FYvMIaawStV07K7PyEg2EZRHR93h/view?usp=sharing). The term 'Hand Trigger' and 'Grip Trigger'
@@ -117,9 +135,9 @@ are used analogously throughout the project, as are the terms 'Index Trigger' an
 | Action      | Rift Touch Controllers    | Keyboard/Mouse   |
 | :------------- | :---------- | :----------- |
 |  Toggle raycasting | (P) Button one (A/X)   | Always on   |
-| Grab | (H) Hand trigger | Not supported |
-| Interact   | Raycasting + (P/H) Index trigger  | (P/H) Left mouse button |
-Scale Object | Grab + Thumbstick up/down | N/A |
+| Grab | (H) Hand trigger | (H) Right mouse button |
+| Interact   | Raycast + (P/H) Index trigger  | (P/H) Left mouse button |
+Scale object | Grab + Thumbstick up/down | Raycast + up/down arrow keys |
 Move camera | Walk around! | WASD |
 Rotate camera | Look around! | (H) Left-Ctrl + move mouse cursor |
 
@@ -128,16 +146,16 @@ Rotate camera | Look around! | (H) Left-Ctrl + move mouse cursor |
 | (P) | Press button once |
 | (H) | Hold button down |
 
-### Selecting a cell
+### Selecting a Cell
 <img src="https://i.imgur.com/knL8vTZ.png" alt="cell previewer" width="500" align="right">
 
-1.  A cell previewer stands against the whiteboard near the window. It attempts to render the 1D mesh of any neuron `.vrn` cell file archives found in `Assets/StreamingAssets/NeuronalDynamics/Geometries`. Three example cells are included with this repo. Several more cells can be found [here](https://drive.google.com/drive/folders/1kyz8S-txISfarPegJSMzABrF_UprH3Y-?usp=sharing).
+1.  A cell previewer stands against the whiteboard near the window. It attempts to render the 1D mesh of any neuron `.vrn` cell file archives found in `StreamingAssets/NeuronalDynamics/Geometries`. Six example cells are included with this repo. Several more cells can be found [here](https://drive.google.com/drive/folders/1kyz8S-txISfarPegJSMzABrF_UprH3Y-?usp=sharing).
 
-2.  Enable raycast mode in VR. The hand with raycast mode enabled should be constantly pointing forward.
+2.  Enable raycast mode. The hand with raycast mode enabled should be constantly pointing forward.
 
-3.  With raycast mode enabled, hover over a cell preview window by pointing at it. A blue guide line should be drawn between your pointer finger and the preview window. Continue hovering to see more information about the cell, or press the Interact button to load the cell and launch solve code. The guide line should turn orange while pressing/holding. The geometry should render in the middle of the room, scaled to fit within the room and appearing in a uniform color. A color scale should now be displayed on the whiteboard.
+3.  With raycast mode enabled, hover over a cell preview window by pointing at it. A blue guide line should be drawn between your pointer finger and the preview window. Continue hovering to see more information about the cell, or press the Interact button to load the cell and launch solve code. The guide line should turn orange while pressing/holding if in VR. The geometry should render in the middle of the room, scaled to fit within the room.
 
-### Simple cell interaction
+### Simple Cell Interaction
 
 #### Grabbing
 The cell can be grabbed by hovering your hand over the 3D geometry and pressing the hand trigger on that hand's controller. Once grabbed, you can  move and rotate cells freely.
@@ -145,10 +163,10 @@ The cell can be grabbed by hovering your hand over the 3D geometry and pressing 
 #### Resizing
 While grabbing a cell, hold the thumbstick up or down on the hand that is being used to grab the cell to resize the cell in world space. Note: this does not affect the environment of the solver code: the cell can be scaled freely in world space without affecting the stored vertex positions of the 1D or 3D meshes.
 
-### Board info and controls
+### Board Info and Controls
 <img src="https://i.imgur.com/v7gbFza.png" alt="board controls" width="500" align="right">
 
-A large user interface is spawned upon selecting a cell. This board contains useful static information about the cell. 
+A large user interface is spawned upon selecting a cell. This board contains useful static information about the cell.
 
 The board contains a color table that shows the current color gradient applied to the cell. The voltage value corresponding to different color values is diosplayed to the left of the color table. The user can change the value corresponding to the top or bottom of the color scale by hovering their finger cursor over either number and holding up/down on the joystick (or the up/down arrow key). The user can also change the color scheme by interacting with the arrows beneath the color table.
 
@@ -193,7 +211,7 @@ The user can highlight all clamps with a red sphere to clarify their position to
 
 ## Point-plotter interaction
 <img src="https://i.imgur.com/LG0Xa2P.png" alt="clamps" width="400" align="right">
-The user is able to spawn line graphs that are attached to specific 1D vertices on the neuron cell. These graphs will show the voltage at that 1D point over time. 
+The user is able to spawn line graphs that are attached to specific 1D vertices on the neuron cell. These graphs will show the voltage at that 1D point over time.
 
 To spawn a graph panel, the user simply needs to toggle "Plot" on the [board UI](#board-info-and-controls). At this point the user can raycast onto the surface of the mesh and press the index trigger (or click with the mouse) in order to spawn a graph attached to the nearest 1D vertex. Panels are grabbable and resizeable in the same way that the cell or the ruler is.
 
@@ -201,7 +219,27 @@ The user can hover over the graph-plane with their raycasting finger or the mous
 
 The number of samples in the graph can be altered by opening the "more info" panel (top-right corner of the graph), hovering over "number of samples", and holding up or down on the joystick (or holding the up or down arrows on the keyboard).
 
-# Standalone Builds
-A standalone build for Windows 64-bit can be downloaded from the "Releases" section. Standalone builds can be run as executable files without the need for the Unity editor and will improve performance. Builds can be made by anybody with the Unity project, but we have made "approved" builds with relevant build information.
+## Changelog
 
-Within a static build, custom .vrn cell archives can be placed within `virtual-reality_Data\StreamingAssets\NeuronalDynamics\Geometries` to be run within the application.
+### 2.0.0
+
+Contributors: [Michael Bennett](https://github.com/CWRMB), Rujeko Chinomona, [Craig Fox](https://github.com/CraigFox0) [(in)](https://www.linkedin.com/in/craig-fox-738951192/), [James Rosado](https://github.com/jarosado0911) [(in)](https://www.linkedin.com/in/rosado-james-3239b2119/), [Jacob Wells](https://github.com/jacobwells97) [(in)](https://www.linkedin.com/in/jacob-wells/), [Noah Williams](https://github.com/U-K-L).
+
+- More than one neuron can now be added
+- Synapses can now be added **NOTE:** This is still a proof of concept feature and is not physically accurate
+- Significant performance improvements were made
+- Desktop mode now has all the features of VR
+
+### 1.0.1
+
+- Fixes group clamp control issue
+
+### 1.0.0
+
+Contributors: [Craig Fox](https://github.com/CraigFox0) [(in)](https://www.linkedin.com/in/craig-fox-738951192/), [Stephan Grein](https://github.com/stephanmg) [(in)](https://www.linkedin.com/in/stephan-grein-8520ba101/), Bogdan Nagirniak, [James Rosado](https://github.com/jarosado0911) [(in)](https://www.linkedin.com/in/rosado-james-3239b2119/), [Jacob Wells](https://github.com/jacobwells97) [(in)](https://www.linkedin.com/in/jacob-wells/), [Noah Williams](https://github.com/U-K-L).
+
+- Allows the creation of one, physically-accurate neuron
+- Designed for VR, but a limited capability desktop version exists
+- The neuron can have a voltage directly applied to it, can be clamped with a continuous voltage, and can have point plotters displaying voltage over time applied to it
+- A ruler provides a length reference point
+- A board displays cell information, controls the controls, sets the color information, and pauses, resumes, and quits the simulation

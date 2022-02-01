@@ -1,8 +1,4 @@
-﻿using C2M2;
-using C2M2.NeuronalDynamics.Simulation;
-using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System;
 using UnityEngine;
 
 //Use this script for object within the game
@@ -16,7 +12,7 @@ public class emulatorMove : MonoBehaviour
     private GameObject target;
     private GameObject parent;
 
-    //return the object that was ray casted on
+    //return the object that was raycasted on
     GameObject ReturnClickedObject(out RaycastHit hit)
     {
         GameObject target = null;
