@@ -257,6 +257,11 @@ public class SynapseManager : MonoBehaviour
                         // We can calculate this by the distance of the two synapses
                         arrowHead.transform.localScale = new Vector3(preSynapse.lossyScale.x / 4, preSynapse.lossyScale.x / 4, Vector3.Distance(preSynapse.position, postSynapse.position));
                         arrowHead.transform.SetParent(preSynapse);
+
+                        // Add the method to update arrows when user moves the neurons
+                        arrowHead.AddComponent<ArrowUpdate>();
+                        arrowHead.GetComponent<ArrowUpdate>().preSynapse = preSynapse;
+                        arrowHead.GetComponent<ArrowUpdate>().postSynapse = postSynapse;
                     }
                 }
                 count = 0;
