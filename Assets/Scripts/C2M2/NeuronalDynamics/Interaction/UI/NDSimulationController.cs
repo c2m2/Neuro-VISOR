@@ -69,10 +69,11 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
         public void AddSimulation()
         {
             // Minimize control board if there is one
-
+            MinimizeBoard(true);
 
             // Reactivate cell previewer
-            GameObject cellPreviewer = GameObject.FindGameObjectWithTag("CellPreviewer");
+            GameObject cellPreviewer = GameManager.instance.cellPreviewer;
+
             cellPreviewer.SetActive(true);
         }
 

@@ -2,6 +2,7 @@
 using UnityEngine;
 using C2M2.NeuronalDynamics.Simulation;
 using System.IO;
+using System.Collections.Generic;
 namespace C2M2.NeuronalDynamics.Interaction
 {
     /// <summary>
@@ -42,6 +43,20 @@ namespace C2M2.NeuronalDynamics.Interaction
         /// </summary>
         [Tooltip("Alter the precision of the color scale display")]
         public int colorScalePrecision = 3;
+
+        // Casts GameManager's list of simulations as NDSimulations
+        public List<NDSimulation> Sims
+        {
+            get
+            {
+                List<NDSimulation> sims = new List<NDSimulation>(GameManager.instance.activeSims.Count);
+                for(int i = 0; i < GameManager.instance.activeSims.Count; i++)
+                {
+                    sims[i] = (NDSimulation)GameManager.instance.activeSims[i];
+                }
+                return sims;
+            }
+        }
 
         // TODO: Allow SparseSolverTestv1 to be a variable script
         public void Load(RaycastHit hit)

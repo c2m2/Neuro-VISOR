@@ -413,6 +413,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
                     controlPanel = Instantiate(controlPanel);
                 }
 
+
                 NDSimulationController controller = controlPanel.GetComponent<NDSimulationController>();
                 if (controller == null)
                 {
@@ -420,6 +421,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
                     Destroy(controlPanel);
                     return;
                 }
+                controller.MinimizeBoard(false);
             }
         }
 

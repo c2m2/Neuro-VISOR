@@ -92,6 +92,15 @@ namespace C2M2
                     }
                 }
             }
+
+            if (cellPreviewer != null)
+            {
+                cellPreviewer = GameObject.Instantiate(cellPreviewer);
+            }
+            else
+            {
+                Debug.LogError("No cell previewer prefab given!");
+            }
         }
 
         private void Update()
