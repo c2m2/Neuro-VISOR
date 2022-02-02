@@ -19,7 +19,7 @@ namespace C2M2.Utils
         private Vector3 screenPosition;
 
         //return the object that was raycasted on
-        GameObject ReturnClickedObject(out RaycastHit hit)
+        private bool IsClickedObjectThisObject(out RaycastHit hit)
         {
             GameObject target = null;
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -27,14 +27,14 @@ namespace C2M2.Utils
             {
                 try
                 {
-                    return hit.collider.transform.parent.gameObject;
+                    target = hit.collider.transform.parent.gameObject;
                 }
                 catch (NullReferenceException)
                 {
-                    return hit.collider.gameObject;
+                    target =  hit.collider.gameObject;
                 }
             }
-            return target;
+            return target == gameObject;
         }
 
         private bool ResetRequested
@@ -47,7 +47,7 @@ namespace C2M2.Utils
                 }
                 else
                 {
-                    return Input.GetKey(resetKey) && ReturnClickedObject(out RaycastHit hitInfo) == gameObject;
+                    return Input.GetKey(resetKey) && IsClickedObjectThisObject(out RaycastHit hitInfo);
                 }
             }
         }
@@ -58,7 +58,15 @@ namespace C2M2.Utils
             {
                 return !GameManager.instance.vrDeviceManager.VRActive
                     && Input.GetMouseButtonDown(moveMouseButton)
-                    && ReturnClickedObject(out RaycastHit hitInfo) == gameObject;
+                    && IsClickedObjectThisObject(out RaycastHit hitInfo);
+            }
+        }
+
+        private bool DesktopMoveEnd
+        {
+            get
+            {
+                return Input.GetMouseButtonUp(moveMouseButton);
             }
         }
 
@@ -85,7 +93,7 @@ namespace C2M2.Utils
                 offset = transform.position - Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPosition.z));
             }
 
-            if (Input.GetMouseButtonUp(moveMouseButton))
+            if (DesktopMoveEnd)
             {
                 isMouseDrag = false;
             }
