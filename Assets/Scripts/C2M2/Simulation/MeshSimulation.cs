@@ -155,8 +155,8 @@ namespace C2M2.Simulation
                 else raycastable.SetSource(viz);
                 
                 gameObject.AddComponent<VRGrabbableMesh>();
-                GrabRescaler rescaler =  gameObject.AddComponent<GrabRescaler>();
-                gameObject.AddComponent<PositionResetControl>();
+                GrabRescaler rescaler = gameObject.AddComponent<GrabRescaler>();
+                gameObject.AddComponent<ObjectMovementControl>();
 
                 defaultRaycastEvent.OnHover.AddListener((hit) =>
                 {
@@ -173,7 +173,7 @@ namespace C2M2.Simulation
 
                 // Instantiate ruler
                 GameObject rulerObj = Resources.Load("Prefabs/Ruler") as GameObject;
-                ruler = GameObject.Instantiate(rulerObj).GetComponent<RulerMeasure>();
+                ruler = Instantiate(rulerObj).GetComponent<RulerMeasure>();
                 ruler.sim = this;
                 rulerObj.transform.position = rulerInitPos;
                 rulerObj.transform.eulerAngles = rulerInitRot;

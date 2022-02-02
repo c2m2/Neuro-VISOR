@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using C2M2.Interaction.VR;
 using C2M2.Utils;
 
 namespace C2M2.Interaction
@@ -25,7 +24,6 @@ namespace C2M2.Interaction
         public KeyCode incKey = KeyCode.UpArrow;
         public KeyCode decKey = KeyCode.DownArrow;
         public KeyCode resetKey = KeyCode.R;
-        private PublicOVRGrabber grabber;
 
         ///<returns>A float between -1 and 1, where -1 means the thumbstick y axis is completely down and 1 implies it is all the way up</returns>
         private float ThumbstickScaler
@@ -62,13 +60,10 @@ namespace C2M2.Interaction
 
         void Update()
         {
+            // MeshSimulation handles calling rescale, TODO this is bad and should be changed
             if (!GameManager.instance.vrDeviceManager.VRActive) return;
-
-            grabber = (PublicOVRGrabber)grabbable.grabbedBy;
-            if (grabbable.isGrabbed)
-            {
-                Rescale();
-            }
+            
+            if (grabbable.isGrabbed) Rescale();
         }
 
         public void Rescale()

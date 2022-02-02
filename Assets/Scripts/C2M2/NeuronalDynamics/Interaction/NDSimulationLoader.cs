@@ -47,6 +47,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         public void Load(RaycastHit hit)
         {
             GameObject solveObj = new GameObject();
+            solveObj.transform.parent = GameManager.instance.simulationSpace.transform;
             solveObj.AddComponent<MeshFilter>();
             solveObj.AddComponent<MeshRenderer>();
 

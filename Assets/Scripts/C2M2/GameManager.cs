@@ -34,6 +34,8 @@ namespace C2M2
         public NeuronClampManager ndClampManager = null;
         public NDGraphManager ndGraphManager = null;
 
+        public GameObject simulationSpace = null;
+
         public GameObject Synapse = null;
 
         [Header("Environment")]
