@@ -2805,129 +2805,18 @@ Transform:
   m_Father: {fileID: 1103864542}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1157977724
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1157977725}
-  - component: {fileID: 1157977727}
-  - component: {fileID: 1157977726}
-  m_Layer: 0
-  m_Name: NeuronClampManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1157977725
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1157977724}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 3671467347388522961}
-  m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1157977726
+--- !u!114 &1157977727 stripped
 MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 6795881404616055385, guid: d8622d069a9db4c4f87e2d042743a9ef,
+    type: 3}
+  m_PrefabInstance: {fileID: 6795881405740469286}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1157977724}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2066920c5141f0e4ca235394b5f8bd4a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  onHover:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1157977727}
-        m_MethodName: PreviewClamp
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  onHoverEnd:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1157977727}
-        m_MethodName: DestroyPreviewClamp
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  onPress:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1157977727}
-        m_MethodName: InstantiateClamp
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  onHoldPress:
-    m_PersistentCalls:
-      m_Calls: []
-  onEndPress:
-    m_PersistentCalls:
-      m_Calls: []
---- !u!114 &1157977727
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1157977724}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 44d31676bc1b53d4eabd97dda90e808e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sensitivity: 100
-  clampPrefab: {fileID: 7051469727396962550, guid: 4565241fccd266147a078e252b27d27f,
-    type: 3}
-  somaClampPrefab: {fileID: 7706642781083156315, guid: c16f9a23908a54e4f8d89d95e3d7a90d,
-    type: 3}
-  clampControllerR: {fileID: 320645336}
-  clampControllerL: {fileID: 835806272}
-  allActive: 1
-  currentSimulation: {fileID: 0}
-  hitEvent: {fileID: 1157977726}
-  toggleDestroyOVR: 8192
-  toggleDestroyOVRS: 2097152
-  powerModifierPlusKey: 273
-  powerModifierMinusKey: 274
-  highlightOVR: 16384
-  highlightOVRS: 4194304
-  cancelCommand: 2
-  cancelCommandS: 8
-  cancelKey: 8
 --- !u!4 &1264370652 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8168634008055164510, guid: 01ee1288b45a4554d918c7499feabe0e,
@@ -5540,6 +5429,16 @@ PrefabInstance:
         type: 3}
     - target: {fileID: 3671467348768610598, guid: f49e57d0c1b71c4418326894ace9a9b5,
         type: 3}
+      propertyPath: clampManagerL
+      value: 
+      objectReference: {fileID: 835806272}
+    - target: {fileID: 3671467348768610598, guid: f49e57d0c1b71c4418326894ace9a9b5,
+        type: 3}
+      propertyPath: clampManagerR
+      value: 
+      objectReference: {fileID: 320645336}
+    - target: {fileID: 3671467348768610598, guid: f49e57d0c1b71c4418326894ace9a9b5,
+        type: 3}
       propertyPath: leftRaycaster
       value: 
       objectReference: {fileID: 0}
@@ -5608,6 +5507,12 @@ PrefabInstance:
       propertyPath: useVirtualReality
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3671467348768610598, guid: f49e57d0c1b71c4418326894ace9a9b5,
+        type: 3}
+      propertyPath: clampManagerPrefab
+      value: 
+      objectReference: {fileID: 6795881404616055386, guid: d8622d069a9db4c4f87e2d042743a9ef,
+        type: 3}
     - target: {fileID: 3671467348768610598, guid: f49e57d0c1b71c4418326894ace9a9b5,
         type: 3}
       propertyPath: ovrRightHandAnchor
@@ -5751,6 +5656,85 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 3671467347388522957}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &6795881405740469286
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 3671467347388522961}
+    m_Modifications:
+    - target: {fileID: 6795881404616055385, guid: d8622d069a9db4c4f87e2d042743a9ef,
+        type: 3}
+      propertyPath: clampControllerL
+      value: 
+      objectReference: {fileID: 835806272}
+    - target: {fileID: 6795881404616055385, guid: d8622d069a9db4c4f87e2d042743a9ef,
+        type: 3}
+      propertyPath: clampControllerR
+      value: 
+      objectReference: {fileID: 320645336}
+    - target: {fileID: 6795881404616055386, guid: d8622d069a9db4c4f87e2d042743a9ef,
+        type: 3}
+      propertyPath: m_Name
+      value: NeuronClampManager
+      objectReference: {fileID: 0}
+    - target: {fileID: 6795881404616055387, guid: d8622d069a9db4c4f87e2d042743a9ef,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6795881404616055387, guid: d8622d069a9db4c4f87e2d042743a9ef,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6795881404616055387, guid: d8622d069a9db4c4f87e2d042743a9ef,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6795881404616055387, guid: d8622d069a9db4c4f87e2d042743a9ef,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6795881404616055387, guid: d8622d069a9db4c4f87e2d042743a9ef,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6795881404616055387, guid: d8622d069a9db4c4f87e2d042743a9ef,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6795881404616055387, guid: d8622d069a9db4c4f87e2d042743a9ef,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6795881404616055387, guid: d8622d069a9db4c4f87e2d042743a9ef,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6795881404616055387, guid: d8622d069a9db4c4f87e2d042743a9ef,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6795881404616055387, guid: d8622d069a9db4c4f87e2d042743a9ef,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6795881404616055387, guid: d8622d069a9db4c4f87e2d042743a9ef,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: d8622d069a9db4c4f87e2d042743a9ef, type: 3}
 --- !u!1001 &8168634008602244503
 PrefabInstance:
   m_ObjectHideFlags: 0

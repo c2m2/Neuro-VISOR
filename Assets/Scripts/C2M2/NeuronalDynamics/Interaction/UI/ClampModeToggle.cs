@@ -1,41 +1,33 @@
 ﻿using UnityEngine;
+using C2M2.NeuronalDynamics.Simulation;
 namespace C2M2.NeuronalDynamics.Interaction.UI {
     public class ClampModeToggle : NDFeatureToggle
     {
         public override void OnToggle(RaycastHit hit, bool toggle)
         {
+
             if (toggle)
             {
                 Debug.Log("Clamp mode toggled on");
 
-                if(Sim.raycastEventManager == null)
+                foreach(NDSimulation sim in GameManager.instance.simulationManager.ActiveSimulations)
                 {
-                    Debug.LogError("No raycast event manager on simualtion");
-                    return;
+                    sim.raycastEventManager.LRTrigger = sim.clampManager.hitEvent;
                 }
-                if(GameManager.instance.ndClampManager == null)
-                {
-                    Debug.LogError("No clamp manager attached to GameManager");
-                    return;
-                }
-                if(GameManager.instance.ndClampManager.hitEvent == null)
-                {
-                    Debug.LogError("No hit event on clampmanager");
-                    return;
-                }
-                Sim.raycastEventManager.LRTrigger = GameManager.instance.ndClampManager.hitEvent;
             }
 
+            
             // Enable/Disable group clamp controllers
             if (GameManager.instance.vrDeviceManager.VRActive)
             {
-                if (GameManager.instance.ndClampManager.clampControllerL != null)
+                NeuronClampManager manager = GameManager.instance.simulationManager.ActiveSimulations[0].clampManager;
+                if (manager.clampControllerL != null)
                 {
-                    GameManager.instance.ndClampManager.clampControllerL.SetActive(toggle);
+                    manager.clampControllerL.SetActive(toggle);
                 }
-                if (GameManager.instance.ndClampManager.clampControllerR != null)
+                if (manager.clampControllerR != null)
                 {
-                    GameManager.instance.ndClampManager.clampControllerR.SetActive(toggle);
+                    manager.clampControllerR.SetActive(toggle);
                 }
             }
         }

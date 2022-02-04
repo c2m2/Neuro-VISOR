@@ -64,13 +64,8 @@ namespace C2M2.NeuronalDynamics.Interaction
             GameObject solveObj = new GameObject();
             solveObj.AddComponent<MeshFilter>();
             solveObj.AddComponent<MeshRenderer>();
-            GameObject parent = GameObject.FindGameObjectWithTag("NeuronContainer");
-            if(parent == null)
-            {
-                parent = new GameObject();
-                parent.name = "NeuronContainer";
-                parent.tag = "NeuronContainer";
-            }
+            GameObject parent = GameManager.instance.simulationManager.gameObject;
+
             solveObj.transform.parent = parent.transform;
 
             Type solverType = Type.GetType(solverName);

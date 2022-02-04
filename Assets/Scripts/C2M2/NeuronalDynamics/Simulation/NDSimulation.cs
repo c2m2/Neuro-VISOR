@@ -65,13 +65,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
         private Dictionary<double, Mesh> meshCache = new Dictionary<double, Mesh>();
 
         public NeuronClampManager clampManager = null;
-        public NeuronClampManager ClampManager
-        {
-            get
-            {
-                return GameManager.instance.ndClampManager;
-            }
-        }
         public List<NeuronClamp> clamps = new List<NeuronClamp>();
         internal readonly object clampLock = new object();
         private static readonly Tuple<int, double> nullClamp = new Tuple<int, double>(-1, -1);
@@ -362,6 +355,8 @@ namespace C2M2.NeuronalDynamics.Simulation {
         protected override void OnAwakePre()
         {
             UpdateGrid1D();
+            var clampManagerObj = GameObject.Instantiate(GameManager.instance.clampManagerPrefab);
+            clampManager = clampManagerObj.GetComponent<NeuronClampManager>();
             base.OnAwakePre();
         }
 

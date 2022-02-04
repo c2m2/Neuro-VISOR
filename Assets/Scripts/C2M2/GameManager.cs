@@ -9,6 +9,7 @@ namespace C2M2
     using Interaction.VR;
     using NeuronalDynamics.Interaction;
     using NeuronalDynamics.Interaction.UI;
+    using NeuronalDynamics.Simulation;
     using Simulation;
 
     /// <summary>
@@ -24,15 +25,16 @@ namespace C2M2
         public bool VRActive { get { return vrDeviceManager.VRActive; } }
 
         public GameObject cellPreviewer = null;
-        public List<Interactable> activeSims = null;
+        public NDSimulationManager simulationManager = null;
+        public List<Interactable> activeSims = new List<Interactable>();
+        public GameObject clampManagerPrefab = null;
+        public GameObject clampManagerL = null;
+        public GameObject clampManagerR = null;
 
         /// <summary>
         /// Allows solver threads to be synched
         /// </summary>
         public Barrier solveBarrier = new Barrier(0);
-
-        public NeuronClampManager ndClampManager = null;
-        public NDGraphManager ndGraphManager = null;
 
         [Header("Environment")]
         public int roomSelected = 0;
@@ -92,6 +94,12 @@ namespace C2M2
                     }
                 }
             }
+
+            // Initialize NDSimulationManager
+            GameObject simulationManagerObj  = new GameObject();
+            simulationManagerObj.name = "NeuronContainer";
+            simulationManagerObj.tag = "NeuronContainer";
+            simulationManager = simulationManagerObj.AddComponent<NDSimulationManager>();
 
             if (cellPreviewer != null)
             {

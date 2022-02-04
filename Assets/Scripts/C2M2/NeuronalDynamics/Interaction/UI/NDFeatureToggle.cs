@@ -8,9 +8,10 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
     public abstract class NDFeatureToggle : RaycastToggle
     {
         public NDBoardController boardController = null;
-        public NDSimulation Sim
+
+        public List<NDSimulation> Sims
         {
-            get { return (NDSimulation)GameManager.instance.activeSims[0]; }
+            get { return GameManager.instance.simulationManager.ActiveSimulations; }
         }
 
         private void Awake()

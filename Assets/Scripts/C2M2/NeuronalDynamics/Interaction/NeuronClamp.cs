@@ -21,7 +21,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         public bool ClampLive { get; private set; } = false;
 
         public double ClampPower { get; set; } = double.PositiveInfinity;
-        public NeuronClampManager ClampManager { get { return GameManager.instance.ndClampManager; } }
+        public NeuronClampManager ClampManager { get { return simulation.clampManager; } }
         public double MinPower { get { return ClampManager.MinPower; } }
         public double MaxPower { get { return ClampManager.MaxPower; } }
 
