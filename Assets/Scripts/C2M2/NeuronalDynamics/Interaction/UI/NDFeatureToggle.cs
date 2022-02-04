@@ -7,7 +7,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
 {
     public abstract class NDFeatureToggle : RaycastToggle
     {
-        public NDSimulationController simController = null;
+        public NDBoardController boardController = null;
         public NDSimulation Sim
         {
             get { return (NDSimulation)GameManager.instance.activeSims[0]; }
@@ -15,10 +15,10 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
 
         private void Awake()
         {
-            if (simController == null)
+            if (boardController == null)
             {
-                simController = GetComponentInParent<NDSimulationController>();
-                if (simController == null)
+                boardController = GetComponentInParent<NDBoardController>();
+                if (boardController == null)
                 {
                     Debug.LogError("No simulation controller found.");
                 }

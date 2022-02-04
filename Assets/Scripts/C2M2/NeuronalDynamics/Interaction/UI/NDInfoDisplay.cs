@@ -7,7 +7,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
 {
     public class NDInfoDisplay : MonoBehaviour
     {
-        public NDSimulationController simController = null;
+        public NDBoardController simController = null;
         public NDSimulation Sim
         {
             get
@@ -58,7 +58,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
 
                 if (simController == null)
                 {
-                    simController = GetComponentInParent<NDSimulationController>();
+                    simController = GetComponentInParent<NDBoardController>();
                     if (simController == null)
                     {
                         Debug.LogError("No sim controller given.");

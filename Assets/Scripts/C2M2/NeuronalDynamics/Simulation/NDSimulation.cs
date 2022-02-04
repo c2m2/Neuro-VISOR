@@ -414,7 +414,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 }
 
 
-                NDSimulationController controller = controlPanel.GetComponent<NDSimulationController>();
+                NDBoardController controller = controlPanel.GetComponent<NDBoardController>();
                 if (controller == null)
                 {
                     Debug.LogWarning("No NDSimulationController found.");

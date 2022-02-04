@@ -13,7 +13,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
         public RectTransform increaseButton = null;
         public RectTransform decreaseButton = null;
         public RectTransform resetButton = null;
-        public NDSimulationController simController = null;
+        public NDBoardController simController = null;
 
         private Color defaultCol = new Color(1f, 0.75f, 0f);
         public Color DefaultCol
@@ -129,7 +129,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
 
                 if(simController == null)
                 {
-                    simController = GetComponentInParent<NDSimulationController>();
+                    simController = GetComponentInParent<NDBoardController>();
                     if(simController == null)
                     {
                         Debug.LogWarning("Could not find simulation controller. Text colors could be wrong.");

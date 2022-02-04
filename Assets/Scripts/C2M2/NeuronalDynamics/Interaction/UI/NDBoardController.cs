@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace C2M2.NeuronalDynamics.Interaction.UI
 {
-    public class NDSimulationController : MonoBehaviour
+    public class NDBoardController : MonoBehaviour
     {
         public Color defaultCol = new Color(1f, 0.75f, 0f);
         public Color highlightCol = new Color(1f, 0.85f, 0.4f);

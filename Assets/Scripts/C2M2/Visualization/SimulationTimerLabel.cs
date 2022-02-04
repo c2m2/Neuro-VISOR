@@ -8,7 +8,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
     [RequireComponent(typeof(Simulation<,,,>))]
     public class SimulationTimerLabel : MonoBehaviour
     {
-        public NDSimulationController simController = null;
+        public NDBoardController simController = null;
         public Interactable Sim
         {
             get
@@ -35,7 +35,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
             }
             if(simController == null)
             {
-                simController = GetComponentInParent<NDSimulationController>();
+                simController = GetComponentInParent<NDBoardController>();
                 if(simController == null)
                 {
                     Debug.LogError("No simulation controller found.");

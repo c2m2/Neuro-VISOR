@@ -9,7 +9,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
 {
     public class GradientDisplay : MonoBehaviour
     {
-        public NDSimulationController simController = null;
+        public NDBoardController simController = null;
         public MeshSimulation Sim
         {
             get { return (MeshSimulation)GameManager.instance.activeSims[0]; }
@@ -82,7 +82,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
         {
             if(simController == null)
             {
-                simController = GetComponentInParent<NDSimulationController>();
+                simController = GetComponentInParent<NDBoardController>();
                 if(simController == null)
                 {
                     Debug.LogError("No simulation controller found.");
