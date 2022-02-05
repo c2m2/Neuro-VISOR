@@ -14,28 +14,25 @@ namespace C2M2.Simulation
     [RequireComponent(typeof(MeshRenderer))]
     public abstract class MeshSimulation : Simulation<float[], Mesh, VRRaycastableMesh, VRGrabbableMesh>
     {
-        #region Variables
-
-        /// <summary>
-        /// Gradient for coloring each surface point based on their scalar values
-        /// </summary>
-        public Gradient gradient;
+        public MeshSimulationManager Manager { get { return GameManager.instance.simulationManager; } }
+        #region Variables   
 
         /// <summary>
         /// Lookup table for more efficient color calculations on the gradient
         /// </summary>
-        public ColorLUT ColorLUT { get; private set; } = null;
-        /// <summary>
-        /// Alter the precision of the color scale display
-        /// </summary>
-        [Tooltip("Alter the precision of the color scale display")]
-        public int colorMarkerPrecision = 3;
+        public ColorLUT ColorLUT { get { return Manager.colorLUT; } }
 
-        public ColorLUT.ExtremaMethod extremaMethod { get; set; } = ColorLUT.ExtremaMethod.GlobalExtrema;
-        [Tooltip("Must be set if extremaMethod is set to GlobalExtrema")]
-        public float globalMax = float.NegativeInfinity;
-        [Tooltip("Must be set if extremaMethod is set to GlobalExtrema")]
-        public float globalMin = float.PositiveInfinity;
+        public float GlobalMax
+        {
+            get { return Manager.GlobalMax; }
+            set { Manager.GlobalMax = value; }
+        }
+
+        public float GlobalMin
+        {
+            get { return Manager.GlobalMin; }
+            set { Manager.GlobalMin = value; }
+        }
 
         /// <summary>
         /// Unit display string that can be manually set by the user
@@ -133,15 +130,8 @@ namespace C2M2.Simulation
             }
             void InitColors()
             {
-                // Initialize the color lookup table
-                ColorLUT = gameObject.AddComponent<ColorLUT>();
-                ColorLUT.Gradient = gradient;
-                ColorLUT.extremaMethod = extremaMethod;
-                if (extremaMethod == ColorLUT.ExtremaMethod.GlobalExtrema)
-                {
-                    ColorLUT.GlobalMax = globalMax;
-                    ColorLUT.GlobalMin = globalMin;
-                }
+                ColorLUT.GlobalMax = GlobalMax;
+                ColorLUT.GlobalMin = GlobalMin;
             }
 
             

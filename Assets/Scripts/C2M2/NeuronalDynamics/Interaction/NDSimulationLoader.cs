@@ -20,7 +20,6 @@ namespace C2M2.NeuronalDynamics.Interaction
         [Tooltip("Script name of the solver script.")]
         public string solverName = "C2M2.NeuronalDynamics.Simulation.SparseSolverTestv1";
         public string vrnFileName { get; set; } = "null";
-        public Gradient gradient;
         public float globalMin = float.PositiveInfinity;
         public float globalMax = float.NegativeInfinity;
         public string lengthScale = "μm";
@@ -95,15 +94,13 @@ namespace C2M2.NeuronalDynamics.Interaction
             {
                 // Set solver values
                 solver.vrnFileName = vrnFileName;
-                solver.gradient = gradient;
-                solver.globalMin = globalMin;
-                solver.globalMax = globalMax;
+                solver.GlobalMin = globalMin;
+                solver.GlobalMax = globalMax;
                 solver.timeStep = timestepSize;
                 solver.endTime = endTime;
                 solver.raycastHitValue = raycastHitValue;
                 solver.unit = unit;
                 solver.unitScaler = unitScaler;
-                solver.colorMarkerPrecision = colorScalePrecision;
 
                 try
                 {

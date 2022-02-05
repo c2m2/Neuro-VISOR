@@ -73,7 +73,7 @@ namespace C2M2.Visualization
             }
         }
 
-        private Gradient gradient;
+        private Gradient gradient = null;
         public Gradient Gradient
         {
             get { return gradient; }

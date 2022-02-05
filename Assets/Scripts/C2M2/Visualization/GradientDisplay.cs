@@ -5,26 +5,15 @@ using UnityEngine;
 using C2M2.Simulation;
 using TMPro;
 using C2M2.NeuronalDynamics.Simulation;
+using C2M2.Visualization;
 namespace C2M2.NeuronalDynamics.Interaction.UI
 {
     public class GradientDisplay : MonoBehaviour
     {
-        public NDBoardController simController = null;
-        public MeshSimulation Sim
-        {
-            get { return (MeshSimulation)GameManager.instance.activeSims[0]; }
-        }
-        public Gradient Gradient
-        {
-            get
-            {
-                return Sim.ColorLUT.Gradient;
-            }
-            set
-            {
-                Sim.ColorLUT.Gradient = value;
-            }
-        }
+        public NDBoardController boardController = null;
+        public NDSimulationManager SimManager { get { return GameManager.instance.simulationManager; } }
+        public ColorLUT ColorLUT { get { return SimManager.colorLUT; } }
+
         public LineRenderer gradientLine = null;
         public float displayLength = 75;
         public float displayHeight = 10;
@@ -39,36 +28,9 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
 
         public TextMarker[] textMarkers = new TextMarker[0];
 
-        public float UnitScaler
-        {
-            get
-            {
-                return Sim.unitScaler;
-            }
-            set
-            {
-                Sim.unitScaler = value;
-            }
-        }
-        public string Unit
-        {
-            get
-            {
-                return Sim.unit;
-            }
-            set
-            {
-                Sim.unit = value;
-            }
-        }
-
-        public string Precision
-        {
-            get
-            {
-                return "F" + Sim.colorMarkerPrecision;
-            }
-        }
+        public float UnitScaler { get { return SimManager.unitScaler; } }
+        public string Unit { get { return SimManager.unit; } }
+        public string Precision { get { return "F" + SimManager.colorMarkerPrecision; } }
 
         private float LineWidth
         {
@@ -80,10 +42,10 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
 
         private void Awake()
         {
-            if(simController == null)
+            if(boardController == null)
             {
-                simController = GetComponentInParent<NDBoardController>();
-                if(simController == null)
+                boardController = GetComponentInParent<NDBoardController>();
+                if(boardController == null)
                 {
                     Debug.LogError("No simulation controller found.");
                     Destroy(this);
@@ -105,8 +67,8 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
 
         private void Start()
         {
-            originalMin = Sim.ColorLUT.GlobalMin;
-            originalMax = Sim.ColorLUT.GlobalMax;
+            originalMin = ColorLUT.GlobalMin;
+            originalMax = ColorLUT.GlobalMax;
         }
 
         private IEnumerator UpdateDisplayRoutine()
@@ -123,9 +85,9 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
                 {
                     Debug.LogError(e);
                     // We set hasChanged to be true so that it tries to update the display again
-                    Sim.ColorLUT.hasChanged = true;
+                    ColorLUT.hasChanged = true;
                 }
-                yield return new WaitUntil(() => Sim.ColorLUT.hasChanged == true);
+                yield return new WaitUntil(() => ColorLUT.hasChanged == true);
             }
         }
 
@@ -151,9 +113,9 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
         private void UpdateDisplay()
         {
             // Fetch graddient from simulation's colorLUT
-            if (Sim.ColorLUT.hasChanged)
+            if (ColorLUT.hasChanged)
             {
-                GradientColorKey[] colorKeys = Gradient.colorKeys;
+                GradientColorKey[] colorKeys = ColorLUT.Gradient.colorKeys;
 
                 gradientLine.positionCount = colorKeys.Length;
                 Vector3[] positions = new Vector3[colorKeys.Length];
@@ -164,7 +126,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
 
                 gradientLine.SetPositions(positions);
 
-                gradientLine.colorGradient = Gradient;
+                gradientLine.colorGradient = ColorLUT.Gradient;
 
                 gradientLine.startWidth = displayHeight;
                 gradientLine.endWidth = displayHeight;
@@ -173,7 +135,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
 
                 UpdateTextMarkers();
 
-                Sim.ColorLUT.hasChanged = false;
+                ColorLUT.hasChanged = false;
             }
         }
         public void UpdateTextMarkers()
@@ -181,8 +143,8 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
             if (textMarkerHolder == null) { Debug.LogError("No text marker holder object found."); return; }
             if (textMarkerPrefab == null) { Debug.LogError("No text marker prefab found."); return; }
 
-            float max = UnitScaler * Sim.ColorLUT.GlobalMax;
-            float min = UnitScaler * Sim.ColorLUT.GlobalMin;
+            float max = UnitScaler * ColorLUT.GlobalMax;
+            float min = UnitScaler * ColorLUT.GlobalMin;
             float valueStep = (max - min) / (numTextMarkers - 1);
             float placementStep = displayLength / (numTextMarkers - 1);
 

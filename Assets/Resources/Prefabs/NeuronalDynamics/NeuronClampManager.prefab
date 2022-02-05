@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 6795881404616055387}
   - component: {fileID: 6795881404616055385}
   - component: {fileID: 6795881404616055384}
+  - component: {fileID: 4386680052802135837}
   m_Layer: 0
   m_Name: NeuronClampManager
   m_TagString: Untagged
@@ -123,3 +124,17 @@ MonoBehaviour:
   onEndPress:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &4386680052802135837
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6795881404616055386}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c228d908a83af14880592181725e735, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  extremaMethod: 1
+  poolMemory: 1

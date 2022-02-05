@@ -61,27 +61,24 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
         {
             get
             {
-                return GradDisplay.Sim.ColorLUT.GlobalMax;
+                return GradDisplay.ColorLUT.GlobalMax;
             }
             set
             {
                 if (value > GlobalMin)
                 {
-                    GradDisplay.Sim.ColorLUT.GlobalMax = value;
+                    GradDisplay.ColorLUT.GlobalMax = value;
                 }
             }
         }
         private float GlobalMin
         {
-            get
-            {
-                return GradDisplay.Sim.ColorLUT.GlobalMin;
-            }
+            get { return GradDisplay.ColorLUT.GlobalMin; }
             set
             {
                 if (value < GlobalMax)
                 {
-                    GradDisplay.Sim.ColorLUT.GlobalMin = value;
+                    GradDisplay.ColorLUT.GlobalMin = value;
                 }
             }
         }

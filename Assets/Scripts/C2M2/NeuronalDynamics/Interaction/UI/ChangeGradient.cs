@@ -58,7 +58,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
 
         public void ApplyGrad()
         {
-            display.Sim.ColorLUT.Gradient = gradients[activeGrad];
+            display.ColorLUT.Gradient = gradients[activeGrad];
             if (nameDisplay != null && gradientNames.Length == gradients.Length)
             {
                 nameDisplay.text = gradientNames[activeGrad];

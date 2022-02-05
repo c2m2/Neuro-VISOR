@@ -25,6 +25,10 @@ namespace C2M2
         public bool VRActive { get { return vrDeviceManager.VRActive; } }
 
         public GameObject cellPreviewer = null;
+        /// <summary>
+        /// Default gradient for coloring the mesh's surface
+        /// </summary>
+        public Gradient defaultGradient;
         public NDSimulationManager simulationManager = null;
         public List<Interactable> activeSims = new List<Interactable>();
         public GameObject clampManagerPrefab = null;

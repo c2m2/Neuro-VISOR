@@ -939,7 +939,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a20f2e558dd4954a84c98bd074c140e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  simController: {fileID: 0}
+  simController: {fileID: 4095725589123035993}
   gradientLine: {fileID: 6870607379871541682}
   displayLength: 75
   displayHeight: 10
@@ -5034,7 +5034,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 0.7490196, b: 0, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_Maskable: 1
   m_OnCullStateChanged:
