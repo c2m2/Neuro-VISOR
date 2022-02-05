@@ -3819,7 +3819,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b4a70f8fcfbb83845a49d1ffe05e547f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  simController: {fileID: 4095725589123035993}
+  boardController: {fileID: 4095725589123035993}
   defaultCol: {r: 0, g: 0, b: 0, a: 1}
   hoverCol: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   pressCol: {r: 1, g: 0.75, b: 0, a: 1}

@@ -6,14 +6,13 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
 {
     public class NDPauseButton : MonoBehaviour
     {
-        public NDBoardController simController = null;
-        public NDSimulation Sim { get { return (NDSimulation)GameManager.instance.activeSims[0]; } }
+        public NDBoardController boardController = null;
         public Color defaultCol;
         public Color DefaultCol
         {
             get
             {
-                return (simController == null) ? defaultCol : simController.defaultCol;
+                return (boardController == null) ? defaultCol : boardController.defaultCol;
             }
         }
         public Color hoverCol;
@@ -21,7 +20,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
         {
             get
             {
-                return (simController == null) ? hoverCol : simController.highlightCol;
+                return (boardController == null) ? hoverCol : boardController.highlightCol;
             }
         }
         public Color pressCol;
@@ -29,7 +28,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
         {
             get
             {
-                return (simController == null) ? pressCol : simController.pressedCol;
+                return (boardController == null) ? pressCol : boardController.pressedCol;
             }
         }
 
@@ -49,17 +48,16 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
                 {
                     Debug.LogError("No play button given.");
                     fatal = true;
-
                 }
                 if (pauseButton == null)
                 {
                     Debug.LogError("No pause button given.");
                     fatal = true;
                 }
-                if (simController == null)
+                if (boardController == null)
                 {
-                    simController = GetComponentInParent<NDBoardController>();
-                    if (simController == null)
+                    boardController = GetComponentInParent<NDBoardController>();
+                    if (boardController == null)
                     {
                         Debug.LogError("No sim controller found.");
                         fatal = true;
@@ -77,20 +75,28 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
         // Don't allow threads to keep running when application pauses or quits
         private void OnApplicationPause(bool pause)
         {
-            if (pause != Sim.paused) TogglePause();
+            if (pause != GameManager.instance.simulationManager.Paused) TogglePause();
+        }
+
+        // Use Paused as a shorthand
+        private bool Paused
+        {
+            get { return GameManager.instance.simulationManager.Paused; }
+            set { GameManager.instance.simulationManager.Paused = value; }
         }
 
         public void TogglePause()
         {
-            Sim.paused = !Sim.paused;
+            // Toggle pause state for all simulatuons
+            Paused = !Paused;
 
             UpdateDisplay();
         }
 
         private void UpdateDisplay()
         {
-            pauseButton.enabled = !Sim.paused;
-            playButton.enabled = Sim.paused;
+            pauseButton.enabled = !Paused;
+            playButton.enabled = Paused;
         }
 
         public void DefaultButtonCol() => ChangeButtonCol(DefaultCol);

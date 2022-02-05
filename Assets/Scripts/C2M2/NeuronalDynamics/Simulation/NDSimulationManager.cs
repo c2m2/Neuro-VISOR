@@ -6,6 +6,22 @@ namespace C2M2.NeuronalDynamics.Simulation
 {
     public class NDSimulationManager : MonoBehaviour
     {
+        private bool paused = false;
+        public bool Paused
+        {
+            get
+            {
+                return paused;
+            }
+            set
+            {
+                paused = value;
+                foreach(NDSimulation sim in ActiveSimulations)
+                {
+                    sim.paused = paused;
+                }
+            }
+        }
         public List<NDSimulation> ActiveSimulations
         {
             get
