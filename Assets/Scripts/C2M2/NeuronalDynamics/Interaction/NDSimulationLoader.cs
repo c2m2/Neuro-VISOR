@@ -44,7 +44,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         public int colorScalePrecision = 3;
 
         // TODO: Allow SparseSolverTestv1 to be a variable script
-        public void Load(RaycastHit hit)
+        public GameObject Load(RaycastHit hit)
         {
             GameObject solveObj = new GameObject();
             solveObj.AddComponent<MeshFilter>();
@@ -56,7 +56,7 @@ namespace C2M2.NeuronalDynamics.Interaction
                 if(solverType == null) Debug.LogError(solverName + " could not be found.");
                 else if(!solverType.IsSubclassOf(typeof(NDSimulation))) Debug.LogError(solverName + " is not a NDSimulation.");
                 Destroy(solveObj);
-                return;
+                return null;
             }
 
             solveObj.name = "(Solver)" + solverName.Substring(solverName.LastIndexOf('.') + 1);
@@ -98,6 +98,8 @@ namespace C2M2.NeuronalDynamics.Interaction
                     Debug.LogError(e);
                 }
             }
+
+            return solveObj;
         }
     }
 }
