@@ -918,6 +918,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   loader: {fileID: 99744259}
+  clampMng: {fileID: 1157977727}
 --- !u!1 &213382918
 GameObject:
   m_ObjectHideFlags: 0
@@ -3992,6 +3993,7 @@ MonoBehaviour:
   allActive: 1
   currentSimulation: {fileID: 0}
   hitEvent: {fileID: 1157977726}
+  clampIndices: 
   toggleDestroyOVR: 8192
   toggleDestroyOVRS: 2097152
   powerModifierPlusKey: 273

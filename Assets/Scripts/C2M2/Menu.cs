@@ -10,11 +10,14 @@ namespace C2M2
     using NeuronalDynamics.Interaction;
     using NeuronalDynamics.Interaction.UI;
 
+    /// <summary>
+    /// Provides Save and Load functionality for cells
+    /// </summary>
     public class Menu : MonoBehaviour
     {
-        private NDSimulation[] cells; // array of all the cells in the scene
         private CellData data; // data for each cell
         public NDSimulationLoader loader = null; // current loader used
+        public NeuronClampManager clampMng = null;
         private string path; // save/load file path (for now)
 
         void Awake()
@@ -24,6 +27,14 @@ namespace C2M2
 
         public void Save()
         {
+            if (clampMng == null)
+            {
+                Debug.Log("No clamp manager given to Menu!");
+                return;
+            }
+
+            NDSimulation[] cells; // array of all the cells in the scene
+
             cells = FindObjectsOfType<SparseSolverTestv1>(); // get all the cells in the scene
 
             if (cells.Length > 0)
@@ -48,10 +59,17 @@ namespace C2M2
                     data.unitScaler = cells[i].unitScaler;
                     data.colorMarkerPrecision = cells[i].colorMarkerPrecision;
 
+                    if (clampMng.clampIndices.Count > 0)
+                    {
+                        data.clampIndices = new List<int>();
+                        for (int j = 0; j < clampMng.clampIndices.Count; j++)
+                            data.clampIndices.Add(clampMng.clampIndices[j]);
+                    }
+
                     string json = JsonUtility.ToJson(data); // convert to Json
                     sw.Write(json);
                     if (i != limit)
-                        sw.Write(';'); // don't add delimiter if it's the last object
+                        sw.Write(';'); // add delimiter unless it's the last object
                 }
 
                 sw.Close();
@@ -60,7 +78,7 @@ namespace C2M2
 
         public void Load()
         {
-            if (loader != null)
+            if (loader != null && clampMng != null)
             {
                 ClearScene();
                 string[] json = File.ReadAllText(path).Split(';');
@@ -82,10 +100,18 @@ namespace C2M2
 
                     GameObject go = loader.Load(new RaycastHit()); // load the cell
                     go.transform.position = data.pos;
+
+                    NDSimulation sim = go.GetComponent<SparseSolverTestv1>();
+                    clampMng.currentSimulation = sim;
+
+                    // int clampIndex = data.clampIndex;
+                    NeuronClamp clamp;
+                    clamp = Instantiate(clampMng.clampPrefab, go.transform).GetComponentInChildren<NeuronClamp>();
+                    // clamp.AttachSimulation(sim, clampIndex);
                 }
             }
             else
-                Debug.LogError("No simulation loader given to Menu!");
+                Debug.LogError("Check that loader or clampMng are not null in Menu!");
         }
 
         public void ClearScene()
