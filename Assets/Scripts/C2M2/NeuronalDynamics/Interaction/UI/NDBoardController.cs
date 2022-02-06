@@ -20,6 +20,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
         public GameObject defaultBackground;
         public GameObject minimizedBackground;
 
+
         private bool Minimized
         {
             get

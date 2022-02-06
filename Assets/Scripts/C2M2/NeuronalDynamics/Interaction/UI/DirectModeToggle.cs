@@ -10,10 +10,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI {
             if (toggled)
             {
                 Debug.Log("Direct interaction turned on.");
-                foreach (NDSimulation sim in GameManager.instance.activeSims)
-                {
-                    sim.raycastEventManager.LRTrigger = sim.defaultRaycastEvent;
-                }
+                GameManager.instance.simulationManager.FeatState = NDSimulationManager.FeatureState.Direct;
             }
         }
     }

@@ -10,10 +10,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI {
             {
                 Debug.Log("Clamp mode toggled on");
 
-                foreach(NDSimulation sim in GameManager.instance.simulationManager.ActiveSimulations)
-                {
-                    sim.raycastEventManager.LRTrigger = sim.clampManager.hitEvent;
-                }
+                GameManager.instance.simulationManager.FeatState = NDSimulationManager.FeatureState.Clamp;
             }
 
             

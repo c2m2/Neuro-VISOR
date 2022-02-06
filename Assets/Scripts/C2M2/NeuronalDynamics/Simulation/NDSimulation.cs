@@ -282,6 +282,23 @@ namespace C2M2.NeuronalDynamics.Simulation {
             {
                 ShowInfoPanel(false, hit);
             });
+
+            switch (((NDSimulationManager)Manager).FeatState)
+            {
+                case (NDSimulationManager.FeatureState.Direct):
+                    raycastEventManager.LRTrigger = defaultRaycastEvent;
+                    break;
+                case (NDSimulationManager.FeatureState.Clamp):
+                    raycastEventManager.LRTrigger = clampManager.hitEvent;
+                    break;
+                case (NDSimulationManager.FeatureState.Plot):
+                    raycastEventManager.LRTrigger = graphManager.hitEvent;
+                    break;
+                case (NDSimulationManager.FeatureState.Synapse):
+
+                    break;
+            }
+            
         }
         /// <summary>
         /// Translate 1D vertex values to 3D values and pass them upwards for visualization

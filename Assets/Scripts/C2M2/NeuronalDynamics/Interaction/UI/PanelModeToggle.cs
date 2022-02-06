@@ -11,11 +11,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
         {
             if (toggled)
             {
-                // Set NDSimulation's event to that event
-                foreach(NDSimulation sim in GameManager.instance.simulationManager.ActiveSimulations)
-                {
-                    sim.raycastEventManager.LRTrigger = sim.graphManager.hitEvent;
-                }
+                GameManager.instance.simulationManager.FeatState = NDSimulationManager.FeatureState.Plot;
                 
                 Debug.Log("Panel interaction turned on.");
             }
