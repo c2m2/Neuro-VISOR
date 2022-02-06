@@ -272,14 +272,27 @@ namespace C2M2.NeuronalDynamics.Simulation
         {
             ///<c>if ((i * k >= 0.015) && SomaOn) { U[0] = vstart; }</c> this checks of the somaclamp is on and sets the soma location to <c>vstart</c>
             ///if ((t * k >= 0.015) && SomaOn) { U[0] = vstart; }
+
+            /// this is the first step in the strang splitting
+            N.Add(fN(U_Active, N).Multiply(timeStep / 2), N);
+            M.Add(fM(U_Active, M).Multiply(timeStep / 2), M);
+            H.Add(fH(U_Active, H).Multiply(timeStep / 2), H);
+
+            R.SetSubVector(0, Neuron.nodes.Count, reactF(reactConst, U_Active, N, M, H, cap));
+            R.Multiply(timeStep/2, R);
+            U_Active.Add(R, U_Active);
+
+            /// this is the second step in the strang splitting
             ///This part does the diffusion solve \n
             /// <c>r_csc.Multiply(U.ToArray(), b);</c> the performs the RHS*Ucurr and stores it in <c>b</c> \n
             /// <c>lu.Solve(b, b);</c> this does the forward/backward substitution of the LU solve and sovles LHS = b \n
             /// <c>U.SetSubVector(0, Neuron.vertCount, Vector.Build.DenseOfArray(b));</c> this sets the U vector to the voltage at the end of the diffusion solve
             r_csc.Multiply(U_Active.ToArray(), b);
             lu.Solve(b, b);
-            Vector bVector = Vector.Build.DenseOfArray(b);
-            U_Active.SetSubVector(0, Neuron.nodes.Count, bVector);
+            //Vector bVector = Vector.Build.DenseOfArray(b);
+            U_Active.SetSubVector(0, Neuron.nodes.Count, Vector.Build.DenseOfArray(b));
+
+            /// this is the third step in the strang splitting
             /// this part solves the reaction portion of the operator splitting \n
             /// <c>R.SetSubVector(0, Neuron.vertCount, reactF(reactConst, U, N, M, H, cap));</c> this first evaluates at the reaction function \f$r(V)\f$ \n
             /// <c>R.Multiply(k, R); </c> this multiplies by the time step size \n
@@ -291,9 +304,9 @@ namespace C2M2.NeuronalDynamics.Simulation
             U_Active.Add(R, U_Active);
             /// this part solve the state variables using Forward Euler
             /// the general rule is \f$N_{next} = N_{curr}+k\cdot f_N(U_{curr},N_{curr})\f$
-            N.Add(fN(U_Active, N).Multiply(timeStep), N);
-            M.Add(fM(U_Active, M).Multiply(timeStep), M);
-            H.Add(fH(U_Active, H).Multiply(timeStep), H);
+            N.Add(fN(U_Active, N).Multiply(timeStep/2), N);
+            M.Add(fM(U_Active, M).Multiply(timeStep/2), M);
+            H.Add(fH(U_Active, H).Multiply(timeStep/2), H);
             ///<c>if ((i * k >= 0.015) && SomaOn) { U[0] = vstart; }</c> this checks of the somaclamp is on and sets the soma location to <c>vstart</c>
             ///if ((t * k >= 0.015) && SomaOn) { U[0] = vstart; }
         }
