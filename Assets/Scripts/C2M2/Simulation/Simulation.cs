@@ -225,6 +225,8 @@ namespace C2M2.Simulation
             PostSolve();
 
             Profiler.EndThreadProfiling();
+
+            solveThread = null;
         }
 
         public sealed override float GetSimulationTime() => curentTimeStep * (float)timeStep;
@@ -245,7 +247,7 @@ namespace C2M2.Simulation
             if (solveThread != null)
             {
                 cts.Cancel();
-                solveThread = null;             
+                solveThread = null;
             }
         }
 
