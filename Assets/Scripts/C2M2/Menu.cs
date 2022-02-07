@@ -20,6 +20,9 @@ namespace C2M2
         public NeuronClampManager clampMng = null;
         private string path; // save/load file path (for now)
 
+        // Simulation state
+        private NDPauseButton pauseBtn; // TODO: change how paused is saved; not best version right now
+
         void Awake()
         {
             path = Application.dataPath + "/save.dat";
@@ -43,10 +46,15 @@ namespace C2M2
                 StreamWriter sw = File.AppendText(path);
                 int limit = cells.Length - 1;
 
+                pauseBtn = FindObjectOfType<NDPauseButton>();
+
                 for (int i = 0; i <= limit; i++)
                 {
                     // fill in the variables to be saved
                     data = new CellData();
+
+                    data.paused = pauseBtn.PauseState;
+
                     data.pos = cells[i].transform.position;
                     data.vrnFileName = cells[i].vrnFileName;
                     data.gradient = cells[i].gradient;
@@ -115,6 +123,9 @@ namespace C2M2
                         }
                     }
                 }
+
+                pauseBtn = FindObjectOfType<NDPauseButton>();
+                pauseBtn.PauseState = data.paused;
             }
             else
                 Debug.LogError("Check that loader or clampMng are not null in Menu!");

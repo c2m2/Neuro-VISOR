@@ -12,6 +12,9 @@ namespace C2M2
     [System.Serializable]
     public class CellData
     {
+        // Simulation state
+        public bool paused;
+
         // Neuron data
         public Vector3 pos;
         public string vrnFileName;
