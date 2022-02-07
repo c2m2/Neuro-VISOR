@@ -104,10 +104,16 @@ namespace C2M2
                     NDSimulation sim = go.GetComponent<SparseSolverTestv1>();
                     clampMng.currentSimulation = sim;
 
-                    // int clampIndex = data.clampIndex;
-                    NeuronClamp clamp;
-                    clamp = Instantiate(clampMng.clampPrefab, go.transform).GetComponentInChildren<NeuronClamp>();
-                    // clamp.AttachSimulation(sim, clampIndex);
+                    List<int> clampIndices = data.clampIndices;
+                    if (clampIndices.Count > 0)
+                    {
+                        for (int j = 0; j < clampIndices.Count; j++)
+                        {
+                            NeuronClamp clamp;
+                            clamp = Instantiate(clampMng.clampPrefab, go.transform).GetComponentInChildren<NeuronClamp>();
+                            clamp.AttachSimulation(sim, clampIndices[j]);
+                        }
+                    }
                 }
             }
             else
