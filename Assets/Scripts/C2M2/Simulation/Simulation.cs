@@ -244,11 +244,7 @@ namespace C2M2.Simulation
         /// </summary>
         public void StopSimulation()
         {
-            if (solveThread != null)
-            {
-                cts.Cancel();
-                solveThread = null;
-            }
+            if (solveThread != null) cts.Cancel();
         }
 
         /// <summary>
