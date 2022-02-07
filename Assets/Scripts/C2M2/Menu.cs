@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -9,6 +10,7 @@ namespace C2M2
     using NeuronalDynamics.Simulation;
     using NeuronalDynamics.Interaction;
     using NeuronalDynamics.Interaction.UI;
+    using NeuronalDynamics.UGX;
 
     /// <summary>
     /// Provides Save and Load functionality for cells
@@ -54,6 +56,7 @@ namespace C2M2
                     data = new CellData();
 
                     data.paused = pauseBtn.PauseState;
+                    data.vals1D = cells[i].vals1D; // voltage at every node
 
                     data.pos = cells[i].transform.position;
                     data.vrnFileName = cells[i].vrnFileName;
@@ -109,7 +112,16 @@ namespace C2M2
                     GameObject go = loader.Load(new RaycastHit()); // load the cell
                     go.transform.position = data.pos;
 
+                    // recreate voltages at every node
                     NDSimulation sim = go.GetComponent<SparseSolverTestv1>();
+                    Neuron n = sim.Neuron;
+                    Tuple<int, double>[] values = new Tuple<int, double>[n.nodes.Count];
+
+                    for (int j = 0; j < n.nodes.Count; j++)
+                        values[j] = Tuple.Create(j, data.vals1D[j]);
+
+                    sim.Set1DValues(values);
+
                     clampMng.currentSimulation = sim;
 
                     List<int> clampIndices = data.clampIndices;

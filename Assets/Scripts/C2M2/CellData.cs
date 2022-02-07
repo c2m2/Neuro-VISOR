@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -14,6 +15,7 @@ namespace C2M2
     {
         // Simulation state
         public bool paused;
+        public double[] vals1D;
 
         // Neuron data
         public Vector3 pos;

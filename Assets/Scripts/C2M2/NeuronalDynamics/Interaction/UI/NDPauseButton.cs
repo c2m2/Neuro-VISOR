@@ -37,11 +37,12 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
         public Image pauseButton = null;
         public int buttonSize = 25;
 
+        // get and set the pause state of the simulation
         public bool PauseState 
         {
             get { return Sim.paused; }
             set { Sim.paused = value; }
-        } // Me
+        }
 
         private void Awake()
         {
