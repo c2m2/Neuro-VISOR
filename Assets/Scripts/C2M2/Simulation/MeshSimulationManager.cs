@@ -43,7 +43,7 @@ namespace C2M2.Simulation
         private static ColorLUT.ExtremaMethod extremaMethod { get; set; } = ColorLUT.ExtremaMethod.GlobalExtrema;
 
         public ColorLUT colorLUT { get; private set; } = null;
-        private void Awake()
+        protected virtual void Awake()
         {
             colorLUT = GetComponent<ColorLUT>();
             // Initialize the color lookup table

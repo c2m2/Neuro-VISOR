@@ -37,6 +37,8 @@ namespace C2M2.NeuronalDynamics.Simulation
             }
         }
 
+        public SynapseManager synapseManager = null;
+
         public enum FeatureState { Direct = 0, Clamp = 1, Plot = 2, Synapse = 3 };
         private FeatureState featState = FeatureState.Direct;
         public FeatureState FeatState
@@ -63,11 +65,40 @@ namespace C2M2.NeuronalDynamics.Simulation
                             sim.raycastEventManager.LRTrigger = sim.graphManager.hitEvent;
                             break;
                         case (FeatureState.Synapse):
-
+                            sim.raycastEventManager.LRTrigger = synapseManager.hitEvent;
                             break;
                     }
                 }
+
+                string s = "";
+                switch (featState)
+                {
+                    case (FeatureState.Direct):
+                        s = "Direct mode";
+                        break;
+                    case (FeatureState.Clamp):
+                        s = "Clamp mode";
+                        break;
+                    case (FeatureState.Plot):
+                        s = "Plot mode";
+                        break;
+                    case (FeatureState.Synapse):
+                        s = "Synapse mode";
+                        break;
+                }
+
+                Debug.Log(s + " active on all cells.");
             }
+        }
+
+        protected override void Awake()
+        {
+            // Add synapse manager
+            var synapseManagerObj = Instantiate(GameManager.instance.synapseManagerPrefab);
+            synapseManagerObj.transform.parent = transform;
+            synapseManager = synapseManagerObj.GetComponent<SynapseManager>();
+
+            base.Awake();
         }
     }
 }

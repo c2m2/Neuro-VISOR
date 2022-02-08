@@ -80,8 +80,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
         internal readonly object clampLock = new object();
         private static readonly Tuple<int, double> nullClamp = new Tuple<int, double>(-1, -1);
 
-        public SynapseManager synapseManager = null;
-
         public NDGraphManager graphManager { get; private set; } = null;
         public List<NDLineGraph> Graphs
         {
@@ -411,11 +409,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
             // parent new clamp manager under this simulation
             clampManagerObj.transform.parent = transform;
             clampManager = clampManagerObj.GetComponent<NeuronClampManager>();
-
-            // Add synapse manager
-            var synapseManagerObj = Instantiate(GameManager.instance.synapseManagerPrefab);
-            synapseManagerObj.transform.parent = transform;
-            synapseManager = synapseManagerObj.GetComponent<SynapseManager>();
 
             base.OnAwakePre();
         }
