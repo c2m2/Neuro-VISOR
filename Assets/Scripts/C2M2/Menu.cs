@@ -73,8 +73,17 @@ namespace C2M2
                     if (clampMng.clampIndices.Count > 0)
                     {
                         data.clampIndices = new List<int>();
+                        data.clmp = new ClampData[clampMng.clampIndices.Count];
+
                         for (int j = 0; j < clampMng.clampIndices.Count; j++)
+                        {
                             data.clampIndices.Add(clampMng.clampIndices[j]);
+
+                            data.clmp[j] = new ClampData();
+                            data.clmp[j].vertex = cells[i].clamps[j].focusVert;
+                            data.clmp[j].live = cells[i].clamps[j].ClampLive;
+                            data.clmp[j].power = cells[i].clamps[j].ClampPower;
+                        }
                     }
 
                     string json = JsonUtility.ToJson(data); // convert to Json
@@ -111,20 +120,18 @@ namespace C2M2
 
                     GameObject go = loader.Load(new RaycastHit()); // load the cell
                     go.transform.position = data.pos;
+                    NDSimulation sim = go.GetComponent<SparseSolverTestv1>();
 
                     // recreate voltages at every node
-                    NDSimulation sim = go.GetComponent<SparseSolverTestv1>();
-                    Neuron n = sim.Neuron;
-                    Tuple<int, double>[] values = new Tuple<int, double>[n.nodes.Count];
-
-                    for (int j = 0; j < n.nodes.Count; j++)
+                    Tuple<int, double>[] values = new Tuple<int, double>[data.vals1D.Length];
+                    for (int j = 0; j < data.vals1D.Length; j++)
                         values[j] = Tuple.Create(j, data.vals1D[j]);
-
                     sim.Set1DValues(values);
 
+                    // recreate clamps
                     clampMng.currentSimulation = sim;
-
                     List<int> clampIndices = data.clampIndices;
+                    ClampData[] c = new ClampData[clampIndices.Count];
                     if (clampIndices.Count > 0)
                     {
                         for (int j = 0; j < clampIndices.Count; j++)
@@ -132,10 +139,17 @@ namespace C2M2
                             NeuronClamp clamp;
                             clamp = Instantiate(clampMng.clampPrefab, go.transform).GetComponentInChildren<NeuronClamp>();
                             clamp.AttachSimulation(sim, clampIndices[j]);
+
+                            c[j] = new ClampData();
+                            c[j] = data.clmp[j];
+                            clamp.focusVert = c[j].vertex;
+                            if (c[j].live) clamp.ActivateClamp();
+                            clamp.ClampPower = c[j].power;
                         }
                     }
                 }
 
+                // load pause button state
                 pauseBtn = FindObjectOfType<NDPauseButton>();
                 pauseBtn.PauseState = data.paused;
             }

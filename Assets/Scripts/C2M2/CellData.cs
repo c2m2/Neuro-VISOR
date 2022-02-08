@@ -33,5 +33,6 @@ namespace C2M2
 
         // Clamp data
         public List<int> clampIndices;
+        public ClampData[] clmp;
     }
 }

@@ -25,7 +25,9 @@ namespace C2M2.NeuronalDynamics.Interaction
         public double MinPower { get { return ClampManager.MinPower; } }
         public double MaxPower { get { return ClampManager.MaxPower; } }
 
-        public int focusVert { get; private set; } = -1;
+        // public int focusVert { get; private set; } = -1; // Me
+        public int focusVert { get; set; } = -1;
+
         public Vector3 FocusPos
         {
             get { return simulation.Verts1D[focusVert]; }
