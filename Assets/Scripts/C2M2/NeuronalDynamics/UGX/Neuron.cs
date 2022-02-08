@@ -31,6 +31,7 @@ namespace C2M2.NeuronalDynamics.UGX
         public List<int> somaIDs = new List<int>();
 
         public double MaxRadius = new double();
+        public double MinRadius = new double();
         public double TargetEdgeLength = new double();
 
         /// <summary>
@@ -87,6 +88,7 @@ namespace C2M2.NeuronalDynamics.UGX
         {
             Vector3[] gridMeshVertices = grid.Mesh.vertices;
             MaxRadius = 0;
+            MinRadius = 1e10;
             TargetEdgeLength = 0;
 
             VertexAttachementAccessor<DiameterData> diameterAccessor = new VertexAttachementAccessor<DiameterData>(grid);
@@ -107,6 +109,7 @@ namespace C2M2.NeuronalDynamics.UGX
                 };
 
                 if ((tempNode.NodeRadius>=MaxRadius )){ MaxRadius = tempNode.NodeRadius; }
+                if ((tempNode.NodeRadius <= MinRadius)) { MinRadius = tempNode.NodeRadius; }
 
                 nodes.Add(tempNode);
             }
@@ -142,6 +145,7 @@ namespace C2M2.NeuronalDynamics.UGX
 
             somaIDs = grid.Subsets["soma"].Indices.ToList();
         }
+        
         /// <summary>
         /// This small routine writes the geometry file that is used to an output file in .swc format
         /// </summary>

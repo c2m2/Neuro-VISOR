@@ -18,7 +18,7 @@ namespace C2M2
     public class GameManager : MonoBehaviour
     {
         public static GameManager instance = null;
-        
+
         public int mainThreadId { get; private set; } = -1;
 
         public VRDeviceManager vrDeviceManager = null;
@@ -39,6 +39,11 @@ namespace C2M2
         /// Allows solver threads to be synched
         /// </summary>
         public Barrier solveBarrier = new Barrier(0);
+
+        public NeuronClampManager ndClampManager = null;
+        public NDGraphManager ndGraphManager = null;
+
+        public GameObject Synapse = null;
 
         [Header("Environment")]
         public int roomSelected = 0;

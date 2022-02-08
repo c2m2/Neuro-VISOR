@@ -86,7 +86,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         {
             ClampPower = (MaxPower - MinPower) / 2;
         }
-        private void FixedUpdate()
+        private void Update()
         {
             if(simulation != null)
             {

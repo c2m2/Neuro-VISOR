@@ -2471,6 +2471,161 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1058183489}
   m_CullTransparentMesh: 0
+--- !u!1001 &1071786428
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 3408630298987087350, guid: 2f0923ceccc20d14596cfdf211bc5ef6,
+        type: 3}
+      propertyPath: pass
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 3408630298987087350, guid: 2f0923ceccc20d14596cfdf211bc5ef6,
+        type: 3}
+      propertyPath: arrow
+      value: 
+      objectReference: {fileID: 5954688046854600746, guid: 4f3ad9ad58453a849a6b5c23e68e4860,
+        type: 3}
+    - target: {fileID: 3408630298987087350, guid: 2f0923ceccc20d14596cfdf211bc5ef6,
+        type: 3}
+      propertyPath: material
+      value: 
+      objectReference: {fileID: 2100000, guid: 3fcb633593a8eff4c82f6e9f2e3df6da, type: 2}
+    - target: {fileID: 3408630298987087350, guid: 2f0923ceccc20d14596cfdf211bc5ef6,
+        type: 3}
+      propertyPath: PostSynapse
+      value: 
+      objectReference: {fileID: 2031213480700699263, guid: 9b67fc3886af4d643b1546efc26bd3c0,
+        type: 3}
+    - target: {fileID: 3408630298987087350, guid: 2f0923ceccc20d14596cfdf211bc5ef6,
+        type: 3}
+      propertyPath: updateArrow
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 3408630298987087350, guid: 2f0923ceccc20d14596cfdf211bc5ef6,
+        type: 3}
+      propertyPath: LatchDistance
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3408630298987087350, guid: 2f0923ceccc20d14596cfdf211bc5ef6,
+        type: 3}
+      propertyPath: SynapseManager
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 3408630298987087350, guid: 2f0923ceccc20d14596cfdf211bc5ef6,
+        type: 3}
+      propertyPath: PrefabPreSynapse
+      value: 
+      objectReference: {fileID: 688227186299511278, guid: 19572d8d06f0512458da9103e290bc40,
+        type: 3}
+    - target: {fileID: 3408630298987087350, guid: 2f0923ceccc20d14596cfdf211bc5ef6,
+        type: 3}
+      propertyPath: PrefabPostSynapse
+      value: 
+      objectReference: {fileID: 4257410569642714750, guid: 9b67fc3886af4d643b1546efc26bd3c0,
+        type: 3}
+    - target: {fileID: 3408630298987087351, guid: 2f0923ceccc20d14596cfdf211bc5ef6,
+        type: 3}
+      propertyPath: m_Name
+      value: SynapseTEST
+      objectReference: {fileID: 0}
+    - target: {fileID: 3408630298987087351, guid: 2f0923ceccc20d14596cfdf211bc5ef6,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3408630298987087354, guid: 2f0923ceccc20d14596cfdf211bc5ef6,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 3408630298987087354, guid: 2f0923ceccc20d14596cfdf211bc5ef6,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 1.435
+      objectReference: {fileID: 0}
+    - target: {fileID: 3408630298987087354, guid: 2f0923ceccc20d14596cfdf211bc5ef6,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.1379
+      objectReference: {fileID: 0}
+    - target: {fileID: 3408630298987087354, guid: 2f0923ceccc20d14596cfdf211bc5ef6,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.42
+      objectReference: {fileID: 0}
+    - target: {fileID: 3408630298987087354, guid: 2f0923ceccc20d14596cfdf211bc5ef6,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.4127493
+      objectReference: {fileID: 0}
+    - target: {fileID: 3408630298987087354, guid: 2f0923ceccc20d14596cfdf211bc5ef6,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.603496
+      objectReference: {fileID: 0}
+    - target: {fileID: 3408630298987087354, guid: 2f0923ceccc20d14596cfdf211bc5ef6,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.53468513
+      objectReference: {fileID: 0}
+    - target: {fileID: 3408630298987087354, guid: 2f0923ceccc20d14596cfdf211bc5ef6,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.4237245
+      objectReference: {fileID: 0}
+    - target: {fileID: 3408630298987087354, guid: 2f0923ceccc20d14596cfdf211bc5ef6,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -2.5830002
+      objectReference: {fileID: 0}
+    - target: {fileID: 3408630298987087354, guid: 2f0923ceccc20d14596cfdf211bc5ef6,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -107.48701
+      objectReference: {fileID: 0}
+    - target: {fileID: 3408630298987087354, guid: 2f0923ceccc20d14596cfdf211bc5ef6,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 95.025
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 3408630298987087355, guid: 2f0923ceccc20d14596cfdf211bc5ef6, type: 3}
+    - {fileID: 3408630298987087352, guid: 2f0923ceccc20d14596cfdf211bc5ef6, type: 3}
+    - {fileID: 3408630298987087353, guid: 2f0923ceccc20d14596cfdf211bc5ef6, type: 3}
+    - {fileID: 3408630298987087350, guid: 2f0923ceccc20d14596cfdf211bc5ef6, type: 3}
+  m_SourcePrefab: {fileID: 100100000, guid: 2f0923ceccc20d14596cfdf211bc5ef6, type: 3}
+--- !u!1 &1071786429 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3408630298987087351, guid: 2f0923ceccc20d14596cfdf211bc5ef6,
+    type: 3}
+  m_PrefabInstance: {fileID: 1071786428}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1071786430
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1071786429}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6a88abe41ec92854cb921791a0e7ae0e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SynapticNodeLocation: []
+  PrefabPreSynapse: {fileID: 688227186299511278, guid: 19572d8d06f0512458da9103e290bc40,
+    type: 3}
+  PrefabPostSynapse: {fileID: 4257410569642714750, guid: 9b67fc3886af4d643b1546efc26bd3c0,
+    type: 3}
+  synapses: []
+  synapseLocations: []
+  arrow: {fileID: 5954688046854600746, guid: 4f3ad9ad58453a849a6b5c23e68e4860, type: 3}
+  numOfDeletionFrames: 75
+  curSimulation: {fileID: 0}
 --- !u!1 &1098955826
 GameObject:
   m_ObjectHideFlags: 0
@@ -5366,6 +5521,11 @@ PrefabInstance:
       propertyPath: useVR
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3671467348768610598, guid: f49e57d0c1b71c4418326894ace9a9b5,
+        type: 3}
+      propertyPath: Synapse
+      value: 
+      objectReference: {fileID: 1071786429}
     - target: {fileID: 3671467348768610598, guid: f49e57d0c1b71c4418326894ace9a9b5,
         type: 3}
       propertyPath: c2m2Room

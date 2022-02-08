@@ -98,53 +98,53 @@ namespace C2M2.Visualization
 
 
         /// <summary> Given the extrema method, color an entire array of scalers using the LUT </summary>
-        public Color32[] Evaluate(float[] unscaledTimes)
+        public Color32[] Evaluate(float[] unscaledValues) //TODO investigate this more. Performance is bad. Also extrema method and user controlling min and max are problematic
         {
-            if (unscaledTimes == null || unscaledTimes.Length == 0) return null;
+            if (unscaledValues == null || unscaledValues.Length == 0) return null;
 
             // If we haven't built the LUT yet, and we have a gradient, build the LUT
             if (lut == null)
                 lut = BuildLUT(gradient, lutRes);
             // Rescale array based on extrema values
-            unscaledTimes = RescaleArray(unscaledTimes, extremaMethod);
+            float[] scaledTimes = RescaleArray(unscaledValues, extremaMethod);
 
             Color32[] cols;
             if (poolMemory)
             {
                 // Initialize the memory pool if necessary
-                if(memPool == null || memPool.Length != unscaledTimes.Length)
+                if(memPool == null || memPool.Length != scaledTimes.Length)
                 {
-                    memPool = new Color32[unscaledTimes.Length];
+                    memPool = new Color32[scaledTimes.Length];
                 }
                 cols = memPool;
             }
             else
             {
-                cols = new Color32[unscaledTimes.Length];
+                cols = new Color32[scaledTimes.Length];
             }
 
-            for (int i = 0; i < unscaledTimes.Length; i++)
+            for (int i = 0; i < scaledTimes.Length; i++)
             {
-                cols[i] = lut[Math.Clamp((int)unscaledTimes[i], 0, lutRes - 1)];
+                cols[i] = lut[Math.Clamp((int)scaledTimes[i], 0, lutRes - 1)];
             }
 
             return cols;
         }
         /// <summary>
-        /// Calculate color at a given time.
+        /// Calculate color of a single value
         /// </summary>
-        public Color32 Evaluate(float unscaledTime)
+        public Color32 Evaluate(float unscaledValue)
         {
             // If we haven't built the LUT yet, and we have a gradient, build the LUT
             if (lut == null)
                 lut = BuildLUT(gradient, lutRes);
 
-            float[] scalars = new float[] { GlobalMin, unscaledTime, GlobalMax };
+            float[] scalars = new float[] { unscaledValue };
 
             // Todo: this only rescales based on global extrema method
-            scalars.RescaleArray(0f, (lutRes - 1), GlobalMin, GlobalMax);
+            scalars.RescaleArray(0f, lutRes - 1, GlobalMin, GlobalMax);
 
-            return lut[Math.Clamp((int)scalars[1], 0, lutRes-1)];
+            return lut[Math.Clamp((int)scalars[0], 0, lutRes - 1)];
         }
 
         // Build a LUT without a gradient object by manually assigning color keys
@@ -162,11 +162,10 @@ namespace C2M2.Visualization
             }
 
             Color32[] gradientLUT = new Color32[lutRes];
-            int maxInd = lutRes;
             // Subtract one from lutRes so we can divide across the gradient's range
             lutRes--;
 
-            for (int i = 0; i < maxInd; i++)
+            for (int i = 0; i < lutRes+1; i++)
             {
                 gradientLUT[i] = gradient.Evaluate((float)i / lutRes);
             }
@@ -174,27 +173,21 @@ namespace C2M2.Visualization
             return gradientLUT;
         }
 
-        public float oldMin { get; private set; } = 0;
-        public float oldMax { get; private set; } = 0;
         private float[] RescaleArray(float[] scalars, ExtremaMethod extremaMethod)
         {
-            oldMin = 0;
-            oldMax = 0;
-            GetMinMax(scalars, extremaMethod);
             // Rescale based on extrema
-            scalars.RescaleArray(0f, (lutRes - 1), oldMin, oldMax);
+            (float, float) minMax = GetMinMax(scalars, extremaMethod);
+            scalars.RescaleArray(0f, lutRes - 1, minMax.Item1, minMax.Item2);
             return scalars;
         }
 
-        public void GetMinMax(float[] scalars, ExtremaMethod extremaMethod)
+        public (float, float) GetMinMax(float[] scalars, ExtremaMethod extremaMethod)
         {
             switch (extremaMethod)
             {
-                case (ExtremaMethod.LocalExtrema):
-                    oldMin = scalars.Min();
-                    oldMax = scalars.Max();
-                    break;
-                case (ExtremaMethod.GlobalExtrema):
+                case ExtremaMethod.LocalExtrema:
+                    return (scalars.Min(), scalars.Max());
+                case ExtremaMethod.GlobalExtrema:
 
                     // The user requested a custom global max, but didn't set one.
                     if (GlobalMax == float.NegativeInfinity || GlobalMin == float.PositiveInfinity)
@@ -203,16 +196,14 @@ namespace C2M2.Visualization
                         GlobalMin = scalars.Min();
                         GlobalMax = scalars.Max();
                     }
-                    oldMin = GlobalMin;
-                    oldMax = GlobalMax;
-                    break;
-                case (ExtremaMethod.RollingExtrema):
+                    return (GlobalMin, GlobalMax);
+                case ExtremaMethod.RollingExtrema:
                     // If localMax > globalMax, replace globalMax
                     GlobalMax = Max(GlobalMax, scalars.Max());
                     GlobalMin = Min(GlobalMin, scalars.Min());
-                    oldMin = GlobalMin;
-                    oldMax = GlobalMax;
-                    break;
+                    return (GlobalMin, GlobalMax);
+                default:
+                    return (0, 0);
             }
         }
     }
