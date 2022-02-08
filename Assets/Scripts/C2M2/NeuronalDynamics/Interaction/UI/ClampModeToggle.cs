@@ -8,8 +8,6 @@ namespace C2M2.NeuronalDynamics.Interaction.UI {
 
             if (toggle)
             {
-                Debug.Log("Clamp mode toggled on");
-
                 GameManager.instance.simulationManager.FeatState = NDSimulationManager.FeatureState.Clamp;
             }
 

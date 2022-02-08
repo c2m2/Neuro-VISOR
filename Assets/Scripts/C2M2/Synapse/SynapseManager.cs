@@ -232,41 +232,40 @@ public class SynapseManager : MonoBehaviour
     /// </summary>
     void placeArrow()
     {
-        if (Simulation != null)
+        if (Simulation == null) return;
+
+        // Only true if we have placed the post-synapse
+        if (count != 2) return;
+
+        for (int i = synapses.Count - 2; i < synapses.Count - 1; i++)
         {
-            // Only true if we have placed the post-synapse
-            if (count == 2)
+            // for each pre-synapse attach an arrow gameobject
+            if (i % 2 == 0)
             {
-                for (int i = synapses.Count - 2; i < synapses.Count - 1; i++)
-                {
-                    // for each pre-synapse attach an arrow gameobject
-                    if (i % 2 == 0)
-                    {
-                        GameObject arrowHead;
-                        Transform preSynapse = synapses[i].prefab.transform;
-                        Transform postSynapse = synapses[i + 1].prefab.transform;
+                GameObject arrowHead;
+                Transform preSynapse = synapses[i].prefab.transform;
+                Transform postSynapse = synapses[i + 1].prefab.transform;
 
-                        // Create a new arrow in 3D space
-                        arrowHead = Instantiate(arrow, new Vector3(0, 0, 0), Quaternion.identity) as GameObject;
-                        /* Use Vector3 lerp so the position does not set it to the middle of the pre synapse but rather in the middle
-                        of both the pre-synapse and post-synapse*/
-                        arrowHead.transform.position = Vector3.Lerp(preSynapse.position, postSynapse.position, 0.5f);
-                        arrowHead.transform.LookAt(postSynapse.position);
+                // Create a new arrow in 3D space
+                arrowHead = Instantiate(arrow, new Vector3(0, 0, 0), Quaternion.identity) as GameObject;
+                /* Use Vector3 lerp so the position does not set it to the middle of the pre synapse but rather in the middle
+                of both the pre-synapse and post-synapse*/
+                arrowHead.transform.position = Vector3.Lerp(preSynapse.position, postSynapse.position, 0.5f);
+                arrowHead.transform.LookAt(postSynapse.position);
 
-                        // Adjust the z scale of the arrow so we can point correctly to the post-synapse
-                        // We can calculate this by the distance of the two synapses
-                        arrowHead.transform.localScale = new Vector3(preSynapse.lossyScale.x / 4, preSynapse.lossyScale.x / 4, Vector3.Distance(preSynapse.position, postSynapse.position));
-                        arrowHead.transform.SetParent(preSynapse);
+                // Adjust the z scale of the arrow so we can point correctly to the post-synapse
+                // We can calculate this by the distance of the two synapses
+                arrowHead.transform.localScale = new Vector3(preSynapse.lossyScale.x / 4, preSynapse.lossyScale.x / 4, Vector3.Distance(preSynapse.position, postSynapse.position));
+                arrowHead.transform.SetParent(preSynapse);
 
-                        // Add the method to update arrows when user moves the neurons
-                        arrowHead.AddComponent<ArrowUpdate>();
-                        arrowHead.GetComponent<ArrowUpdate>().preSynapse = preSynapse;
-                        arrowHead.GetComponent<ArrowUpdate>().postSynapse = postSynapse;
-                    }
-                }
-                count = 0;
+                // Add the method to update arrows when user moves the neurons
+                arrowHead.AddComponent<ArrowUpdate>();
+                arrowHead.GetComponent<ArrowUpdate>().preSynapse = preSynapse;
+                arrowHead.GetComponent<ArrowUpdate>().postSynapse = postSynapse;
             }
         }
+        count = 0;
+
     }
 
 }
