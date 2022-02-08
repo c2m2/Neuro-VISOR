@@ -18,8 +18,6 @@ namespace C2M2.NeuronalDynamics.Interaction
 
         public GameObject clampPrefab = null;
         public GameObject somaClampPrefab = null;
-        public GameObject clampControllerR = null;
-        public GameObject clampControllerL = null;
         private NeuronClamp previewClamp = null;
         public bool allActive = false;
         public NDSimulation currentSimulation = null;

@@ -35,6 +35,8 @@ namespace C2M2
         public GameObject clampManagerL = null;
         public GameObject clampManagerR = null;
 
+        public GameObject synapseManagerPrefab = null;
+
         /// <summary>
         /// Allows solver threads to be synched
         /// </summary>
