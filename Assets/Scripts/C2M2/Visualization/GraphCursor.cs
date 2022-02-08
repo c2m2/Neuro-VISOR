@@ -147,7 +147,7 @@ namespace C2M2.Visualization
 
             // Get the cursor's nearest value in the graph
             int ind = Mathf.RoundToInt((truePos.x / GraphWidth) * NumSamples);
-            ind = Mathf.Clamp(ind, 0, lineGraph.positions.Count);
+            ind = Mathf.Clamp(ind, 0, lineGraph.positions.Count-1);
             Vector3 labelValue = lineGraph.positions[ind];
 
             // Latch the cursor to a value on the graph
