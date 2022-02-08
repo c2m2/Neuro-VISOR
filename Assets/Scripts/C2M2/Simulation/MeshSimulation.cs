@@ -14,7 +14,7 @@ namespace C2M2.Simulation
     [RequireComponent(typeof(MeshRenderer))]
     public abstract class MeshSimulation : Simulation<float[], Mesh, VRRaycastableMesh, VRGrabbableMesh>
     {
-        public MeshSimulationManager Manager { get { return GameManager.instance.simulationManager; } }
+        public virtual MeshSimulationManager Manager { get { return GameManager.instance.simulationManager; } }
         #region Variables   
 
         /// <summary>

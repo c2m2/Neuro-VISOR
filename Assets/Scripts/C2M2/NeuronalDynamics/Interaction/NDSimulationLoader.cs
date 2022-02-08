@@ -88,6 +88,8 @@ namespace C2M2.NeuronalDynamics.Interaction
 
             solver.Initialize();
 
+            solver.Manager.FeatState = solver.Manager.FeatState;
+
             transform.gameObject.SetActive(false);
 
             void TransferValues()

@@ -27,6 +27,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
     /// </remarks>
     public abstract class NDSimulation : MeshSimulation {
 
+        public new NDSimulationManager Manager { get { return (NDSimulationManager)GameManager.instance.simulationManager; } }
         private double visualInflation = 1;
         public double VisualInflation
         {
@@ -282,22 +283,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
             {
                 ShowInfoPanel(false, hit);
             });
-
-            switch (((NDSimulationManager)Manager).FeatState)
-            {
-                case (NDSimulationManager.FeatureState.Direct):
-                    raycastEventManager.LRTrigger = defaultRaycastEvent;
-                    break;
-                case (NDSimulationManager.FeatureState.Clamp):
-                    raycastEventManager.LRTrigger = clampManager.hitEvent;
-                    break;
-                case (NDSimulationManager.FeatureState.Plot):
-                    raycastEventManager.LRTrigger = graphManager.hitEvent;
-                    break;
-                case (NDSimulationManager.FeatureState.Synapse):
-
-                    break;
-            }
             
         }
         /// <summary>
