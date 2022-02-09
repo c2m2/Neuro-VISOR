@@ -7116,6 +7116,8 @@ GameObject:
   - component: {fileID: 2168964937537411965}
   - component: {fileID: 2168964937537411962}
   - component: {fileID: 8198696467454360633}
+  - component: {fileID: 856960900527284290}
+  - component: {fileID: 4932199581192497660}
   m_Layer: 12
   m_Name: NDLineGraph
   m_TagString: Untagged
@@ -7239,6 +7241,7 @@ MonoBehaviour:
   yMaxLabel: {fileID: 2168964936027736413}
   positions: []
   manager: {fileID: 0}
+  sim: {fileID: 0}
   vert: -1
   obeyParentScale: 0
 --- !u!65 &2168964937537411967
@@ -7301,8 +7304,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scaler: 0.2
-  minPercentage: 0.5
-  maxPercentage: 3
+  minPercentage: 0
+  maxPercentage: Infinity
   xScale: 1
   yScale: 1
   zScale: 1
@@ -7311,6 +7314,62 @@ MonoBehaviour:
   incKey: 273
   decKey: 274
   resetKey: 114
+  target: {fileID: 0}
+--- !u!114 &856960900527284290
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2168964937537411963}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2066920c5141f0e4ca235394b5f8bd4a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  onHover:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 8198696467454360633}
+        m_MethodName: Rescale
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onHoverEnd:
+    m_PersistentCalls:
+      m_Calls: []
+  onPress:
+    m_PersistentCalls:
+      m_Calls: []
+  onHoldPress:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndPress:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &4932199581192497660
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2168964937537411963}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28b11226efa244245bbd38574d99ef9c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  resetButton: 256
+  resetKey: 120
+  resetPosition: {x: 0, y: 0, z: 0}
+  resetRotation: {x: 0, y: 0, z: 0}
+  moveMouseButton: 1
 --- !u!1 &2168964937591415090
 GameObject:
   m_ObjectHideFlags: 0

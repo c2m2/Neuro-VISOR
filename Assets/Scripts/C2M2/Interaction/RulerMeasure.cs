@@ -9,7 +9,6 @@ namespace C2M2.Interaction
     [RequireComponent(typeof(List<Canvas>))]
     public class RulerMeasure : MonoBehaviour
     {
-        public MeshSimulation sim = null;
         public List<Canvas> measurementDisplays;
         public GameObject topEndcap;
         public GameObject bottomEndCap;
@@ -35,9 +34,10 @@ namespace C2M2.Interaction
         // Update is called once per frame
         void Update()
         {
-            if (sim != null)
+            GameObject simulationSpace = GameManager.instance.simulationSpace;
+            if (simulationSpace != null)
             {
-                float rulerLength = transform.lossyScale.z / sim.transform.lossyScale.z;
+                float rulerLength = transform.lossyScale.z / simulationSpace.transform.lossyScale.z;
                 if (prevRulerLength != rulerLength && Math.Abs((prevRulerLength - rulerLength)/prevRulerLength) >= .005) /// length change must be greater than 0.5% to update
                 {
                     float markerSpacing = 0.03f; ///< minimum spacing between each marker and beginning and end of ruler
@@ -46,11 +46,9 @@ namespace C2M2.Interaction
 
                     int magnitude = GetMagnitude(firstMarkerLength*2); //multiplication by 2 ensures that markers above 500 get treated as the next unit up
 
-                    // Update simulation's length unit
-                    sim.lengthUnit = GetUnit(magnitude);
-                    units = " " + sim.lengthUnit;
+                    units = " " + GetUnit(magnitude);
 
-                   int siPrefixGroup = (int)Math.Floor(magnitude / 3.0);
+                    int siPrefixGroup = (int)Math.Floor(magnitude / 3.0);
                     // scaledFirstMarkerLength is a scaled version of firstMarkerLength so it is between .5 and 500
                     float scaledFirstMarkerLength = (float)(firstMarkerLength / Math.Pow(10, siPrefixGroup * 3));
                     scaledRulerLength = (float)(rulerLength / Math.Pow(10, siPrefixGroup * 3));

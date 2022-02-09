@@ -14,8 +14,8 @@ namespace C2M2.Interaction
         private Vector3 minScale;
         private Vector3 maxScale;
         public float scaler = 0.2f;
-        public float minPercentage = 0.5f;
-        public float maxPercentage = 3f;
+        public float minPercentage = 0;
+        public float maxPercentage = float.PositiveInfinity;
         public bool xScale = true;
         public bool yScale = true;
         public bool zScale = true;
@@ -24,22 +24,23 @@ namespace C2M2.Interaction
         public KeyCode incKey = KeyCode.UpArrow;
         public KeyCode decKey = KeyCode.DownArrow;
         public KeyCode resetKey = KeyCode.R;
+        public Transform target = null;
 
-        ///<returns>A float between -1 and 1, where -1 means the thumbstick y axis is completely down and 1 implies it is all the way up</returns>
-        private float ThumbstickScaler
+        private float ChangeScaler
         {
             get
             {
+                ///<returns>A float between -1 and 1, where -1 means the thumbstick y axis is completely down and 1 implies it is all the way up</returns>
                 if (GameManager.instance.vrDeviceManager.VRActive) return (OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick).y + OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick).y);
-                else if (Input.GetKey(incKey)) return 1;
-                else if (Input.GetKey(decKey)) return -1;
+                else if (Input.GetKey(incKey) && !Input.GetKey(decKey)) return .2f;
+                else if (Input.GetKey(decKey) && !Input.GetKey(incKey)) return -.2f;
                 return 0;
             }
         }
 
 
         ///<returns>A boolean of whether the joystick is pressed</returns>
-        private bool ThumbstickPressed
+        private bool ResetPressed
         {
             get
             {
@@ -50,17 +51,20 @@ namespace C2M2.Interaction
 
         private void Start()
         {
+            if (target == null) target = transform;
+
             grabbable = GetComponent<OVRGrabbable>();
 
             // Use this to determine how to scale at runtime
-            origScale = transform.localScale;
+            origScale = target.localScale;
             minScale = minPercentage * origScale;
-            maxScale = maxPercentage * origScale;
+            if (maxPercentage == float.PositiveInfinity) maxScale = Vector3.positiveInfinity;
+            else maxScale = maxPercentage * origScale;
         }
 
         void Update()
         {
-            // MeshSimulation handles calling rescale, TODO this is bad and should be changed
+            // RaycastEventHandler handles calling rescale for Desktop mode, TODO this is bad and should be changed
             if (!GameManager.instance.vrDeviceManager.VRActive) return;
             
             if (grabbable.isGrabbed) Rescale();
@@ -68,25 +72,24 @@ namespace C2M2.Interaction
 
         public void Rescale()
         {
-            // if joystick is pressed in, it resets the scale to the original scale
-            if (ThumbstickPressed)
+            if (ResetPressed)
             {
-                transform.localScale = origScale;
+                target.localScale = origScale;
             }
-            else if(ThumbstickScaler != 0)
-            { // Otherwise resolve our new scale
-                Vector3 scaleValue = scaler * ThumbstickScaler * origScale;
-                Vector3 newLocalScale = transform.localScale + scaleValue;
+            else if(ChangeScaler != 0)
+            {
+                Vector3 scaleValue = scaler * ChangeScaler * origScale;
+                Vector3 newLocalScale = target.localScale + scaleValue;
 
                 // Makes sure the new scale is within the determined range
                 newLocalScale = Math.Clamp(newLocalScale, minScale, maxScale);
 
                 // Only scales the proper dimensions
-                if (!xScale) newLocalScale.x = transform.localScale.x;
-                if (!yScale) newLocalScale.y = transform.localScale.y;
-                if (!zScale) newLocalScale.z = transform.localScale.z;
+                if (!xScale) newLocalScale.x = target.localScale.x;
+                if (!yScale) newLocalScale.y = target.localScale.y;
+                if (!zScale) newLocalScale.z = target.localScale.z;
 
-                transform.localScale = newLocalScale;
+                target.localScale = newLocalScale;
             }
         }
     }

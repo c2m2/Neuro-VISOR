@@ -411,8 +411,9 @@ namespace C2M2.NeuronalDynamics.Simulation {
 
                 VisualMesh = Grid2D.Mesh;
  
-                VisualMesh.Rescale(transform, new Vector3 (4, 4, 4));
-                VisualMesh.RecalculateNormals ();
+                VisualMesh.Rescale(transform, new Vector3(4, 4, 4)); //TODO why 4?
+                VisualMesh.RecalculateNormals();
+                //TODO clean up this
 
                 // Pass blownupMesh upwards to MeshSimulation
                 ColliderMesh = VisualMesh;
@@ -449,7 +450,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
                     return;
                 }
 
-                controller.sim = this; //GET RID OF THIS
+                controller.sim = this; //TODO GET RID OF THIS
 
                 //NDUIPresent = true;
 
