@@ -120,8 +120,6 @@ namespace C2M2.Simulation
 
             void BuildInteraction()
             {
-                this.gameObject.AddComponent<emulatorMove>();
-
                 /// Add event child object for interaction scripts to find
                 GameObject child = new GameObject("DirectRaycastInteractionEvent");
                 child.transform.parent = transform;
@@ -227,6 +225,8 @@ namespace C2M2.Simulation
             PostSolve();
 
             Profiler.EndThreadProfiling();
+
+            solveThread = null;
         }
 
         public sealed override float GetSimulationTime() => curentTimeStep * (float)timeStep;
@@ -244,11 +244,7 @@ namespace C2M2.Simulation
         /// </summary>
         public void StopSimulation()
         {
-            if (solveThread != null)
-            {
-                cts.Cancel();
-                solveThread = null;             
-            }
+            if (solveThread != null) cts.Cancel();
         }
 
         /// <summary>

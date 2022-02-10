@@ -65,14 +65,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
 
         private Dictionary<double, Mesh> meshCache = new Dictionary<double, Mesh>();
 
-        //public List<Synapse> synapses
-        //{
-        //    get
-        //    {
-        //        return GameObject.Find("SynapseTEST").GetComponent<vertexSnap>().synapses;
-        //    }
-        //}
-
         public List<Synapse> synapses = new List<Synapse>();
 
         public NeuronClampManager clampManager = null;
@@ -86,7 +78,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
             get { return graphManager.graphs; }
             set { graphManager.graphs = value; }
         }
-    
+
 
         [Header ("1D Visualization")]
         public bool visualize1D = false;
@@ -229,7 +221,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 infoPanel.Vertex = id;
                 infoPanel.Power = vals1D[id] * unitScaler;
                 infoPanel.FocusLocalPosition = Verts1D[id]; //offset so the popup is not in the middle of the dendrite
-            }        
+            }
         }
 
         protected override void PostSolveStep(int t)
@@ -238,7 +230,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
             SetOutputValues();
             void ApplyInteractionVals()
             {
-                ///<c>if (clamps != null && clamps.Count > 0)</c> this if statement is where we apply voltage clamps   
+                ///<c>if (clamps != null && clamps.Count > 0)</c> this if statement is where we apply voltage clamps
                 /// Apply clamp values, if there are any clamps
 
                 if (clamps.Count > 0)
@@ -258,7 +250,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
                             }
                         }
                     }
-                    
+
                     Set1DValues(clampValues);
                 }
 
@@ -273,15 +265,14 @@ namespace C2M2.NeuronalDynamics.Simulation {
                     {
                         if (i % 2 != 0)
                         {
+                            // i - 1 means the presynaptic since we store those first
                             Synapse curPreSynaptic = synapses[i - 1];
                             Synapse curPostSynaptic = synapses[i];
 
                             postSynapse.Add(curPostSynaptic);
 
-                            // i - 1 means the presynaptic since we store those first
-                            double[] curVoltage = curPreSynaptic.attachedSim.Get1DValues();
                             // Set the synapse voltage to what the voltage is at the 1D vertex
-                            curPreSynaptic.voltage = curVoltage[curPreSynaptic.nodeIndex];
+                            curPreSynaptic.voltage = curPreSynaptic.attachedSim.Get1DValues()[curPreSynaptic.nodeIndex];
 
                             preSynapse.Add(curPreSynaptic);
                         }
@@ -331,7 +322,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
             {
                 ShowInfoPanel(false, hit);
             });
-            
+
         }
         /// <summary>
         /// Translate 1D vertex values to 3D values and pass them upwards for visualization
@@ -341,7 +332,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
             vals1D = Get1DValues();
 
             if (vals1D == null) { return null; }
-            
+
             for (int i = 0; i < Map.Length; i++) { // for each 3D point,
 
                 // Take an weighted average using lambda
@@ -378,7 +369,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
             Tuple<int, double>[] new1Dvalues = new Tuple<int, double>[newValues.Length];
             // Receive values given to 3D vertices, translate them onto 1D vertices and apply values there
             for (int i = 0; i < newValues.Length; i++)
-            {    
+            {
                 int vert3D = newValues[i].Item1;
                 double val3D = newValues[i].Item2;
 
@@ -428,9 +419,10 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 Update2DGrid();
 
                 VisualMesh = Grid2D.Mesh;
- 
-                VisualMesh.Rescale(transform, new Vector3 (4, 4, 4));
-                VisualMesh.RecalculateNormals ();
+
+                VisualMesh.Rescale(transform, new Vector3(4, 4, 4)); //TODO why 4?
+                VisualMesh.RecalculateNormals();
+                //TODO clean up this
 
                 // Pass blownupMesh upwards to MeshSimulation
                 ColliderMesh = VisualMesh;

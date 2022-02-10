@@ -4,7 +4,7 @@ public class ArrowUpdate : MonoBehaviour
 {
     public Transform preSynapse;
     public Transform postSynapse;
-   
+
     /// <summary>
     /// A script to update arrow direction and size when the user has moved the neuron
     /// </summary>

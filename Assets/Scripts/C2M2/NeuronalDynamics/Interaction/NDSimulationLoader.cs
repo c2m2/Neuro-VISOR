@@ -3,6 +3,7 @@ using UnityEngine;
 using C2M2.NeuronalDynamics.Simulation;
 using System.IO;
 using System.Collections.Generic;
+using C2M2.Interaction;
 namespace C2M2.NeuronalDynamics.Interaction
 {
     /// <summary>
@@ -57,6 +58,9 @@ namespace C2M2.NeuronalDynamics.Interaction
             }
         }
 
+        public Vector3 rulerInitPos = new Vector3(-0.5f, 0.443f, -0.322f);
+        public Vector3 rulerInitRot = new Vector3(90, 0, 0);
+
         // TODO: Allow SparseSolverTestv1 to be a variable script
         public void Load(RaycastHit hit)
         {
@@ -91,6 +95,21 @@ namespace C2M2.NeuronalDynamics.Interaction
             solver.Manager.FeatState = solver.Manager.FeatState;
 
             transform.gameObject.SetActive(false);
+            
+            if (GameManager.instance.activeSims.Count == 1) //no other sims present
+            {
+                GameManager.instance.simulationSpace.transform.localScale = solver.transform.localScale;
+
+                // Instantiate ruler when the first simulation is added
+                // TODO create better method of handling object generation and removal for ruler and similar objects
+                GameObject rulerObj = Instantiate(Resources.Load("Prefabs/Ruler") as GameObject);
+                rulerObj.transform.position = rulerInitPos;
+                rulerObj.transform.eulerAngles = rulerInitRot;
+                rulerObj.name = "Ruler";
+                rulerObj.GetComponent<GrabRescaler>().target = GameManager.instance.simulationSpace.transform;
+            }
+            solveObj.transform.parent = GameManager.instance.simulationSpace.transform;
+            solver.transform.localScale = Vector3.one;
 
             void TransferValues()
             {

@@ -310,6 +310,7 @@ GameObject:
   - component: {fileID: 2919815283430764373}
   - component: {fileID: 473024890890826751}
   - component: {fileID: 9098607124181544640}
+  - component: {fileID: 6528004498817801977}
   m_Layer: 12
   m_Name: Ruler
   m_TagString: Ruler
@@ -442,7 +443,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0faf125b30e051b49a0d0e83de666f8b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sim: {fileID: 0}
   measurementDisplays:
   - {fileID: 6978054425490887901}
   - {fileID: 899021641628970695}
@@ -461,16 +461,34 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scaler: 0.2
-  minPercentage: 0.5
-  maxPercentage: 2
-  xScale: 0
-  yScale: 0
+  minPercentage: 0
+  maxPercentage: Infinity
+  xScale: 1
+  yScale: 1
   zScale: 1
   vrThumbstick: 32768
   vrThumbstickS: 8388608
   incKey: 273
   decKey: 274
   resetKey: 114
+  target: {fileID: 0}
+--- !u!114 &6528004498817801977
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4174845952812593659}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28b11226efa244245bbd38574d99ef9c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  resetButton: 256
+  resetKey: 120
+  resetPosition: {x: 0, y: 0, z: 0}
+  resetRotation: {x: 0, y: 0, z: 0}
+  moveMouseButton: 1
 --- !u!1 &4924299292279712794
 GameObject:
   m_ObjectHideFlags: 0

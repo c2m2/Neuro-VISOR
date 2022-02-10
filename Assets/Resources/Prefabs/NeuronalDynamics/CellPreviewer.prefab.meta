@@ -1,6 +1,12 @@
 fileFormatVersion: 2
+<<<<<<< HEAD:Assets/Resources/Prefabs/NeuronalDynamics/CellPreviewer.prefab.meta
 guid: 6175613733e31004ab38a72fda281516
 PrefabImporter:
+=======
+guid: 8e645edf8fc058740b945bdf53a54899
+folderAsset: yes
+DefaultImporter:
+>>>>>>> RulerScalingUpdates:Assets/Scripts/C2M2/MolecularDynamics/Visualization.meta
   externalObjects: {}
   userData: 
   assetBundleName: 

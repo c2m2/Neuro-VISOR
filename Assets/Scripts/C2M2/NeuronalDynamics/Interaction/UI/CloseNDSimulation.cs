@@ -31,8 +31,10 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
             if(Sim != null)
             {
                 GameManager.instance.activeSims.Remove(Sim);
-                // Destroy the cell's ruler
-                Sim.CloseRuler();
+
+                // Destroy ruler if no cells are left
+                // TODO See NDSimulationLoader for note on ruler generation and removal improvement
+                if (GameManager.instance.activeSims.Count == 0) Destroy(GameObject.Find("Ruler"));
 
                 // Destroy the cell
                 Destroy(Sim.gameObject);

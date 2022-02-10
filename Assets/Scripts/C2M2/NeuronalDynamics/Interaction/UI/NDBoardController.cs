@@ -92,8 +92,6 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
             NDSimulation sim = (NDSimulation)GameManager.instance.activeSims[simIndex];
             if (sim != null)
             {
-                // Destroy the cell's ruler
-                sim.CloseRuler();
 
                 // Destroy the cell
                 Destroy(sim.gameObject);

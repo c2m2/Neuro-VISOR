@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using C2M2.Visualization;
-using C2M2.Interaction;
 using System;
 
 namespace C2M2.Simulation
@@ -15,7 +14,7 @@ namespace C2M2.Simulation
     public abstract class MeshSimulation : Simulation<float[], Mesh, VRRaycastableMesh, VRGrabbableMesh>
     {
         public virtual MeshSimulationManager Manager { get { return GameManager.instance.simulationManager; } }
-        #region Variables   
+        #region Variables
 
         /// <summary>
         /// Lookup table for more efficient color calculations on the gradient
@@ -45,15 +44,8 @@ namespace C2M2.Simulation
         [Tooltip("Can be used to manually convert Gradient Display values to match unit string")]
         public float unitScaler = 1000f;
 
-        public string lengthUnit = "μm";
-
-        public Vector3 rulerInitPos = new Vector3(-0.5f, 0.443f, -0.322f);
-        public Vector3 rulerInitRot = new Vector3(90, 0, 0);
-
         public double raycastHitValue = 55;
         public Tuple<int, double>[] raycastHits = new Tuple<int, double>[0];
-
-        public RulerMeasure ruler = null;
 
         private Mesh visualMesh = null;
         public Mesh VisualMesh
@@ -125,7 +117,7 @@ namespace C2M2.Simulation
                 mr = GetComponent<MeshRenderer>();
                 if (mr == null) mr = gameObject.AddComponent<MeshRenderer>();
 
-                // Ensure the renderer has a vertex coloring material     
+                // Ensure the renderer has a vertex coloring material
                 mr.material = GameManager.instance.vertexColorationMaterial;
             }
             void InitColors()
@@ -134,7 +126,7 @@ namespace C2M2.Simulation
                 ColorLUT.GlobalMin = GlobalMin;
             }
 
-            
+
 
             void InitInteraction()
             {
@@ -143,15 +135,9 @@ namespace C2M2.Simulation
 
                 if (ColliderMesh != null) raycastable.SetSource(ColliderMesh);
                 else raycastable.SetSource(viz);
-                
-                gameObject.AddComponent<VRGrabbableMesh>();
-                GrabRescaler rescaler =  gameObject.AddComponent<GrabRescaler>();
-                gameObject.AddComponent<PositionResetControl>();
 
-                defaultRaycastEvent.OnHover.AddListener((hit) =>
-                {
-                    rescaler.Rescale();
-                });
+                gameObject.AddComponent<VRGrabbableMesh>();
+                gameObject.AddComponent<ObjectMovementControl>();
                 defaultRaycastEvent.OnHoldPress.AddListener((hit) =>
                 {
                     ShiftRaycastValue();
@@ -161,22 +147,6 @@ namespace C2M2.Simulation
                     ResetRaycastHits();
                 });
 
-                // Instantiate ruler
-                GameObject rulerObj = Resources.Load("Prefabs/Ruler") as GameObject;
-                GameObject rulerGameObj = GameObject.FindGameObjectWithTag("Ruler");
-                if (rulerGameObj == null)
-                {
-                    ruler = GameObject.Instantiate(rulerObj).GetComponent<RulerMeasure>();
-                }
-                else
-                {
-                    ruler = rulerGameObj.GetComponent<RulerMeasure>();
-                }
-
-                ruler.sim = this;
-                rulerObj.transform.position = rulerInitPos;
-                rulerObj.transform.eulerAngles = rulerInitRot;
-                rulerObj.name = gameObject.name + "Ruler";
             }
         }
 
@@ -209,14 +179,6 @@ namespace C2M2.Simulation
         {
             raycastHitValue += PowerModifier;
             raycastHitValue = Math.Clamp(raycastHitValue, ColorLUT.GlobalMin, ColorLUT.GlobalMax);
-        }
-
-        public void CloseRuler()
-        {
-            if (ruler != null)
-            {
-                Destroy(ruler.gameObject);
-            }
         }
 
         public void ResetRaycastHits()

@@ -45,6 +45,8 @@ namespace C2M2
         public NeuronClampManager ndClampManager = null;
         public NDGraphManager ndGraphManager = null;
 
+        public GameObject simulationSpace = null;
+
         public GameObject Synapse = null;
 
         [Header("Environment")]
@@ -106,11 +108,13 @@ namespace C2M2
                 }
             }
 
+            /*
             // Initialize NDSimulationManager
             GameObject simulationManagerObj  = new GameObject();
             simulationManagerObj.name = "NeuronContainer";
             simulationManagerObj.tag = "NeuronContainer";
             simulationManager = simulationManagerObj.AddComponent<NDSimulationManager>();
+            */
 
             if (cellPreviewer != null)
             {

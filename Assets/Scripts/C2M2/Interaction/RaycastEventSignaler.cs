@@ -2,7 +2,6 @@
 
 namespace C2M2.Interaction
 {
-    using Utils;
     /// <summary>
     /// Abstract class for signalers that use raycasting to trigger events on objects.
     /// </summary>
@@ -113,7 +112,7 @@ namespace C2M2.Interaction
         /// <returns> Whether or not the raycast hit a valid target </returns>
         protected abstract bool RaycastingMethod(out RaycastHit hit, float maxDistance, LayerMask layerMask);
         /// <summary>
-        /// Rrequire some condition before raycast requests are made.
+        /// Require some condition before raycast requests are made.
         /// </summary>
         /// <remarks> 
         /// You can require a button be pressed before raycasting.
