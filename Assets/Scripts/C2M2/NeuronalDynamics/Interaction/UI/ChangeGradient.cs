@@ -64,6 +64,8 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
                 nameDisplay.text = gradientNames[activeGrad];
             }
             else Debug.LogWarning("Could not update gradient name.");
+
+            display.ColorLUT.HasChanged = true;
         }
 
         private void Awake()

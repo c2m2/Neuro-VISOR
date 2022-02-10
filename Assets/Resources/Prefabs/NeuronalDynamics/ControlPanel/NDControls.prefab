@@ -130,7 +130,7 @@ MonoBehaviour:
   gradients: []
   gradientNames: []
   defaultGradient: jet
-  simController: {fileID: 0}
+  simController: {fileID: 3579931557669952269}
   extension: .txt
   subPath: \Gradients
 --- !u!1 &200029330072468099
@@ -2073,7 +2073,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: -1.1369934, y: 0.57299805}
+  m_AnchoredPosition: {x: -1.1369629, y: 0.57299805}
   m_SizeDelta: {x: 180, y: 120}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &4133387755434405301
@@ -3630,7 +3630,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a20f2e558dd4954a84c98bd074c140e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  boardController: {fileID: 0}
+  boardController: {fileID: 3579931557669952269}
   gradientLine: {fileID: 9061237660079899940}
   displayLength: 75
   displayHeight: 10

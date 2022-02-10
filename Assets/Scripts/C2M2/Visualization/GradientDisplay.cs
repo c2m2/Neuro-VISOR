@@ -62,32 +62,21 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
                 }
             }
 
-            StartCoroutine(UpdateDisplayRoutine());
         }
 
         private void Start()
         {
             originalMin = ColorLUT.GlobalMin;
             originalMax = ColorLUT.GlobalMax;
+
+           // StartCoroutine(UpdateDisplayRoutine());
         }
 
-        private IEnumerator UpdateDisplayRoutine()
+        private void Update()
         {
-            // Wait for first frame to render, then run every 0.5 seconds
-            yield return new WaitForEndOfFrame();
-            while (true)
+            if (ColorLUT.HasChanged)
             {
-                try
-                {
-                    UpdateDisplay();
-                }
-                catch (Exception e)
-                {
-                    Debug.LogError(e);
-                    // We set hasChanged to be true so that it tries to update the display again
-                    ColorLUT.hasChanged = true;
-                }
-                yield return new WaitUntil(() => ColorLUT.hasChanged == true);
+                UpdateDisplay();
             }
         }
 
@@ -113,7 +102,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
         private void UpdateDisplay()
         {
             // Fetch graddient from simulation's colorLUT
-            if (ColorLUT.hasChanged)
+            if (ColorLUT.HasChanged)
             {
                 GradientColorKey[] colorKeys = ColorLUT.Gradient.colorKeys;
 
@@ -135,7 +124,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
 
                 UpdateTextMarkers();
 
-                ColorLUT.hasChanged = false;
+                ColorLUT.HasChanged = false;
             }
         }
         public void UpdateTextMarkers()

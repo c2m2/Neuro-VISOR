@@ -228,6 +228,8 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
         }
         private void ScaleExtremaHold(float sign)
         {
+            if (sign == 0) return;
+
             float holdTime = Time.unscaledTime - startTime;
 
             SetExtrema(sign * Time.fixedDeltaTime * GetScaler(Math.Min(holdTime, maxHoldTime)));

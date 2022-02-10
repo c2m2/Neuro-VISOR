@@ -49,7 +49,7 @@ namespace C2M2.Simulation
             // Initialize the color lookup table
             colorLUT.Gradient = GameManager.instance.defaultGradient;
             colorLUT.extremaMethod = extremaMethod;
-            colorLUT.hasChanged = true;
+            colorLUT.HasChanged = true;
         }
     }
 }

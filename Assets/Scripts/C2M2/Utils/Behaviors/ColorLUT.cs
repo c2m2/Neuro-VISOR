@@ -28,7 +28,7 @@ namespace C2M2.Visualization
             set
             {
                 globalMax = value;
-                hasChanged = true;
+                HasChanged = true;
             }
         }
         private float globalMin = float.PositiveInfinity;
@@ -41,7 +41,7 @@ namespace C2M2.Visualization
             set
             {
                 globalMin = value;
-                hasChanged = true;
+                HasChanged = true;
             }
         }
 
@@ -51,13 +51,21 @@ namespace C2M2.Visualization
         public bool poolMemory = true;
         private Color32[] memPool = null;
 
+        private bool hasChanged = false;
         /// <summary>
         /// Flag is set true when globalMin, globalMax, or gradient have changed.
         /// </summary>
         /// <remarks>
         /// Flag must be manually reset to false. See C2M2.Visualization.GradientDisplay for example.
         /// </remarks>
-        public bool hasChanged { get; set; } = false;
+        public bool HasChanged
+        {
+            get { return hasChanged; }
+            set
+            {
+                hasChanged = value;
+            }
+        }
 
         /// <summary>
         /// Resolution of the lookup table. Increase for finer-grained color evaluations
@@ -81,7 +89,7 @@ namespace C2M2.Visualization
             {
                 gradient = value;
                 lut = BuildLUT(gradient, lutRes);
-                hasChanged = true;
+                HasChanged = true;
             }
         }
         // Gradient look-up-table greatly reduces time expense and memory
@@ -92,7 +100,7 @@ namespace C2M2.Visualization
             set
             {
                 lut = value;
-                hasChanged = true;
+                HasChanged = true;
             }
         }
 
