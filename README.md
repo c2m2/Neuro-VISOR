@@ -74,7 +74,7 @@ Performance issues and code-related questions can be sent to <jacob.wells@temple
 
 ### Recommended for Running as a Standalone Application and in Unity Editor
 
-- Windows 10 or 11 64-bit - This program may be functional on other operating systems, but its performance is not guaranteed. The emulator functions have been tested on Ubuntu 16.04 LTS.
+- Windows 10 or 11 64-bit, or MacOS 64-bit - This program may be functional on other operating systems, but its performance is not guaranteed. The emulator functions have been tested on Ubuntu 16.04 LTS.
 
 - Relevant HMD software and drivers
 
@@ -223,12 +223,13 @@ The number of samples in the graph can be altered by opening the "more info" pan
 
 ### 2.0.0
 
-Contributors: [Michael Bennett](https://github.com/CWRMB), Rujeko Chinomona, [Craig Fox](https://github.com/CraigFox0) [(in)](https://www.linkedin.com/in/craig-fox-738951192/), [James Rosado](https://github.com/jarosado0911) [(in)](https://www.linkedin.com/in/rosado-james-3239b2119/), [Jacob Wells](https://github.com/jacobwells97) [(in)](https://www.linkedin.com/in/jacob-wells/), [Noah Williams](https://github.com/U-K-L).
+Contributors: [Michael Bennett](https://github.com/CWRMB), Rujeko Chinomona, [Craig Fox](https://github.com/CraigFox0) [(in)](https://www.linkedin.com/in/craig-fox-738951192/), [James Rosado](https://github.com/jarosado0911) [(in)](https://www.linkedin.com/in/rosado-james-3239b2119/), [Jacob Wells](https://github.com/jacobwells97) [(in)](https://www.linkedin.com/in/jacob-wells/), [Noah Williams](https://github.com/U-K-L), [Wayne Zheng](https://github.com/WayneJWZLemon).
 
 - More than one neuron can now be added
 - Synapses can now be added **NOTE:** This is still a proof of concept feature and is not physically accurate
 - Significant performance improvements were made
 - Desktop mode now has all the features of VR
+- MacOS is now supported
 
 ### 1.0.1
 
