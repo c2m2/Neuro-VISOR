@@ -29,7 +29,6 @@ namespace C2M2
         /// Default gradient for coloring the mesh's surface
         /// </summary>
         public Gradient defaultGradient;
-        public NDSimulationManager simulationManager = null;
         public List<Interactable> activeSims = new List<Interactable>();
         public GameObject clampManagerPrefab = null;
         public GameObject clampManagerL = null;
@@ -42,12 +41,8 @@ namespace C2M2
         /// </summary>
         public Barrier solveBarrier = new Barrier(0);
 
-        public NeuronClampManager ndClampManager = null;
-        public NDGraphManager ndGraphManager = null;
-
+        public NDSimulationManager simulationManager = null;
         public GameObject simulationSpace = null;
-
-        public GameObject Synapse = null;
 
         [Header("Environment")]
         public int roomSelected = 0;
@@ -107,14 +102,6 @@ namespace C2M2
                     }
                 }
             }
-
-            /*
-            // Initialize NDSimulationManager
-            GameObject simulationManagerObj  = new GameObject();
-            simulationManagerObj.name = "NeuronContainer";
-            simulationManagerObj.tag = "NeuronContainer";
-            simulationManager = simulationManagerObj.AddComponent<NDSimulationManager>();
-            */
 
             if (cellPreviewer != null)
             {

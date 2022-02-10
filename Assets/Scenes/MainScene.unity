@@ -5594,6 +5594,11 @@ PrefabInstance:
       objectReference: {fileID: 726520547}
     - target: {fileID: 3671467348768610598, guid: f49e57d0c1b71c4418326894ace9a9b5,
         type: 3}
+      propertyPath: simulationManager
+      value: 
+      objectReference: {fileID: 560988219}
+    - target: {fileID: 3671467348768610598, guid: f49e57d0c1b71c4418326894ace9a9b5,
+        type: 3}
       propertyPath: useVirtualReality
       value: 0
       objectReference: {fileID: 0}
