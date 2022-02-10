@@ -4945,7 +4945,7 @@ MonoBehaviour:
   onPress:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 3579931557669952269}
         m_MethodName: MinimizeToggle
         m_Mode: 1
         m_Arguments:
