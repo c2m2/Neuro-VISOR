@@ -28,7 +28,8 @@ namespace C2M2
 
         public void Save()
         {
-            NDSimulation[] cells; // array of all the cells in the scene
+            // NDSimulation[] cells; // array of all the cells in the scene
+            SparseSolverTestv1[] cells;
 
             cells = FindObjectsOfType<SparseSolverTestv1>(); // get all the cells in the scene
 
@@ -44,6 +45,9 @@ namespace C2M2
                     data = new CellData();
 
                     data.vals1D = cells[i].vals1D; // voltage at every node
+                    data.M = cells[i].getM();
+                    data.N = cells[i].getN();
+                    data.H = cells[i].getH();
 
                     data.pos = cells[i].transform.position;
                     data.rotation = cells[i].transform.rotation;
@@ -122,7 +126,8 @@ namespace C2M2
                     go.transform.position = data.pos;
                     go.transform.rotation = data.rotation;
                     go.transform.localScale = data.scale;
-                    NDSimulation sim = go.GetComponent<SparseSolverTestv1>();
+                    SparseSolverTestv1 sim = go.GetComponent<SparseSolverTestv1>();
+                    sim.BuildVectors(data.M, data.N, data.H);
 
                     // recreate voltages at every node
                     Tuple<int, double>[] values = new Tuple<int, double>[data.vals1D.Length];

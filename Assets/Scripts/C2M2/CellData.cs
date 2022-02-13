@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Vector = MathNet.Numerics.LinearAlgebra.Vector<double>;
 
 namespace C2M2
 {
@@ -15,6 +16,9 @@ namespace C2M2
     {
         // Simulation state
         public double[] vals1D;
+        public double[] M;
+        public double[] N;
+        public double[] H;
 
         // Neuron data
         public Vector3 pos;

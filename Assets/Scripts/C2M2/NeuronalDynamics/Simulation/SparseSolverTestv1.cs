@@ -65,11 +65,11 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// This is the voltage for the voltage clamp, this is primarily used for when we do the convergence analysis of the code using a 
         /// soma clamp at 50 [mV], the units for voltage in the solver is [V] that is why <c>vstart</c> is set to 0.05
         ///</summary>
-        public double vstart = 0.050;     
+        public double vstart = 0.050;
         /// <summary>
         /// This is for turning the soma on/off, this option is primarily used for testing purposes for the convergence analysis, for a soma clamp experiment
         /// </summary>
-        public bool SomaOn = false;            
+        public bool SomaOn = false;
         ///<summary>
         /// [ohm.m] resistance.length, this is the axial resistence of the neuron, increasing this value has the effect of making the AP waves more localized and slower conduction speed
         /// decreasing this value has the effect of make the AP waves larger and have a faster conduction speed
@@ -129,7 +129,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// <summary>
         /// this is the scale factor for increasing the time step size if it is unnecessarily small
         /// </summary>
-        private double cfl = 1.5;        
+        private double cfl = 1.5;
 
         /// <summary>
         /// These are the solution vectors for the voltage <code>U</code>
@@ -206,7 +206,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         private Vector R;                                 //This is a vector for the reaction solve 
         private double[] b;                               //This is the right hand side vector when solving Ax = b
         List<double> reactConst;                            //This is for passing the reaction function constants
-        List<CoordinateStorage<double>> sparse_stencils;    
+        List<CoordinateStorage<double>> sparse_stencils;
         CompressedColumnStorage<double> r_csc;              //This is for the rhs sparse matrix
         CompressedColumnStorage<double> l_csc;              //This is for the lhs sparse matrix
         private SparseLU lu;                                //Initialize the LU factorizaation
@@ -224,9 +224,9 @@ namespace C2M2.NeuronalDynamics.Simulation
             reactConst = new List<double> { gk, gna, gl, ek, ena, el };
 
             /// this sets the target time step size
-            timeStep = SetTargetTimeStep(cap, 2 * Neuron.MaxRadius, Neuron.TargetEdgeLength, gna, gk, res, Rmemscf,cfl);
+            timeStep = SetTargetTimeStep(cap, 2 * Neuron.MaxRadius, Neuron.TargetEdgeLength, gna, gk, res, Rmemscf, cfl);
             ///UnityEngine.Debug.Log("Target Time Step = " + timeStep);
-            
+
             ///<c>List<CoordinateStorage<double>> sparse_stencils = makeSparseStencils(Neuron, res, cap, k);</c> Construct sparse RHS and LHS in coordinate storage format, no zeros are stored \n
             /// <c>sparse_stencils</c> this is a list which contains only two matrices the LHS and RHS matrices for the Crank-Nicolson solve
             sparse_stencils = makeSparseStencils(Neuron, res, cap, timeStep);
@@ -339,20 +339,20 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// <param name="res"></param> this is the axial resistance
         /// <param name="Rmemscf"></param> this is membrane resistance scale factor, since this is only a fraction of theoretical maximum
         /// <returns></returns>
-        public static double SetTargetTimeStep(double cap, double maxDiameter, double edgeLength ,double gna, double gk, double res, double Rmemscf, double cfl)
+        public static double SetTargetTimeStep(double cap, double maxDiameter, double edgeLength, double gna, double gk, double res, double Rmemscf, double cfl)
         {
             /// here we set the minimum time step size and maximum time step size
             /// the dtmin is based on prior numerical experiments that revealed that for each refinement level the 
             /// voltage profiles were visually accurate when compared to Yale Neuron for delta t at least 2 microseconds
-            double dtmin = 2e-6;  
-            double dtmax = 32e-6;        
+            double dtmin = 2e-6;
+            double dtmax = 32e-6;
             /// this is where we compute the maximum conduction speed (wave speed) of the ap wave
             /// set the maxDiameter to [m] by multiplying by 1e-6
-            double vmax = (1 / cap) * System.Math.Sqrt(maxDiameter * (1e-6) *Rmemscf* (gna + gk) / (res));
+            double vmax = (1 / cap) * System.Math.Sqrt(maxDiameter * (1e-6) * Rmemscf * (gna + gk) / (res));
             /// this is the target time step size, set to seconds by multiplying by 1e-6
-            double tstep = (edgeLength / vmax) * (1e-6);            
+            double tstep = (edgeLength / vmax) * (1e-6);
             /// we use the loop incase the time step if it is unnecessarily small
-            while(tstep < dtmin){ tstep = tstep * cfl;}
+            while (tstep < dtmin) { tstep = tstep * cfl; }
             /// this avoid making the time step too big will cause numerical instability
             if (tstep > dtmax) { tstep = tstep * 0.5; }
             return tstep;
@@ -426,16 +426,16 @@ namespace C2M2.NeuronalDynamics.Simulation
                 nghbrLen = nghbrlist.Count;
                 sumRecip = 0;
                 /// <c>tempRadius = myCell.nodeData[j].nodeRadius*scf;</c> get the current radius at node j \n
-                tempRadius = myCell.nodes[j].NodeRadius*scf;
+                tempRadius = myCell.nodes[j].NodeRadius * scf;
 
                 /// in this loop we collect the edgelengths that go to node j, and we compute the coefficient given in our paper \n
                 foreach (int nghbrIds in nghbrlist)
                 {
                     /// <c>tempEdgeLen = myCell.nodes[j].AdjacencyList[nghbrIds]*scf;</c> get the edge length at current node j, to node neighbor p, scale to micro meters \n
-                    tempEdgeLen = myCell.nodes[j].AdjacencyList[nghbrIds]*scf;
+                    tempEdgeLen = myCell.nodes[j].AdjacencyList[nghbrIds] * scf;
                     /// <c>edgelengths.Add(tempEdgeLen);</c> put the edge length in the list, this list of edges will have length equal to length of neighbor list \n
                     edgelengths.Add(tempEdgeLen);
-                    sumRecip = sumRecip + 1 / (tempEdgeLen * tempRadius * ((1 / (myCell.nodes[nghbrIds].NodeRadius*scf* myCell.nodes[nghbrIds].NodeRadius*scf)) + (1 / (tempRadius * tempRadius))));
+                    sumRecip = sumRecip + 1 / (tempEdgeLen * tempRadius * ((1 / (myCell.nodes[nghbrIds].NodeRadius * scf * myCell.nodes[nghbrIds].NodeRadius * scf)) + (1 / (tempRadius * tempRadius))));
                 }
                 /// get the average edge lengths of neighbors \n
                 avgEdgeLengths = edgelengths.Average();
@@ -445,8 +445,8 @@ namespace C2M2.NeuronalDynamics.Simulation
                 /// set off diagonal entries by going through the neighbor list, and using <c>rhs.At()</c>
                 for (int p = 0; p < nghbrLen; p++)
                 {
-                    rhs.At(j, nghbrlist[p], k / (2 * res * cap * tempRadius* avgEdgeLengths * edgelengths[p] * ((1 / (myCell.nodes[nghbrlist[p]].NodeRadius*scf * myCell.nodes[nghbrlist[p]].NodeRadius*scf)) + (1 / (tempRadius * tempRadius)))));
-                    lhs.At(j, nghbrlist[p], -1.0 * k / (2 * res * cap * tempRadius * avgEdgeLengths * edgelengths[p] * ((1 / (myCell.nodes[nghbrlist[p]].NodeRadius*scf * myCell.nodes[nghbrlist[p]].NodeRadius*scf)) + (1 / (tempRadius * tempRadius)))));
+                    rhs.At(j, nghbrlist[p], k / (2 * res * cap * tempRadius * avgEdgeLengths * edgelengths[p] * ((1 / (myCell.nodes[nghbrlist[p]].NodeRadius * scf * myCell.nodes[nghbrlist[p]].NodeRadius * scf)) + (1 / (tempRadius * tempRadius)))));
+                    lhs.At(j, nghbrlist[p], -1.0 * k / (2 * res * cap * tempRadius * avgEdgeLengths * edgelengths[p] * ((1 / (myCell.nodes[nghbrlist[p]].NodeRadius * scf * myCell.nodes[nghbrlist[p]].NodeRadius * scf)) + (1 / (tempRadius * tempRadius)))));
                 }
             }
             //rhs.At(0, 0, 1);
@@ -523,7 +523,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// <param name="H"></param> this is the current vector of state H for the geometry
         /// <returns>f(V,H)</returns> the function returns the right hand side of the state H ODE.
         private static Vector fH(Vector V, Vector H) { return ah(V).PointwiseMultiply(1 - H) - bh(V).PointwiseMultiply(H); }
-       
+
         /// <summary>
         /// This is \f$\alpha_n\f$ rate function, the rate functions take the form of
         /// \f[
@@ -621,5 +621,15 @@ namespace C2M2.NeuronalDynamics.Simulation
             return (1.0E3) * 4.0 / (((40.0 - Vin) / 5.0).PointwiseExp() + 1.0);
         }
         #endregion
+
+        public double[] getM() { return M.AsArray(); }
+        public double[] getN() { return N.AsArray(); }
+        public double[] getH() { return H.AsArray(); }
+        public void BuildVectors(double[] m, double[] n, double[] h)
+        {
+            M = Vector.Build.Dense(m);
+            N = Vector.Build.Dense(n);
+            H = Vector.Build.Dense(h);
+        }
     }
 }
