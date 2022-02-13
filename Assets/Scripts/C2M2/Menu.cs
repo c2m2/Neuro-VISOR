@@ -106,7 +106,19 @@ namespace C2M2
                     loader.unitScaler = data.unitScaler;
                     loader.colorScalePrecision = data.colorMarkerPrecision;
 
-                    GameObject go = loader.Load(new RaycastHit()); // load the cell
+                    GameObject go;
+                    try
+                    {
+                        go = loader.Load(new RaycastHit()); // load the cell
+                    }
+                    catch (FileNotFoundException e)
+                    {
+                        go = FindObjectOfType<SparseSolverTestv1>().gameObject;
+                        Destroy(go);
+                        Debug.Log(e.Message);
+                        return;
+                    }
+
                     go.transform.position = data.pos;
                     go.transform.rotation = data.rotation;
                     go.transform.localScale = data.scale;
