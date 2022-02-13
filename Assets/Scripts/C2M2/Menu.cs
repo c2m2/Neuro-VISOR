@@ -46,8 +46,8 @@ namespace C2M2
                     data.vals1D = cells[i].vals1D; // voltage at every node
 
                     data.pos = cells[i].transform.position;
-                    //data.rotation = cells[i].transform.rotation;
-                    //data.scale = cells[i].transform.scale;
+                    data.rotation = cells[i].transform.rotation;
+                    data.scale = cells[i].transform.localScale;
                     data.vrnFileName = cells[i].vrnFileName;
                     data.gradient = cells[i].gradient;
                     data.globalMin = cells[i].globalMin;
@@ -108,8 +108,8 @@ namespace C2M2
 
                     GameObject go = loader.Load(new RaycastHit()); // load the cell
                     go.transform.position = data.pos;
-                    //go.transform.rotation = data.rotation;
-                    //go.transform.scale = data.scale;
+                    go.transform.rotation = data.rotation;
+                    go.transform.localScale = data.scale;
                     NDSimulation sim = go.GetComponent<SparseSolverTestv1>();
 
                     // recreate voltages at every node

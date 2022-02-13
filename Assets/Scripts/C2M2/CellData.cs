@@ -18,8 +18,8 @@ namespace C2M2
 
         // Neuron data
         public Vector3 pos;
-        //public Vector3 rotation;
-        //public Vector3 scale;
+        public Quaternion rotation;
+        public Vector3 scale;
         public string vrnFileName;
         public Gradient gradient;
         public float globalMin;

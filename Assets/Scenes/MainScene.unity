@@ -3993,7 +3993,6 @@ MonoBehaviour:
   allActive: 1
   currentSimulation: {fileID: 0}
   hitEvent: {fileID: 1157977726}
-  clampIndices: 
   toggleDestroyOVR: 8192
   toggleDestroyOVRS: 2097152
   powerModifierPlusKey: 273
