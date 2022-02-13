@@ -14,11 +14,12 @@ namespace C2M2
     public class CellData
     {
         // Simulation state
-        public bool paused;
         public double[] vals1D;
 
         // Neuron data
         public Vector3 pos;
+        //public Vector3 rotation;
+        //public Vector3 scale;
         public string vrnFileName;
         public Gradient gradient;
         public float globalMin;
@@ -32,7 +33,6 @@ namespace C2M2
         public int colorMarkerPrecision;
 
         // Clamp data
-        public List<int> clampIndices;
-        public ClampData[] clmp;
+        public ClampData[] clamp;
     }
 }

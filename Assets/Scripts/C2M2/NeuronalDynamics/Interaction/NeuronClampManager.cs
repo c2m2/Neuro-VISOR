@@ -33,9 +33,6 @@ namespace C2M2.NeuronalDynamics.Interaction
 
         public RaycastPressEvents hitEvent = null;
 
-        private int clampIndex = -1; // current clamp index
-        public List<int> clampIndices = new List<int>(); // list of indices where clamps are positioned
-
         #region InputButtons
         /// <summary>
         /// Hold down a raycast for this many frames in order to destroy a clamp
@@ -113,7 +110,6 @@ namespace C2M2.NeuronalDynamics.Interaction
         {
             currentSimulation = hit.collider.GetComponentInParent<NDSimulation>();
             BuildClamp(hit);
-            clampIndices.Add(clampIndex);
         }
         private NeuronClamp BuildClamp(RaycastHit hit)
         {
@@ -128,7 +124,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             if (hit.collider.GetComponentInParent<NDSimulation>() == null) return null;
 
             // Find the 1D vertex that we hit
-            clampIndex = currentSimulation.GetNearestPoint(hit);
+            int clampIndex = currentSimulation.GetNearestPoint(hit);
 
             if (VertIsAvailable(clampIndex))
             {

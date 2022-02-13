@@ -19,11 +19,7 @@ namespace C2M2
     {
         private CellData data; // data for each cell
         public NDSimulationLoader loader = null; // current loader used
-        public NeuronClampManager clampMng = null;
         private string path; // save/load file path (for now)
-
-        // Simulation state
-        private NDPauseButton pauseBtn; // TODO: change how paused is saved; not best version right now
 
         void Awake()
         {
@@ -32,12 +28,6 @@ namespace C2M2
 
         public void Save()
         {
-            if (clampMng == null)
-            {
-                Debug.Log("No clamp manager given to Menu!");
-                return;
-            }
-
             NDSimulation[] cells; // array of all the cells in the scene
 
             cells = FindObjectsOfType<SparseSolverTestv1>(); // get all the cells in the scene
@@ -48,17 +38,16 @@ namespace C2M2
                 StreamWriter sw = File.AppendText(path);
                 int limit = cells.Length - 1;
 
-                pauseBtn = FindObjectOfType<NDPauseButton>();
-
                 for (int i = 0; i <= limit; i++)
                 {
                     // fill in the variables to be saved
                     data = new CellData();
 
-                    data.paused = pauseBtn.PauseState;
                     data.vals1D = cells[i].vals1D; // voltage at every node
 
                     data.pos = cells[i].transform.position;
+                    //data.rotation = cells[i].transform.rotation;
+                    //data.scale = cells[i].transform.scale;
                     data.vrnFileName = cells[i].vrnFileName;
                     data.gradient = cells[i].gradient;
                     data.globalMin = cells[i].globalMin;
@@ -70,19 +59,16 @@ namespace C2M2
                     data.unitScaler = cells[i].unitScaler;
                     data.colorMarkerPrecision = cells[i].colorMarkerPrecision;
 
-                    if (clampMng.clampIndices.Count > 0)
+                    if (cells[i].clamps.Count > 0)
                     {
-                        data.clampIndices = new List<int>();
-                        data.clmp = new ClampData[clampMng.clampIndices.Count];
+                        data.clamp = new ClampData[cells[i].clamps.Count];
 
-                        for (int j = 0; j < clampMng.clampIndices.Count; j++)
+                        for (int j = 0; j < data.clamp.Length; j++)
                         {
-                            data.clampIndices.Add(clampMng.clampIndices[j]);
-
-                            data.clmp[j] = new ClampData();
-                            data.clmp[j].vertex = cells[i].clamps[j].focusVert;
-                            data.clmp[j].live = cells[i].clamps[j].ClampLive;
-                            data.clmp[j].power = cells[i].clamps[j].ClampPower;
+                            data.clamp[j] = new ClampData();
+                            data.clamp[j].vertex = cells[i].clamps[j].focusVert;
+                            data.clamp[j].live = cells[i].clamps[j].ClampLive;
+                            data.clamp[j].power = cells[i].clamps[j].ClampPower;
                         }
                     }
 
@@ -98,8 +84,10 @@ namespace C2M2
 
         public void Load()
         {
-            if (loader != null && clampMng != null)
+            if (loader != null)
             {
+                NeuronClampManager clampMng = GameManager.instance.ndClampManager;
+
                 ClearScene();
                 string[] json = File.ReadAllText(path).Split(';');
 
@@ -120,6 +108,8 @@ namespace C2M2
 
                     GameObject go = loader.Load(new RaycastHit()); // load the cell
                     go.transform.position = data.pos;
+                    //go.transform.rotation = data.rotation;
+                    //go.transform.scale = data.scale;
                     NDSimulation sim = go.GetComponent<SparseSolverTestv1>();
 
                     // recreate voltages at every node
@@ -130,31 +120,26 @@ namespace C2M2
 
                     // recreate clamps
                     clampMng.currentSimulation = sim;
-                    List<int> clampIndices = data.clampIndices;
-                    ClampData[] c = new ClampData[clampIndices.Count];
-                    if (clampIndices.Count > 0)
+                    if (data.clamp.Length > 0)
                     {
-                        for (int j = 0; j < clampIndices.Count; j++)
+                        for (int j = 0; j < data.clamp.Length; j++)
                         {
                             NeuronClamp clamp;
                             clamp = Instantiate(clampMng.clampPrefab, go.transform).GetComponentInChildren<NeuronClamp>();
-                            clamp.AttachSimulation(sim, clampIndices[j]);
+                            clamp.AttachSimulation(sim, data.clamp[j].vertex);
 
-                            c[j] = new ClampData();
-                            c[j] = data.clmp[j];
-                            clamp.focusVert = c[j].vertex;
-                            if (c[j].live) clamp.ActivateClamp();
-                            clamp.ClampPower = c[j].power;
+                            clamp.ClampPower = data.clamp[j].power;
+                            if (data.clamp[j].live) clamp.ActivateClamp();
                         }
                     }
                 }
 
-                // load pause button state
-                pauseBtn = FindObjectOfType<NDPauseButton>();
-                pauseBtn.PauseState = data.paused;
+                // set paused to true
+                NDPauseButton pauseBtn = FindObjectOfType<NDPauseButton>();
+                pauseBtn.PauseState = true;
             }
             else
-                Debug.LogError("Check that loader or clampMng are not null in Menu!");
+                Debug.LogError("Check that loader are not null in Menu!");
         }
 
         public void ClearScene()
