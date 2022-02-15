@@ -318,6 +318,32 @@ namespace C2M2.NeuronalDynamics.Simulation {
 
         internal abstract void SetOutputValues();
 
+        // Me
+        public bool selected = false;
+        private bool hovering = false;
+        private Material currMat;
+        public void Select()
+        {
+            if (!hovering)
+            {
+                hovering = true;
+                Renderer rend = this.transform.GetComponent<Renderer>();
+                currMat = rend.material;
+                Material mat = new Material(Shader.Find("Specular"));
+                mat.SetColor("_Color", Color.red);
+                rend.material = mat;
+            }
+        }
+        public void StopSelect()
+        {
+            if (hovering || selected)
+            {
+                hovering = false;
+                Renderer rend = this.transform.GetComponent<Renderer>();
+                rend.material = currMat;
+            }
+        }
+
         protected override void OnAwakePost(Mesh viz)
         {
             base.OnAwakePost(viz);
@@ -325,14 +351,22 @@ namespace C2M2.NeuronalDynamics.Simulation {
 
             defaultRaycastEvent.OnHover.AddListener((hit) =>
             {
+                Select();
                 ShowInfoPanel(true, hit);
             });
             defaultRaycastEvent.OnHoverEnd.AddListener((hit) =>
             {
+                if (!selected)
+                    StopSelect();
                 ShowInfoPanel(false, hit);
             });
             defaultRaycastEvent.OnHoldPress.AddListener((hit) =>
             {
+                if (!selected)
+                {
+                    hovering = true;
+                    SetValues(hit);
+                }
                 ShowInfoPanel(true, hit);
             });
             defaultRaycastEvent.OnEndPress.AddListener((hit) =>

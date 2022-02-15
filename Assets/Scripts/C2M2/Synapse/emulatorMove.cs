@@ -16,6 +16,9 @@ public class emulatorMove : MonoBehaviour
     private GameObject target;
     private GameObject parent;
 
+    // Me
+    private bool selected = false;
+
     //return the object that was ray casted on
     GameObject ReturnClickedObject(out RaycastHit hit)
     {
@@ -38,6 +41,33 @@ public class emulatorMove : MonoBehaviour
     }
     void Update()
     {
+        // Me
+        if (Input.GetKey(KeyCode.RightControl) && Input.GetMouseButtonDown(0))
+        {
+            RaycastHit hit;
+            target = ReturnClickedObject(out hit);
+            try
+            {
+                NDSimulation sim = target.GetComponent<NDSimulation>();
+                sim.selected = true;
+                selected = true;
+                sim.Select();
+            }
+            catch (Exception e) { }
+        }
+
+        if (Input.GetKey(KeyCode.C))
+        {
+            if (selected)
+            {
+                // Debug.Log("Hi");
+                NDSimulation sim = FindObjectOfType<NDSimulation>();
+                sim.StopSelect();
+                sim.selected = false;
+                selected = false;
+            }
+        }
+
         if (Input.GetMouseButtonDown(1))
         {
             RaycastHit hitInfo;
