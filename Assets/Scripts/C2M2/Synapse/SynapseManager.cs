@@ -169,7 +169,7 @@ public class SynapseManager : MonoBehaviour
 
 
     /// <summary>
-    /// When this script has been enabled through the game object it is attached to initiliaze some values
+    /// When this script has been enabled through the game object it is attached to initialize some values
     /// </summary>
     private void OnEnable()
     {
@@ -191,37 +191,6 @@ public class SynapseManager : MonoBehaviour
     /// </summary>
     private void OnDisable()
     {
-        // Pass refrence of our updated synapse list to the NDSimulation
-
-        try
-        {
-            // Check if each postsynaptic is attached to a unique simulation, if it is add the post and pre to that simulation
-            for(int i = 0; i < Simulation.Count; i++)
-            {
-                for(int j = 0; j < synapses.Count; j++)
-                {
-                    if(Simulation[i].GetComponent<NDSimulation>() == synapses[j].attachedSim)
-                    {
-                        if(j % 2 != 0)
-                        {
-                            //presynaptic 
-                            Simulation[i].GetComponent<NDSimulation>().synapses.Add(synapses[j - 1]);
-                            // postsynaptic
-                            Simulation[i].GetComponent<NDSimulation>().synapses.Add(synapses[j]);
-                        }
-                    }
-                }
-            }
-        }
-        catch (NullReferenceException)
-        {
-            Debug.Log("Synapses Disabled");
-        }
-        catch (MissingReferenceException)
-        {
-            Debug.Log("Synapses Disabled");
-        }
-
         // This prevents adding many RaycastPressEvents scripts each time user enables() this script
         Destroy(GetComponent<RaycastPressEvents>());
     }

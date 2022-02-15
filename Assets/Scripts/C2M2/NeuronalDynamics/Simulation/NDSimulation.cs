@@ -27,7 +27,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
     /// </remarks>
     public abstract class NDSimulation : MeshSimulation {
 
-        public new NDSimulationManager Manager { get { return (NDSimulationManager)GameManager.instance.simulationManager; } }
+        public new NDSimulationManager Manager { get { return GameManager.instance.simulationManager; } }
         private double visualInflation = 1;
         public double VisualInflation
         {
@@ -64,8 +64,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
         }
 
         private Dictionary<double, Mesh> meshCache = new Dictionary<double, Mesh>();
-
-        public List<Synapse> synapses = new List<Synapse>();
 
         public NeuronClampManager clampManager = null;
         public List<NeuronClamp> clamps = new List<NeuronClamp>();
@@ -255,26 +253,30 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 }
 
                 ///<c> if we have active synapes apply the voltage values </c>
-                if (synapses.Count > 0)
+                if (Manager.synapseManager.synapses.Count > 0)
                 {
                     List<Synapse> postSynapse = new List<Synapse>();
                     List<Synapse> preSynapse = new List<Synapse>();
 
                     // Gather a list of each synapse (i.e. the pre and post synapses)
-                    for (int i = 0; i < synapses.Count; i++)
+                    for (int i = 0; i < Manager.synapseManager.synapses.Count; i++)
                     {
                         if (i % 2 != 0)
                         {
                             // i - 1 means the presynaptic since we store those first
-                            Synapse curPreSynaptic = synapses[i - 1];
-                            Synapse curPostSynaptic = synapses[i];
+                            Synapse curPreSynaptic = Manager.synapseManager.synapses[i - 1];
+                            Synapse curPostSynaptic = Manager.synapseManager.synapses[i];
+                            if (this == curPostSynaptic.attachedSim)
+                            {
+                                postSynapse.Add(curPostSynaptic);
 
-                            postSynapse.Add(curPostSynaptic);
+                                // Set the synapse voltage to what the voltage is at the 1D vertex
+                                curPreSynaptic.voltage = curPreSynaptic.attachedSim.Get1DValues()[curPreSynaptic.nodeIndex];
 
-                            // Set the synapse voltage to what the voltage is at the 1D vertex
-                            curPreSynaptic.voltage = curPreSynaptic.attachedSim.Get1DValues()[curPreSynaptic.nodeIndex];
+                                preSynapse.Add(curPreSynaptic);
+                            }
 
-                            preSynapse.Add(curPreSynaptic);
+                            
                         }
                     }
 

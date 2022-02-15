@@ -67,7 +67,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             GameObject solveObj = new GameObject();
             solveObj.AddComponent<MeshFilter>();
             solveObj.AddComponent<MeshRenderer>();
-            GameObject parent = GameManager.instance.simulationManager.gameObject;
+            GameObject parent = GameManager.instance.simulationSpace.gameObject;
 
             solveObj.transform.parent = parent.transform;
 
