@@ -101,6 +101,31 @@ namespace C2M2.Simulation
         /// </summary>
         protected virtual void PostSolveStep(int t) { }
 
+        // Me
+        private bool hovering = false;
+        private Material currMat;
+        public void Select()
+        {
+            if (!hovering)
+            {
+                hovering = true;
+                Renderer rend = this.transform.GetComponent<Renderer>();
+                currMat = rend.material;
+                Material mat = new Material(Shader.Find("Specular"));
+                mat.SetColor("_Color", Color.red);
+                rend.material = mat;
+            }
+        }
+        public void StopSelect()
+        {
+            if (hovering)
+            {
+                hovering = false;
+                Renderer rend = this.transform.GetComponent<Renderer>();
+                rend.material = currMat;
+            }
+        }
+
         #region Unity Methods
         public void Initialize()
         {
@@ -131,7 +156,16 @@ namespace C2M2.Simulation
                 // Create hit events
                 defaultRaycastEvent = child.AddComponent<RaycastPressEvents>();
 
-                defaultRaycastEvent.OnHoldPress.AddListener((hit) => SetValues(hit));
+                defaultRaycastEvent.OnHoldPress.AddListener((hit) =>
+                {
+                    // Me
+                    hovering = true;
+                    SetValues(hit);
+                });
+
+                // Me
+                defaultRaycastEvent.OnHover.AddListener((hit) => Select());
+                defaultRaycastEvent.OnHoverEnd.AddListener((hit) => StopSelect());
 
                 raycastEventManager.LRTrigger = defaultRaycastEvent;
 

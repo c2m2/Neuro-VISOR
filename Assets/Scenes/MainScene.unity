@@ -918,7 +918,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   loader: {fileID: 99744259}
-  clampMng: {fileID: 1157977727}
 --- !u!1 &213382918
 GameObject:
   m_ObjectHideFlags: 0
@@ -6620,6 +6619,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 806130742508269518, guid: b8e32f33023aba348a3a271448030708,
+        type: 3}
+      propertyPath: field of view
+      value: 26.991467
+      objectReference: {fileID: 0}
+    - target: {fileID: 806130742508269518, guid: b8e32f33023aba348a3a271448030708,
+        type: 3}
+      propertyPath: m_projectionMatrixMode
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 806130742527054365, guid: b8e32f33023aba348a3a271448030708,
         type: 3}

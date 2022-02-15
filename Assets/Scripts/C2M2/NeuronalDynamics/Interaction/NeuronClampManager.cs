@@ -144,6 +144,9 @@ namespace C2M2.NeuronalDynamics.Interaction
         {
             currentSimulation = hit.collider.GetComponentInParent<NDSimulation>();
 
+            // Me
+            currentSimulation.Select();
+
             // If we haven't already created a preview clamp, create one
             if (previewClamp == null)
             {
@@ -180,6 +183,9 @@ namespace C2M2.NeuronalDynamics.Interaction
         {
             if (previewClamp != null)
             {
+                // Me
+                currentSimulation.StopSelect();
+
                 Destroy(previewClamp.transform.parent.gameObject);
                 previewClamp = null;
             }
