@@ -70,7 +70,7 @@ namespace C2M2
 
             mainThreadId = Thread.CurrentThread.ManagedThreadId;
 
-            if(roomOptions != null && roomOptions.Length > 0)
+            if (roomOptions != null && roomOptions.Length > 0)
             {
                 Mathf.Clamp(roomSelected, 0, roomOptions.Length - 1);
                 // Only enable selected room, disable all others

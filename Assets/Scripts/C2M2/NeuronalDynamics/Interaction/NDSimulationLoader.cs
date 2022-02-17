@@ -27,6 +27,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         public double timestepSize = 0.002 * 1e-3;
         public double endTime = 100.0;
         public double raycastHitValue = 0.05;
+
         /// <summary>
         /// Unit display string that can be manually set by the user
         /// </summary>
