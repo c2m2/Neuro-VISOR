@@ -1,9 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using C2M2.Simulation;
-using C2M2.Visualization;
-using C2M2.Interaction;
 namespace C2M2.NeuronalDynamics.Simulation
 {
     public class NDSimulationManager : MeshSimulationManager
@@ -18,10 +15,6 @@ namespace C2M2.NeuronalDynamics.Simulation
             set
             {
                 paused = value;
-                foreach(NDSimulation sim in ActiveSimulations)
-                {
-                    sim.paused = paused;
-                }
             }
         }
         public List<NDSimulation> ActiveSimulations

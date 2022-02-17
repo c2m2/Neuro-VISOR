@@ -5,6 +5,7 @@ using C2M2.Interaction;
 using UnityEngine.Profiling;
 using System.Collections;
 using System.Threading.Tasks;
+using C2M2.NeuronalDynamics.Simulation;
 
 namespace C2M2.Simulation
 {
@@ -23,8 +24,6 @@ namespace C2M2.Simulation
         /// Run solve code without visualization or interaction
         /// </summary>
         public bool dryRun = false;
-
-        public bool paused = false;
 
         /// <summary>
         /// Cancellation token for thread
@@ -143,7 +142,7 @@ namespace C2M2.Simulation
         {
             while (!dryRun)
             {
-                if (!paused)
+                if (!GameManager.instance.simulationManager.Paused)
                 {
                     ValueType simulationValues = GetValues();
                     if (simulationValues != null) UpdateVisualization(simulationValues);
@@ -195,7 +194,7 @@ namespace C2M2.Simulation
             curentTimeStep = 0;
             while (curentTimeStep < nT)
             {
-                if (!paused)
+                if (!GameManager.instance.simulationManager.Paused)
                 {
                     PreSolveStep(curentTimeStep);
 

@@ -67,9 +67,6 @@ namespace C2M2.NeuronalDynamics.Interaction
             GameObject solveObj = new GameObject();
             solveObj.AddComponent<MeshFilter>();
             solveObj.AddComponent<MeshRenderer>();
-            GameObject parent = GameManager.instance.simulationSpace.gameObject;
-
-            solveObj.transform.parent = parent.transform;
 
             Type solverType = Type.GetType(solverName);
             if(solverType == null || !solverType.IsSubclassOf(typeof(NDSimulation)))

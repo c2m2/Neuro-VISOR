@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using C2M2.NeuronalDynamics.Simulation;
 using UnityEngine.UI;
 
 namespace C2M2.NeuronalDynamics.Interaction.UI

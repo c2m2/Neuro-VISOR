@@ -1,23 +1,13 @@
-﻿using System;
+﻿using C2M2.Simulation;
+using System;
 using TMPro;
 using UnityEngine;
-using C2M2.Simulation;
 
 namespace C2M2.NeuronalDynamics.Interaction.UI
 {
-    [RequireComponent(typeof(Simulation<,,,>))]
+    [RequireComponent(typeof(TextMeshProUGUI))]
     public class SimulationTimerLabel : MonoBehaviour
     {
-        public NDBoardController simController = null;
-        public Interactable Sim
-        {
-            get
-            {
-                // Use the first simulation instance to keep time
-                return GameManager.instance.activeSims[0];
-            }
-        }
-
         public TextMeshProUGUI timerText;
 
         /// <summary>
@@ -27,28 +17,21 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
 
         private void Awake()
         {
-            bool fatal = false;
             if(timerText == null)
             {
-                Debug.LogError("No label found.");
-                fatal = true;
+                Debug.LogError("No label found");
+                Destroy(this);
             }
-            if(simController == null)
-            {
-                simController = GetComponentInParent<NDBoardController>();
-                if(simController == null)
-                {
-                    Debug.LogError("No simulation controller found.");
-                    fatal = true;
-                }
-            }
-            if (fatal) Destroy(this);
         }
 
         private void Update()
         {
-            time = Sim.GetSimulationTime();
-            timerText.text = ToString();
+            if (GameManager.instance.activeSims.Count != 0)
+            {
+                time = GameManager.instance.activeSims[0].GetSimulationTime();
+                timerText.text = ToString();
+            }
+            
         }
 
         static string sFormat = "{0:f0} s {1:f0} ms";

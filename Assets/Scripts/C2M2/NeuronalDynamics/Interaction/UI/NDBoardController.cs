@@ -80,7 +80,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
 
         public void CloseAllSimulations()
         {
-            for(int i = 0; i < GameManager.instance.activeSims.Count; i++)
+            for(int i = GameManager.instance.activeSims.Count-1; i >= 0; i--)
             {
                 CloseSimulation(i);
             }
@@ -88,22 +88,26 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
 
         public void CloseSimulation(int simIndex)
         {
-            simIndex = Mathf.Clamp(simIndex, 0, GameManager.instance.activeSims.Count - 1);
             NDSimulation sim = (NDSimulation)GameManager.instance.activeSims[simIndex];
             if (sim != null)
             {
+                GameManager.instance.activeSims.Remove(sim);
 
                 // Destroy the cell
                 Destroy(sim.gameObject);
-
-                // Destroy this control panel
-                Destroy(transform.root.gameObject);
-
+                
                 if (GameManager.instance.cellPreviewer != null)
                 {
                     // Reenable the cell previewer
                     GameManager.instance.cellPreviewer.SetActive(true);
+
+                    // Destroy this control panel
+                    Destroy(transform.root.gameObject);
                 }
+
+                // Destroy ruler if no cells are left
+                // TODO See NDSimulationLoader for note on ruler generation and removal improvement
+                if (GameManager.instance.activeSims.Count == 0) Destroy(GameObject.Find("Ruler"));
             }
         }
 
