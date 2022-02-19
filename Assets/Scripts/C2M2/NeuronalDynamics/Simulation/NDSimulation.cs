@@ -319,6 +319,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
         internal abstract void SetOutputValues();
 
         // Me
+        public Vector3 distance; // distance from the selected object in group
         public bool selected = false;
         private bool hovering = false;
         private Material currMat;

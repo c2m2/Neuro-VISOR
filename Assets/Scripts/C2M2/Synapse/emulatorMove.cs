@@ -39,10 +39,13 @@ public class emulatorMove : MonoBehaviour
         }
         return target;
     }
+    
+    // Me
+    private List<NDSimulation> selectedList = new List<NDSimulation>();
     void Update()
     {
         // Me
-        if (Input.GetKey(KeyCode.RightControl) && Input.GetMouseButtonDown(0))
+        if (Input.GetKey(KeyCode.LeftShift) && Input.GetMouseButtonDown(0))
         {
             RaycastHit hit;
             target = ReturnClickedObject(out hit);
@@ -52,6 +55,7 @@ public class emulatorMove : MonoBehaviour
                 sim.selected = true;
                 selected = true;
                 sim.Select();
+                selectedList.Add(sim);
             }
             catch (Exception e) { }
         }
@@ -60,10 +64,13 @@ public class emulatorMove : MonoBehaviour
         {
             if (selected)
             {
-                // Debug.Log("Hi");
-                NDSimulation sim = FindObjectOfType<NDSimulation>();
-                sim.StopSelect();
-                sim.selected = false;
+                foreach (NDSimulation s in selectedList)
+                {
+                    s.StopSelect();
+                    s.selected = false;
+                }
+
+                selectedList.RemoveRange(0, selectedList.Count);
                 selected = false;
             }
         }
@@ -78,6 +85,12 @@ public class emulatorMove : MonoBehaviour
                 //Convert world position to screen position.
                 screenPosition = Camera.main.WorldToScreenPoint(target.transform.position);
                 offset = target.transform.position - Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPosition.z));
+
+                // Me
+                foreach (NDSimulation s in selectedList)
+                {
+                    s.distance = s.transform.position - target.transform.position;
+                }
             }
         }
         //Get right mouse button up
@@ -98,7 +111,18 @@ public class emulatorMove : MonoBehaviour
             //Debug.Log(target.name);
             if(target.gameObject == this.gameObject)
             {
+                NDSimulation sim = this.transform.GetComponent<NDSimulation>();
+
                 this.transform.position = currentPosition;
+
+                if (sim.selected)
+                {
+                    foreach (NDSimulation s in selectedList)
+                    {
+                        if (s != this)
+                            s.transform.position = currentPosition + s.distance;
+                    }
+                }
             }
         }
 
