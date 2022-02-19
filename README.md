@@ -225,6 +225,8 @@ The number of samples in the graph can be altered by opening the "more info" pan
 
 Contributors: [Michael Bennett](https://github.com/CWRMB), Rujeko Chinomona, [Craig Fox](https://github.com/CraigFox0) [(in)](https://www.linkedin.com/in/craig-fox-738951192/), [James Rosado](https://github.com/jarosado0911) [(in)](https://www.linkedin.com/in/rosado-james-3239b2119/), [Jacob Wells](https://github.com/jacobwells97) [(in)](https://www.linkedin.com/in/jacob-wells/), [Noah Williams](https://github.com/U-K-L), [Wayne Zheng](https://github.com/WayneJWZLemon).
 
+Beta Testers: [Calin Pescaru](https://github.com/calin-pescaru), [Garret Quallet](https://github.com/Gquallet001)
+
 - More than one neuron can now be added
 - Synapses can now be added **NOTE:** This is still a proof of concept feature and is not physically accurate
 - Significant performance improvements were made
@@ -238,6 +240,8 @@ Contributors: [Michael Bennett](https://github.com/CWRMB), Rujeko Chinomona, [Cr
 ### 1.0.0
 
 Contributors: [Craig Fox](https://github.com/CraigFox0) [(in)](https://www.linkedin.com/in/craig-fox-738951192/), [Stephan Grein](https://github.com/stephanmg) [(in)](https://www.linkedin.com/in/stephan-grein-8520ba101/), Bogdan Nagirniak, [James Rosado](https://github.com/jarosado0911) [(in)](https://www.linkedin.com/in/rosado-james-3239b2119/), [Jacob Wells](https://github.com/jacobwells97) [(in)](https://www.linkedin.com/in/jacob-wells/), [Noah Williams](https://github.com/U-K-L).
+
+Beta Testers: Marcus Bingenheimer, Rouying Tang
 
 - Allows the creation of one, physically-accurate neuron
 - Designed for VR, but a limited capability desktop version exists
