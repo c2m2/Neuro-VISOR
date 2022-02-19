@@ -111,8 +111,16 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
 
         private void ReadGradients()
         {
+            // detect macOS
+            if (Application.platform == RuntimePlatform.OSXPlayer || Application.platform == RuntimePlatform.OSXEditor)
+                subPath = Path.AltDirectorySeparatorChar + "Gradients";
+
             // Find gradient files in gradient directory
             DirectoryInfo d = new DirectoryInfo(basePath + subPath + Path.DirectorySeparatorChar);
+
+            if (Application.platform == RuntimePlatform.OSXPlayer || Application.platform == RuntimePlatform.OSXEditor)
+                d = new DirectoryInfo(basePath + subPath + Path.AltDirectorySeparatorChar);
+
             FileInfo[] files = d.GetFiles("*" + extension);
 
             if (files.Length > 0)
@@ -130,7 +138,10 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
                 // Read requested gradietns
                 for(int i = 0; i < readNames.Length; i++)
                 {
-                    readGrads[i] = ReadGradient.Read(basePath + subPath + Path.DirectorySeparatorChar + readNames[i] + extension);
+                    if (Application.platform == RuntimePlatform.OSXPlayer || Application.platform == RuntimePlatform.OSXEditor)
+                        readGrads[i] = ReadGradient.Read(basePath + subPath + Path.AltDirectorySeparatorChar + readNames[i] + extension);
+                    else
+                        readGrads[i] = ReadGradient.Read(basePath + subPath + Path.DirectorySeparatorChar + readNames[i] + extension);
                 }
 
                 // Merge read gradients and manually given gradients

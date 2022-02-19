@@ -72,6 +72,10 @@ namespace C2M2.NeuronalDynamics.Interaction {
             FindWindowPrefab();
             FindSimulationLoader();
 
+            // detect macOS
+            if (Application.platform == RuntimePlatform.OSXPlayer || Application.platform == RuntimePlatform.OSXEditor)
+                cellsPath = "NeuronalDynamics" + Path.AltDirectorySeparatorChar + "Geometries";
+
             // Get possible geometries from given direcrory
             fullPath = Application.streamingAssetsPath + Path.DirectorySeparatorChar + cellsPath;
             geoms = GetGeometryNames(fullPath);
