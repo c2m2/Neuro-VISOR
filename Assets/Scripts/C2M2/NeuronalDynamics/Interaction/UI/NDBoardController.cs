@@ -74,9 +74,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
             MinimizeBoard(true);
 
             // Reactivate cell previewer
-            GameObject cellPreviewer = GameManager.instance.cellPreviewer;
-
-            cellPreviewer.SetActive(true);
+            GameManager.instance.cellPreviewer.SetActive(true);
         }
 
         public void CloseAllSimulations()
@@ -121,6 +119,9 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
             }
             defaultBackground.SetActive(!minimize);
             minimizedBackground.SetActive(minimize);
+
+            // Ensure cell previewer is not present if board is expanded 
+            if (!minimize) GameManager.instance.cellPreviewer.SetActive(false);
         }
 
         public void MinimizeToggle()
