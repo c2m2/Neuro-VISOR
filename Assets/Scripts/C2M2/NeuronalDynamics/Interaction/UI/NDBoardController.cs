@@ -12,6 +12,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
         public Color highlightCol = new Color(1f, 0.85f, 0.4f);
         public Color pressedCol = new Color(1f, 0.9f, 0.6f);
         public Color errorCol = Color.red;
+        public Color textCol = new Color(1f, 0.75f, 0f);
         public Image[] defColTargets = new Image[0];
         public Image[] hiColTargets = new Image[0];
         public Image[] pressColTargets = new Image[0];
@@ -38,7 +39,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
         {
             foreach (TextMeshProUGUI text in GetComponentsInChildren<TextMeshProUGUI>(true))
             {
-                if(text != null) text.color = defaultCol;
+                if(text != null) text.color = textCol;
             }
             foreach(Image i in defColTargets)
             {

@@ -2131,10 +2131,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f2aa69807575a8499420c7fbf9cc4a5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  defaultCol: {r: 1, g: 0.7621143, b: 0.43529415, a: 1}
+  defaultCol: {r: 1, g: 0.7607843, b: 0.43529412, a: 1}
   highlightCol: {r: 1, g: 0.8521358, b: 0.6509434, a: 1}
   pressedCol: {r: 0.4339623, g: 0.7751063, b: 1, a: 1}
   errorCol: {r: 1, g: 0.43529415, b: 0.46807757, a: 1}
+  textCol: {r: 1, g: 0.7607843, b: 0.43529415, a: 1}
   defColTargets:
   - {fileID: 2627589459206956050}
   - {fileID: 4184954026136108813}
@@ -2252,7 +2253,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f6e5e0a37b8f7c419fa8be41d5e9f60, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  simController: {fileID: 0}
   timerText: {fileID: 1210797421914022565}
 --- !u!1 &2145856083342321483
 GameObject:
