@@ -461,8 +461,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scaler: 0.2
-  minPercentage: 0
-  maxPercentage: Infinity
+  minPercentage: 0.01
+  maxPercentage: 100
   xScale: 1
   yScale: 1
   zScale: 1
