@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using C2M2.Utils;
+using C2M2.Interaction.VR;
 
 namespace C2M2.Interaction
 {
@@ -13,7 +14,7 @@ namespace C2M2.Interaction
         private Vector3 origScale;
         private Vector3 minScale;
         private Vector3 maxScale;
-        public float scaler = 0.2f;
+        public float scaler = 0.1f;
         public float minPercentage = 0;
         public float maxPercentage = float.PositiveInfinity;
         public bool xScale = true;
@@ -31,9 +32,9 @@ namespace C2M2.Interaction
             get
             {
                 ///<returns>A float between -1 and 1, where -1 means the thumbstick y axis is completely down and 1 implies it is all the way up</returns>
-                if (GameManager.instance.vrDeviceManager.VRActive) return (OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick).y + OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick).y);
-                else if (Input.GetKey(incKey) && !Input.GetKey(decKey)) return .2f;
-                else if (Input.GetKey(decKey) && !Input.GetKey(incKey)) return -.2f;
+                if (GameManager.instance.vrDeviceManager.VRActive) return OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick, ((PublicOVRGrabber)grabbable.grabbedBy).Controller).y;
+                else if (Input.GetKey(incKey) && !Input.GetKey(decKey)) return .5f;
+                else if (Input.GetKey(decKey) && !Input.GetKey(incKey)) return -.5f;
                 return 0;
             }
         }

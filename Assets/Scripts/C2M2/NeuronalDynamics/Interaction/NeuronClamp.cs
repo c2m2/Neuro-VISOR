@@ -25,17 +25,17 @@ namespace C2M2.NeuronalDynamics.Interaction
         public double MinPower { get { return ClampManager.MinPower; } }
         public double MaxPower { get { return ClampManager.MaxPower; } }
 
-        public int focusVert { get; private set; } = -1;
+        public int FocusVert { get; private set; } = -1;
         public Vector3 FocusPos
         {
-            get { return simulation.Verts1D[focusVert]; }
+            get { return simulation.Verts1D[FocusVert]; }
         }
 
         public Neuron.NodeData NodeData
         {
             get
             {
-                return simulation.Neuron.nodes[focusVert];
+                return simulation.Neuron.nodes[FocusVert];
             }
         }
 
@@ -220,7 +220,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         public void ShowClampInfo()
         {
             clampInfo.gameObject.SetActive(true);
-            clampInfo.Vertex = focusVert;
+            clampInfo.Vertex = FocusVert;
             clampInfo.Power = ClampPower * simulation.unitScaler;
             clampInfo.FocusLocalPosition = transform.localPosition;
         }
@@ -264,7 +264,7 @@ namespace C2M2.NeuronalDynamics.Interaction
 
         public void PlaceClamp(int clampIndex)
         {
-            focusVert = clampIndex;
+            FocusVert = clampIndex;
 
             //CheckSoma(NodeData);
             SetScale(NodeData);
@@ -318,7 +318,7 @@ namespace C2M2.NeuronalDynamics.Interaction
                 holdCount++;
 
                 // If we've held the button long enough to destroy, color caps red until user releases button
-                if(holdCount > ClampManager.destroyCount && !powerClick) SwitchCaps(false);
+                if(holdCount > ClampManager.DestroyCount && !powerClick) SwitchCaps(false);
                 else if (powerClick) SwitchCaps(true);
             }
             else CheckInput();
@@ -328,8 +328,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             // If clamp power is modified while the user holds a click, don't let the click also toggle/destroy the clamp
             if (power != 0 && !powerClick) powerClick = true;
 
-            ClampPower += power;
-            Math.Clamp(ClampPower, MinPower, MaxPower);
+            ClampPower = Math.Clamp(ClampPower+power, MinPower, MaxPower);
         }
 
         // Changes clamp to a red aesthetic to signal that destroy is imminent
@@ -369,7 +368,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         {
             if (!ClampManager.PressedCancel && !powerClick)
             {
-                if (holdCount >= ClampManager.destroyCount)
+                if (holdCount >= ClampManager.DestroyCount)
                 {
                     Destroy(transform.parent.gameObject);
                 }

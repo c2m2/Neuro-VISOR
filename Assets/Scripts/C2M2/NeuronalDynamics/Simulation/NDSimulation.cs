@@ -238,9 +238,9 @@ namespace C2M2.NeuronalDynamics.Simulation {
                     {
                         for (int i = 0; i < clamps.Count; i++)
                         {
-                            if (clamps[i] != null && clamps[i].focusVert != -1 && clamps[i].ClampLive)
+                            if (clamps[i] != null && clamps[i].FocusVert != -1 && clamps[i].ClampLive)
                             {
-                                clampValues[i] = new Tuple<int, double>(clamps[i].focusVert, clamps[i].ClampPower);
+                                clampValues[i] = new Tuple<int, double>(clamps[i].FocusVert, clamps[i].ClampPower);
                             }
                             else
                             {

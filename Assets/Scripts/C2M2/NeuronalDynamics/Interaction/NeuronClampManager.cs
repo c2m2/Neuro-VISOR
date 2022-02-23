@@ -13,8 +13,8 @@ namespace C2M2.NeuronalDynamics.Interaction
         public float MinPower { get { return currentSimulation.ColorLUT.GlobalMin; } }
         public float MaxPower { get { return currentSimulation.ColorLUT.GlobalMax; } }
         // Sensitivity of the clamp power control. Lower sensitivity means clamp power changes more quickly
-        public float sensitivity = 200f;
-        public float ThumbstickScaler { get { return (MaxPower - MinPower) / sensitivity; } }
+        public float sensitivity = 1000f;
+        public float Scaler { get { return (MaxPower - MinPower) / sensitivity; } }
 
         public GameObject clampPrefab = null;
         public GameObject somaClampPrefab = null;
@@ -35,10 +35,10 @@ namespace C2M2.NeuronalDynamics.Interaction
         /// <summary>
         /// Hold down a raycast for this many frames in order to destroy a clamp
         /// </summary>
-        public int destroyCount { get; private set; } = 50;
+        public int DestroyCount { get; private set; } = 50;
         private int holdCount = 0;
         /// <summary>
-        /// Pressing these buttonb toggles clamps on/off. Holding these buttons down for long enough destroys the clamp
+        /// Pressing these buttons toggles clamps on/off. Holding these buttons down for long enough destroys the clamp
         /// </summary>
         public OVRInput.Button toggleDestroyOVR = OVRInput.Button.PrimaryIndexTrigger;
         public OVRInput.Button toggleDestroyOVRS = OVRInput.Button.SecondaryIndexTrigger;
@@ -47,7 +47,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             get
             {
                 if (GameManager.instance.vrDeviceManager.VRActive)
-                    return (OVRInput.Get(toggleDestroyOVR) || OVRInput.Get(toggleDestroyOVRS));
+                    return OVRInput.Get(toggleDestroyOVR) || OVRInput.Get(toggleDestroyOVRS);
                 else return true;
             }
         }
@@ -59,15 +59,14 @@ namespace C2M2.NeuronalDynamics.Interaction
             {
                 if (GameManager.instance.vrDeviceManager.VRActive)
                 {
-                    // Uses the value of both joysticks added together
                     float scaler = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick).y + OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick).y;
 
-                    return ThumbstickScaler * scaler;
+                    return Scaler * scaler;
                 }
                 else
                 {
-                    if (Input.GetKey(powerModifierPlusKey)) return ThumbstickScaler;
-                    if (Input.GetKey(powerModifierMinusKey)) return -ThumbstickScaler;
+                    if (Input.GetKey(powerModifierPlusKey)) return Scaler*.5f;
+                    if (Input.GetKey(powerModifierMinusKey)) return -Scaler*.5f;
                     else return 0;
                 }
             }
@@ -194,7 +193,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             foreach (NeuronClamp clamp in currentSimulation.clamps)
             {
                 // If there is a clamp on that 1D vertex, the spot is not open
-                if (clamp.focusVert == clampIndex)
+                if (clamp.FocusVert == clampIndex)
                 {
                     Debug.LogWarning("Clamp already exists on focus vert [" + clampIndex + "]");
                     return false;
@@ -203,10 +202,10 @@ namespace C2M2.NeuronalDynamics.Interaction
                 else
                 {
 
-                    float dist = (currentSimulation.Verts1D[clamp.focusVert] - currentSimulation.Verts1D[clampIndex]).magnitude;
+                    float dist = (currentSimulation.Verts1D[clamp.FocusVert] - currentSimulation.Verts1D[clampIndex]).magnitude;
                     if (dist < distanceBetweenClamps)
                     {
-                        Debug.LogWarning("Clamp too close to clamp located on vert [" + clamp.focusVert + "].");
+                        Debug.LogWarning("Clamp too close to clamp located on vert [" + clamp.FocusVert + "].");
                         return false;
                     }
                 }
@@ -255,7 +254,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         {
             if (!powerClick)
             {
-                if (holdCount >= destroyCount)
+                if (holdCount >= DestroyCount)
                     DestroyAll();
                 else if (holdCount > 0)
                     ToggleAll();
@@ -271,7 +270,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             {
                 foreach (NeuronClamp clamp in Clamps)
                 {
-                    if (clamp != null && clamp.focusVert != -1) {
+                    if (clamp != null && clamp.FocusVert != -1) {
                         if (allActive)
                             clamp.DeactivateClamp();
                         else
@@ -289,7 +288,7 @@ namespace C2M2.NeuronalDynamics.Interaction
                 
                 foreach (NeuronClamp clamp in Clamps)
                 {
-                    if (clamp != null && clamp.focusVert != -1)
+                    if (clamp != null && clamp.FocusVert != -1)
                         Destroy(clamp.transform.parent.gameObject);
                 }
             }
