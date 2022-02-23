@@ -21,6 +21,8 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
         public GameObject defaultBackground;
         public GameObject minimizedBackground;
 
+        private TextMeshProUGUI[] textElements = null;
+
 
         private bool Minimized
         {
@@ -32,12 +34,14 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
 
         private void Start()
         {
+            textElements = GetComponentsInChildren<TextMeshProUGUI>(true);
+
             StartCoroutine(UpdateColRoutine(0.5f));
         }
 
         private void UpdateCols()
         {
-            foreach (TextMeshProUGUI text in GetComponentsInChildren<TextMeshProUGUI>(true))
+            foreach (TextMeshProUGUI text in textElements)
             {
                 if(text != null) text.color = textCol;
             }

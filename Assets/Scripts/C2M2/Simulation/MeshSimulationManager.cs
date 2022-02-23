@@ -24,7 +24,7 @@ namespace C2M2.Simulation
         /// Alter the precision of the color scale display
         /// </summary>
         [Tooltip("Alter the precision of the color scale display")]
-        public int colorMarkerPrecision = 3;
+        public int displayPrecision = 2;
 
         [Tooltip("Must be set if extremaMethod is set to GlobalExtrema")]
         private float globalMax = float.NegativeInfinity;

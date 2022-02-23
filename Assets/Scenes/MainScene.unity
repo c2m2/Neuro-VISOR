@@ -359,8 +359,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 124, y: -65}
-  m_SizeDelta: {x: 1049, y: 302}
+  m_AnchoredPosition: {x: 124, y: -114}
+  m_SizeDelta: {x: 1080, y: 650}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &122926925
 MonoBehaviour:
@@ -1130,7 +1130,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   unit: mV
   unitScaler: 1000
-  colorMarkerPrecision: 3
+  displayPrecision: 2
   synapseManager: {fileID: 0}
 --- !u!114 &560988220
 MonoBehaviour:

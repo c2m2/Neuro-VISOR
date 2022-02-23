@@ -30,7 +30,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
 
         public float UnitScaler { get { return SimManager.unitScaler; } }
         public string Unit { get { return SimManager.unit; } }
-        public string Precision { get { return "F" + SimManager.colorMarkerPrecision; } }
+        public string Precision { get { return "F" + SimManager.displayPrecision; } }
 
         private float LineWidth
         {
