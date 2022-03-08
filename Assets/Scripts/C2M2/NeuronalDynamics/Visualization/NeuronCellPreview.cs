@@ -144,12 +144,7 @@ namespace C2M2.NeuronalDynamics.Visualization
         {
             loader.vrnFileName = vrnFileName;
             loader.refinementLevel = refinement;
-
-            int numOfNeurons = 1; //Set how many neurons you want here
-            for (int i = 0; i<numOfNeurons;i++)
-            {
-                loader.Load(hit);
-            }
+            loader.Load(hit);
         }
         public bool RemoveRefinement(int refinement)
         {

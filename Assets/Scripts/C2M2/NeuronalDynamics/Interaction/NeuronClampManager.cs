@@ -81,7 +81,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             {
                 if (GameManager.instance.vrDeviceManager.VRActive)
                     return (OVRInput.Get(highlightOVR) || OVRInput.Get(highlightOVRS));
-                else return false; // We cannot highlight through the emulator
+                else return false; // TODO We cannot highlight through the emulator
             }
         }
 
