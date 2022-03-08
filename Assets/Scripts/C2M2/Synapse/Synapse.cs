@@ -30,7 +30,6 @@ public class Synapse : MonoBehaviour
 
     public GameObject prefab;
     public int nodeIndex;
-    public double voltage;
     public NDSimulation attachedSim;
 
     /// <summary>
@@ -39,18 +38,17 @@ public class Synapse : MonoBehaviour
     /// <param name="prefab"></param>
     /// <param name="nodeIndex"></param>
     /// <param name="voltage"></param>
-    public Synapse(GameObject prefab, int nodeIndex, double voltage, NDSimulation attachedSim)
+    public Synapse(GameObject prefab, int nodeIndex, NDSimulation attachedSim)
     {
         this.prefab = prefab;
         this.nodeIndex = nodeIndex;
-        this.voltage = voltage;
         this.attachedSim = attachedSim;
     }
 
     override
     public string ToString()
     {
-        return prefab.name + " " + nodeIndex + " " + voltage;
+        return prefab.name + " " + nodeIndex;
     }
 
     /// <summary>

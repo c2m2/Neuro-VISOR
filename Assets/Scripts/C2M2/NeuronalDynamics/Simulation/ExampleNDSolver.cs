@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace C2M2.NeuronalDynamics.Simulation
 {
@@ -9,7 +7,7 @@ namespace C2M2.NeuronalDynamics.Simulation
     {
         // One value for each 1D vertex
         double[] vals;
-        double[] vals_active; // TODO will eventually be removed
+        double[] vals_active;
 
         public override double[] Get1DValues()
         {
@@ -53,6 +51,20 @@ namespace C2M2.NeuronalDynamics.Simulation
         internal override void SetOutputValues()
         {
             lock (visualizationValuesLock) vals = (double[])vals_active.Clone();
+        }
+
+        internal override void HandleSynapses(List<(Synapse, Synapse)> synapses)
+        {
+            Tuple<int, double>[] new1DVoltages = new Tuple<int, double>[synapses.Count];
+
+            // apply the voltage from the pre-synapse and to the location of the postsynapse
+            for (int i = 0; i < synapses.Count; i++)
+            {
+                new1DVoltages[i] = new Tuple<int, double>(synapses[i].Item2.nodeIndex, synapses[i].Item1.attachedSim.Get1DValues()[synapses[i].Item1.nodeIndex]);
+            }
+
+            // Pass the tuple so we can set our new voltage value
+            Set1DValues(new1DVoltages);
         }
     }
 }

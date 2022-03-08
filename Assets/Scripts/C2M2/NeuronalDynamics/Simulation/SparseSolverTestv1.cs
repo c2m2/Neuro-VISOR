@@ -137,7 +137,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// </summary>
         private Vector U;
         /// <summary>
-        /// This is the U that gets modified during the step before U is set to it. TODO remove this when U is moved to NDSimulation
+        /// This is the U that gets modified during the step before U is set to it.
         /// </summary>
         private Vector U_Active;
         /// <summary>
@@ -163,7 +163,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// <returns>curVals</returns>
         public override double[] Get1DValues()
         {
-            /// this initialize the curvals which will be sent back to the VR simulation
+            /// this initialize the curVals which will be sent back to the VR simulation
             double[] curVals = null;
             /// check if this beginning of the simulation
             if (curentTimeStep > -1)
@@ -194,7 +194,6 @@ namespace C2M2.NeuronalDynamics.Simulation
             {
                 if (newVal != null)
                 {
-                    /// here we set the voltage at the location, notice that we multiply by 0.0001 to convert to volts [V]
                     if (newVal.Item1 >= 0 && newVal.Item1 < Neuron.nodes.Count)
                     {
                         U_Active[newVal.Item1] = newVal.Item2;
@@ -314,7 +313,20 @@ namespace C2M2.NeuronalDynamics.Simulation
         internal override void SetOutputValues()
         {
             lock (visualizationValuesLock) U = U_Active.Clone();
+        }
 
+        internal override void HandleSynapses(List<(Synapse, Synapse)> synapses)
+        {
+            Tuple<int, double>[] new1DVoltages = new Tuple<int, double>[synapses.Count];
+
+            // apply the voltage from the pre-synapse and to the location of the postsynapse
+            for (int i = 0; i < synapses.Count; i++)
+            {
+                new1DVoltages[i] = new Tuple<int, double>(synapses[i].Item2.nodeIndex, synapses[i].Item1.attachedSim.Get1DValues()[synapses[i].Item1.nodeIndex]);
+            }
+
+            // Pass the tuple so we can set our new voltage value
+            Set1DValues(new1DVoltages);
         }
 
         #region Local Functions

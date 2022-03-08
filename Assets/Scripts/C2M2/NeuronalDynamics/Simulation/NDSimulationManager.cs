@@ -58,7 +58,7 @@ namespace C2M2.NeuronalDynamics.Simulation
                             sim.raycastEventManager.LRTrigger = sim.graphManager.hitEvent;
                             break;
                         case (FeatureState.Synapse):
-                            sim.raycastEventManager.LRTrigger = synapseManager.hitEvent;
+                            sim.raycastEventManager.LRTrigger = synapseManager.HitEvent;
                             break;
                     }
                 }
