@@ -199,7 +199,7 @@ namespace C2M2.NeuronalDynamics.Simulation
             {
                 if (newVal != null)
                 {
-                    /// here we set the voltage at the location, notice that we multiply by 0.0001 to convert to volts [V]
+                    
                     if (newVal.Item1 >= 0 && newVal.Item1 < Neuron.nodes.Count)
                     {
                         bj = new double[Neuron.nodes.Count];
@@ -220,6 +220,29 @@ namespace C2M2.NeuronalDynamics.Simulation
                         YY = Vector.Build.DenseOfArray(y);
 
                         YY.Add(ZZ.Multiply(rj.DotProduct(YY) / (1 - rj.DotProduct(ZZ))), U_Active);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Receives 1D information for synaptic communication
+        /// newValues =(index, and current value in Amps)
+        /// </summary>
+        /// <param name="newValues"></param>
+        public override void SetSynapseCurrent(Tuple<int, double>[] newValues)
+        {
+            double area = new float();
+
+            foreach (Tuple<int, double> newVal in newValues)
+            {
+                if (newVal != null)
+                {
+                    if (newVal.Item1 >= 0 && newVal.Item1 < Neuron.nodes.Count)
+                    {
+                        area = 2 * System.Math.PI * Neuron.nodes[newVal.Item1].NodeRadius * Neuron.TargetEdgeLength * 1e-12;
+
+                        U_Active[newVal.Item1] = U_Active[newVal.Item1] + timeStep * newVal.Item2 / (cap * area);
                     }
                 }
             }

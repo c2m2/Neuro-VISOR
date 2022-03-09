@@ -282,14 +282,20 @@ namespace C2M2.NeuronalDynamics.Simulation {
 
                     Tuple<int, double>[] new1Dvalues = new Tuple<int, double>[postSynapse.Count];
 
+                    double syncurrent = new double();
+
                     // apply the voltage from the pre-synapse and the node index from the post-synapse into a tuple
                     for (int i = 0; i < postSynapse.Count; i++)
                     {
-                        new1Dvalues[i] = new Tuple<int, double>(postSynapse[i].nodeIndex, preSynapse[i].voltage);
+                        // the units of the syncurrent should be in Amps, in the range 0 - 400 picoAmps
+                        syncurrent = preSynapse[i].voltage * 1e-8;  // this is where you would apply your function to the presynaptic voltage
+
+                        new1Dvalues[i] = new Tuple<int, double>(postSynapse[i].nodeIndex, syncurrent);
                     }
 
                     // Pass the tuple so we can set our new voltage value
-                    Set1DValues(new1Dvalues);
+                    //Set1DValues(new1Dvalues);
+                    SetSynapseCurrent(new1Dvalues);
                 }
 
 
@@ -387,6 +393,8 @@ namespace C2M2.NeuronalDynamics.Simulation {
         /// </summary>
         /// <param name="newValues"> List of 1D vert indices and values to add onto that index. </param>
         public abstract void Set1DValues (Tuple<int, double>[] newValues);
+
+        public abstract void SetSynapseCurrent(Tuple<int, double>[] newValues);
 
         /// <summary>
         /// Requires derived classes to know how to make available one value for each 1D vertex
