@@ -232,7 +232,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// <param name="newValues"></param>
         public override void SetSynapseCurrent(Tuple<int, double>[] newValues)
         {
-            double area = new float();
+            double area = new double();
 
             foreach (Tuple<int, double> newVal in newValues)
             {
