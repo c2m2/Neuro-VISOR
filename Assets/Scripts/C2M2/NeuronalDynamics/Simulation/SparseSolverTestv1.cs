@@ -79,6 +79,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// [F/m2] capacitance per unit area, this is the plasma membrane capacitance, this a standard value for the capacitance
         /// </summary>
         private double cap = 1.0 * 1.0E-2;
+        public double Cap {get => cap;}
         /// <summary>
         /// [S/m2] potassium conductance per unit area, this is the Potassium conductance per unit area, it is used in this term
         /// \f[\bar{g}_{K}n^4(V-V_k)\f]
@@ -173,7 +174,7 @@ namespace C2M2.NeuronalDynamics.Simulation
                 {
                     /// define the current time slice to send and initialize it to the correct size which is the number of vertices in the geometry
                     /// initialize it to the current state of the voltage, this is the voltage we are sending back to vr simulation
-                    curTimeSlice = U.SubVector(0, Neuron.nodes.Count);
+                    curTimeSlice = U_Active.SubVector(0, Neuron.nodes.Count);
                 }
                 //curTimeSlice.Multiply(1, curTimeSlice);
 

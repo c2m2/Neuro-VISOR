@@ -31,18 +31,19 @@ public class Synapse : MonoBehaviour
     public GameObject prefab;
     public int nodeIndex;
     public NDSimulation attachedSim;
+    public float initializationTime;
 
     /// <summary>
-    /// Contructor so we can initilize values for each synapse
+    /// Constructor so we can initialize values for each synapse
     /// </summary>
     /// <param name="prefab"></param>
     /// <param name="nodeIndex"></param>
-    /// <param name="voltage"></param>
     public Synapse(GameObject prefab, int nodeIndex, NDSimulation attachedSim)
     {
         this.prefab = prefab;
         this.nodeIndex = nodeIndex;
         this.attachedSim = attachedSim;
+        this.initializationTime = initializationTime;
     }
 
     override

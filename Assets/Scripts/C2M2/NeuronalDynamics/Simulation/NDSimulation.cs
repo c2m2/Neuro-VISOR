@@ -26,6 +26,9 @@ namespace C2M2.NeuronalDynamics.Simulation {
     /// 1D Neuron surface simulations should derive from this class.
     /// </remarks>
     public abstract class NDSimulation : MeshSimulation {
+        List<Synapse> postSynapse = new List<Synapse>();
+        List<Synapse> preSynapse = new List<Synapse>();
+
 
         public new NDSimulationManager Manager { get { return GameManager.instance.simulationManager; } }
         private double visualInflation = 1;
@@ -288,7 +291,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
         {
             base.OnAwakePost(viz);
             infoPanelPrefab = (GameObject)Resources.Load("Prefabs" + Path.DirectorySeparatorChar + "NeuronalDynamics" + Path.DirectorySeparatorChar + "HoverInfo");
-
+            
             defaultRaycastEvent.OnHover.AddListener((hit) =>
             {
                 ShowInfoPanel(true, hit);
