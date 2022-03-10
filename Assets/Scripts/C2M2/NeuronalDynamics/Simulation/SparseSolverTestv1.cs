@@ -174,7 +174,7 @@ namespace C2M2.NeuronalDynamics.Simulation
                 {
                     /// define the current time slice to send and initialize it to the correct size which is the number of vertices in the geometry
                     /// initialize it to the current state of the voltage, this is the voltage we are sending back to vr simulation
-                    curTimeSlice = U_Active.SubVector(0, Neuron.nodes.Count);
+                    curTimeSlice = U.SubVector(0, Neuron.nodes.Count);
                 }
                 //curTimeSlice.Multiply(1, curTimeSlice);
 
@@ -318,16 +318,42 @@ namespace C2M2.NeuronalDynamics.Simulation
 
         internal override void HandleSynapses(List<(Synapse, Synapse)> synapses)
         {
-            Tuple<int, double>[] new1DVoltages = new Tuple<int, double>[synapses.Count];
+            Tuple<int, double>[] new1Dvalues = new Tuple<int, double>[synapses.Count];
+                    
+                    for (int i = 0; i < synapses.Count; i++)
+                    {
+                        float time = (float)synapses[i].Item1.curSimulation.GetSimulationTime()-synapses[i].Item1.initializationTime;
+                        //-initializationTime;( Figure out time values)
+                        float voltage = (float) U_Active[synapses[i].Item2.nodeIndex];
+                        float e = 2.71828F;
+                
+                        float current = 45e-12f * 1.0F/(1.0F + Mathf.Pow( e,-0.62F * voltage * 17.0F/3.57F )) * Mathf.Pow(e, -time)/1.3e-3F * voltage ;
 
-            // apply the voltage from the pre-synapse and to the location of the postsynapse
-            for (int i = 0; i < synapses.Count; i++)
-            {
-                new1DVoltages[i] = new Tuple<int, double>(synapses[i].Item2.nodeIndex, synapses[i].Item1.attachedSim.Get1DValues()[synapses[i].Item1.nodeIndex]);
-            }
+                        Debug.LogError("voltage"+ voltage);
+                        Debug.LogError("Curren"+ current);
+                        Debug.LogError("capacitance"+ ((SparseSolverTestv1)(synapses[i].Item1.curSimulation)).Cap);
+                        Debug.LogError("timeStep"+synapses[i].Item1.curSimulation.timeStep);
+                        double modifiedVoltage = voltage +current /Cap *timeStep;
 
-            // Pass the tuple so we can set our new voltage value
-            Set1DValues(new1DVoltages);
+                        new1Dvalues[i] = new Tuple<int, double>(synapses[i].Item2.nodeIndex, modifiedVoltage);
+                    }
+
+                    // Pass the tuple so we can set our new voltage value
+                    Set1DValues(new1Dvalues);
+                /*
+                *  G= 45E-12
+                *  b(vm)= 1/[1+exp(-0.62(voltage)*17/3.57)*vm]
+                *  a(t)= if (time click <= time < click time + 1.3E-3)
+                {
+                    exp((-timeclick - time)/(1.3E-3))
+                }
+                *      else
+                {
+                    0 when time > time click +1.3E-3
+                }
+                Vm = curPreSynaptic
+                I = G 
+                */
         }
 
         #region Local Functions
