@@ -324,22 +324,15 @@ namespace C2M2.NeuronalDynamics.Simulation
                     {
                         float time = (float)synapses[i].Item1.curSimulation.GetSimulationTime()-synapses[i].Item1.initializationTime;
                         //-initializationTime;( Figure out time values)
-                        float voltage = (float) U_Active[synapses[i].Item2.nodeIndex];
                         float e = 2.71828F;
                 
-                        float current = 45e-12f * 1.0F/(1.0F + Mathf.Pow( e,-0.62F * voltage * 17.0F/3.57F )) * Mathf.Pow(e, -time)/1.3e-3F * voltage ;
+                        double current = 45e-12 * 1/(1.0 + System.Math.Pow(e,-0.62 * U_Active[synapses[i].Item2.nodeIndex] * 17.0/3.57)) * System.Math.Pow(e, -time)/1.3e-3 * U_Active[synapses[i].Item2.nodeIndex];
+                        current = .5;
+                        double synapseAddition = current*timeStep/Cap; // timeStep/Cap = .005
+                        Debug.LogError("Synapse Contribution "+ synapseAddition);
 
-                        Debug.LogError("voltage"+ voltage);
-                        Debug.LogError("Curren"+ current);
-                        Debug.LogError("capacitance"+ ((SparseSolverTestv1)(synapses[i].Item1.curSimulation)).Cap);
-                        Debug.LogError("timeStep"+synapses[i].Item1.curSimulation.timeStep);
-                        double modifiedVoltage = voltage +current /Cap *timeStep;
-
-                        new1Dvalues[i] = new Tuple<int, double>(synapses[i].Item2.nodeIndex, modifiedVoltage);
+                        U_Active[synapses[i].Item2.nodeIndex] = U_Active[synapses[i].Item2.nodeIndex] + synapseAddition;
                     }
-
-                    // Pass the tuple so we can set our new voltage value
-                    Set1DValues(new1Dvalues);
                 /*
                 *  G= 45E-12
                 *  b(vm)= 1/[1+exp(-0.62(voltage)*17/3.57)*vm]
