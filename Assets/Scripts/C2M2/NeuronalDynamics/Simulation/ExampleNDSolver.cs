@@ -25,9 +25,9 @@ namespace C2M2.NeuronalDynamics.Simulation
             }
         }
 
-        public override void SetSynapseCurrent(Tuple<int, double>[] newValues)
+        public override void SetSynapseCurrent(Tuple<int, double,double>[] newValues)
         {
-            foreach (Tuple<int, double> val in newValues)
+            foreach (Tuple<int, double,double> val in newValues)
             {
                 int index = val.Item1;
                 double value = val.Item2;

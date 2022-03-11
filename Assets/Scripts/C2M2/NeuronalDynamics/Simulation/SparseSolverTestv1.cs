@@ -74,7 +74,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// [ohm.m] resistance.length, this is the axial resistence of the neuron, increasing this value has the effect of making the AP waves more localized and slower conduction speed
         /// decreasing this value has the effect of make the AP waves larger and have a faster conduction speed
         /// </summary>
-        private double res = 300.0 * 1.0E-2;
+        private double res = 1800.0 * 1.0E-2;
         /// <summary>
         /// [F/m2] capacitance per unit area, this is the plasma membrane capacitance, this a standard value for the capacitance
         /// </summary>
@@ -125,11 +125,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// the membrane resistance does not hit the theoretical maximum, it is approximately 65%
         /// but this may change depending on the rate functions that are used
         /// </summary>
-        private double Rmemscf = 1.0;
-        /// <summary>
-        /// this is the scale factor for increasing the time step size if it is unnecessarily small
-        /// </summary>
-        private double cfl = 1.0;        
+        private double Rmemscf = 1.0;         
 
         /// <summary>
         /// These are the solution vectors for the voltage <code>U</code>
@@ -155,6 +151,9 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// the state <c>M</c>, state <c>N</c>, and state <c>H</c>
         /// </summary>
         private Vector H;
+
+        private Vector Isyn;
+        
 
         private Vector Upre, Npre, Mpre, Hpre;
         private Vector ej, rj, ZZ, YY;
@@ -230,19 +229,34 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// newValues =(index, and current value in Amps)
         /// </summary>
         /// <param name="newValues"></param>
-        public override void SetSynapseCurrent(Tuple<int, double>[] newValues)
+        public override void SetSynapseCurrent(Tuple<int, double,double>[] newValues)
         {
             double area = new double();
+            double icurr = new double();
+            double syntime = new double();
+            double curtime = new double();
 
-            foreach (Tuple<int, double> newVal in newValues)
+            foreach (Tuple<int, double,double> newVal in newValues)
             {
                 if (newVal != null)
                 {
                     if (newVal.Item1 >= 0 && newVal.Item1 < Neuron.nodes.Count)
                     {
-                        area = 2 * System.Math.PI * Neuron.nodes[newVal.Item1].NodeRadius * Neuron.TargetEdgeLength * 1e-12;
+                        //note newVal.Item1 = index of postsynapse
+                        //note newVal.Item2 = voltage at postsynapse
 
-                        U_Active[newVal.Item1] = U_Active[newVal.Item1] + timeStep * newVal.Item2 / (cap * area);
+                        area = 2 * System.Math.PI * Neuron.nodes[newVal.Item1].NodeRadius * Neuron.TargetEdgeLength * 1e-12;
+                        syntime = newVal.Item3; // this is the time the clamp is placed
+                        curtime = curentTimeStep*timeStep;
+                        Debug.Log("syntime = " + syntime.ToString() + " curtime = " + curtime.ToString());
+                        icurr = SynapseCurrentFunction(newVal.Item2,System.Math.Abs(syntime-curtime));
+                        Debug.Log("current = " + icurr.ToString());
+                        
+                        //icurr =newVal.Item2*0.25e-8;
+                        //U_Active[newVal.Item1] = U_Active[newVal.Item1] + timeStep * newVal.Item2 / (cap * area);
+                        //Isyn[newVal.Item1] = (2.0/3.0) * timeStep * newVal.Item2*(0.25e-8) / (cap * area);
+
+                        Isyn[newVal.Item1] = (2.0 / 3.0) * timeStep * icurr / (cap * area);
                     }
                 }
             }
@@ -257,6 +271,16 @@ namespace C2M2.NeuronalDynamics.Simulation
         CompressedColumnStorage<double> l_csc;              //This is for the lhs sparse matrix
         private SparseLU lu;                                //Initialize the LU factorizaation
 
+        public static double SynapseCurrentFunction(double voltpresyn,double t)
+        {
+            double icurr = new double();
+            double ee = System.Math.E; // base of natural logarithm
+            t = 1.0;
+            icurr = (45.0e-12) * 1 / (1.0 + System.Math.Pow(ee, -0.62 * voltpresyn * 17.0 / 3.57)) * System.Math.Pow(ee, -1.0 * t) / (1.3e-3) * voltpresyn;
+
+            return icurr;
+        }
+
         /// <summary>
         /// This is a small routine call to initialize the Neuron Cell
         /// this will initialize the solution vectors which are <c>U</c>, <c>M</c>, <c>N</c>, and <c>H</c>
@@ -270,6 +294,7 @@ namespace C2M2.NeuronalDynamics.Simulation
             rj = Vector.Build.Dense(Neuron.nodes.Count);
             ZZ = Vector.Build.Dense(Neuron.nodes.Count);
             YY = Vector.Build.Dense(Neuron.nodes.Count);
+                        
             tempState = Vector.Build.Dense(Neuron.nodes.Count, 0);
             ///<c>reactConst</c> this is a small list for collecting the conductances and reversal potential which is sent to the reaction solve routine
             reactConst = new List<double> { gk, gna, gl, ek, ena, el };
@@ -325,6 +350,8 @@ namespace C2M2.NeuronalDynamics.Simulation
             R.Add(reactF(reactConst, U_Active, N, M, H, cap).Multiply((4.0 / 3.0) * timeStep), R);
             R.Add(Upre.Multiply(-1.0 / 3.0), R);
             R.Add(reactF(reactConst, Upre, Npre, Mpre, Hpre, cap).Multiply((-2.0 / 3.0) * timeStep), R);
+            R.Add(Isyn, R);
+            Isyn.Multiply(0.0,Isyn); // reset synaptic source 
 
             lu.Solve(R.ToArray(), b);
 
@@ -424,13 +451,14 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// </summary>
         private void InitializeNeuronCell()
         {
-            lock (visualizationValuesLock) U = Vector.Build.Dense(Neuron.nodes.Count, 0);
+            lock (visualizationValuesLock) U = Vector.Build.Dense(Neuron.nodes.Count, 0.0);
             U_Active = U.Clone();
             Upre = U_Active.Clone();
 
             M = Vector.Build.Dense(Neuron.nodes.Count, mi);
             N = Vector.Build.Dense(Neuron.nodes.Count, ni);
             H = Vector.Build.Dense(Neuron.nodes.Count, hi);
+            Isyn = Vector.Build.Dense(Neuron.nodes.Count, 0.0);
             Mpre = M.Clone(); Npre = N.Clone(); Hpre = H.Clone();
         }
         /// <summary>
