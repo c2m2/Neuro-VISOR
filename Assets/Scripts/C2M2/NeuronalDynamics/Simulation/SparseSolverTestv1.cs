@@ -74,7 +74,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// [ohm.m] resistance.length, this is the axial resistence of the neuron, increasing this value has the effect of making the AP waves more localized and slower conduction speed
         /// decreasing this value has the effect of make the AP waves larger and have a faster conduction speed
         /// </summary>
-        private double res = 1800.0 * 1.0E-2;
+        private double res = 300.0 * 1.0E-2;
         /// <summary>
         /// [F/m2] capacitance per unit area, this is the plasma membrane capacitance, this a standard value for the capacitance
         /// </summary>
@@ -229,14 +229,14 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// newValues =(index, and current value in Amps)
         /// </summary>
         /// <param name="newValues"></param>
-        public override void SetSynapseCurrent(Tuple<int, double,double>[] newValues)
+        public override void SetSynapseCurrent(Tuple<int, double,double,double>[] newValues)
         {
             double area = new double();
             double icurr = new double();
             double syntime = new double();
             double curtime = new double();
 
-            foreach (Tuple<int, double,double> newVal in newValues)
+            foreach (Tuple<int, double,double,double> newVal in newValues)
             {
                 if (newVal != null)
                 {
@@ -244,19 +244,22 @@ namespace C2M2.NeuronalDynamics.Simulation
                     {
                         //note newVal.Item1 = index of postsynapse
                         //note newVal.Item2 = voltage at postsynapse
+                        //note newVal.Item3 = current simulation time
+                        //note newVal.Item4 = synapse initializatio time
 
                         area = 2 * System.Math.PI * Neuron.nodes[newVal.Item1].NodeRadius * Neuron.TargetEdgeLength * 1e-12;
-                        syntime = newVal.Item3; // this is the time the clamp is placed
-                        curtime = curentTimeStep*timeStep;
-                        Debug.Log("syntime = " + syntime.ToString() + " curtime = " + curtime.ToString());
-                        icurr = SynapseCurrentFunction(newVal.Item2,System.Math.Abs(syntime-curtime));
-                        Debug.Log("current = " + icurr.ToString());
-                        
-                        //icurr =newVal.Item2*0.25e-8;
-                        //U_Active[newVal.Item1] = U_Active[newVal.Item1] + timeStep * newVal.Item2 / (cap * area);
-                        //Isyn[newVal.Item1] = (2.0/3.0) * timeStep * newVal.Item2*(0.25e-8) / (cap * area);
+                        curtime = newVal.Item3; // this is the current time
+                        syntime = newVal.Item4; // this is synapse initialization time
 
-                        Isyn[newVal.Item1] = (2.0 / 3.0) * timeStep * icurr / (cap * area);
+                        if (newVal.Item2 <= 0.0)
+                        {
+                            Isyn[newVal.Item1] = 0.0;
+                        }
+                        else
+                        {
+                            icurr = SynapseCurrentFunction(newVal.Item2, curtime - syntime);
+                            Isyn[newVal.Item1] = (2.0 / 3.0) * timeStep * icurr / (cap * area);
+                        }
                     }
                 }
             }
@@ -275,7 +278,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         {
             double icurr = new double();
             double ee = System.Math.E; // base of natural logarithm
-            t = 1.0;
+            //t = 1.0;
             icurr = (45.0e-12) * 1 / (1.0 + System.Math.Pow(ee, -0.62 * voltpresyn * 17.0 / 3.57)) * System.Math.Pow(ee, -1.0 * t) / (1.3e-3) * voltpresyn;
 
             return icurr;
