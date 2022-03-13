@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using System;
+using UnityEngine.XR.Interaction.Toolkit;
+using System.Collections.Generic;
 
 namespace C2M2.Interaction.VR
 {
@@ -12,9 +14,9 @@ namespace C2M2.Interaction.VR
     /// This is used so that we can produce a NonConvexMeshCollider and set its colliders as grab points at runtime
     /// </remarks>
     ////////////////////////////////////////////////////////////////////////////////////////////////////
-    public class PublicOVRGrabbable : OVRGrabbable
+    public class PublicOVRGrabbable : XRBaseInteractable
     {
-        public Collider[] M_GrabPoints { get { return m_grabPoints; } set { m_grabPoints = value; } }
+        public IEnumerable<Collider> M_GrabPoints { get; set; }
     }
 
     public class GrabbableNotFoundException : Exception

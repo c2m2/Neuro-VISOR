@@ -12,51 +12,19 @@ PluginImporter:
   validateReferences: 1
   platformData:
   - first:
-      '': Editor
-    second:
-      enabled: 0
-      settings:
-        CPU: X86_64
-        OS: Windows
-  - first:
       Any: 
     second:
-      enabled: 0
+      enabled: 1
       settings: {}
   - first:
       Editor: Editor
     second:
-      enabled: 1
-      settings:
-        CPU: X86_64
-        DefaultValueInitialized: true
-        OS: Windows
-  - first:
-      Facebook: Win
-    second:
       enabled: 0
-      settings:
-        CPU: None
-  - first:
-      Facebook: Win64
-    second:
-      enabled: 1
-      settings:
-        CPU: AnyCPU
-  - first:
-      Standalone: Linux
-    second:
-      enabled: 0
-      settings:
-        CPU: None
-  - first:
-      Standalone: Linux64
-    second:
-      enabled: 1
       settings:
         CPU: x86_64
+        DefaultValueInitialized: true
   - first:
-      Standalone: LinuxUniversal
+      Standalone: Linux64
     second:
       enabled: 1
       settings:
