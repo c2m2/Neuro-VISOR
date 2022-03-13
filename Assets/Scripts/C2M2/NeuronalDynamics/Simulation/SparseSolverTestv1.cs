@@ -646,5 +646,26 @@ namespace C2M2.NeuronalDynamics.Simulation
             return (1.0E3) * 4.0 / (((40.0 - Vin) / 5.0).PointwiseExp() + 1.0);
         }
         #endregion
+
+        // used by save/load functions in Menu.cs
+        public double[] getM() { return M.AsArray(); }
+        public double[] getN() { return N.AsArray(); }
+        public double[] getH() { return H.AsArray(); }
+        public void BuildVectors(double[] voltages, double[] m, double[] n, double[] h)
+        {
+            // recreate voltages at every node
+            Tuple<int, double>[] values = new Tuple<int, double>[voltages.Length];
+            for (int j = 0; j < voltages.Length; j++)
+                values[j] = Tuple.Create(j, voltages[j]);
+            Set1DValues(values); // update U_Active vector
+            SetOutputValues(); // update U vector
+
+            M = Vector.Build.Dense(m);
+            N = Vector.Build.Dense(n);
+            H = Vector.Build.Dense(h);
+
+            // float[] newValues = GetValues();
+            // UpdateVisualization(newValues);
+        }
     }
 }
