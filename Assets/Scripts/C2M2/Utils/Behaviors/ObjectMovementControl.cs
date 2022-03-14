@@ -1,14 +1,23 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.XR;
+using UnityEngine.XR.Interaction.Toolkit;
 
 namespace C2M2.Utils
 {
-    [RequireComponent(typeof(OVRGrabbable))]
+    [System.Serializable]
+    public class MenuButtonEvent : UnityEvent<bool> { }
+
+    [RequireComponent(typeof(XRGrabInteractable))]
     public class ObjectMovementControl : MonoBehaviour
     {
-        private OVRGrabbable grabbable = null;
+        private XRGrabInteractable grabbable = null;
 
-        public OVRInput.Button resetButton = OVRInput.Button.Start;
+        public List<InputDevice> devicesWithMenuBtn;
+        public MenuButtonEvent menuButtonPress;
+        private bool lastButtonState = false;
         public KeyCode resetKey = KeyCode.X;
         public Vector3 resetPosition = Vector3.zero;
         public Vector3 resetRotation = Vector3.zero;
@@ -41,9 +50,23 @@ namespace C2M2.Utils
         {
             get
             {
+                bool tempState = false;
+                foreach(var device in devicesWithMenuBtn)
+                {
+                    bool menuButtonState = false;
+                    tempState = device.TryGetFeatureValue(CommonUsages.menuButton, out menuButtonState)
+                                        && menuButtonState
+                                        || tempState;
+                }
+                bool isPress = tempState != lastButtonState;
+                if(isPress)
+                {
+                    menuButtonPress.Invoke(tempState);
+                    lastButtonState = tempState;
+                }
                 if (GameManager.instance.vrDeviceManager.VRActive)
                 {
-                    return OVRInput.Get(resetButton) && grabbable.isGrabbed;
+                    return isPress && grabbable.isSelected;
                 }
                 else
                 {
@@ -70,9 +93,18 @@ namespace C2M2.Utils
             }
         }
 
+        private void Awake()
+        {
+            if (menuButtonPress == null)
+            {
+                menuButtonPress = new MenuButtonEvent();
+            }
+            devicesWithMenuBtn = new List<InputDevice>();
+        }
+
         private void Start()
         {
-            grabbable = GetComponent<OVRGrabbable>();
+            grabbable = GetComponent<XRGrabInteractable>();
             resetPosition = transform.position;
             resetRotation = transform.eulerAngles;
         }

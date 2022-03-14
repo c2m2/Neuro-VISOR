@@ -3,6 +3,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Threading;
+using UnityEngine.XR.Interaction.Toolkit;
 
 namespace C2M2
 {
@@ -62,7 +63,7 @@ namespace C2M2
         [Header("OVR Player Controller")]
         public GameObject ovrRightHandAnchor = null;
         public GameObject ovrLeftHandAnchor = null;
-        public OVRPlayerController ovrPlayerController { get; set; } = null;
+        public XRController ovrPlayerController { get; set; } = null;
         public GameObject nonVRCamera { get; set; } = null;
 
         [Header("FPS Counter")]
