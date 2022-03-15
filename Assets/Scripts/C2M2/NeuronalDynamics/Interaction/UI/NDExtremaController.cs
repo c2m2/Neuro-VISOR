@@ -4,6 +4,8 @@ using UnityEngine;
 using C2M2.Utils;
 using TMPro;
 using UnityEngine.UI;
+using UnityEngine.XR;
+
 namespace C2M2.NeuronalDynamics.Interaction.UI
 {
     [RequireComponent(typeof(BoxCollider))]
@@ -97,16 +99,22 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
             }
         }
 
-        public OVRInput.Axis2D thumbstickP = OVRInput.Axis2D.PrimaryThumbstick;
-        public OVRInput.Axis2D thumbstickS = OVRInput.Axis2D.SecondaryThumbstick;
+        public List<InputDevice> devicesWithThumbstick = new List<InputDevice>();
         public KeyCode incKey = KeyCode.UpArrow;
         public KeyCode decKey = KeyCode.DownArrow;
         public float PowerModifier
         {
             get
             {
+                float yTotal = 0;
+                Vector2 thumbstickDirection = new Vector2();
+                foreach (var device in devicesWithThumbstick)
+                {
+                    device.TryGetFeatureValue(CommonUsages.primary2DAxis, out thumbstickDirection);
+                    yTotal += thumbstickDirection.y;
+                }
                 // Uses the value of both joysticks added together
-                if (GameManager.instance.vrDeviceManager.VRActive) return OVRInput.Get(thumbstickP).y + OVRInput.Get(thumbstickS).y;
+                if (GameManager.instance.vrDeviceManager.VRActive) return yTotal;
                 else if (Input.GetKey(incKey)) return 1;
                 else if (Input.GetKey(decKey)) return -1;
                 else return 0f;
@@ -115,6 +123,9 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
 
         private void Awake()
         {
+            InputDeviceCharacteristics controllerCharacteristics = InputDeviceCharacteristics.Left | InputDeviceCharacteristics.Right | InputDeviceCharacteristics.Controller;
+            InputDevices.GetDevicesWithCharacteristics(controllerCharacteristics, devicesWithThumbstick);
+
             NullChecks();
 
             bc = GetComponent<BoxCollider>();

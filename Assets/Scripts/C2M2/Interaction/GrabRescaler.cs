@@ -37,13 +37,15 @@ namespace C2M2.Interaction
         {
             get
             {
+                float yTotal = 0;
                 Vector2 thumbstickDirection = new Vector2();
                 foreach (var device in controllers)
                 {
                     device.TryGetFeatureValue(CommonUsages.primary2DAxis, out thumbstickDirection);
+                    yTotal += thumbstickDirection.y;
                 }
                 ///<returns>A float between -1 and 1, where -1 means the thumbstick y axis is completely down and 1 implies it is all the way up</returns>
-                if (GameManager.instance.vrDeviceManager.VRActive) return thumbstickDirection.y;
+                if (GameManager.instance.vrDeviceManager.VRActive) return yTotal;
                 else if (Input.GetKey(incKey) && !Input.GetKey(decKey)) return .2f;
                 else if (Input.GetKey(decKey) && !Input.GetKey(incKey)) return -.2f;
                 return 0;

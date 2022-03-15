@@ -16,7 +16,6 @@ namespace C2M2.Utils.DebugUtils.Actions
         List<InputDevice> inputDevices = new List<InputDevice>();
         public PrimaryButtonEvent primaryButtonPress;
         private bool lastButtonState = false;
-        //public OVRInput.Button oculusPauseButton = OVRInput.Button.PrimaryThumbstick;
         public bool allowKeyboardPause = true;
         public KeyCode keyboardPauseButton = KeyCode.Space;
         // Update is called once per frame

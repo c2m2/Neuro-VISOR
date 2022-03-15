@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
-
+using UnityEngine.XR.Interaction.Toolkit;
 namespace C2M2.Interaction
 {
     using Utils;
@@ -18,7 +18,7 @@ namespace C2M2.Interaction
         public bool toggleMode = true;
         [Tooltip("Button to invoke hit/hold events from a distance")]
         public OVRInput.Button triggerEventsButton = OVRInput.Button.PrimaryIndexTrigger;
-        public OVRGrabber grabber = null;
+        public XRGrabInteractable grabber = null;
         [Tooltip("Line renderer for visually mimicking raycast vector")]
         public LineRenderer lineRend;
         [Tooltip("Line renderer default color")]
@@ -50,7 +50,7 @@ namespace C2M2.Interaction
 
             if(grabber == null)
             {
-                grabber = GetComponentInParent<OVRGrabber>();
+                grabber = GetComponentInParent<XRGrabInteractable>();
             }
         }
         protected override void OnStart()
@@ -67,7 +67,7 @@ namespace C2M2.Interaction
             bool rURaycasting = toggleMode ? Toggled : OVRInput.Get(beginRaycastingButton, controller);
 
             // If an object is being actively grabbed, don't raycast
-            if (grabber != null && grabber.grabbedObject != null)
+            if (grabber != null && grabber.isSelected)
                 rURaycasting = false;
 
             StaticHandSetActive(rURaycasting);

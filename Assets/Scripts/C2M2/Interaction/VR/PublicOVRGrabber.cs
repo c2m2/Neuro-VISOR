@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.XR.Interaction.Toolkit;
 
 namespace C2M2.Interaction.VR
 {
@@ -11,9 +13,9 @@ namespace C2M2.Interaction.VR
     /// This allows you to change the user's grab colliders at runtime
     /// </remarks>
     ////////////////////////////////////////////////////////////////////////////////////////////////////
-    public class PublicOVRGrabber : OVRGrabber
+    public class PublicOVRGrabber : XRGrabInteractable
     {
-        public Collider[] M_GrabVolumes { get { return m_grabVolumes; } set { m_grabVolumes = value; } }
-        public OVRInput.Controller Controller { get { return m_controller; } }
+        public Collider[] M_GrabVolumes { get => colliders.ToArray(); set { } }
+        public XRController Controller { get; }
     }
 }

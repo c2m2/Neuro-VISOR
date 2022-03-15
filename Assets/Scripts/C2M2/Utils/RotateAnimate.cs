@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.XR.Interaction.Toolkit;
 namespace C2M2.Utils.Animation
 {
     public class RotateAnimate : MonoBehaviour
@@ -8,13 +9,13 @@ namespace C2M2.Utils.Animation
 
         public float rotateSpeed = 0.1f;
 
-        private OVRGrabbable grabbable;
+        private XRGrabInteractable grabbable;
         private Rigidbody rb;
 
         // Use this for initialization
         void Start()
         {
-            grabbable = GetComponent<OVRGrabbable>();
+            grabbable = GetComponent<XRGrabInteractable>();
             rb = GetComponent<Rigidbody>();
             enabled = true;
         }

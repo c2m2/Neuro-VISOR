@@ -2,9 +2,14 @@
 using UnityEngine;
 using C2M2.NeuronalDynamics.Simulation;
 using C2M2.Interaction;
+using UnityEngine.XR.Interaction.Toolkit;
+using UnityEngine.XR;
+using UnityEngine.Events;
 
 namespace C2M2.NeuronalDynamics.Interaction
 {
+    [System.Serializable]
+    public class TriggerPressEvent : UnityEvent<bool> { }
     /// <summary>
     /// Provides public method for instantiating clamps. Provides controls for multiple clamps
     /// </summary>
@@ -40,6 +45,8 @@ namespace C2M2.NeuronalDynamics.Interaction
         /// <summary>
         /// Pressing these buttonb toggles clamps on/off. Holding these buttons down for long enough destroys the clamp
         /// </summary>
+        public List<InputDevice> devicesWithTrigger = new List<InputDevice>();
+        
         public OVRInput.Button toggleDestroyOVR = OVRInput.Button.PrimaryIndexTrigger;
         public OVRInput.Button toggleDestroyOVRS = OVRInput.Button.SecondaryIndexTrigger;
         public bool PressedToggleDestroy
@@ -99,6 +106,14 @@ namespace C2M2.NeuronalDynamics.Interaction
         }
 
         #endregion
+
+        private void Awake()
+        {
+            InputDeviceCharacteristics controllerCharacteristics = InputDeviceCharacteristics.Left | InputDeviceCharacteristics.Right | InputDeviceCharacteristics.Controller;
+            InputDevices.GetDevicesWithCharacteristics(controllerCharacteristics, devicesWithTrigger);
+        }
+
+
 
         /// <summary>
         /// Looks for NDSimulation instance and adds neuronClamp object if possible
