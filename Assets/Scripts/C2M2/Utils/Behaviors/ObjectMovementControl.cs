@@ -15,7 +15,7 @@ namespace C2M2.Utils
     {
         private XRGrabInteractable grabbable = null;
 
-        public List<InputDevice> devicesWithMenuBtn;
+        public List<InputDevice> devicesWithMenuBtn = new List<InputDevice>();
         public MenuButtonEvent menuButtonPress;
         private bool lastButtonState = false;
         public KeyCode resetKey = KeyCode.X;
@@ -99,7 +99,8 @@ namespace C2M2.Utils
             {
                 menuButtonPress = new MenuButtonEvent();
             }
-            devicesWithMenuBtn = new List<InputDevice>();
+            InputDeviceCharacteristics controllerCharacteristics = InputDeviceCharacteristics.Left | InputDeviceCharacteristics.Right | InputDeviceCharacteristics.Controller;
+            InputDevices.GetDevicesWithCharacteristics(controllerCharacteristics, devicesWithMenuBtn);
         }
 
         private void Start()

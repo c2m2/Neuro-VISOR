@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.XR;
 
 namespace C2M2.Utils
@@ -6,14 +8,42 @@ namespace C2M2.Utils
     public class QuitGame : MonoBehaviour
     {
         public KeyCode quitKey = KeyCode.Escape;
-        public OVRInput.Button quitButton = OVRInput.Button.Start;
+        public List<InputDevice> devicesWithMenuBtn = new List<InputDevice>();
+        public MenuButtonEvent menuButtonPress;
+        private bool lastButtonState = false;
         private bool OculusRequested
         {
             get
             {
-                return OVRInput.Get(quitButton, OVRInput.Controller.LTouch) || OVRInput.Get(quitButton, OVRInput.Controller.RTouch);
+                bool tempState = false;
+                foreach (var device in devicesWithMenuBtn)
+                {
+                    bool menuButtonState = false;
+                    tempState = device.TryGetFeatureValue(CommonUsages.menuButton, out menuButtonState)
+                                        && menuButtonState
+                                        || tempState;
+                }
+                bool isPress = tempState != lastButtonState;
+                if (isPress)
+                {
+                    menuButtonPress.Invoke(tempState);
+                    lastButtonState = tempState;
+                }
+                return isPress;
             }
         }
+
+        private void Awake()
+        {
+            if (menuButtonPress == null)
+            {
+                menuButtonPress = new MenuButtonEvent();
+            }
+
+            InputDeviceCharacteristics controllerCharacteristics = InputDeviceCharacteristics.Left | InputDeviceCharacteristics.Right | InputDeviceCharacteristics.Controller;
+            InputDevices.GetDevicesWithCharacteristics(controllerCharacteristics, devicesWithMenuBtn);
+        }
+
         private bool QuitRequested
         {
             get

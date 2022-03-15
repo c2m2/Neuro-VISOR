@@ -1,15 +1,21 @@
 ﻿using UnityEngine;
 using C2M2.Utils;
+using UnityEngine.XR.Interaction.Toolkit;
+using System.Collections.Generic;
+using UnityEngine.XR;
+using UnityEngine.Events;
 
 namespace C2M2.Interaction
 {
+    [System.Serializable]
+    public class PrimaryThumbstickEvent: UnityEvent<bool> { }
     /// <summary>
     /// Controls the scaling of a transform
     /// </summary>
-    [RequireComponent(typeof(OVRGrabbable))]
+    [RequireComponent(typeof(XRGrabInteractable))]
     public class GrabRescaler : MonoBehaviour
     {
-        private OVRGrabbable grabbable = null;
+        private XRGrabInteractable grabbable = null;
         private Vector3 origScale;
         private Vector3 minScale;
         private Vector3 maxScale;
@@ -19,8 +25,9 @@ namespace C2M2.Interaction
         public bool xScale = true;
         public bool yScale = true;
         public bool zScale = true;
-        public OVRInput.Button vrThumbstick = OVRInput.Button.PrimaryThumbstick;
-        public OVRInput.Button vrThumbstickS = OVRInput.Button.SecondaryThumbstick;
+        public List<InputDevice> controllers = new List<InputDevice>();
+        public PrimaryThumbstickEvent primaryThumbstickPress;
+        private bool lastThumbstickState = false;
         public KeyCode incKey = KeyCode.UpArrow;
         public KeyCode decKey = KeyCode.DownArrow;
         public KeyCode resetKey = KeyCode.R;
@@ -30,8 +37,13 @@ namespace C2M2.Interaction
         {
             get
             {
+                Vector2 thumbstickDirection = new Vector2();
+                foreach (var device in controllers)
+                {
+                    device.TryGetFeatureValue(CommonUsages.primary2DAxis, out thumbstickDirection);
+                }
                 ///<returns>A float between -1 and 1, where -1 means the thumbstick y axis is completely down and 1 implies it is all the way up</returns>
-                if (GameManager.instance.vrDeviceManager.VRActive) return (OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick).y + OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick).y);
+                if (GameManager.instance.vrDeviceManager.VRActive) return thumbstickDirection.y;
                 else if (Input.GetKey(incKey) && !Input.GetKey(decKey)) return .2f;
                 else if (Input.GetKey(decKey) && !Input.GetKey(incKey)) return -.2f;
                 return 0;
@@ -44,16 +56,36 @@ namespace C2M2.Interaction
         {
             get
             {
-                if (GameManager.instance.vrDeviceManager.VRActive) return (OVRInput.Get(vrThumbstick) || OVRInput.Get(vrThumbstickS));
+                bool tempState = false;
+                foreach (var device in controllers)
+                {
+                    bool primaryThumbstickState = false;
+                    tempState = device.TryGetFeatureValue(CommonUsages.primaryButton, out primaryThumbstickState) // did get a value
+                                && primaryThumbstickState // the value we got
+                                || tempState; // cumulative result from other controllers
+                }
+                bool isPressed = tempState != lastThumbstickState;
+                if (isPressed) // Button state changed since last frame
+                {
+                    primaryThumbstickPress.Invoke(tempState);
+                    lastThumbstickState = tempState;
+                }
+                if (GameManager.instance.vrDeviceManager.VRActive) return isPressed;
                 else return Input.GetKey(resetKey);
             }
+        }
+
+        private void Awake()
+        {
+            InputDeviceCharacteristics controllerCharacteristics = InputDeviceCharacteristics.Left | InputDeviceCharacteristics.Right | InputDeviceCharacteristics.Controller;
+            InputDevices.GetDevicesWithCharacteristics(controllerCharacteristics, controllers);
         }
 
         private void Start()
         {
             if (target == null) target = transform;
 
-            grabbable = GetComponent<OVRGrabbable>();
+            grabbable = GetComponent<XRGrabInteractable>();
 
             // Use this to determine how to scale at runtime
             origScale = target.localScale;
@@ -67,7 +99,7 @@ namespace C2M2.Interaction
             // RaycastEventHandler handles calling rescale for Desktop mode, TODO this is bad and should be changed
             if (!GameManager.instance.vrDeviceManager.VRActive) return;
 
-            if (grabbable.isGrabbed) Rescale();
+            if (grabbable.isSelected) Rescale();
         }
 
         public void Rescale()
