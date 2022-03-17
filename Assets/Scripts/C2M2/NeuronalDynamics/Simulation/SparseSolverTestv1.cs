@@ -226,16 +226,11 @@ namespace C2M2.NeuronalDynamics.Simulation
 
         /// <summary>
         /// Receives 1D information for synaptic communication
-        /// newValues =(index, and current value in Amps)
+        /// newValues = (index of postsynapse, voltage at postsynapse, current simulation time, synapse initialization time)
         /// </summary>
         /// <param name="newValues"></param>
-        public override void SetSynapseCurrent(Tuple<int, double,double,double>[] newValues)
+        public override void SetSynapseCurrent(Tuple<int,double,double,double>[] newValues)
         {
-            double area = new double();
-            double icurr = new double();
-            double syntime = new double();
-            double curtime = new double();
-
             foreach (Tuple<int, double,double,double> newVal in newValues)
             {
                 if (newVal != null)
@@ -245,11 +240,11 @@ namespace C2M2.NeuronalDynamics.Simulation
                         //note newVal.Item1 = index of postsynapse
                         //note newVal.Item2 = voltage at postsynapse
                         //note newVal.Item3 = current simulation time
-                        //note newVal.Item4 = synapse initializatio time
+                        //note newVal.Item4 = synapse initialization time
 
-                        area = 2 * System.Math.PI * Neuron.nodes[newVal.Item1].NodeRadius * Neuron.TargetEdgeLength * 1e-12;
-                        curtime = newVal.Item3; // this is the current time
-                        syntime = newVal.Item4; // this is synapse initialization time
+                        double area = 2 * System.Math.PI * Neuron.nodes[newVal.Item1].NodeRadius * Neuron.TargetEdgeLength * 1e-12;
+                        double curtime = newVal.Item3; // this is the current time
+                        double syntime = newVal.Item4; // this is synapse initialization time
 
                         if (newVal.Item2 <= 0.0)
                         {
@@ -257,7 +252,7 @@ namespace C2M2.NeuronalDynamics.Simulation
                         }
                         else
                         {
-                            icurr = SynapseCurrentFunction(newVal.Item2, curtime - syntime);
+                            double icurr = SynapseCurrentFunction(newVal.Item2, curtime - syntime);
                             Isyn[newVal.Item1] = (2.0 / 3.0) * timeStep * icurr / (cap * area);
                         }
                     }
@@ -274,12 +269,10 @@ namespace C2M2.NeuronalDynamics.Simulation
         CompressedColumnStorage<double> l_csc;              //This is for the lhs sparse matrix
         private SparseLU lu;                                //Initialize the LU factorizaation
 
-        public static double SynapseCurrentFunction(double voltpresyn,double t)
+        public static double SynapseCurrentFunction(double voltpresyn, double t)
         {
-            double icurr = new double();
-            double ee = System.Math.E; // base of natural logarithm
             //t = 1.0;
-            icurr = (45.0e-12) * 1 / (1.0 + System.Math.Pow(ee, -0.62 * voltpresyn * 17.0 / 3.57)) * System.Math.Pow(ee, -1.0 * t) / (1.3e-3) * voltpresyn;
+            double icurr = (45.0e-12) * 1 / (1.0 + System.Math.Exp(-0.62 * voltpresyn * 17.0 / 3.57)) * System.Math.Exp(-1.0 * t) / (1.3e-3) * voltpresyn;
 
             return icurr;
         }
