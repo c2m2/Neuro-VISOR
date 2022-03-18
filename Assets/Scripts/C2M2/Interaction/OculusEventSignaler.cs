@@ -1,23 +1,47 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.XR;
 using UnityEngine.XR.Interaction.Toolkit;
 namespace C2M2.Interaction
 {
+    using System.Collections.Generic;
+    using UnityEngine.Events;
     using Utils;
 
+    [System.Serializable]
+    public class PrimaryButtonEvent : UnityEvent<bool> { }
+    [System.Serializable]
+    public class IndexTriggerEvent : UnityEvent<bool> { }
     /// <summary>
     /// Activate raycast triggers using oculus controller buttons and fingertip distance
     /// </summary>
     public class OculusEventSignaler : RaycastEventSignaler
     {
+        /// <summary>
+        /// This is an attempt to replace the Oculus SDK to a more generic XR input system
+        /// 1. Get a list of input devices using the new XR input system.
+        ///     * Use the "InputDeviceCharacteristics.Right" field to target the devices that would be categorized as the right hand controller
+        /// 2. Then use the XR.Input.CommonUsage class to get the corresponding button press event on the right hand controller 
+        /// </summary>
         [Tooltip("The Oculus controller being raycasted from")]
-        public OVRInput.Controller controller = OVRInput.Controller.RTouch;
-        [Tooltip("Button to activate raycasting mode")]
-        public OVRInput.Button beginRaycastingButton = OVRInput.Button.One;
+        public List<InputDevice> controllers = new List<InputDevice>();
+
+
+        //[Tooltip("Button to activate raycasting mode")]
+        //public OVRInput.Button beginRaycastingButton = OVRInput.Button.One;
+        public PrimaryButtonEvent primaryButtonPress;
+        private bool lastPrimaryBtnState = false;
+
+
         [Tooltip("If Toggle Mode is enabled, pressing Begin Raycasting Button will toggle raycasting mode on. Otherwise Begin Raycasting Button needs to be held down to enter raycasting mode.")]
         public bool toggleMode = true;
-        [Tooltip("Button to invoke hit/hold events from a distance")]
-        public OVRInput.Button triggerEventsButton = OVRInput.Button.PrimaryIndexTrigger;
+
+
+        //[Tooltkip("Button to invoke hit/hold events from a distance")]
+        //public OVRInput.Button triggerEventsButton = OVRInput.Button.PrimaryIndexTrigger;
+        public IndexTriggerEvent indexTriggerPress;
+        private bool lastIndexTriggerState = false;
+
         public XRGrabInteractable grabber = null;
         [Tooltip("Line renderer for visually mimicking raycast vector")]
         public LineRenderer lineRend;
@@ -34,9 +58,19 @@ namespace C2M2.Interaction
         {
             get
             {
-                // If the raycasting button was pressed for the first time this frame, enable/disable raycasting
-                if (OVRInput.GetDown(beginRaycastingButton, controller))
+                bool tempState = false;
+                foreach (var device in controllers)
                 {
+                    bool primaryButtonState = false;
+                    tempState = device.TryGetFeatureValue(CommonUsages.primaryButton, out primaryButtonState) // did get a value
+                                && primaryButtonState // the value we got
+                                || tempState; // cumulative result from other controllers
+                }
+                bool isPressed = tempState != lastPrimaryBtnState;
+                if (isPressed) //If the raycasting button was pressed for the first time this frame, enable/disable raycasting
+                {
+                    primaryButtonPress.Invoke(tempState);
+                    lastPrimaryBtnState = tempState;
                     toggled = !toggled;
                 }
                 return toggled;
@@ -45,6 +79,8 @@ namespace C2M2.Interaction
 
         protected override void OnAwake()
         {
+            InputDeviceCharacteristics controllerCharacteristics = InputDeviceCharacteristics.Right;
+            InputDevices.GetDevicesWithCharacteristics(controllerCharacteristics, controllers);
             lineRend = gameObject.GetComponentInChildren<LineRenderer>();
             if (lineRend == null) { Debug.LogWarning("Couldn't find line renderer in RaycastForward"); }
 
@@ -62,9 +98,23 @@ namespace C2M2.Interaction
         }
         protected override bool RaycastRequested()
         {
+            bool tempState = false;
+            foreach (var device in controllers)
+            {
+                bool primaryButtonState = false;
+                tempState = device.TryGetFeatureValue(CommonUsages.primaryButton, out primaryButtonState) // did get a value
+                            && primaryButtonState // the value we got
+                            || tempState; // cumulative result from other controllers
+            }
+            bool isPressed = tempState != lastPrimaryBtnState;
+            if (isPressed) //If the raycasting button was pressed for the first time this frame, enable/disable raycasting
+            {
+                primaryButtonPress.Invoke(tempState);
+                lastPrimaryBtnState = tempState;
+            }
             // If we are in toggle mode, is raycasting mode toggled on?
             // Otherwise, is the Begin Raycasting Button currently being pressed down?
-            bool rURaycasting = toggleMode ? Toggled : OVRInput.Get(beginRaycastingButton, controller);
+            bool rURaycasting = toggleMode ? Toggled : isPressed;
 
             // If an object is being actively grabbed, don't raycast
             if (grabber != null && grabber.isSelected)
@@ -77,7 +127,9 @@ namespace C2M2.Interaction
         }
         private bool distancePressed = false;
         /// <returns> True if the specified controller button is pressed OR if we are near enough to the raycast target </returns>
-        protected override bool PressCondition() => (OVRInput.Get(triggerEventsButton, controller) || distancePressed);
+        protected override bool PressCondition() => (
+            OVRInput.Get(triggerEventsButton, controller) || distancePressed
+            );
 
         // At the start of a click change the line renderer color to pressed color
         protected override void OnPressBegin()

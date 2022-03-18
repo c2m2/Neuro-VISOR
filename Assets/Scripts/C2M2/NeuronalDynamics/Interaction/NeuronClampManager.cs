@@ -8,8 +8,14 @@ using UnityEngine.Events;
 
 namespace C2M2.NeuronalDynamics.Interaction
 {
+    //trigger = index trigger
+    //grib = hand trigger
     [System.Serializable]
-    public class TriggerPressEvent : UnityEvent<bool> { }
+    public class IndexTriggerPressEvent : UnityEvent<bool> { }
+    [System.Serializable]
+    public class HandTriggerPressEvent : UnityEvent<bool> { }
+    [System.Serializable]
+    public class CancelEvent : UnityEvent<bool> { }
     /// <summary>
     /// Provides public method for instantiating clamps. Provides controls for multiple clamps
     /// </summary>
@@ -45,16 +51,37 @@ namespace C2M2.NeuronalDynamics.Interaction
         /// <summary>
         /// Pressing these buttonb toggles clamps on/off. Holding these buttons down for long enough destroys the clamp
         /// </summary>
-        public List<InputDevice> devicesWithTrigger = new List<InputDevice>();
+        public List<InputDevice> handControllers = new List<InputDevice>();
+
+        public CancelEvent secondaryBtnPress;
+        private bool lastSecondaryBtnState = false;
+
+        public IndexTriggerPressEvent indexTriggerPress;
+        private bool lastIndexTriggerState = false;
+
+        public HandTriggerPressEvent handTriggerPress;
+        private bool lastHandTriggerState = false;
         
-        public OVRInput.Button toggleDestroyOVR = OVRInput.Button.PrimaryIndexTrigger;
-        public OVRInput.Button toggleDestroyOVRS = OVRInput.Button.SecondaryIndexTrigger;
         public bool PressedToggleDestroy
         {
             get
             {
+                bool tempState = false;
+                foreach (var device in handControllers)
+                {
+                    bool indexTriggerState = false;
+                    tempState = device.TryGetFeatureValue(CommonUsages.triggerButton, out indexTriggerState) // did get a value
+                                && indexTriggerState // the value we got
+                                || tempState; // cumulative result from other controllers
+                }
+                bool isPressed = tempState != lastIndexTriggerState;
+                if (isPressed) // Button state changed since last frame
+                {
+                    indexTriggerPress.Invoke(tempState);
+                    lastIndexTriggerState = tempState;
+                }
                 if (GameManager.instance.vrDeviceManager.VRActive)
-                    return (OVRInput.Get(toggleDestroyOVR) || OVRInput.Get(toggleDestroyOVRS));
+                    return isPressed;
                 else return true;
             }
         }
@@ -66,8 +93,15 @@ namespace C2M2.NeuronalDynamics.Interaction
             {
                 if (GameManager.instance.vrDeviceManager.VRActive)
                 {
+                    float yTotal = 0;
+                    Vector2 thumbstickDirection = new Vector2();
+                    foreach (var device in handControllers)
+                    {
+                        device.TryGetFeatureValue(CommonUsages.primary2DAxis, out thumbstickDirection);
+                        yTotal += thumbstickDirection.y;
+                    }
                     // Uses the value of both joysticks added together
-                    float scaler = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick).y + OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick).y;
+                    float scaler = yTotal;
 
                     return ThumbstickScaler * scaler;
                 }
@@ -81,26 +115,50 @@ namespace C2M2.NeuronalDynamics.Interaction
         }
         private bool powerClick = false;
 
-        public OVRInput.Button highlightOVR = OVRInput.Button.PrimaryHandTrigger;
-        public OVRInput.Button highlightOVRS = OVRInput.Button.SecondaryHandTrigger;
         public bool PressedHighlight
         {
             get
             {
+                bool tempState = false;
+                foreach (var device in handControllers)
+                {
+                    bool handTriggerState = false;
+                    tempState = device.TryGetFeatureValue(CommonUsages.gripButton, out handTriggerState) // did get a value
+                                && handTriggerState // the value we got
+                                || tempState; // cumulative result from other controllers
+                }
+                bool isPressed = tempState != lastHandTriggerState;
+                if (isPressed) // Button state changed since last frame
+                {
+                    handTriggerPress.Invoke(tempState);
+                    lastHandTriggerState = tempState;
+                }
                 if (GameManager.instance.vrDeviceManager.VRActive)
-                    return (OVRInput.Get(highlightOVR) || OVRInput.Get(highlightOVRS));
+                    return isPressed;
                 else return false; // We cannot highlight through the emulator
             }
         }
 
-        public OVRInput.Button cancelCommand = OVRInput.Button.Two;
-        public OVRInput.Button cancelCommandS = OVRInput.Button.Four;
         public KeyCode cancelKey = KeyCode.Backspace;
         public bool PressedCancel
         {
             get
             {
-                if (GameManager.instance.vrDeviceManager.VRActive) return OVRInput.Get(cancelCommand) || OVRInput.Get(cancelCommandS);
+                bool tempState = false;
+                foreach (var device in handControllers)
+                {
+                    bool secondaryButtonState = false;
+                    tempState = device.TryGetFeatureValue(CommonUsages.secondaryButton, out secondaryButtonState) // did get a value
+                                && secondaryButtonState // the value we got
+                                || tempState; // cumulative result from other controllers
+                }
+                bool isPressed = tempState != lastSecondaryBtnState;
+                if (isPressed) // Button state changed since last frame
+                {
+                    secondaryBtnPress.Invoke(tempState);
+                    lastSecondaryBtnState = tempState;
+                }
+                if (GameManager.instance.vrDeviceManager.VRActive) return isPressed;
                 else return Input.GetKey(cancelKey);
             }
         }
@@ -109,8 +167,12 @@ namespace C2M2.NeuronalDynamics.Interaction
 
         private void Awake()
         {
+            if (secondaryBtnPress == null)
+            {
+                secondaryBtnPress = new CancelEvent();
+            }
             InputDeviceCharacteristics controllerCharacteristics = InputDeviceCharacteristics.Left | InputDeviceCharacteristics.Right | InputDeviceCharacteristics.Controller;
-            InputDevices.GetDevicesWithCharacteristics(controllerCharacteristics, devicesWithTrigger);
+            InputDevices.GetDevicesWithCharacteristics(controllerCharacteristics, handControllers);
         }
 
 
