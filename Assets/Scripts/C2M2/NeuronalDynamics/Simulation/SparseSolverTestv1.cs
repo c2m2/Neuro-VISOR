@@ -293,6 +293,7 @@ namespace C2M2.NeuronalDynamics.Simulation
             GameManager g = GameManager.instance;
             // if loading, the values from file will be set in BuildVectors and Set1DValues
             if (!g.Loading) InitializeNeuronCell();
+            else BuildVectors(g.U, g.M, g.N, g.H, g.Upre, g.Mpre, g.Npre, g.Hpre);
 
             ///<c>R</c> this is the reaction vector for the reaction solve
             R = Vector.Build.Dense(Neuron.nodes.Count);
@@ -732,30 +733,19 @@ namespace C2M2.NeuronalDynamics.Simulation
         public void BuildVectors(double[] u, double[] m, double[] n, double[] h,
                                     double[] upre, double[] mpre, double[] npre, double[] hpre)
         {
-            lock (visualizationValuesLock)
-            {
-                U = Vector.Build.Dense(u);
-                U_Active = U.Clone();
-            }
-            Upre = Vector.Build.Dense(upre);
+            lock (visualizationValuesLock) U = Vector.Build.DenseOfArray(u);
+            lock (visualizationValuesLock) U_Active = U.Clone();
+            Upre = Vector.Build.DenseOfArray(upre);
 
-            M = Vector.Build.Dense(m);
-            N = Vector.Build.Dense(n);
-            H = Vector.Build.Dense(h);
+            M = Vector.Build.DenseOfArray(m);
+            N = Vector.Build.DenseOfArray(n);
+            H = Vector.Build.DenseOfArray(h);
 
-            Mpre = Vector.Build.Dense(mpre);
-            Npre = Vector.Build.Dense(npre);
-            Hpre = Vector.Build.Dense(hpre);
+            Mpre = Vector.Build.DenseOfArray(mpre);
+            Npre = Vector.Build.DenseOfArray(npre);
+            Hpre = Vector.Build.DenseOfArray(hpre);
 
-            Tuple<int, double>[] values = new Tuple<int, double>[u.Length];
-            for (int j = 0; j < u.Length; j++)
-                values[j] = Tuple.Create(j, u[j]);
-
-            Set1DValues(values);
-            // SetOutputValues();
-
-            // float[] newValues = GetValues();
-            // UpdateVisualization(newValues);
+            Isyn = Vector.Build.Dense(Neuron.nodes.Count, 0.0); // will have to save/load
         }
     }
 }

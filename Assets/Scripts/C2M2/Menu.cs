@@ -161,13 +161,14 @@ namespace C2M2
         public void Load()
         {
             // clear the scene first
-            ClearScene();
+            //ClearScene();
 
             loader = FindObjectOfType<NDSimulationLoader>();
 
             if (loader != null)
             {
                 loading = true; // this is for ChangeGradient
+                gm.Loading = true;
                 // NeuronClampManager clampMng = gm.ndClampManager;
 
                 // ClearScene();
@@ -200,6 +201,17 @@ namespace C2M2
                     loader.timestepSize = data.timeStep;
                     loader.endTime = data.endTime;
 
+                    // restore vectors
+                    gm.U = data.U;
+                    gm.M = data.M;
+                    gm.N = data.N;
+                    gm.H = data.H;
+
+                    gm.Upre = data.Upre;
+                    gm.Mpre = data.Mpre;
+                    gm.Npre = data.Npre;
+                    gm.Hpre = data.Hpre;
+
                     GameObject go;
                     try
                     {
@@ -213,20 +225,17 @@ namespace C2M2
                         return;
                     }
 
+                    SparseSolverTestv1 sim = go.GetComponent<SparseSolverTestv1>();
+
                     go.transform.position = data.pos;
                     go.transform.rotation = data.rotation;
                     go.transform.localScale = data.scale;
-
-                    SparseSolverTestv1 sim = go.GetComponent<SparseSolverTestv1>();
 
                     // get clamp manager
                     NeuronClampManager clampMng = sim.clampManager;
 
                     // set current time step
                     sim.curentTimeStep = t.currentTimeStep;
-
-                    // restore U, M, N, H, Upre, Mpre, Npre, Hpre vectors
-                    sim.BuildVectors(data.U, data.M, data.N, data.H, data.Upre, data.Mpre, data.Npre, data.Hpre);
 
                     // recreate clamps
                     clampMng.currentSimulation = sim;
@@ -267,11 +276,12 @@ namespace C2M2
                         gradientIndex = data.gradientIndex;
                 }
 
-                // set paused to true
-                NDPauseButton pauseBtn = FindObjectOfType<NDPauseButton>();
-                pauseBtn.PauseState = true;
-
                 finishedLoading = true; // this is for ChangeGradient
+                gm.Loading = false;
+
+                // set paused
+                NDPauseButton pauseBtn = FindObjectOfType<NDPauseButton>();
+                pauseBtn.TogglePause();
             }
             else
                 Debug.LogError("Check that loader are not null in Menu!");
