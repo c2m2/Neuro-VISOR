@@ -171,7 +171,7 @@ namespace C2M2
                 gm.Loading = true;
                 // NeuronClampManager clampMng = gm.ndClampManager;
 
-                // ClearScene();
+                ClearScene();
 
                 string[] json = File.ReadAllText(path).Split(';');
 
@@ -289,15 +289,12 @@ namespace C2M2
 
         public void ClearScene()
         {
-            //NDBoardController ctrl = FindObjectOfType<NDBoardController>();
-            //if (ctrl != null)
-            //    ctrl.CloseAllSimulations();
-            foreach (NDSimulation s in gm.activeSims)
-                Destroy(s.gameObject);
-
-            if (gm.activeSims.Count == 0) Destroy(GameObject.Find("Ruler"));
-
-            gm.cellPreviewer.SetActive(true);
+            GameObject controlPanel = GameObject.FindGameObjectWithTag("ControlPanel");
+            if (controlPanel != null)
+            {
+                NDBoardController c = controlPanel.GetComponent<NDBoardController>();
+                c.CloseAllSimulations();
+            }
         }
     }
 }
