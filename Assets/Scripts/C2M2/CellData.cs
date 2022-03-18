@@ -33,10 +33,15 @@ namespace C2M2
         public ClampData[] clamps;
 
         // Simulation state
-        public double[] voltage1D; // save U vector!!!
+        public double[] U;
         public double[] M;
         public double[] N;
         public double[] H;
+
+        public double[] Upre;
+        public double[] Mpre;
+        public double[] Npre;
+        public double[] Hpre;
 
         // Graph data
         [System.Serializable]

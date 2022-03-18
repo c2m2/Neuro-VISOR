@@ -69,6 +69,14 @@ namespace C2M2
         public Utils.DebugUtils.FPSCounter fpsCounter;
         private bool isRunning = false;
 
+        // for loading a file
+        private bool loading = false;
+        public bool Loading
+        {
+            get { return loading; }
+            set { loading = value; }
+        }
+
         private void Awake()
         {
             // Initialize the GameManager

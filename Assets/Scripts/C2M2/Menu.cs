@@ -10,6 +10,7 @@ namespace C2M2
     using NeuronalDynamics.Simulation;
     using NeuronalDynamics.Interaction;
     using NeuronalDynamics.Interaction.UI;
+    using NeuronalDynamics.Visualization;
 
     /// <summary>
     /// Provides Save and Load functionality for cells
@@ -101,10 +102,15 @@ namespace C2M2
                     // fill in the variables to be saved
                     data = new CellData();
 
-                    data.voltage1D = sim.Get1DValues(); // voltage at every node
+                    data.U = sim.Get1DValues(); // voltage at every node
                     data.M = sim.getM(); // M vector
                     data.N = sim.getN(); // N vector
                     data.H = sim.getH(); // H vector
+
+                    data.Upre = sim.getUpre(); // Upre vector
+                    data.Mpre = sim.getMpre(); // Mpre vector
+                    data.Npre = sim.getNpre(); // Npre vector
+                    data.Hpre = sim.getHpre(); // Hpre vector
 
                     data.pos = sim.transform.position;
                     data.rotation = sim.transform.rotation;
@@ -122,7 +128,6 @@ namespace C2M2
 
                         for (int j = 0; j < data.clamps.Length; j++)
                         {
-                            // data.clamp[j] = new ClampData();
                             data.clamps[j].vertex1D = sim.clamps[j].focusVert;
                             data.clamps[j].live = sim.clamps[j].ClampLive;
                             data.clamps[j].power = sim.clamps[j].ClampPower;
@@ -155,15 +160,17 @@ namespace C2M2
 
         public void Load()
         {
+            // clear the scene first
+            ClearScene();
+
+            loader = FindObjectOfType<NDSimulationLoader>();
+
             if (loader != null)
             {
                 loading = true; // this is for ChangeGradient
                 // NeuronClampManager clampMng = gm.ndClampManager;
 
                 // ClearScene();
-                // clear the scene first
-                // NDBoardController ctrl = FindObjectOfType<NDBoardController>();
-                // ctrl.CloseAllSimulations();
 
                 string[] json = File.ReadAllText(path).Split(';');
 
@@ -218,8 +225,8 @@ namespace C2M2
                     // set current time step
                     sim.curentTimeStep = t.currentTimeStep;
 
-                    // restore U_Active, M, N, H vectors
-                    sim.BuildVectors(data.voltage1D, data.M, data.N, data.H);
+                    // restore U, M, N, H, Upre, Mpre, Npre, Hpre vectors
+                    sim.BuildVectors(data.U, data.M, data.N, data.H, data.Upre, data.Mpre, data.Npre, data.Hpre);
 
                     // recreate clamps
                     clampMng.currentSimulation = sim;
@@ -270,14 +277,17 @@ namespace C2M2
                 Debug.LogError("Check that loader are not null in Menu!");
         }
 
-        //public void ClearScene()
-        //{
-        //    CloseNDSimulation[] sims;
+        public void ClearScene()
+        {
+            //NDBoardController ctrl = FindObjectOfType<NDBoardController>();
+            //if (ctrl != null)
+            //    ctrl.CloseAllSimulations();
+            foreach (NDSimulation s in gm.activeSims)
+                Destroy(s.gameObject);
 
-        //    sims = FindObjectsOfType<CloseNDSimulation>();
+            if (gm.activeSims.Count == 0) Destroy(GameObject.Find("Ruler"));
 
-        //    for (int i = 0; i < sims.Length; i++)
-        //        sims[i].CloseSimulation();
-        //}
+            gm.cellPreviewer.SetActive(true);
+        }
     }
 }

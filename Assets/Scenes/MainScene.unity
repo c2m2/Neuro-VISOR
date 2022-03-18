@@ -1032,7 +1032,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f36f7badfba4e440193a3859f84723fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  loader: {fileID: 1369221526178195441, guid: 6175613733e31004ab38a72fda281516, type: 3}
+  loader: {fileID: 0}
   gradientIndex: 0
   loading: 0
   finishedLoading: 0
