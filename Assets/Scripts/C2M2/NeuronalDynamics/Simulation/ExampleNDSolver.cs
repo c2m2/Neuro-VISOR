@@ -25,12 +25,12 @@ namespace C2M2.NeuronalDynamics.Simulation
             }
         }
 
-        public override void SetSynapseCurrent(Tuple<int, double,double,double>[] newValues)
+        public override void SetSynapseCurrent(List<(Synapse, Synapse)> newValues)
         {
-            foreach (Tuple<int, double,double,double> val in newValues)
+            foreach ((Synapse, Synapse) val in newValues)
             {
-                int index = val.Item1;
-                double value = val.Item2;
+                int index = val.Item1.nodeIndex;
+                double value = val.Item2.voltage;
                 vals_active[index] = value;
             }
         }

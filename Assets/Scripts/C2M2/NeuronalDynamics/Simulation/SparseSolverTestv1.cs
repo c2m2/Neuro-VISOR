@@ -153,12 +153,19 @@ namespace C2M2.NeuronalDynamics.Simulation
         private Vector H;
 
         private Vector Isyn;
-        
-
         private Vector Upre, Npre, Mpre, Hpre;
         private Vector ej, rj, ZZ, YY;
         private double[] z, y;
         private double[] bj;
+        private int solvecount;
+        private Vector R;                                 //This is a vector for the reaction solve 
+        private double[] b;                               //This is the right hand side vector when solving Ax = b
+        private Vector tempState;
+        List<double> reactConst;                            //This is for passing the reaction function constants
+        List<CoordinateStorage<double>> sparse_stencils;
+        CompressedColumnStorage<double> r_csc;              //This is for the rhs sparse matrix
+        CompressedColumnStorage<double> l_csc;              //This is for the lhs sparse matrix
+        private SparseLU lu;                                //Initialize the LU factorizaation
 
         /// <summary>
         /// Send simulation 1D values, this send the current voltage after the solve runs 1 iteration
@@ -226,53 +233,101 @@ namespace C2M2.NeuronalDynamics.Simulation
 
         /// <summary>
         /// Receives 1D information for synaptic communication
-        /// newValues = (index of postsynapse, voltage at postsynapse, current simulation time, synapse initialization time)
+        /// newValues = is a list of (presynapse, postsynapse)
         /// </summary>
         /// <param name="newValues"></param>
-        public override void SetSynapseCurrent(Tuple<int,double,double,double>[] newValues)
+        public override void SetSynapseCurrent(List<(Synapse,Synapse)> newValues)
         {
-            foreach (Tuple<int, double,double,double> newVal in newValues)
+            // iterate through teach (pre,post) synapse pair
+            foreach ((Synapse,Synapse) newVal in newValues)
             {
-                if (newVal != null)
+                if ((newVal.Item1 != null) && (newVal.Item2 != null))
                 {
-                    if (newVal.Item1 >= 0 && newVal.Item1 < Neuron.nodes.Count)
+                    if (newVal.Item1.nodeIndex >= 0 && newVal.Item1.nodeIndex < Neuron.nodes.Count && newVal.Item2.nodeIndex >= 0 && newVal.Item2.nodeIndex < Neuron.nodes.Count)
                     {
-                        //note newVal.Item1 = index of postsynapse
-                        //note newVal.Item2 = voltage at postsynapse
-                        //note newVal.Item3 = current simulation time
-                        //note newVal.Item4 = synapse initialization time
-
-                        double area = 2 * System.Math.PI * Neuron.nodes[newVal.Item1].NodeRadius * Neuron.TargetEdgeLength * 1e-12;
-                        double curtime = newVal.Item3; // this is the current time
-                        double syntime = newVal.Item4; // this is synapse initialization time
-
-                        if (newVal.Item2 <= 0.0)
-                        {
-                            Isyn[newVal.Item1] = 0.0;
-                        }
-                        else
-                        {
-                            double icurr = SynapseCurrentFunction(newVal.Item2, curtime - syntime);
-                            Isyn[newVal.Item1] = (2.0 / 3.0) * timeStep * icurr / (cap * area);
-                        }
+                        // compute the synaptic current at the postsynapse using an explicity SBDF update
+                        Isyn[newVal.Item2.nodeIndex] = explicitSBDF(newVal);
                     }
                 }
             }
         }
-
-        private Vector R;                                 //This is a vector for the reaction solve 
-        private double[] b;                               //This is the right hand side vector when solving Ax = b
-        private Vector tempState;
-        List<double> reactConst;                            //This is for passing the reaction function constants
-        List<CoordinateStorage<double>> sparse_stencils;    
-        CompressedColumnStorage<double> r_csc;              //This is for the rhs sparse matrix
-        CompressedColumnStorage<double> l_csc;              //This is for the lhs sparse matrix
-        private SparseLU lu;                                //Initialize the LU factorizaation
-
-        public static double SynapseCurrentFunction(double voltpresyn, double t)
+                
+        /// <summary>
+        /// This computes the explicit update for the Isynaptic current
+        /// the input is a tuple (presyn, postsyn) = (item1, item2) respectively
+        /// each synapse contains information
+        /// item1.nodeindex = index on the 1d geometry
+        /// item1.voltage = voltage at that node
+        /// </summary>
+        /// <param name="newVal"></param>
+        /// <returns></returns>
+        public double explicitSBDF((Synapse, Synapse) newVal)
         {
-            //t = 1.0;
-            double icurr = (45.0e-12) * 1 / (1.0 + System.Math.Exp(-0.62 * voltpresyn * 17.0 / 3.57)) * System.Math.Exp(-1.0 * t) / (1.3e-3) * voltpresyn;
+            double area = new double();
+            List<double> Icurrs = new List<double>();
+
+            // compute surface area at postsynaptic location
+            area = 2 * System.Math.PI * Neuron.nodes[newVal.Item2.nodeIndex].NodeRadius * Neuron.TargetEdgeLength * 1e-12;
+
+            //Icurrs[0] is current synaptic state
+            //Icurrs[1] is previous synaptic state
+            Icurrs = SynapseCurrentFunction(newVal);
+
+            // this is the SBDF calculation using the Icurr of the current state, and Icurr of the previous state
+            return (2.0 / 3.0) * timeStep / (cap * area) * (2.0 * Icurrs[0] - Icurrs[1]);
+        }
+
+        /// <summary>
+        /// This is the synaptic current function
+        /// the input is a tuple (presyn, postsyn) = (item1, item2) respectively
+        /// each synapse contains information
+        /// item1.nodeindex = index on the 1d geometry
+        /// item1.voltage = voltage at that node
+        /// </summary>
+        /// <param name="newVal"></param>
+        /// <returns></returns>
+        public List<double> SynapseCurrentFunction((Synapse, Synapse) newVal)
+        {
+            // allocate a small for the two currents, one for current state, and one for previous state
+            List<double> Icurrs = new List<double>();
+
+            // get the pre and post synaptic voltages
+            double presynVoltage = newVal.Item1.voltage;
+            double postsynVoltage = newVal.Item2.voltage;
+            double voltageThreshold = 0.04;
+
+            // if the presynapse is below a threshold, then the synapse is INACTIVE
+            if ((presynVoltage <= voltageThreshold))
+            {
+                Icurrs = new List<double>();
+                // keep updating the activationTime until it becomes active, once active then this values will be used in else block
+                newVal.Item1.activationTime = solvecount * timeStep;
+                Icurrs.Add(0.0);    // zero current at postsynapse while INACTIVE
+                Icurrs.Add(0.0);    // zero current at postsynapse while INACTIVE
+            }
+            else // if the presynaptic voltage is above threshold, then do not update activation time and compute the new current
+            {
+                Icurrs = new List<double>();
+                Icurrs.Add(SynFunction(newVal.Item2.voltage, solvecount * timeStep, newVal.Item1.activationTime));         // compute current synaptic state using current voltage state
+                Icurrs.Add(SynFunction(Upre[newVal.Item2.nodeIndex], solvecount * timeStep, newVal.Item1.activationTime)); // compute previous synaptic state using previous voltage state
+            }
+
+            return Icurrs;
+        }
+        /// <summary>
+        /// This is the Synapse function borrowed from Rothman, Jason S. "Modeling Synapses." (2014).
+        /// </summary>
+        /// <param name="v"></param> this is the postsynaptic voltage
+        /// <param name="t"></param> this is the current simulation time
+        /// <param name="ts"></param> this is the activation time of the synapse, this is NOT the time the synapse is placed
+        /// <returns></returns>
+        public double SynFunction(double v, double t, double ts)
+        {
+            double icurr = new double();        // allocate for current calculation
+            double ee = System.Math.E;          // base of natural logarithm
+            double Erev = -0.0125;              // reversal potential for synapse
+            double taud = 1.3e-3;               // decay constant from function
+            icurr = (45.0e-12) * (1.0) / (1.0 + System.Math.Pow(ee, -0.62 * v * 17.0 / 3.57)) * System.Math.Pow(ee, -1.0 * (t - ts)) / (taud) * (v - Erev);
 
             return icurr;
         }
@@ -290,7 +345,8 @@ namespace C2M2.NeuronalDynamics.Simulation
             rj = Vector.Build.Dense(Neuron.nodes.Count);
             ZZ = Vector.Build.Dense(Neuron.nodes.Count);
             YY = Vector.Build.Dense(Neuron.nodes.Count);
-                        
+            solvecount = 0;
+            
             tempState = Vector.Build.Dense(Neuron.nodes.Count, 0);
             ///<c>reactConst</c> this is a small list for collecting the conductances and reversal potential which is sent to the reaction solve routine
             reactConst = new List<double> { gk, gna, gl, ek, ena, el };
@@ -368,6 +424,8 @@ namespace C2M2.NeuronalDynamics.Simulation
 
             Upre = U_Active.Clone();
             U_Active.SetSubVector(0, Neuron.nodes.Count, Vector.Build.DenseOfArray(b));
+
+            solvecount++;
         }
 
         internal override void SetOutputValues()
