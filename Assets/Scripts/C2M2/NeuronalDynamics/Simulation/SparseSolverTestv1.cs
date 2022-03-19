@@ -29,10 +29,9 @@ namespace C2M2.NeuronalDynamics.Simulation
     /// The main solver begins with the function call <c>Solve()</c> prior to each iteration of <c>Solve()</c> the new voltage
     /// values <c>U</c> are sent to this class and then new <c>U</c> are sent out from <c>Solve()</c>
     /// 
-    /// The solver currently uses Forward Euler time stepping and the spatial solve is done using Crank-Nicolson in 1D
+    /// The solver currently uses SBDF2 (semi-implicit) Backward Difference 2
     /// The solver takes into account the non-uniform radii of the geometry and the non-uniform edgelength of the geometry
     /// 
-    /// The first part of the code is labeled with 'Simulation Parameters' and 'Biological Parameters'
     /// These parameters need to be made available to the user to modify for their particular simulation parameters
     /// The rate functions are defined at the end
     /// Note: Very important --> ALL UNITS FOR THE SOLVER ARE IN MKS, therefore when modifying the color bars ranges, and raycast/clamp hit values
@@ -41,15 +40,6 @@ namespace C2M2.NeuronalDynamics.Simulation
     /// The simulation parameters are defined first, initial voltage hit value for raycasting, the endTime, time step size (k)
     /// Also other options are defined here such as having the SomaOn for clamping the soma on for voltage clamp tests (this is 
     /// mostly used for verifying the voltage output against Yale Neuron).
-    /// Another set of options that need to be incorporated is to select whether to output voltage data
-    /// 
-    /// 1) TODO: define default time step size
-    /// 
-    /// 2) TODO: get rid of end time user should signal off in vr, this will require changing the loop structure in the solver to a while loop()
-    /// 
-    /// 3) These are the biological parameters that can also be set by the user, right now they are set to private but we want the user to be able to modify these prior to the start of the simulation
-    /// 
-    /// 4) TODO: have the inputs for these parameters be shown inspector for easy changing --> as sliders
     /// </summary>
 
     //tex: Below are the Hodgkin Huxley equations
@@ -60,7 +50,6 @@ namespace C2M2.NeuronalDynamics.Simulation
 
     public class SparseSolverTestv1 : NDSimulation
     {
-        [Header("Simulation Parameters")]
         ///<summary>
         /// This is the voltage for the voltage clamp, this is primarily used for when we do the convergence analysis of the code using a 
         /// soma clamp at 50 [mV], the units for voltage in the solver is [V] that is why <c>vstart</c> is set to 0.05
@@ -125,8 +114,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// the membrane resistance does not hit the theoretical maximum, it is approximately 65%
         /// but this may change depending on the rate functions that are used
         /// </summary>
-        private double Rmemscf = 1.0;         
-
+        private double Rmemscf = 1.0;    
         /// <summary>
         /// These are the solution vectors for the voltage <code>U</code>
         /// the state <c>M</c>, state <c>N</c>, and state <c>H</c>
@@ -140,27 +128,29 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// These are the solution vectors for the voltage <code>U</code>
         /// the state <c>M</c>, state <c>N</c>, and state <c>H</c>
         /// </summary>
-        private Vector M;
+        private Vector M, N, H;
         /// <summary>
-        /// These are the solution vectors for the voltage <code>U</code>
-        /// the state <c>M</c>, state <c>N</c>, and state <c>H</c>
+        /// This is for the synaptic current, it is not the current but the SBDF2 explicit component for the additional current term
         /// </summary>
-        private Vector N;
-        /// <summary>
-        /// These are the solution vectors for the voltage <code>U</code>
-        /// the state <c>M</c>, state <c>N</c>, and state <c>H</c>
-        /// </summary>
-        private Vector H;
-
         private Vector Isyn;
+        /// <summary>
+        /// this is for storing previous states
+        /// </summary>
         private Vector Upre, Npre, Mpre, Hpre;
-        private Vector ej, rj, ZZ, YY;
-        private double[] z, y;
-        private double[] bj;
         private int solvecount;
-        private Vector R;                                 //This is a vector for the reaction solve 
-        private double[] b;                               //This is the right hand side vector when solving Ax = b
+        /// <summary>
+        /// This is a vector the Reaction terms
+        /// </summary>
+        private Vector R;       
+        /// <summary>
+        /// This is an array for the right hand side of the problem Ax = b
+        /// </summary>
+        private double[] b;                               
+        /// <summary>
+        /// Temporary state vector
+        /// </summary>
         private Vector tempState;
+
         List<double> reactConst;                            //This is for passing the reaction function constants
         List<CoordinateStorage<double>> sparse_stencils;
         CompressedColumnStorage<double> r_csc;              //This is for the rhs sparse matrix
@@ -204,31 +194,51 @@ namespace C2M2.NeuronalDynamics.Simulation
             foreach (Tuple<int, double> newVal in newValues)
             {
                 if (newVal != null)
-                {
-                    
+                {                    
                     if (newVal.Item1 >= 0 && newVal.Item1 < Neuron.nodes.Count)
                     {
-                        bj = new double[Neuron.nodes.Count];
-                        z = new double[Neuron.nodes.Count];
-                        y = new double[Neuron.nodes.Count];
-
-                        R.At(newVal.Item1, newVal.Item2);
-                        ej = Vector.Build.Dense(Neuron.nodes.Count, 0.0);
-                        ej.At(newVal.Item1, 1.0);
-                        (l_csc.Transpose()).Multiply(ej.ToArray(), bj);
-                        rj = Vector.Build.DenseOfArray(bj);
-                        rj.At(newVal.Item1, rj[newVal.Item1] - 1);
-
-                        lu.Solve(ej.ToArray(), z);
-                        lu.Solve(R.ToArray(), y);
-
-                        ZZ = Vector.Build.DenseOfArray(z);
-                        YY = Vector.Build.DenseOfArray(y);
-
-                        YY.Add(ZZ.Multiply(rj.DotProduct(YY) / (1 - rj.DotProduct(ZZ))), U_Active);
+                        // perform a rank1 update solve to properly update with added dirichelet boundary conditions
+                        // from a raycast, or voltage clamp. This is done because with a voltage clamp you are imposing
+                        // a dirichelet B.C. which requires solving an updated diffusion problem with identity rows.
+                        U_Active = Vector.Build.DenseOfVector(DircheletRank1UpdateSolve(newVal));                        
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// this perform a Rank1UpdateSolve to properly adjust for added dirichelet boundary conditions.
+        /// </summary>
+        /// <param name="newVal"></param>
+        /// <returns></returns>
+        public Vector DircheletRank1UpdateSolve(Tuple<int, double> newVal)
+        {
+            double[] bj = new double[Neuron.nodes.Count];
+            double[] z = new double[Neuron.nodes.Count];
+            double[] y = new double[Neuron.nodes.Count];
+            
+            Vector outV = Vector.Build.Dense(Neuron.nodes.Count, 0.0);
+            Vector ej = outV.Clone();
+            Vector rj = outV.Clone();
+            Vector ZZ = outV.Clone();
+            Vector YY = outV.Clone();
+
+            R.At(newVal.Item1, newVal.Item2);
+            ej = Vector.Build.Dense(Neuron.nodes.Count, 0.0);
+            ej.At(newVal.Item1, 1.0);
+            (l_csc.Transpose()).Multiply(ej.ToArray(), bj);
+            rj = Vector.Build.DenseOfArray(bj);
+            rj.At(newVal.Item1, rj[newVal.Item1] - 1);
+
+            lu.Solve(ej.ToArray(), z);
+            lu.Solve(R.ToArray(), y);
+            
+            ZZ = Vector.Build.DenseOfArray(z);
+            YY = Vector.Build.DenseOfArray(y);
+
+            YY.Add(ZZ.Multiply(rj.DotProduct(YY) / (1 - rj.DotProduct(ZZ))), outV);
+
+            return outV;
         }
 
         /// <summary>
@@ -341,10 +351,6 @@ namespace C2M2.NeuronalDynamics.Simulation
             InitializeNeuronCell();
             ///<c>R</c> this is the reaction vector for the reaction solve
             R = Vector.Build.Dense(Neuron.nodes.Count);
-            ej = Vector.Build.Dense(Neuron.nodes.Count);
-            rj = Vector.Build.Dense(Neuron.nodes.Count);
-            ZZ = Vector.Build.Dense(Neuron.nodes.Count);
-            YY = Vector.Build.Dense(Neuron.nodes.Count);
             solvecount = 0;
             
             tempState = Vector.Build.Dense(Neuron.nodes.Count, 0);
@@ -369,33 +375,9 @@ namespace C2M2.NeuronalDynamics.Simulation
 
         /// <summary>
         /// This is the main solver, it is running on it own thread.
-        /// Inside this solver it 
-        /// 1. initialize the stencil matrix (only once) for the diffusion solve of the operator splitting
-        /// 2. there is a for-loop which is controled by <c>i</c>
-        /// 3. Inside the for-loop we do the diffusion solve first, then reaction solve, and then updated the state ODEs
-        /// We make the following definitions: \n
-        ///\f[A(V):=\frac{a}{2RC}\frac{\partial ^ 2V}{\partial x^2}\f] \n
-        ///\f[r(V):= -\frac{\bar{ g} _{ K} }{ C}n ^ 4(V - V_k) -\frac{\bar{ g} _{ Na} }{ C}m ^ 3h(V - V_{ Na})-\frac{\bar{ g} _l}{ C} (V - V_l)\f] \n
-        /// then we solve in two separate steps \n
-        ///\f[\frac{dV}{dt}=A(V)+r(V),\f] \n
-        /// where \f$A(V)\f$ is the second order differential operator on \f$V\f$ and \f$r(V)\f$ is the reaction part.
-        /// We employ a Lie Splitting by first solving \n
-        /// \f[\frac{ dV ^ *}{ dt}= A(V ^ *)\f] \n
-        /// with initial conditions \f$V_0^*=V(t_n)= V_n\f$ at the beginning of the time step to get the intermediate solution \f$V^*\f$
-        /// Then we solve \f$\frac{dV^{**}}{dt}=r(V^{**})\f$ with initial condition \f$V_0^{**}=V^*\f$ to get \f$V^{**}\f$, and \f$V_{n+1}=V(t_{n+1})=V^{**}\f$ the voltage at the end of the time step.
-        /// For equation the diffusion we use a Crank-Nicolson scheme
-        /// </summary>
-        /// 
-        //tex:
-        //$$A(V):=\frac{a}{2RC}\frac{\partial ^ 2V}{\partial x^2}$$
-        //$$r(V):= -\frac{\bar{ g} _{ K} }{ C}n ^ 4(V - V_k) -\frac{\bar{ g} _{ Na} }{ C}m ^ 3h(V - V_{ Na})-\frac{\bar{ g} _l}{ C} (V - V_l)$$
-        // then we solve in two separate steps
-        //$$\frac{dV}{dt}=A(V)+r(V),$$
-        //where $A(V)$ is the second order differential operator on $V$ and $r(V)$ is the reaction term on $V$. We employ a Lie Splitting by first solving
-        //$$\frac{ dV ^ *}{ dt}= A(V ^ *)$$
-        //with initial condition $V_0^*=V(t_n)= V_n$ at the beginning of the time step to get the intermediate solution $V^*$. Then we solve
-        //$\frac{dV^{**}}{dt}=r(V^{**})$ with initial condition $V_0^{**}=V^*$ to get $V^{**}$, and $V_{n+1}=V(t_{n+1})=V^{**}$ the voltage at the end of the time step.
-        //For equation the diffusion we use a Crank-Nicolson scheme
+        /// The solver using SBDF2 for time steping, the implicit part is used for the diffusion and the explicit
+        /// is for the reaction terms and state variables
+        /// </summary>     
         protected override void SolveStep(int t)
         {
             U_Active.Multiply(4.0 / 3.0, R);
