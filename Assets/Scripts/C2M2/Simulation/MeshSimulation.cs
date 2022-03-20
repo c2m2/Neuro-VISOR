@@ -6,6 +6,9 @@ namespace C2M2.Simulation
 {
     using Utils;
     using Interaction.VR;
+    using System.Collections.Generic;
+    using UnityEngine.XR;
+
     /// <summary>
     /// Simulation of type double[] for visualizing scalar fields on mesh surfaces
     /// </summary>
@@ -13,6 +16,8 @@ namespace C2M2.Simulation
     [RequireComponent(typeof(MeshRenderer))]
     public abstract class MeshSimulation : Simulation<float[], Mesh, VRRaycastableMesh, VRGrabbableMesh>
     {
+        private List<InputDevice> handControllers = new List<InputDevice>();
+
         public virtual MeshSimulationManager Manager { get { return GameManager.instance.simulationManager; } }
         #region Variables
 
@@ -88,6 +93,12 @@ namespace C2M2.Simulation
         /// <summary>
         /// Update vertex colors based on simulation values
         /// </summary>
+        private void Awake()
+        {
+            InputDeviceCharacteristics desiredCharacteristics = InputDeviceCharacteristics.Left | InputDeviceCharacteristics.Right | InputDeviceCharacteristics.Controller;
+            InputDevices.GetDevicesWithCharacteristics(desiredCharacteristics, handControllers);
+        }
+
         protected override void UpdateVisualization(in float[] newValues)
         {
             Color32[] newCols = ColorLUT.Evaluate(newValues);
@@ -162,8 +173,15 @@ namespace C2M2.Simulation
             {
                 if (GameManager.instance.vrDeviceManager.VRActive)
                 {
+                    float yTotal = 0.0f;
+                    Vector2 thumbstickDirection = new Vector2();
+                    foreach(var device in handControllers)
+                    {
+                        device.TryGetFeatureValue(CommonUsages.primary2DAxis, out thumbstickDirection);
+                        yTotal += thumbstickDirection.y;
+                    }
                     // Uses the value of both joysticks added together
-                    float scaler = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick).y + OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick).y;
+                    float scaler = yTotal;
 
                     return ThumbstickScaler * scaler;
                 }

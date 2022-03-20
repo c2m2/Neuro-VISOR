@@ -35,6 +35,7 @@ namespace C2M2.Interaction
         private bool lastPrimaryButtonState = false;
         private bool lastIndexButtonState = false;
 
+        private bool tempStateIndexTrigger = false;
 
         [Tooltip("Layers that raycast pays attention to")]
         public LayerMask layerMask;
@@ -149,13 +150,13 @@ namespace C2M2.Interaction
                             && primaryButtonState // the value we got
                             || tempState; // cumulative result from other controllers
             }
-            bool isPressed = tempState!=lastPrimaryButtonState;
-            if (isPressed) // Button state changed since last frame
+            bool isPrimaryButtonPressed = tempState!=lastPrimaryButtonState;
+            if (isPrimaryButtonPressed) // Button state changed since last frame
             {
                 primaryButtonPress.Invoke(tempState);
                 lastPrimaryButtonState = tempState;
             }
-            bool raycastActive = isPressed || (mouseMode && Input.GetMouseButton(0));
+            bool raycastActive = isPrimaryButtonPressed || (mouseMode && Input.GetMouseButton(0));
             if (raycastActive)
             {
                 // Resolve raycast hit info for VR or mouse controller
@@ -271,22 +272,22 @@ namespace C2M2.Interaction
             void ResolveClickEvents(RaycastHit hit)
             {
                 bool buttonPressed = false;
-                bool tempState = false;
+                tempStateIndexTrigger = false;
                 foreach (var device in rightController)
                 {
                     bool primaryIndexState = false;
-                    tempState = device.TryGetFeatureValue(CommonUsages.triggerButton, out primaryIndexState) // did get a value
+                    tempStateIndexTrigger = device.TryGetFeatureValue(CommonUsages.triggerButton, out primaryIndexState) // did get a value
                                 && primaryIndexState // the value we got
-                                || tempState; // cumulative result from other controllers
+                                || tempStateIndexTrigger; // cumulative result from other controllers
                 }
-                bool isPressed = tempState != lastIndexButtonState;
-                if (isPressed) // Button state changed since last frame
+                bool isIndexTriggerPressed = tempStateIndexTrigger != lastIndexButtonState;
+                if (isIndexTriggerPressed) // Button state changed since last frame
                 {
-                    indexButtonPress.Invoke(tempState);
-                    lastIndexButtonState = tempState;
+                    indexButtonPress.Invoke(tempStateIndexTrigger);
+                    lastIndexButtonState = tempStateIndexTrigger;
                 }
                 if (mouseMode) buttonPressed = true;
-                else if (isPressed) buttonPressed = true;
+                else if (isIndexTriggerPressed) buttonPressed = true;
                 if (buttonPressed)
                 { // If we are holding down the relevant button
                     if (!clicked)

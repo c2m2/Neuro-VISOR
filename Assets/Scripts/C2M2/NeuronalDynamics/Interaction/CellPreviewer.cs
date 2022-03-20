@@ -50,6 +50,29 @@ namespace C2M2.NeuronalDynamics.Interaction {
         [Tooltip("If true, positionsNorm will stack above and below on the y axis")]
         public bool stackPos = true;
 
+        /*This code snippet is from
+        //https://stackoverflow.com/questions/33437244/find-children-of-children-of-a-gameobject
+        */
+        Transform RecursiveFindChild(Transform parent, string childName)
+        {
+            foreach (Transform child in parent)
+            {
+                if (child.name == childName)
+                {
+                    return child;
+                }
+                else
+                {
+                    Transform found = RecursiveFindChild(child, childName);
+                    if (found != null)
+                    {
+                        return found;
+                    }
+                }
+            }
+            return null;
+        }
+
         private void Awake()
         {
             // Make sure we have window preview prefab and a pointer to a simulation loader
@@ -81,7 +104,7 @@ namespace C2M2.NeuronalDynamics.Interaction {
                 if (ErrorWindow != null)
                 {
                     ErrorWindow.SetActive(true);
-                    var go = ErrorWindow.transform.FindChildRecursive("FileName");
+                    var go = RecursiveFindChild(ErrorWindow.transform, "FileName");
                     if (go != null)
                     {
                         TMPro.TextMeshProUGUI errorMsg = go.GetComponent<TMPro.TextMeshProUGUI>();

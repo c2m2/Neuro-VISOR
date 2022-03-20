@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using UnityEngine.XR;
+
 namespace C2M2.Utils.DebugUtils
 {
 #if (UNITY_EDITOR)
@@ -10,12 +12,14 @@ namespace C2M2.Utils.DebugUtils
     /// </summary>
     public class SkinnedMeshRenderSnapshot : MonoBehaviour
     {
+        public SecondaryButtonEvent secondaryButtonPress = new SecondaryButtonEvent();
+
         [Tooltip("Location to save mesh to")]
         public string saveLocation = "Assets/";
 
         [Tooltip("Button to press to take a snapshot")]
         public KeyCode key = KeyCode.Space;
-
+        
         [Tooltip("Number of meshes already stored. Change this manually if you need to ensure that meshes won't overwrite eachother")]
         public int count = 0;
 
@@ -23,6 +27,15 @@ namespace C2M2.Utils.DebugUtils
         public bool retrieveImmediate = true;
 
         private SkinnedMeshRenderer smr;
+
+        private bool lastSecondaryButtonState = false;
+        private List<InputDevice> handControllers = new List<InputDevice>();
+
+        private void Awake()
+        {
+            InputDeviceCharacteristics desiredCharacteristics = InputDeviceCharacteristics.Left;
+            InputDevices.GetDevicesWithCharacteristics(desiredCharacteristics, handControllers);
+        }
 
         void Start()
         {
@@ -47,7 +60,21 @@ namespace C2M2.Utils.DebugUtils
 
         void Update()
         {
-            if (OVRInput.GetDown(OVRInput.Button.Four))
+            bool tempState = false;
+            foreach (var device in handControllers)
+            {
+                bool secondaryButtonState = false;
+                tempState = device.TryGetFeatureValue(CommonUsages.secondaryButton, out secondaryButtonState) // did get a value
+                            && secondaryButtonState // the value we got
+                            || tempState; // cumulative result from other controllers
+            }
+            bool isPressed = tempState != lastSecondaryButtonState;
+            if (isPressed) // Button state changed since last frame
+            {
+                secondaryButtonPress.Invoke(tempState);
+                lastSecondaryButtonState = tempState;
+            }
+            if (isPressed)
             {
                 Debug.Log("Saving snapshot...");
                 //Save the mesh

@@ -171,6 +171,14 @@ namespace C2M2.NeuronalDynamics.Interaction
             {
                 secondaryBtnPress = new CancelEvent();
             }
+            if (handTriggerPress == null)
+            {
+                handTriggerPress = new HandTriggerPressEvent();
+            }
+            if (indexTriggerPress == null)
+            {
+                indexTriggerPress = new IndexTriggerPressEvent();
+            }
             InputDeviceCharacteristics controllerCharacteristics = InputDeviceCharacteristics.Left | InputDeviceCharacteristics.Right | InputDeviceCharacteristics.Controller;
             InputDevices.GetDevicesWithCharacteristics(controllerCharacteristics, handControllers);
         }

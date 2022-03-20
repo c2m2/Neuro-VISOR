@@ -3,9 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using UnityEngine.XR;
+
 namespace C2M2.Visualization {
     public class LineGraphEditor : MonoBehaviour
     {
+        private List<InputDevice> handControllers = new List<InputDevice>();
+
         public LineGrapher lineGraph = null;
         public int NumSamples
         {
@@ -27,6 +31,8 @@ namespace C2M2.Visualization {
 
         private void Awake()
         {
+            InputDeviceCharacteristics desiredCharacteristics = InputDeviceCharacteristics.Left | InputDeviceCharacteristics.Right | InputDeviceCharacteristics.Controller;
+            InputDevices.GetDevicesWithCharacteristics(desiredCharacteristics, handControllers);
             NullChecks();
 
            // xPrecisionReading.text = lineGraph.XPrecision.ToString();
@@ -95,7 +101,16 @@ namespace C2M2.Visualization {
             get 
             {
                 if (GameManager.instance.VRActive)
-                    return OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick).y + OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick).y;
+                {
+                    float yTotal = 0.0f;
+                    Vector2 thumbstickDirection = new Vector2();
+                    foreach(var device in handControllers)
+                    {
+                        device.TryGetFeatureValue(CommonUsages.primary2DAxis, out thumbstickDirection);
+                        yTotal += thumbstickDirection.y;
+                    }
+                    return yTotal;
+                }
                 else if (Input.GetKey(KeyCode.UpArrow)) return 1f;
                 else if (Input.GetKey(KeyCode.DownArrow)) return -1f;
                 else return 0;

@@ -13,14 +13,14 @@ namespace C2M2.Utils.DebugUtils
     public class PrintMaterialAssetPaths : MonoBehaviour
     {
         public Material mat;
-        public SecondaryButtonEvent secondaryButtonPress;
+        public SecondaryButtonEvent secondaryButtonPress = new SecondaryButtonEvent();
 
         private bool lastSecondaryButtonState = false;
         private List<InputDevice> handControllers = new List<InputDevice>();
 
         private void Awake()
         {
-            InputDeviceCharacteristics desiredCharacteristics = InputDeviceCharacteristics.HeldInHand | InputDeviceCharacteristics.Left | InputDeviceCharacteristics.Controller;
+            InputDeviceCharacteristics desiredCharacteristics = InputDeviceCharacteristics.Right;
             InputDevices.GetDevicesWithCharacteristics(desiredCharacteristics, handControllers);
         }
 
@@ -30,7 +30,7 @@ namespace C2M2.Utils.DebugUtils
             foreach (var device in handControllers)
             {
                 bool secondaryButtonState = false;
-                tempState = device.TryGetFeatureValue(CommonUsages.primaryButton, out secondaryButtonState) // did get a value
+                tempState = device.TryGetFeatureValue(CommonUsages.secondaryButton, out secondaryButtonState) // did get a value
                             && secondaryButtonState // the value we got
                             || tempState; // cumulative result from other controllers
             }
