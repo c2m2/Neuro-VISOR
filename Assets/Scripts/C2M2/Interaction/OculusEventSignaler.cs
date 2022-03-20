@@ -24,7 +24,7 @@ namespace C2M2.Interaction
         /// 2. Then use the XR.Input.CommonUsage class to get the corresponding button press event on the right hand controller 
         /// </summary>
         [Tooltip("The Oculus controller being raycasted from")]
-        public List<InputDevice> controllers = new List<InputDevice>();
+        private List<InputDevice> controllers = new List<InputDevice>();
 
 
         //[Tooltip("Button to activate raycasting mode")]

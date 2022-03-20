@@ -27,7 +27,7 @@ namespace C2M2.Interaction
         #region Raycasting_Utilities
         #region Public_Members
         [Header("Raycasting Information")]
-        public List<InputDevice> rightController = new List<InputDevice>();
+        private List<InputDevice> rightController = new List<InputDevice>();
 
         public PrimaryButtonEvent primaryButtonPress;
         public IndexTriggerEvent indexButtonPress;
