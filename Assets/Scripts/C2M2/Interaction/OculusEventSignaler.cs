@@ -77,10 +77,22 @@ namespace C2M2.Interaction
             }
         }
 
-        protected override void OnAwake()
+        private void Awake()
         {
+            if(primaryButtonPress == null)
+            {
+                primaryButtonPress = new PrimaryButtonEvent();
+            }
+            if(indexTriggerPress == null)
+            {
+                indexTriggerPress = new IndexTriggerEvent();
+            }
             InputDeviceCharacteristics controllerCharacteristics = InputDeviceCharacteristics.Right;
             InputDevices.GetDevicesWithCharacteristics(controllerCharacteristics, controllers);
+        }
+
+        protected override void OnAwake()
+        {
             lineRend = gameObject.GetComponentInChildren<LineRenderer>();
             if (lineRend == null) { Debug.LogWarning("Couldn't find line renderer in RaycastForward"); }
 
@@ -127,10 +139,25 @@ namespace C2M2.Interaction
         }
         private bool distancePressed = false;
         /// <returns> True if the specified controller button is pressed OR if we are near enough to the raycast target </returns>
-        protected override bool PressCondition() => (
-            OVRInput.Get(triggerEventsButton, controller) || distancePressed
-            );
-
+        protected override bool PressCondition()
+        {
+            bool tempState = false;
+            foreach (var device in controllers)
+            {
+                bool indexButtonState = false;
+                tempState = device.TryGetFeatureValue(CommonUsages.triggerButton, out indexButtonState) // did get a value
+                            && indexButtonState // the value we got
+                            || tempState; // cumulative result from other controllers
+            }
+            bool isPressed = tempState != lastIndexTriggerState;
+            if (isPressed) // Button state changed since last frame
+            {
+                indexTriggerPress.Invoke(tempState);
+                lastIndexTriggerState = tempState;
+            }
+            return isPressed || distancePressed;
+        }
+            
         // At the start of a click change the line renderer color to pressed color
         protected override void OnPressBegin()
         {

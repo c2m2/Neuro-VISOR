@@ -2,6 +2,10 @@
 
 using UnityEngine;
 using System;
+using UnityEngine.XR;
+using System.Collections.Generic;
+using UnityEngine.XR.Interaction.Toolkit;
+
 namespace C2M2.Interaction
 {
     [Obsolete("Replace by OculusEventSignaler")]
@@ -23,12 +27,15 @@ namespace C2M2.Interaction
         #region Raycasting_Utilities
         #region Public_Members
         [Header("Raycasting Information")]
-        [Tooltip("The Oculus controller being raycasted from")]
-        public OVRInput.Controller raycastController = OVRInput.Controller.RTouch;
-        [Tooltip("Button to activate raycasting mode")]
-        public OVRInput.Button raycastButton = OVRInput.Button.One;
-        [Tooltip("Button to invoke hit/hold events from a distance")]
-        public OVRInput.Button triggerButton = OVRInput.Button.PrimaryIndexTrigger;
+        public List<InputDevice> rightController = new List<InputDevice>();
+
+        public PrimaryButtonEvent primaryButtonPress;
+        public IndexTriggerEvent indexButtonPress;
+
+        private bool lastPrimaryButtonState = false;
+        private bool lastIndexButtonState = false;
+
+
         [Tooltip("Layers that raycast pays attention to")]
         public LayerMask layerMask;
         [Tooltip("The renderer component for the static pointed hand ")]
@@ -78,6 +85,21 @@ namespace C2M2.Interaction
         private enum StateCode : sbyte { NULL, HIT, HOLD, END };     // Define the possible states of our raycaster
         private StateCode currentState = StateCode.NULL;            // Track of the current state of our raycaster
         public bool mouseMode = false;
+
+        private void Awake()
+        {
+            if(primaryButtonPress == null)
+            {
+                primaryButtonPress = new PrimaryButtonEvent();
+            }
+            if(indexButtonPress == null)
+            {
+                indexButtonPress = new IndexTriggerEvent();
+            }
+            InputDeviceCharacteristics controllerCharacteristics = InputDeviceCharacteristics.Right;
+            InputDevices.GetDevicesWithCharacteristics(controllerCharacteristics, rightController);
+        }
+
         private void Start()
         {
             // If this is the non-VR camera, then we don't need to find hand objects because we don't have hands
@@ -85,7 +107,16 @@ namespace C2M2.Interaction
             if (!mouseMode)
             {
                 // Resolve which controller we are using. Left hand will be default
-                rightHand = (raycastController.Equals(OVRInput.Controller.RTouch) || gameObject.name.Contains("right")) ? true : false;
+                bool isRightController = false;
+                foreach(var device in rightController)
+                {
+                    if(device.characteristics == InputDeviceCharacteristics.Right)
+                    {
+                        isRightController = true;
+                        break;
+                    }
+                }
+                rightHand = (isRightController || gameObject.name.Contains("right")) ? true : false;
                 // Get the renderer of the static pointed finger and disable it initially
                 // staticIndexRenderer = staticHandObject.GetComponent<MeshRenderer>();        
                 // Disable the static hand if we can find it
@@ -110,7 +141,21 @@ namespace C2M2.Interaction
         private void TryRaycastHit()
         {
             // If the user enables "raycast mode" by VR controller or by mouse
-            bool raycastActive = OVRInput.Get(raycastButton, raycastController) || (mouseMode && Input.GetMouseButton(0));
+            bool tempState = false;
+            foreach (var device in rightController)
+            {
+                bool primaryButtonState = false;
+                tempState = device.TryGetFeatureValue(CommonUsages.primaryButton, out primaryButtonState) // did get a value
+                            && primaryButtonState // the value we got
+                            || tempState; // cumulative result from other controllers
+            }
+            bool isPressed = tempState!=lastPrimaryButtonState;
+            if (isPressed) // Button state changed since last frame
+            {
+                primaryButtonPress.Invoke(tempState);
+                lastPrimaryButtonState = tempState;
+            }
+            bool raycastActive = isPressed || (mouseMode && Input.GetMouseButton(0));
             if (raycastActive)
             {
                 // Resolve raycast hit info for VR or mouse controller
@@ -226,8 +271,22 @@ namespace C2M2.Interaction
             void ResolveClickEvents(RaycastHit hit)
             {
                 bool buttonPressed = false;
+                bool tempState = false;
+                foreach (var device in rightController)
+                {
+                    bool primaryIndexState = false;
+                    tempState = device.TryGetFeatureValue(CommonUsages.triggerButton, out primaryIndexState) // did get a value
+                                && primaryIndexState // the value we got
+                                || tempState; // cumulative result from other controllers
+                }
+                bool isPressed = tempState != lastIndexButtonState;
+                if (isPressed) // Button state changed since last frame
+                {
+                    indexButtonPress.Invoke(tempState);
+                    lastIndexButtonState = tempState;
+                }
                 if (mouseMode) buttonPressed = true;
-                else if (OVRInput.Get(triggerButton, raycastController)) buttonPressed = true;
+                else if (isPressed) buttonPressed = true;
                 if (buttonPressed)
                 { // If we are holding down the relevant button
                     if (!clicked)
@@ -321,19 +380,19 @@ namespace C2M2.Interaction
                         { // Set the appropriate color and controller vibration
                             case StateCode.NULL:
                                 LineRendSetEndpointColors(nullCol);
-                                OVRInput.SetControllerVibration(hapFreq, nullAmp, raycastController);
+                                rightController[0].SendHapticImpulse(0 ,0.0f, 0.5f);
                                 break;
                             case StateCode.HOLD:
                                 LineRendSetEndpointColors(holdCol);
-                                OVRInput.SetControllerVibration(hapFreq, holdAmp, raycastController);
+                                rightController[0].SendHapticImpulse(0, 0.0f, 0.5f);
                                 break;
                             case StateCode.HIT:
                                 LineRendSetEndpointColors(hitCol);
-                                OVRInput.SetControllerVibration(hapFreq, hitAmp, raycastController);
+                                rightController[0].SendHapticImpulse(0, 0.0f, 0.5f);
                                 break;
                             case StateCode.END:
                                 LineRendSetEndpointColors(endCol);
-                                OVRInput.SetControllerVibration(hapFreq, endAmp, raycastController);
+                                rightController[0].SendHapticImpulse(0, 0.0f, 0.5f);
                                 break;
                         }
                     }
