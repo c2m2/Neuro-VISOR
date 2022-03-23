@@ -216,12 +216,11 @@ namespace C2M2.NeuronalDynamics.Simulation
             double[] bj = new double[Neuron.nodes.Count];
             double[] z = new double[Neuron.nodes.Count];
             double[] y = new double[Neuron.nodes.Count];
-            
-            Vector outV = Vector.Build.Dense(Neuron.nodes.Count, 0.0);
-            Vector ej = outV.Clone();
-            Vector rj = outV.Clone();
-            Vector ZZ = outV.Clone();
-            Vector YY = outV.Clone();
+                        
+            Vector ej = Vector.Build.Dense(Neuron.nodes.Count, 0.0);
+            Vector rj = ej.Clone();
+            Vector ZZ = ej.Clone();
+            Vector YY = ej.Clone();
 
             R.At(newVal.Item1, newVal.Item2);
             ej = Vector.Build.Dense(Neuron.nodes.Count, 0.0);
@@ -236,9 +235,7 @@ namespace C2M2.NeuronalDynamics.Simulation
             ZZ = Vector.Build.DenseOfArray(z);
             YY = Vector.Build.DenseOfArray(y);
 
-            YY.Add(ZZ.Multiply(rj.DotProduct(YY) / (1 - rj.DotProduct(ZZ))), outV);
-
-            return outV;
+            return YY.Add(ZZ.Multiply(rj.DotProduct(YY) / (1 - rj.DotProduct(ZZ))));
         }
 
         /// <summary>
@@ -340,7 +337,7 @@ namespace C2M2.NeuronalDynamics.Simulation
             double icurr = new double();        // allocate for current calculation
             double Erev = -0.0125;              // reversal potential for synapse
             double taud = 3.0e-3;               // decay constant from function
-            double Gnmdar = 30e-9;              // borrowed from Rothman Paper they  mention 10s of nanosiemens
+            double Gnmdar = 25e-9;              // borrowed from Rothman Paper they  mention 10s of nanosiemens
                         
             icurr = Gnmdar * (1.0 / (1.0 + System.Math.Exp(-1.0 * (v + 0.0128) / 0.0224))) * System.Math.Exp(-1.0 * (t - ts) / taud) * (v - Erev);
             return icurr;
@@ -394,18 +391,15 @@ namespace C2M2.NeuronalDynamics.Simulation
             lu.Solve(R.ToArray(), b);
 
             tempState = N.Clone();
-            N.Add(fN(U_Active, N).Multiply(timeStep), N); N.Multiply(4.0 / 3.0, N);
-            N.Add(Npre.Multiply(-1.0 / 3.0), N); N.Add(fN(Upre, Npre).Multiply(-2.0 * timeStep / 3.0), N);
+            stateexplicitSBDF2(N, Npre, fS(N, an(U_Active), bn(U_Active)), fS(Npre, an(Upre), bn(Upre)), timeStep);
             Npre = tempState.Clone();
 
             tempState = M.Clone();
-            M.Add(fM(U_Active, M).Multiply(timeStep), M); M.Multiply(4.0 / 3.0, M);
-            M.Add(Mpre.Multiply(-1.0 / 3.0), M); M.Add(fM(Upre, Mpre).Multiply(-2.0 * timeStep / 3.0), M);
+            stateexplicitSBDF2(M, Mpre, fS(M, am(U_Active), bm(U_Active)), fS(Mpre, am(Upre), bm(Upre)), timeStep);
             Mpre = tempState.Clone();
 
             tempState = H.Clone();
-            H.Add(fH(U_Active, H).Multiply(timeStep), H); H.Multiply(4.0 / 3.0, H);
-            H.Add(Hpre.Multiply(-1.0 / 3.0), H); H.Add(fH(Upre, Hpre).Multiply(-2.0 * timeStep / 3.0), H);
+            stateexplicitSBDF2(H, Hpre, fS(H, ah(U_Active), bh(U_Active)), fS(Hpre, ah(Upre), bh(Upre)), timeStep);
             Hpre = tempState.Clone();
 
             Upre = U_Active.Clone();
@@ -631,30 +625,22 @@ namespace C2M2.NeuronalDynamics.Simulation
 
             return output;
         }
+
+        private void stateexplicitSBDF2(Vector S, Vector Spre, Vector F, Vector Fpre, double dt)
+        {
+            S.Add(F.Multiply(dt), S); S.Multiply(4.0 / 3.0, S);
+            S.Add(Spre.Multiply(-1.0 / 3.0), S); S.Add(Fpre.Multiply(-2.0 * dt / 3.0), S);
+        }
+
         /// <summary>
-        /// This is the function for the right hand side of the ODE on state N, which is given by:
-        /// \f[\frac{dn}{dt}=\alpha_n(V)(1-n)-\beta_n(V)n\f]
+        /// This is the function for the right hand side of the ODE on state S, which is given by:
+        /// \f[\frac{dS}{dt}=\alpha_S(V)(1-S)-\beta_S(V)S\f]
         /// </summary>
-        /// <param name="V"></param> this is the current input voltage for the geometry
-        /// <param name="N"></param> this is the current vector of state N for the geometry
+        /// <param name="a"></param> this is the rate vector
+        /// <param name="b"></param> this is the rate vector
+        /// <param name="S"></param> this is the current vector of state S for the geometry
         /// <returns>f(V,N)</returns> the function returns the right hand side of the state N ODE.
-        private static Vector fN(Vector V, Vector N) { return an(V).PointwiseMultiply(1 - N) - bn(V).PointwiseMultiply(N); }
-        /// <summary>
-        /// This is the function for the right hand side of the ODE on state M, which is given by:
-        /// \f[\frac{dm}{dt}=\alpha_m(V)(1-m)-\beta_m(V)m\f]
-        /// </summary>
-        /// <param name="V"></param> this is the current input voltage for the geometry
-        /// <param name="M"></param> this is the current vector of state M for the geometry
-        /// <returns>f(V,M)</returns> the function returns the right hand side of the state M ODE.
-        private static Vector fM(Vector V, Vector M) { return am(V).PointwiseMultiply(1 - M) - bm(V).PointwiseMultiply(M); }
-        /// <summary>
-        /// This is the function for the right hand side of the ODE on state H, which is given by:
-        /// \f[\frac{dh}{dt}=\alpha_h(V)(1-h)-\beta_h(V)h\f]
-        /// </summary>
-        /// <param name="V"></param> this is the current input voltage for the geometry
-        /// <param name="H"></param> this is the current vector of state H for the geometry
-        /// <returns>f(V,H)</returns> the function returns the right hand side of the state H ODE.
-        private static Vector fH(Vector V, Vector H) { return ah(V).PointwiseMultiply(1 - H) - bh(V).PointwiseMultiply(H); }
+        private static Vector fS(Vector S, Vector a, Vector b) { return a.PointwiseMultiply(1 - S) - b.PointwiseMultiply(S); }
        
         /// <summary>
         /// This is \f$\alpha_n\f$ rate function, the rate functions take the form of
