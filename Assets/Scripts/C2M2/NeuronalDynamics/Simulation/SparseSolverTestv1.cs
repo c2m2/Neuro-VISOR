@@ -256,7 +256,7 @@ namespace C2M2.NeuronalDynamics.Simulation
                     if (newVal.Item1.nodeIndex >= 0 && newVal.Item1.nodeIndex < Neuron.nodes.Count && newVal.Item2.nodeIndex >= 0 && newVal.Item2.nodeIndex < Neuron.nodes.Count)
                     {
                         // compute the synaptic current at the postsynapse using an explicity SBDF update
-                        Isyn[newVal.Item2.nodeIndex] = explicitSBDF(newVal);
+                        Isyn[newVal.Item2.nodeIndex] = synapseExplicitSBDF(newVal);
                     }
                 }
             }
@@ -271,7 +271,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// </summary>
         /// <param name="newVal"></param>
         /// <returns></returns>
-        public double explicitSBDF((Synapse, Synapse) newVal)
+        public double synapseExplicitSBDF((Synapse, Synapse) newVal)
         {
             double area = new double();
             List<double> Icurrs = new List<double>();
@@ -302,8 +302,7 @@ namespace C2M2.NeuronalDynamics.Simulation
             List<double> Icurrs = new List<double>();
 
             // get the pre and post synaptic voltages
-            double presynVoltage = newVal.Item1.voltage;
-            double postsynVoltage = newVal.Item2.voltage;
+            double presynVoltage = newVal.Item1.attachedSim.Get1DValues()[newVal.Item1.nodeIndex];
             double voltageThreshold = 0.04;
 
             // if the presynapse is below a threshold, then the synapse is INACTIVE
@@ -311,7 +310,6 @@ namespace C2M2.NeuronalDynamics.Simulation
             {
                 Icurrs = new List<double>();
                 // keep updating the activationTime until it becomes active, once active then this values will be used in else block
-                //newVal.Item1.activationTime = solvecount * timeStep;
                 newVal.Item1.SetActivationTime(((double)solvecount) * timeStep);
                 Icurrs.Add(0.0);    // zero current at postsynapse while INACTIVE
                 Icurrs.Add(0.0);    // zero current at postsynapse while INACTIVE
@@ -324,8 +322,8 @@ namespace C2M2.NeuronalDynamics.Simulation
                 }
 
                 Icurrs = new List<double>();
-                Icurrs.Add(SynFunction(newVal.Item2.voltage, solvecount * timeStep, newVal.Item1.activationTime));         // compute current synaptic state using current voltage state
-                Icurrs.Add(SynFunction(Upre[newVal.Item2.nodeIndex], solvecount * timeStep, newVal.Item1.activationTime)); // compute previous synaptic state using previous voltage state
+                Icurrs.Add(SynFunction(U_Active[newVal.Item2.nodeIndex], solvecount * timeStep, newVal.Item1.activationTime));         // compute current synaptic state using current voltage state
+                Icurrs.Add(SynFunction(Upre[newVal.Item2.nodeIndex], solvecount * timeStep, newVal.Item1.activationTime));             // compute previous synaptic state using previous voltage state
             }
 
             return Icurrs;
