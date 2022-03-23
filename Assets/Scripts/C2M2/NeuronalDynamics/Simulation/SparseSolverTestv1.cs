@@ -311,12 +311,18 @@ namespace C2M2.NeuronalDynamics.Simulation
             {
                 Icurrs = new List<double>();
                 // keep updating the activationTime until it becomes active, once active then this values will be used in else block
-                newVal.Item1.activationTime = solvecount * timeStep;
+                //newVal.Item1.activationTime = solvecount * timeStep;
+                newVal.Item1.SetActivationTime(((double)solvecount) * timeStep);
                 Icurrs.Add(0.0);    // zero current at postsynapse while INACTIVE
                 Icurrs.Add(0.0);    // zero current at postsynapse while INACTIVE
             }
             else // if the presynaptic voltage is above threshold, then do not update activation time and compute the new current
             {
+                if (((double)solvecount * timeStep) > (newVal.Item1.activationTime + 3.0e-3))
+                {
+                    newVal.Item1.SetActivationTime(((double)solvecount) * timeStep);
+                }
+
                 Icurrs = new List<double>();
                 Icurrs.Add(SynFunction(newVal.Item2.voltage, solvecount * timeStep, newVal.Item1.activationTime));         // compute current synaptic state using current voltage state
                 Icurrs.Add(SynFunction(Upre[newVal.Item2.nodeIndex], solvecount * timeStep, newVal.Item1.activationTime)); // compute previous synaptic state using previous voltage state
@@ -334,11 +340,11 @@ namespace C2M2.NeuronalDynamics.Simulation
         public double SynFunction(double v, double t, double ts)
         {
             double icurr = new double();        // allocate for current calculation
-            double ee = System.Math.E;          // base of natural logarithm
             double Erev = -0.0125;              // reversal potential for synapse
-            double taud = 1.3e-3;               // decay constant from function
-            icurr = (45.0e-12) * (1.0) / (1.0 + System.Math.Pow(ee, -0.62 * v * 17.0 / 3.57)) * System.Math.Pow(ee, -1.0 * (t - ts)) / (taud) * (v - Erev);
-
+            double taud = 3.0e-3;               // decay constant from function
+            double Gnmdar = 30e-9;              // borrowed from Rothman Paper they  mention 10s of nanosiemens
+                        
+            icurr = Gnmdar * (1.0 / (1.0 + System.Math.Exp(-1.0 * (v + 0.0128) / 0.0224))) * System.Math.Exp(-1.0 * (t - ts) / taud) * (v - Erev);
             return icurr;
         }
 

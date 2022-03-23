@@ -57,6 +57,13 @@ public class Synapse : MonoBehaviour
         return prefab.name + " " + nodeIndex + " " + voltage;
     }
 
+    public void SetActivationTime(double activateTime)
+    {
+        //Debug.Log("setting activation time to " + activateTime);
+        this.activationTime = activateTime;
+        //Debug.Log("setting activation time to " + this.activationTime);
+    }
+
     /// <summary>
     /// Place the synapse prefab(sphere) onto the current neuron
     /// </summary>
