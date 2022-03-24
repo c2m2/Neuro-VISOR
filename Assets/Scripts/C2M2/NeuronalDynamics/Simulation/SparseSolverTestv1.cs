@@ -264,17 +264,14 @@ namespace C2M2.NeuronalDynamics.Simulation
             // compute surface area at postsynaptic location
             area = 2 * System.Math.PI * Neuron.nodes[newVal.Item2.nodeIndex].NodeRadius * Neuron.TargetEdgeLength * 1e-12;
 
-            //Icurrs[0] is current synaptic state
-            //Icurrs[1] is previous synaptic state
+            //Icurrs[0] is current synaptic state, and Icurrs[1] is previous synaptic state
             Icurrs = SynapseCurrentFunction(newVal);
 
-            
+            // If the user should use unrealistic biological parameters, this will check the current and set the current appropriately if the current goes beyond
+            // biologically accurate currents
             if ((Double.IsNaN(Icurrs[0]) || Double.IsNaN(Icurrs[1])) || ((Icurrs[0] > 0.5e-9)||(Icurrs[1]>0.5e-9)) )
-            {
-                //Debug.LogError("Current check");
-                Icurrs[0] = 1.0e-16;
-                //Debug.LogError(Icurrs[0]);
-                Icurrs[1] = 0.9e-16;
+            {   
+                Icurrs[0] = 1.0e-16; Icurrs[1] = 0.9e-16;
             }
 
             // this is the SBDF calculation using the Icurr of the current state, and Icurr of the previous state
@@ -301,24 +298,19 @@ namespace C2M2.NeuronalDynamics.Simulation
             double voltageThreshold = 0.038;
 
             if ((presynVoltage >= voltageThreshold) && (presynVoltage0< voltageThreshold))
-            {
-                newVal.Item1.SetActivationTime(GetSimulationTime());
-            }
+            { newVal.Item1.SetActivationTime(GetSimulationTime()); }
                                    
             // if the presynapse is below a threshold, then the synapse is INACTIVE
             if ((presynVoltage <= voltageThreshold))
             {
                 Icurrs = new List<double>();
-                // keep updating the activationTime until it becomes active, once active then this values will be used in else block
                 Icurrs.Add(0.0);    // zero current at postsynapse while INACTIVE
                 Icurrs.Add(0.0);    // zero current at postsynapse while INACTIVE
             }
             else // if the presynaptic voltage is above threshold, then do not update activation time and compute the new current
             {
                 if ((GetSimulationTime()) > (newVal.Item1.activationTime + 3.0e-3))
-                {
-                    newVal.Item1.SetActivationTime(GetSimulationTime());
-                }
+                { newVal.Item1.SetActivationTime(GetSimulationTime()); }
 
                 Icurrs = new List<double>();
                 Icurrs.Add(SynFunction(U_Active[newVal.Item2.nodeIndex], GetSimulationTime(), newVal.Item1.activationTime));         // compute current synaptic state using current voltage state
@@ -335,15 +327,12 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// <param name="ts"></param> this is the activation time of the synapse, this is NOT the time the synapse is placed
         /// <returns></returns>
         public double SynFunction(double v, double t, double ts)
-        {
-            double icurr = new double();        // allocate for current calculation
+        {            
             double Erev = -0.0125;              // reversal potential for synapse
             double taud = 3.0e-3;               // decay constant from function
             double Gnmdar = 25e-9;              // borrowed from Rothman Paper they  mention 10's of nanosiemens
                         
-            icurr = Gnmdar * (1.0 / (1.0 + System.Math.Exp(-1.0 * (v + 0.0128) / 0.0224))) * System.Math.Exp(-1.0 * (t - ts) / taud) * (v - Erev);
-           
-            return icurr;
+            return Gnmdar * (1.0 / (1.0 + System.Math.Exp(-1.0 * (v + 0.0128) / 0.0224))) * System.Math.Exp(-1.0 * (t - ts) / taud) * (v - Erev);           
         }
 
         /// <summary>
@@ -354,8 +343,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         {
             InitializeNeuronCell();
             ///<c>R</c> this is the reaction vector for the reaction solve
-            R = Vector.Build.Dense(Neuron.nodes.Count);
-            
+            R = Vector.Build.Dense(Neuron.nodes.Count);            
             
             tempState = Vector.Build.Dense(Neuron.nodes.Count, 0);
             ///<c>reactConst</c> this is a small list for collecting the conductances and reversal potential which is sent to the reaction solve routine
@@ -411,10 +399,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         }
 
         internal override void SetOutputValues()
-        {
-            lock (visualizationValuesLock) U = U_Active.Clone();
-
-        }
+        { lock (visualizationValuesLock) U = U_Active.Clone(); }
 
         #region Local Functions
 
