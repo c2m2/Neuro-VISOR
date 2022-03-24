@@ -2,9 +2,7 @@
 using System.Linq;
 using System;
 using UnityEngine;
-/// These libraries are for using the Vector data type
 using Vector = MathNet.Numerics.LinearAlgebra.Vector<double>;
-/// These are for the sparse solving functionality
 using CSparse.Storage;
 using CSparse.Double.Factorization;
 using CSparse;
@@ -54,11 +52,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// This is the voltage for the voltage clamp, this is primarily used for when we do the convergence analysis of the code using a 
         /// soma clamp at 50 [mV], the units for voltage in the solver is [V] that is why <c>vstart</c> is set to 0.05
         ///</summary>
-        public double vstart = 0.050;     
-        /// <summary>
-        /// This is for turning the soma on/off, this option is primarily used for testing purposes for the convergence analysis, for a soma clamp experiment
-        /// </summary>
-        public bool SomaOn = false;            
+        public double vstart = 0.050;         
         ///<summary>
         /// [ohm.m] resistance.length, this is the axial resistence of the neuron, increasing this value has the effect of making the AP waves more localized and slower conduction speed
         /// decreasing this value has the effect of make the AP waves larger and have a faster conduction speed
@@ -109,12 +103,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// <summary>
         /// [] sodium channel state probability, unitless  
         /// </summary>
-        private double hi = 0.9959410;
-        /// <summary>
-        /// the membrane resistance does not hit the theoretical maximum, it is approximately 65%
-        /// but this may change depending on the rate functions that are used
-        /// </summary>
-        private double Rmemscf = 1.0;    
+        private double hi = 0.9959410;        
         /// <summary>
         /// These are the solution vectors for the voltage <code>U</code>
         /// the state <c>M</c>, state <c>N</c>, and state <c>H</c>
@@ -137,7 +126,6 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// this is for storing previous states
         /// </summary>
         private Vector Upre, Npre, Mpre, Hpre;
-        private int solvecount;
         /// <summary>
         /// This is a vector the Reaction terms
         /// </summary>
@@ -280,6 +268,15 @@ namespace C2M2.NeuronalDynamics.Simulation
             //Icurrs[1] is previous synaptic state
             Icurrs = SynapseCurrentFunction(newVal);
 
+            
+            if ((Double.IsNaN(Icurrs[0]) || Double.IsNaN(Icurrs[1])) || ((Icurrs[0] > 0.5e-9)||(Icurrs[1]>0.5e-9)) )
+            {
+                //Debug.LogError("Current check");
+                Icurrs[0] = 1.0e-16;
+                //Debug.LogError(Icurrs[0]);
+                Icurrs[1] = 0.9e-16;
+            }
+
             // this is the SBDF calculation using the Icurr of the current state, and Icurr of the previous state
             return (2.0 / 3.0) * timeStep / (cap * area) * (2.0 * Icurrs[0] - Icurrs[1]);
         }
@@ -300,29 +297,34 @@ namespace C2M2.NeuronalDynamics.Simulation
 
             // get the pre and post synaptic voltages
             double presynVoltage = newVal.Item1.attachedSim.Get1DValues()[newVal.Item1.nodeIndex];
-            double voltageThreshold = 0.04;
+            double presynVoltage0 = Upre[newVal.Item1.nodeIndex];
+            double voltageThreshold = 0.038;
 
+            if ((presynVoltage >= voltageThreshold) && (presynVoltage0< voltageThreshold))
+            {
+                newVal.Item1.SetActivationTime(GetSimulationTime());
+            }
+                                   
             // if the presynapse is below a threshold, then the synapse is INACTIVE
             if ((presynVoltage <= voltageThreshold))
             {
                 Icurrs = new List<double>();
                 // keep updating the activationTime until it becomes active, once active then this values will be used in else block
-                newVal.Item1.SetActivationTime(((double)solvecount) * timeStep);
                 Icurrs.Add(0.0);    // zero current at postsynapse while INACTIVE
                 Icurrs.Add(0.0);    // zero current at postsynapse while INACTIVE
             }
             else // if the presynaptic voltage is above threshold, then do not update activation time and compute the new current
             {
-                if (((double)solvecount * timeStep) > (newVal.Item1.activationTime + 3.0e-3))
+                if ((GetSimulationTime()) > (newVal.Item1.activationTime + 3.0e-3))
                 {
-                    newVal.Item1.SetActivationTime(((double)solvecount) * timeStep);
+                    newVal.Item1.SetActivationTime(GetSimulationTime());
                 }
 
                 Icurrs = new List<double>();
-                Icurrs.Add(SynFunction(U_Active[newVal.Item2.nodeIndex], solvecount * timeStep, newVal.Item1.activationTime));         // compute current synaptic state using current voltage state
-                Icurrs.Add(SynFunction(Upre[newVal.Item2.nodeIndex], solvecount * timeStep, newVal.Item1.activationTime));             // compute previous synaptic state using previous voltage state
+                Icurrs.Add(SynFunction(U_Active[newVal.Item2.nodeIndex], GetSimulationTime(), newVal.Item1.activationTime));         // compute current synaptic state using current voltage state
+                Icurrs.Add(SynFunction(Upre[newVal.Item2.nodeIndex], GetSimulationTime(), newVal.Item1.activationTime));             // compute previous synaptic state using previous voltage state
             }
-
+            
             return Icurrs;
         }
         /// <summary>
@@ -337,9 +339,10 @@ namespace C2M2.NeuronalDynamics.Simulation
             double icurr = new double();        // allocate for current calculation
             double Erev = -0.0125;              // reversal potential for synapse
             double taud = 3.0e-3;               // decay constant from function
-            double Gnmdar = 25e-9;              // borrowed from Rothman Paper they  mention 10s of nanosiemens
+            double Gnmdar = 25e-9;              // borrowed from Rothman Paper they  mention 10's of nanosiemens
                         
             icurr = Gnmdar * (1.0 / (1.0 + System.Math.Exp(-1.0 * (v + 0.0128) / 0.0224))) * System.Math.Exp(-1.0 * (t - ts) / taud) * (v - Erev);
+           
             return icurr;
         }
 
@@ -352,14 +355,14 @@ namespace C2M2.NeuronalDynamics.Simulation
             InitializeNeuronCell();
             ///<c>R</c> this is the reaction vector for the reaction solve
             R = Vector.Build.Dense(Neuron.nodes.Count);
-            solvecount = 0;
+            
             
             tempState = Vector.Build.Dense(Neuron.nodes.Count, 0);
             ///<c>reactConst</c> this is a small list for collecting the conductances and reversal potential which is sent to the reaction solve routine
             reactConst = new List<double> { gk, gna, gl, ek, ena, el };
 
             /// this sets the target time step size
-            timeStep = SetTargetTimeStep(cap, 2 * Neuron.MaxRadius,2*Neuron.MinRadius, Neuron.TargetEdgeLength, gna, gk,gl, res, Rmemscf, 1.0);
+            timeStep = SetTargetTimeStep(cap, 2 * Neuron.MaxRadius,2*Neuron.MinRadius, Neuron.TargetEdgeLength, gna, gk,gl, res, 1.0);
             ///UnityEngine.Debug.Log("Target Time Step = " + timeStep);
 
             ///<c>List<CoordinateStorage<double>> sparse_stencils = makeSparseStencils(Neuron, res, cap, k);</c> Construct sparse RHS and LHS in coordinate storage format, no zeros are stored \n
@@ -380,13 +383,13 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// is for the reaction terms and state variables
         /// </summary>     
         protected override void SolveStep(int t)
-        {
+        {            
             U_Active.Multiply(4.0 / 3.0, R);
             R.Add(reactF(reactConst, U_Active, N, M, H, cap).Multiply((4.0 / 3.0) * timeStep), R);
             R.Add(Upre.Multiply(-1.0 / 3.0), R);
             R.Add(reactF(reactConst, Upre, Npre, Mpre, Hpre, cap).Multiply((-2.0 / 3.0) * timeStep), R);
             R.Add(Isyn, R);
-            Isyn.Multiply(0.0,Isyn); // reset synaptic source 
+            Isyn.Multiply(0.0,Isyn); // reset synaptic source this ensures that when you remove the synapse that Isyn becomes 0; therefore, current is not being sent to postsynapse once synapse is removed
 
             lu.Solve(R.ToArray(), b);
 
@@ -404,8 +407,7 @@ namespace C2M2.NeuronalDynamics.Simulation
 
             Upre = U_Active.Clone();
             U_Active.SetSubVector(0, Neuron.nodes.Count, Vector.Build.DenseOfArray(b));
-
-            solvecount++;
+                       
         }
 
         internal override void SetOutputValues()
@@ -449,7 +451,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// <param name="res"></param> this is the axial resistance
         /// <param name="Rmemscf"></param> this is membrane resistance scale factor, since this is only a fraction of theoretical maximum
         /// <returns></returns>
-        public static double SetTargetTimeStep(double cap, double maxDiameter, double minDiameter,double edgeLength ,double gna, double gk, double gl, double res, double Rmemscf, double cfl)
+        public static double SetTargetTimeStep(double cap, double maxDiameter, double minDiameter,double edgeLength ,double gna, double gk, double gl, double res, double cfl)
         {
             /// here we set the minimum time step size and maximum time step size
             /// the dtmin is based on prior numerical experiments that revealed that for each refinement level the 
