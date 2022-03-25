@@ -1,4 +1,5 @@
-﻿using C2M2.NeuronalDynamics.Simulation;
+﻿using C2M2;
+using C2M2.NeuronalDynamics.Simulation;
 using C2M2.NeuronalDynamics.UGX;
 using System;
 using UnityEngine;
@@ -61,7 +62,12 @@ public class Synapse : MonoBehaviour
     /// <param name="hit"></param>
     public void transformRayCast(RaycastHit hit)
     {
-        curSimulation = hit.collider.GetComponentInParent<NDSimulation>();
+        // if not loading
+        if (!GameManager.instance.Loading)
+            curSimulation = hit.collider.GetComponentInParent<NDSimulation>();
+        else
+            curSimulation = attachedSim;
+
         if (curSimulation.Neuron.somaIDs.Contains(nodeIndex))
         {
             //Transform the position of the synapse to where we raycast onto

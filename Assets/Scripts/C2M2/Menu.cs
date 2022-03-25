@@ -19,7 +19,9 @@ namespace C2M2
     {
         GameManager gm = null; // current instance of GameManager
 
-        private CellData data; // data for each cell
+        private CellData data = null; // data for each cell
+        private SynapseManager synM = null;
+        private SynapseData synD = null;
         public NDSimulationLoader loader = null; // current loader used
         private string path; // save/load file path (for now)
 
@@ -103,6 +105,11 @@ namespace C2M2
                     data = new CellData();
 
                     data.U = sim.Get1DValues(); // voltage at every node
+
+                    //for (int k = 0; k < 10; k++)
+                        //Debug.Log(data.U[k]);
+                    //Debug.Log(sim.GetSimulationTime());
+
                     data.M = sim.getM(); // M vector
                     data.N = sim.getN(); // N vector
                     data.H = sim.getH(); // H vector
@@ -154,24 +161,37 @@ namespace C2M2
                         sw.Write(';'); // add delimiter unless it's the last object
                 }
 
+                // write synapses list to file (Json doesn't work with List)
+                synM = gm.simulationManager.synapseManager;
+                sw.Write(';');
+                synD = new SynapseData();
+
+                if (synM.synapses.Count > 0)
+                {
+                    synD.syns = new SynapseData.SynData[synM.synapses.Count];
+                    for (int j = 0; j < synM.synapses.Count; j++)
+                    {
+                        synD.syns[j].synVert = synM.synapses[j].nodeIndex;
+                        synD.syns[j].simID = synM.synapses[j].curSimulation.simID;
+                    }
+                }
+                string jSon = JsonUtility.ToJson(synD);
+                sw.Write(jSon);
+
                 sw.Close();
             }
         }
 
         public void Load()
         {
-            // clear the scene first
-            //ClearScene();
+            ClearScene();
 
-            loader = FindObjectOfType<NDSimulationLoader>();
+            loader = gm.cellPreviewer.GetComponentInChildren<NDSimulationLoader>();
 
             if (loader != null)
             {
                 loading = true; // this is for ChangeGradient
                 gm.Loading = true;
-                // NeuronClampManager clampMng = gm.ndClampManager;
-
-                ClearScene();
 
                 string[] json = File.ReadAllText(path).Split(';');
 
@@ -190,7 +210,9 @@ namespace C2M2
 
                 CurrentTimeStep t = JsonUtility.FromJson<CurrentTimeStep>(json[i++]);
 
-                int limit = json.Length - 1;
+                int limit = json.Length - 2; // account for the synapses array at the end of the file
+
+                int ID = 0; // this will be the current ID when placing a new cell after loading
 
                 for (; i <= limit; i++)
                 {
@@ -276,8 +298,27 @@ namespace C2M2
                         gradientIndex = data.gradientIndex;
                 }
 
+                // recreate synapses
+                synD = JsonUtility.FromJson<SynapseData>(json[i]);
+                synM = gm.simulationManager.synapseManager;
+
+                for (int j = 0; j < synD.syns.Length; j++)
+                {
+                    foreach (NDSimulation sim in gm.activeSims)
+                    {
+                        if (sim.simID == synD.syns[j].simID)
+                        {
+                            synM.focusVert = synD.syns[j].synVert;
+                            synM.curSimulation = sim;
+                            // the function automatically takes care of post synapses too
+                            synM.preSynapticPlacement(new RaycastHit());
+                        }
+                    }
+                }
+
                 finishedLoading = true; // this is for ChangeGradient
                 gm.Loading = false;
+                gm.simID = ID;
 
                 // set paused
                 NDPauseButton pauseBtn = FindObjectOfType<NDPauseButton>();
@@ -294,6 +335,8 @@ namespace C2M2
             {
                 NDBoardController c = controlPanel.GetComponent<NDBoardController>();
                 c.CloseAllSimulations();
+                DestroyImmediate(c.gameObject);
+                DestroyImmediate(controlPanel);
             }
         }
     }

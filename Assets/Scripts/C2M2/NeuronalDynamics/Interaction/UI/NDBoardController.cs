@@ -83,6 +83,10 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
 
         public void CloseAllSimulations()
         {
+            // set paused to false; it's needed for load function to work properly
+            if (GameManager.instance.simulationManager.Paused)
+                GameManager.instance.simulationManager.Paused = false;
+
             for(int i = GameManager.instance.activeSims.Count-1; i >= 0; i--)
             {
                 CloseSimulation(i);

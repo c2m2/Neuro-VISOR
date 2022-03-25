@@ -120,6 +120,8 @@ namespace C2M2.NeuronalDynamics.Interaction
                 solver.unit = unit;
                 solver.unitScaler = unitScaler;
 
+                solver.simID = GameManager.instance.simID; // set ID
+
                 try
                 {
                     solver.RefinementLevel = refinementLevel;

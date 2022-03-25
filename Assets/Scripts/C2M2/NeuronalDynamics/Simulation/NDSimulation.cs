@@ -26,6 +26,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
     /// 1D Neuron surface simulations should derive from this class.
     /// </remarks>
     public abstract class NDSimulation : MeshSimulation {
+        public int simID = -1; // simulation ID
 
         public new NDSimulationManager Manager { get { return GameManager.instance.simulationManager; } }
         private double visualInflation = 1;
@@ -217,7 +218,8 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 int id = GetNearestPoint(hit);
                 infoPanel.unit = unit;
                 infoPanel.Vertex = id;
-                infoPanel.Power = vals1D[id] * unitScaler;
+                //infoPanel.Power = vals1D[id] * unitScaler;
+                infoPanel.Power = Get1DValues()[id] * unitScaler;
                 infoPanel.FocusLocalPosition = Verts1D[id]; //offset so the popup is not in the middle of the dendrite
             }
         }
@@ -338,7 +340,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
         /// </summary>
         /// <returns> One scalar value for each 3D vertex based on its 1D vert's scalar value </returns>
         public sealed override float[] GetValues () {
-            vals1D = Get1DValues();
+            double[] vals1D = Get1DValues();
 
             if (vals1D == null) { return null; }
 
@@ -463,7 +465,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
                     controlPanel = Resources.Load("Prefabs/NeuronalDynamics/ControlPanel/NDControls") as GameObject;
                     controlPanel = Instantiate(controlPanel);
                 }
-
 
                 NDBoardController controller = controlPanel.GetComponent<NDBoardController>();
                 if (controller == null)
