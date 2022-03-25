@@ -106,10 +106,6 @@ namespace C2M2
 
                     data.U = sim.Get1DValues(); // voltage at every node
 
-                    //for (int k = 0; k < 10; k++)
-                        //Debug.Log(data.U[k]);
-                    //Debug.Log(sim.GetSimulationTime());
-
                     data.M = sim.getM(); // M vector
                     data.N = sim.getN(); // N vector
                     data.H = sim.getH(); // H vector
@@ -119,6 +115,7 @@ namespace C2M2
                     data.Npre = sim.getNpre(); // Npre vector
                     data.Hpre = sim.getHpre(); // Hpre vector
 
+                    data.simID = sim.simID;
                     data.pos = sim.transform.position;
                     data.rotation = sim.transform.rotation;
                     data.scale = sim.transform.localScale;
@@ -249,6 +246,10 @@ namespace C2M2
 
                     SparseSolverTestv1 sim = go.GetComponent<SparseSolverTestv1>();
 
+                    // restore cell ID
+                    sim.simID = data.simID;
+                    ID = sim.simID;
+
                     go.transform.position = data.pos;
                     go.transform.rotation = data.rotation;
                     go.transform.localScale = data.scale;
@@ -318,7 +319,7 @@ namespace C2M2
 
                 finishedLoading = true; // this is for ChangeGradient
                 gm.Loading = false;
-                gm.simID = ID;
+                GameManager.simID = ID;
 
                 // set paused
                 NDPauseButton pauseBtn = FindObjectOfType<NDPauseButton>();

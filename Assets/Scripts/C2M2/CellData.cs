@@ -12,6 +12,7 @@ namespace C2M2
     public class CellData
     {
         // Neuron data
+        public int simID;
         public Vector3 pos;
         public Quaternion rotation;
         public Vector3 scale;

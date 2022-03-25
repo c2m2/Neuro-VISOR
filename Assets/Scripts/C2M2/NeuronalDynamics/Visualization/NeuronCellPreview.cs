@@ -148,7 +148,7 @@ namespace C2M2.NeuronalDynamics.Visualization
             int numOfNeurons = 1; //Set how many neurons you want here
             for (int i = 0; i<numOfNeurons;i++)
             {
-                ++GameManager.instance.simID; // set ID
+                ++GameManager.simID; // set ID
                 loader.Load(hit);
             }
         }
