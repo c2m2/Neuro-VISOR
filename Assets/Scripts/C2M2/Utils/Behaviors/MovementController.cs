@@ -94,7 +94,15 @@ namespace C2M2.Utils
             DisableMovement();
         }
 
-        // Set x, y, z for loading
-        public void SetXYZ(Vector3 v) { x = v.x; y = v.y; z = v.z; }
+        // set/get x, y, z for saving/loading
+        public void setXYZ(Vector3 v) { x = v.x; y = v.y; z = v.z; }
+        public Vector3 getXYZ()
+        {
+            Vector3 ret;
+            ret.x = x;
+            ret.y = y;
+            ret.z = z;
+            return ret;
+        }
     }
 }

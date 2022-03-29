@@ -36,11 +36,13 @@ namespace C2M2
         {
             public Vector3 camPos;
             public Vector3 camRot;
+            public Vector3 xyz; //x, y, z values from MovementController.cs
 
-            public CamTransform(Vector3 pos, Vector3 rot)
+            public CamTransform(Vector3 pos, Vector3 rot, Vector3 abc)
             {
                 camPos = pos;
                 camRot = rot;
+                xyz = abc;
             }
         }
 
@@ -77,7 +79,7 @@ namespace C2M2
                 MovementController cam = FindObjectOfType<MovementController>();
                 if (cam != null && cam.transform.parent.gameObject.activeSelf)
                 {
-                    CamTransform c = new CamTransform(cam.transform.position, cam.transform.eulerAngles);
+                    CamTransform c = new CamTransform(cam.transform.position, cam.transform.eulerAngles, cam.getXYZ());
                     string saveCam = JsonUtility.ToJson(c); // convert to Json
                     sw.Write(saveCam + ";");
                 }
@@ -201,7 +203,7 @@ namespace C2M2
                     CamTransform c = JsonUtility.FromJson<CamTransform>(json[i]);
                     cam.transform.position = c.camPos;
                     cam.transform.eulerAngles = c.camRot;
-                    cam.SetXYZ(cam.transform.eulerAngles);
+                    cam.setXYZ(c.xyz);
                 }
                 ++i;
 
