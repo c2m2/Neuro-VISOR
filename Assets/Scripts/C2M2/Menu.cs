@@ -10,7 +10,6 @@ namespace C2M2
     using NeuronalDynamics.Simulation;
     using NeuronalDynamics.Interaction;
     using NeuronalDynamics.Interaction.UI;
-    using NeuronalDynamics.Visualization;
 
     /// <summary>
     /// Provides Save and Load functionality for cells

@@ -87,6 +87,10 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
             if (GameManager.instance.simulationManager.Paused)
                 GameManager.instance.simulationManager.Paused = false;
 
+            // delete Synapse scripts under SynapseManager object
+            foreach (Synapse s in GameManager.instance.simulationManager.synapseManager.synapses)
+                Destroy(s);
+
             for(int i = GameManager.instance.activeSims.Count-1; i >= 0; i--)
             {
                 CloseSimulation(i);
