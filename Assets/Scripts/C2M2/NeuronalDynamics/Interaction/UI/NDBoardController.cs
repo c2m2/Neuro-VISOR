@@ -91,7 +91,12 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
             foreach (Synapse s in GameManager.instance.simulationManager.synapseManager.synapses)
                 Destroy(s);
 
-            for(int i = GameManager.instance.activeSims.Count-1; i >= 0; i--)
+            // disable Save button
+            Menu m = FindObjectOfType<Menu>();
+            m.CloseFileList();
+            m.SaveButtonVisible(false);
+
+            for (int i = GameManager.instance.activeSims.Count-1; i >= 0; i--)
             {
                 CloseSimulation(i);
             }

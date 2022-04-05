@@ -87,6 +87,10 @@ namespace C2M2.NeuronalDynamics.Interaction
 
             TransferValues();
 
+            // make Save button visible
+            Menu m = FindObjectOfType<Menu>();
+            m.SaveButtonVisible(true);
+
             solver.Initialize();
 
             solver.Manager.FeatState = solver.Manager.FeatState;
