@@ -13,8 +13,8 @@ namespace C2M2.NeuronalDynamics.Interaction
         public float MinPower { get { return currentSimulation.ColorLUT.GlobalMin; } }
         public float MaxPower { get { return currentSimulation.ColorLUT.GlobalMax; } }
         // Sensitivity of the clamp power control. Lower sensitivity means clamp power changes more quickly
-        public float sensitivity = 200f;
-        public float ThumbstickScaler { get { return (MaxPower - MinPower) / sensitivity; } }
+        public float sensitivity = 5;
+        public float Scaler { get { return (MaxPower - MinPower) / sensitivity; } }
 
         public GameObject clampPrefab = null;
         public GameObject somaClampPrefab = null;
@@ -33,10 +33,10 @@ namespace C2M2.NeuronalDynamics.Interaction
 
         #region InputButtons
         /// <summary>
-        /// Hold down a raycast for this many frames in order to destroy a clamp
+        /// Hold down a raycast for this many seconds in order to destroy a clamp
         /// </summary>
-        public int destroyCount { get; private set; } = 50;
-        private int holdCount = 0;
+        public int DestroyCount { get; private set; } = 1;
+        private float holdCount = 0;
         /// <summary>
         /// Pressing these buttonb toggles clamps on/off. Holding these buttons down for long enough destroys the clamp
         /// </summary>
@@ -62,12 +62,12 @@ namespace C2M2.NeuronalDynamics.Interaction
                     // Uses the value of both joysticks added together
                     float scaler = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick).y + OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick).y;
 
-                    return ThumbstickScaler * scaler;
+                    return Scaler * scaler;
                 }
                 else
                 {
-                    if (Input.GetKey(powerModifierPlusKey)) return ThumbstickScaler;
-                    if (Input.GetKey(powerModifierMinusKey)) return -ThumbstickScaler;
+                    if (Input.GetKey(powerModifierPlusKey)) return .4f*Scaler;
+                    if (Input.GetKey(powerModifierMinusKey)) return .4f*-Scaler;
                     else return 0;
                 }
             }
@@ -231,11 +231,11 @@ namespace C2M2.NeuronalDynamics.Interaction
         public void MonitorGroupInput()
         {
             if (PressedToggleDestroy)
-                holdCount++;
+                holdCount+=Time.deltaTime;
             else
                 CheckInputResult();
 
-            float power = PowerModifier;
+            float power = Time.deltaTime*PowerModifier;
             // If clamp power is modified while the user holds a click, don't let the click also toggle/destroy the clamp
             if (power != 0 && !powerClick) powerClick = true;
 
@@ -255,7 +255,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         {
             if (!powerClick)
             {
-                if (holdCount >= destroyCount)
+                if (holdCount >= DestroyCount)
                     DestroyAll();
                 else if (holdCount > 0)
                     ToggleAll();

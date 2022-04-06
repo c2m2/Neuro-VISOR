@@ -13,7 +13,7 @@ namespace C2M2.Interaction
         private Vector3 origScale;
         private Vector3 minScale;
         private Vector3 maxScale;
-        public float scaler = 0.2f;
+        public float scaler = 50f;
         public float minPercentage = 0;
         public float maxPercentage = float.PositiveInfinity;
         public bool xScale = true;
@@ -78,7 +78,7 @@ namespace C2M2.Interaction
             }
             else if(ChangeScaler != 0)
             {
-                Vector3 scaleValue = scaler * ChangeScaler * origScale;
+                Vector3 scaleValue = scaler * Time.deltaTime * ChangeScaler * origScale;
                 Vector3 newLocalScale = target.localScale + scaleValue;
 
                 // Makes sure the new scale is within the determined range

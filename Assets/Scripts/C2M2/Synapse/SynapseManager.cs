@@ -17,9 +17,9 @@ public class SynapseManager : MonoBehaviour
     public RaycastPressEvents hitEvent { get; private set; } = null;
 
     public GameObject arrow;
-    private int holdCount = 0;
+    private float holdCount = 0;
     public int focusVert { get; private set; } = -1;
-    public int numOfDeletionFrames = 50;
+    public int DestoryCount = 1;
 
 
     ///<summary> 
@@ -128,9 +128,9 @@ public class SynapseManager : MonoBehaviour
     {
         curSimulation = hit.collider.GetComponentInParent<NDSimulation>();
 
-        holdCount++;
+        holdCount+=Time.deltaTime;
         // Hold count threshhold to check if the user has pressed for x frames
-        if(holdCount >= numOfDeletionFrames)
+        if(holdCount >= DestoryCount)
         {
             // Get the 1d vertex user has pressed
             int hitIndex = curSimulation.GetNearestPoint(hit);

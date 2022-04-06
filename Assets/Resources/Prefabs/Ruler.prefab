@@ -460,7 +460,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1fd8b6f922b3f0147b59e7daa8f4ee0f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scaler: 0.2
+  scaler: 50
   minPercentage: 0.01
   maxPercentage: 100
   xScale: 1

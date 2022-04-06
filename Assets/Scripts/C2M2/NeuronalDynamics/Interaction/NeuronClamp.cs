@@ -300,7 +300,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         #endregion
 
         #region Input
-        int holdCount = 0;
+        float holdCount = 0;
 
         private bool powerClick = false;
         /// <summary>
@@ -315,15 +315,15 @@ namespace C2M2.NeuronalDynamics.Interaction
 
             if (ClampManager.PressedToggleDestroy)
             {
-                holdCount++;
+                holdCount+=Time.deltaTime;
 
                 // If we've held the button long enough to destroy, color caps red until user releases button
-                if(holdCount > ClampManager.destroyCount && !powerClick) SwitchCaps(false);
+                if(holdCount > ClampManager.DestroyCount && !powerClick) SwitchCaps(false);
                 else if (powerClick) SwitchCaps(true);
             }
             else CheckInput();
 
-            float power = ClampManager.PowerModifier;
+            float power = Time.deltaTime*ClampManager.PowerModifier;
             
             // If clamp power is modified while the user holds a click, don't let the click also toggle/destroy the clamp
             if (power != 0 && !powerClick) powerClick = true;
@@ -369,7 +369,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         {
             if (!ClampManager.PressedCancel && !powerClick)
             {
-                if (holdCount >= ClampManager.destroyCount)
+                if (holdCount >= ClampManager.DestroyCount)
                 {
                     Destroy(transform.parent.gameObject);
                 }
