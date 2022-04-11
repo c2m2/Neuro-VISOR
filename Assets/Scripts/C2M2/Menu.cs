@@ -22,7 +22,7 @@ namespace C2M2
         private int file_index; // keep track of how many files are saved already
         private String filename; // filename to save to
         private String[] files = null; // list of files saved
-        private bool filelist_visible = false;
+        private bool filelist_visible = false; // if true the children of File object under SaveLoad are active
 
         GameManager gm = null; // current instance of GameManager
 
@@ -70,8 +70,9 @@ namespace C2M2
 
         void Awake()
         {
-            //path = Application.dataPath + "/save.dat";
             path = Application.dataPath + "/";
+            if (!Directory.Exists(path + "Save")) Directory.CreateDirectory(path + "Save");
+            path += "Save/";
             gm = GameManager.instance;
             if (File.Exists(path + "/settings.txt"))
                 file_index = int.Parse(File.ReadAllLines(path + "/settings.txt")[0]);
@@ -80,19 +81,25 @@ namespace C2M2
 
         private void OnDestroy()
         {
-            File.WriteAllText(path + "/settings.txt", file_index.ToString());
+            File.WriteAllText(path + "/settings.txt", file_index.ToString()); // save current file index to settings.txt
         }
 
+        /// <summary>
+        /// Save the current scene.
+        /// </summary>
         public void Save()
         {
             if (gm.activeSims.Count > 0)
             {
+                // hide save button
+                SaveButtonVisible(false);
+
                 // reset file_index
                 if (file_index == MAX_SAVE_FILES)
                     file_index = 0;
 
                 // filename format: index_date-time.dat
-                filename = file_index + "_" + date.Date.ToString("M-d-yyyy") + "-" + DateTime.Now.ToString("hh-mm-ss-fff-tt") + ".dat";
+                filename = file_index + "_" + date.Date.ToString("M-d-yyyy") + "-" + DateTime.Now.ToString("HH-mm-ss") + ".dat";
                 // delete and replace file with the same index
                 String[] files = Directory.GetFiles(path, file_index + "_*");
                 foreach (String f in files)
@@ -122,26 +129,16 @@ namespace C2M2
                 ChangeGradient grad = FindObjectOfType<ChangeGradient>();
                 int gIndex = grad.GetActiveGradient();
 
-                // get graph manager
-                graphM = s.graphManager;
-
                 // save cells
                 for (int i = 0; i <= limit; i++)
                 {
                     SparseSolverTestv1 sim = (SparseSolverTestv1)gm.activeSims[i];
+                    graphM = sim.graphManager;
 
                     // fill in the variables to be saved
                     data = new CellData();
 
                     data.U = sim.Get1DValues(); // voltage at every node
-
-                    //for (int m = 0; m < data.U.Length; m++)
-                    //Debug.Log(m + " = " + data.U[m]);
-
-                    //MeshFilter mf = sim.GetComponent<MeshFilter>();
-                    //for (int m = 0; m < mf.mesh.colors32.Length; m++)
-                    //    Debug.Log(m + " = " + mf.mesh.colors32[m]);
-
                     data.M = sim.getM(); // M vector
                     data.N = sim.getN(); // N vector
                     data.H = sim.getH(); // H vector
@@ -212,9 +209,24 @@ namespace C2M2
                 sw.Write(jSon);
 
                 sw.Close();
+
+                StartCoroutine(ShowSaveButton()); // show save button after 1.5 seconds
             }
         }
 
+        /// <summary>
+        /// Show save button if it is possible.
+        /// </summary>
+        IEnumerator ShowSaveButton()
+        {
+            yield return new WaitForSeconds(1.5f);
+            if (!filelist_visible && !gm.cellPreviewer.activeInHierarchy)
+                SaveButtonVisible(true);
+        }
+
+        /// <summary>
+        /// Load a file. Return true if successful.
+        /// </summary>
         public bool Load(String f)
         {
             ClearScene();
@@ -225,8 +237,20 @@ namespace C2M2
             {
                 loading = true; // this is for ChangeGradient
                 gm.Loading = true;
+                string[] json;
 
-                string[] json = File.ReadAllText(path + f + ".dat").Split(';');
+                try
+                {
+                    json = File.ReadAllText(path + f + ".dat").Split(';');
+                }
+                catch (FileNotFoundException e)
+                {
+                    Debug.Log(e.Message);
+                    loading = false;
+                    gm.Loading = false;
+                    finishedLoading = true;
+                    return false;
+                }
 
                 int i = 0; // index for json string
 
@@ -275,6 +299,7 @@ namespace C2M2
                     catch (FileNotFoundException e)
                     {
                         go = FindObjectOfType<SparseSolverTestv1>().gameObject;
+                        gm.activeSims.RemoveAt(gm.activeSims.Count-1);
                         Destroy(go);
                         Debug.Log(e.Message);
                         loading = false;
@@ -350,7 +375,7 @@ namespace C2M2
                         {
                             synM.focusVert = synD.syns[j].synVert;
                             synM.curSimulation = sim;
-                            // the function automatically takes care of post synapses too
+                            // this function automatically takes care of post synapses too
                             synM.preSynapticPlacement(new RaycastHit());
                         }
                     }
@@ -361,8 +386,7 @@ namespace C2M2
                 GameManager.simID = ID;
 
                 // set paused
-                NDPauseButton pauseBtn = FindObjectOfType<NDPauseButton>();
-                pauseBtn.TogglePause();
+                gm.simulationManager.Paused = true;
             }
             else
             {
@@ -373,6 +397,9 @@ namespace C2M2
             return true;
         }
 
+        /// <summary>
+        /// Clear the scene in order to load a file.
+        /// </summary>
         public void ClearScene()
         {
             GameObject controlPanel = GameObject.FindGameObjectWithTag("ControlPanel");
@@ -385,6 +412,9 @@ namespace C2M2
             }
         }
 
+        /// <summary>
+        /// Loads the selected (clicked) file.
+        /// </summary>
         public void LoadThisFile(RaycastHit hit)
         {
             GameObject g = hit.collider.gameObject.transform.GetChild(1).gameObject;
@@ -394,15 +424,16 @@ namespace C2M2
             for (int i = 0; i < t.childCount; i++)
                 t.GetChild(i).gameObject.SetActive(false);
 
-            if (!Load(text.text)) // fix: if geometry is missing simulation cannot load a different neuron from cell preview
-            {
-                ClearScene();
+            if (!Load(text.text))
                 CloseFileList();
-            }
+
             LoadButtonVisible(true);
             CloseButtonVisible(false);
         }
 
+        /// <summary>
+        /// Lists the filename objects.
+        /// </summary>
         public void ListSavedFiles()
         {
             files = Directory.GetFiles(path, "*.dat");
@@ -433,6 +464,9 @@ namespace C2M2
             }
         }
 
+        /// <summary>
+        /// Close filename objects.
+        /// </summary>
         public void CloseFileList()
         {
             if (filelist_visible)
@@ -443,10 +477,10 @@ namespace C2M2
                 for (int i = 0; i < files.Length; i++)
                     g.GetChild(i).gameObject.SetActive(false);
 
-                //LoadButtonVisible(true);
                 filelist_visible = false;
-
                 LoadButtonVisible(true);
+
+                // if controlPanel is active unminimize it, otherwise show the cell previewer
                 GameObject controlPanel = GameObject.FindGameObjectWithTag("ControlPanel");
                 if (controlPanel != null)
                 {
@@ -460,31 +494,26 @@ namespace C2M2
 
         }
 
+        /*
+         * Show/hide buttons.
+         */
+
         public void SaveButtonVisible(bool visible)
         {
             GameObject save = gameObject.transform.GetChild(0).gameObject;
-            if (visible)
-                save.SetActive(true);
-            else
-                save.SetActive(false);
+            save.SetActive(visible);
         }
 
         public void LoadButtonVisible(bool visible)
         {
             GameObject load = gameObject.transform.GetChild(1).gameObject;
-            if (visible)
-                load.SetActive(true);
-            else
-                load.SetActive(false);
+            load.SetActive(visible);
         }
 
         public void CloseButtonVisible(bool visible)
         {
             GameObject close = gameObject.transform.GetChild(2).gameObject;
-            if (visible)
-                close.SetActive(true);
-            else
-                close.SetActive(false);
+            close.SetActive(visible);
         }
     }
 }
