@@ -1,16 +1,13 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using C2M2.Interaction;
-using C2M2.NeuronalDynamics.Simulation;
 using System.IO;
 
 namespace C2M2.NeuronalDynamics.Interaction.UI
 {
-    public class NDGraphManager : MonoBehaviour
+    public class NDGraphManager : NDInteractablesManager<NDGraph>
     {
         public GameObject graphPrefab { get; private set; } = null;
         public RaycastPressEvents hitEvent { get; private set; } = null;
-        public List<NDLineGraph> graphs = new List<NDLineGraph>();
 
         private void Awake()
         {
@@ -22,71 +19,70 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
             }
 
             hitEvent = gameObject.AddComponent<RaycastPressEvents>();
-            hitEvent.OnPress.AddListener((hit) => InstantiateGraph(hit));
+            hitEvent.OnPress.AddListener((hit) => BuildGraph(hit));
         }
 
         /// <summary>
         /// Looks for NDSimulation instance and adds neuronClamp object if possible
         /// </summary>
         /// <param name="hit"></param>
-        public void InstantiateGraph(RaycastHit hit)
+        public NDGraph BuildGraph(RaycastHit hit)
         {
             // Make sure we have a valid prefab and simulation
-            if (graphPrefab == null) Debug.LogError("No Clamp prefab found");
+            if (graphPrefab == null) Debug.LogError("No Graph prefab found");
 
-            NDSimulation sim = hit.collider.GetComponentInParent<NDSimulation>();
-            // If there is no NDSimulation, don't try instantiating a clamp
-            if (sim == null) return;
-
-            var graphObj = Instantiate(graphPrefab);
-            NDLineGraph graph = graphObj.GetComponent<NDLineGraph>();
-            graph.manager = this;
-            graph.sim = sim;
-            AttachToSimulation(graph, sim, hit);
-
-        }
-        /// <summary>
-        /// Attempt to latch a graph onto a given simulation
-        /// </summary>
-        public void AttachToSimulation(NDLineGraph graph, NDSimulation simulation, RaycastHit hit)
-        {
-            int vertIndex = simulation.GetNearestPoint(hit);
-
-            // Check for duplicates
-            if (!VertIsAvailable(vertIndex, simulation))
+            int vertIndex = currentSimulation.GetNearestPoint(hit);
+            if (VertexAvailable(vertIndex))
             {
-                Destroy(graph.gameObject);
-                return;
+                GameObject graphObj = Instantiate(graphPrefab);
+                NDGraph graph = graphObj.GetComponent<NDGraph>();
+                graph.AttachToSimulation(currentSimulation, vertIndex);
+
+                interactables.Add(graph);
+
+                return graph;
             }
 
-            graph.vert = vertIndex;
-
-            graphs.Add(graph);
-        }
-
-        /// <returns> True if the 1D index is available, otherwise returns false</returns>
-        private bool VertIsAvailable(int clampIndex, NDSimulation simulation)
-        {
-            bool validLocation = true;
-
-            foreach(NDLineGraph graph in graphs)
-            {
-                if(graph.vert == clampIndex)
-                {
-                    Debug.LogWarning("Clamp already exists on vertex [" + clampIndex + "].");
-                    validLocation = false;
-                }
-            }
-
-            return validLocation;
+            return null;
         }
 
         private void OnDestroy()
         {
-            foreach(var graph in graphs)
+            foreach(var graph in interactables)
             {
-                graph.DestroyPlot();
+                graph.ndlinegraph.DestroyPlot();
             }
+        }
+
+        public override bool VertexAvailable(int index)
+        {
+            // minimum distance between graphs 
+            float distanceBetweenGraphs = currentSimulation.AverageDendriteRadius * 2;
+
+            foreach (NDGraph graph in interactables)
+            {
+                if (graph.simulation == currentSimulation)
+                {
+                    // If there is a graph on that 1D vertex, the spot is not open
+                    if (graph.FocusVert == index)
+                    {
+                        Debug.LogWarning("Graph already exists on focus vert [" + index + "]");
+                        return false;
+                    }
+                    // If there is a clamp within distanceBetweenGraphs, the spot is not open
+                    else
+                    {
+                        float dist = (currentSimulation.Verts1D[graph.FocusVert] - currentSimulation.Verts1D[index]).magnitude;
+                        if (dist < distanceBetweenGraphs)
+                        {
+                            Debug.LogWarning("Graph too close to graph located on vert [" + graph.FocusVert + "].");
+                            return false;
+                        }
+                    }
+                }
+                
+            }
+            return true;
         }
     }
 }

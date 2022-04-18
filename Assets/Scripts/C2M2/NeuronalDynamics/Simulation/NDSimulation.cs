@@ -71,10 +71,10 @@ namespace C2M2.NeuronalDynamics.Simulation {
         private static readonly Tuple<int, double> nullClamp = new Tuple<int, double>(-1, -1);
 
         public NDGraphManager graphManager { get; private set; } = null;
-        public List<NDLineGraph> Graphs
+        public List<NDGraph> Graphs
         {
-            get { return graphManager.graphs; }
-            set { graphManager.graphs = value; }
+            get { return graphManager.interactables; }
+            set { graphManager.interactables = value; }
         }
 
 
@@ -228,9 +228,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
             SetOutputValues();
             void ApplyInteractionVals()
             {
-                ///<c>if (clamps != null && clamps.Count > 0)</c> this if statement is where we apply voltage clamps
                 /// Apply clamp values, if there are any clamps
-
                 if (clamps.Count > 0)
                 {
                     Tuple<int, double>[] clampValues = new Tuple<int, double>[clamps.Count];
@@ -238,9 +236,9 @@ namespace C2M2.NeuronalDynamics.Simulation {
                     {
                         for (int i = 0; i < clamps.Count; i++)
                         {
-                            if (clamps[i] != null && clamps[i].focusVert != -1 && clamps[i].ClampLive)
+                            if (clamps[i] != null && clamps[i].FocusVert != -1 && clamps[i].ClampLive)
                             {
-                                clampValues[i] = new Tuple<int, double>(clamps[i].focusVert, clamps[i].ClampPower);
+                                clampValues[i] = new Tuple<int, double>(clamps[i].FocusVert, clamps[i].ClampPower);
                             }
                             else
                             {
@@ -252,47 +250,25 @@ namespace C2M2.NeuronalDynamics.Simulation {
                     Set1DValues(clampValues);
                 }
 
-                ///<c> if we have active synapes apply the voltage values </c>
+                /// Apply synapse values, if there are any synapses
                 if (Manager.synapseManager.synapses.Count > 0)
                 {
-                    List<Synapse> postSynapse = new List<Synapse>();
-                    List<Synapse> preSynapse = new List<Synapse>();
-
-                    // Gather a list of each synapse (i.e. the pre and post synapses)
-                    for (int i = 0; i < Manager.synapseManager.synapses.Count; i++)
+                    List<(Synapse, Synapse)> synapses = new List<(Synapse, Synapse)>(); //pre (Item1) and post (Item2) synapses
+                    
+                    // Gather a list of each synapses with their post on the current sim
+                    foreach ((Synapse, Synapse) syn in Manager.synapseManager.synapses)
                     {
-                        if (i % 2 != 0)
+                        Synapse preSynapse = syn.Item1;
+                        Synapse postSynapse = syn.Item2;
+                        if (this == postSynapse.attachedSim)
                         {
-                            // i - 1 means the presynaptic since we store those first
-                            Synapse curPreSynaptic = Manager.synapseManager.synapses[i - 1];
-                            Synapse curPostSynaptic = Manager.synapseManager.synapses[i];
-                            if (this == curPostSynaptic.attachedSim)
-                            {
-                                postSynapse.Add(curPostSynaptic);
-
-                                // Set the synapse voltage to what the voltage is at the 1D vertex
-                                curPreSynaptic.voltage = curPreSynaptic.attachedSim.Get1DValues()[curPreSynaptic.nodeIndex];
-
-                                preSynapse.Add(curPreSynaptic);
-                            }
-
-                            
+                            synapses.Add((preSynapse, postSynapse));
                         }
                     }
 
-                    Tuple<int, double>[] new1Dvalues = new Tuple<int, double>[postSynapse.Count];
-
-                    // apply the voltage from the pre-synapse and the node index from the post-synapse into a tuple
-                    for (int i = 0; i < postSynapse.Count; i++)
-                    {
-                        new1Dvalues[i] = new Tuple<int, double>(postSynapse[i].nodeIndex, preSynapse[i].voltage);
-                    }
-
-                    // Pass the tuple so we can set our new voltage value
-                    Set1DValues(new1Dvalues);
+                    HandleSynapses(synapses);
                 }
-
-
+                
                 // Apply raycast values
                 if (raycastHits.Length > 0)
                 {
@@ -302,6 +278,12 @@ namespace C2M2.NeuronalDynamics.Simulation {
         }
 
         internal abstract void SetOutputValues();
+
+        /// <summary>
+        /// Controls Synapses Behavior
+        /// </summary>
+        /// <param name="synapses">pre (Item1) and post (Item2) synapses</param>
+        internal abstract void HandleSynapses(List<(Synapse, Synapse)> synapses);
 
         protected override void OnAwakePost(Mesh viz)
         {
@@ -343,9 +325,9 @@ namespace C2M2.NeuronalDynamics.Simulation {
             }
 
             // Update graphs
-            foreach(NDLineGraph graph in Graphs)
+            foreach(NDGraph graph in Graphs)
             {
-                graph.AddValue(1000*GetSimulationTime(), (float)vals1D[graph.vert] * unitScaler);
+                graph.ndlinegraph.AddValue(1000*GetSimulationTime(), (float)vals1D[graph.FocusVert] * unitScaler);
             }
 
             return Scalars3D.ToFloat();
@@ -398,7 +380,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
             UpdateGrid1D();
 
             // Add clamp manager
-            var clampManagerObj = GameObject.Instantiate(GameManager.instance.clampManagerPrefab);
+            var clampManagerObj = Instantiate(GameManager.instance.clampManagerPrefab);
             // parent new clamp manager under this simulation
             clampManagerObj.transform.parent = transform;
             clampManager = clampManagerObj.GetComponent<NeuronClampManager>();

@@ -10,7 +10,7 @@ using System.Linq;
 namespace C2M2.NeuronalDynamics.Interaction
 {
     [RequireComponent(typeof(MeshRenderer))]
-    public class NeuronClamp : MonoBehaviour
+    public class NeuronClamp : NDInteractables
     {
         public float radiusRatio = 3f;
         public float heightRatio = 1f;
@@ -25,17 +25,11 @@ namespace C2M2.NeuronalDynamics.Interaction
         public double MinPower { get { return ClampManager.MinPower; } }
         public double MaxPower { get { return ClampManager.MaxPower; } }
 
-        public int focusVert { get; private set; } = -1;
-        public Vector3 FocusPos
-        {
-            get { return simulation.Verts1D[focusVert]; }
-        }
-
         public Neuron.NodeData NodeData
         {
             get
             {
-                return simulation.Neuron.nodes[focusVert];
+                return simulation.Neuron.nodes[FocusVert];
             }
         }
 
@@ -43,8 +37,6 @@ namespace C2M2.NeuronalDynamics.Interaction
         public Material inactiveMaterial = null;
         public Material previewMaterial = null;
         public Material destroyMaterial = null;
-
-        public NDSimulation simulation = null;
 
         public List<GameObject> defaultCapHolders = null;
         public List<GameObject> destroyCapHolders = null;
@@ -73,7 +65,6 @@ namespace C2M2.NeuronalDynamics.Interaction
             UpdateScale((float)newInflation);
         }
 
-        public GameObject highlightObj;
         public float minHighlightGlobalSize = 0.1f * (1/3);
 
         #region Unity Methods
@@ -220,7 +211,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         public void ShowClampInfo()
         {
             clampInfo.gameObject.SetActive(true);
-            clampInfo.Vertex = focusVert;
+            clampInfo.Vertex = FocusVert;
             clampInfo.Power = ClampPower * simulation.unitScaler;
             clampInfo.FocusLocalPosition = transform.localPosition;
         }
@@ -236,7 +227,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         #endregion
 
         #region Simulation Checks
-        /// <summary>
+        /*/// <summary>
         /// Attempt to latch a clamp onto a given simulation
         /// </summary>
         public NDSimulation AttachSimulation(NDSimulation simulation, int clampIndex)
@@ -260,13 +251,20 @@ namespace C2M2.NeuronalDynamics.Interaction
             }
 
             return this.simulation;
-        }
+        } */
 
-        public void PlaceClamp(int clampIndex)
+        override public void Place(int clampIndex)
         {
-            focusVert = clampIndex;
+            if (simulation.Neuron.somaIDs.Contains(clampIndex)) somaClamp = true;
+            
+            simulation.OnVisualInflationChange += VisualInflationChangeHandler;
 
-            //CheckSoma(NodeData);
+            // wait for clamp list access, add to list
+            lock (simulation.clampLock) simulation.clamps.Add(this);
+
+            FocusVert = clampIndex;
+
+            CheckSoma(NodeData);
             SetScale(NodeData);
             SetRotation(NodeData);
 
@@ -300,9 +298,6 @@ namespace C2M2.NeuronalDynamics.Interaction
         #endregion
 
         #region Input
-        float holdCount = 0;
-
-        private bool powerClick = false;
         /// <summary>
         /// If the user holds a raycast down for X seconds on a clamp, it should destroy the clamp
         /// </summary>
@@ -313,20 +308,20 @@ namespace C2M2.NeuronalDynamics.Interaction
                 ResetInput();
             }
 
-            if (ClampManager.PressedToggleDestroy)
+            if (ClampManager.PressedInteract)
             {
-                holdCount+=Time.deltaTime;
+                ClampManager.holdCount += Time.deltaTime;
 
                 // If we've held the button long enough to destroy, color caps red until user releases button
-                if(holdCount > ClampManager.DestroyCount && !powerClick) SwitchCaps(false);
-                else if (powerClick) SwitchCaps(true);
+                if(ClampManager.holdCount > ClampManager.DestroyCount && !ClampManager.powerClick) SwitchCaps(false);
+                else if (ClampManager.powerClick) SwitchCaps(true);
             }
             else CheckInput();
 
             float power = Time.deltaTime*ClampManager.PowerModifier;
             
             // If clamp power is modified while the user holds a click, don't let the click also toggle/destroy the clamp
-            if (power != 0 && !powerClick) powerClick = true;
+            if (power != 0 && !ClampManager.powerClick) ClampManager.powerClick = true;
 
             ClampPower += power;
             Math.Clamp(ClampPower, MinPower, MaxPower);
@@ -354,12 +349,6 @@ namespace C2M2.NeuronalDynamics.Interaction
             }
         }
 
-        public void Highlight(bool highlight)
-        {
-            if (highlightObj != null)
-                highlightObj.SetActive(highlight);
-        }
-
         public void ResetInput()
         {
             CheckInput();
@@ -367,17 +356,17 @@ namespace C2M2.NeuronalDynamics.Interaction
 
         private void CheckInput()
         {
-            if (!ClampManager.PressedCancel && !powerClick)
+            if (!ClampManager.PressedCancel && !ClampManager.powerClick)
             {
-                if (holdCount >= ClampManager.DestroyCount)
+                if (ClampManager.holdCount >= ClampManager.DestroyCount)
                 {
                     Destroy(transform.parent.gameObject);
                 }
-                else if (holdCount > 0) ToggleClamp();
+                else if (ClampManager.holdCount > 0) ToggleClamp();
             }
 
-            holdCount = 0;
-            powerClick = false;
+            ClampManager.holdCount = 0;
+            ClampManager.powerClick = false;
             SwitchCaps(true);
         }
 

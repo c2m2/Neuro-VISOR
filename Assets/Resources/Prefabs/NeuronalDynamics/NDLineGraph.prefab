@@ -7111,6 +7111,7 @@ GameObject:
   - component: {fileID: 2168964937537411955}
   - component: {fileID: 2168964937537411952}
   - component: {fileID: 2168964937537411953}
+  - component: {fileID: 2039472419592228062}
   - component: {fileID: 2168964937537411964}
   - component: {fileID: 2168964937537411967}
   - component: {fileID: 2168964937537411965}
@@ -7207,6 +7208,21 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!114 &2039472419592228062
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2168964937537411963}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b2dd74094378ae4f9dbfd3a677d0773, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  simulation: {fileID: 0}
+  highlightObj: {fileID: 0}
+  ndlinegraph: {fileID: 2168964937537411964}
 --- !u!114 &2168964937537411964
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7240,9 +7256,7 @@ MonoBehaviour:
   yMinLabel: {fileID: 2168964936445175920}
   yMaxLabel: {fileID: 2168964936027736413}
   positions: []
-  manager: {fileID: 0}
-  sim: {fileID: 0}
-  vert: -1
+  ndgraph: {fileID: 0}
   obeyParentScale: 0
 --- !u!65 &2168964937537411967
 BoxCollider:

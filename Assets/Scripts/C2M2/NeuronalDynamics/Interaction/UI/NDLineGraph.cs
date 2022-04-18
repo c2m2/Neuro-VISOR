@@ -1,14 +1,22 @@
 ﻿using UnityEngine;
 using C2M2.Visualization;
 using C2M2.NeuronalDynamics.Simulation;
+
 namespace C2M2.NeuronalDynamics.Interaction.UI
 {
     public class NDLineGraph : LineGrapher
     {
-        public NDGraphManager manager = null;
-        public NDSimulation sim = null;
-        public int vert = -1;
 
+        public NDGraph ndgraph;
+
+        public NDSimulation Sim
+        {
+            get
+            {
+                return ndgraph.simulation;
+            } 
+        }
+        
         /// <summary>
         /// If true, this object will scale with parent object as per usual.
         /// If false, this object will maintain worldspace size as parent scales
@@ -16,7 +24,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
         public bool obeyParentScale = false;
 
         // Worldspace position of the vertex
-        public Vector3 VertPos { get { return sim.transform.TransformPoint(sim.Verts1D[vert]); } }
+        public Vector3 VertPos { get { return Sim.transform.TransformPoint(Sim.Verts1D[ndgraph.FocusVert]); } }
         private new RectTransform rt = null;
         // World space size of the graph
         private Vector3 GraphSize { get { return rt.sizeDelta * rt.localScale; } }
@@ -30,7 +38,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
         // Start is called before the first frame update
         void Start()
         {
-            if(vert == -1)
+            if(ndgraph.FocusVert == -1)
             {
                 Debug.LogError("Invalid vertex given to NDLineGraph");
                 Destroy(this);
@@ -49,13 +57,13 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
             //UpdateSize();
             MaxSamples = 500;
 
-            name = "LineGraph(" + sim.name + ")[vert" + vert + "]";
+            name = "LineGraph(" + Sim.name + ")[vert" + ndgraph.FocusVert + "]";
 
             void SetLabels()
             {
-                string title = "Voltage vs. Time (Vert " + vert + ")";
+                string title = "Voltage vs. Time (Vert " + ndgraph.FocusVert + ")";
                 string xLabel = "Time (ms)";
-                string yLabel = "Voltage (" + sim.unit + ")";
+                string yLabel = "Voltage (" + Sim.unit + ")";
 
                 base.SetLabels(title, xLabel, yLabel);
             }
@@ -89,8 +97,8 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
 
         public override void AddValue(float x, float y)
         {
-            YMin = sim.ColorLUT.GlobalMin * sim.unitScaler;
-            YMax = sim.ColorLUT.GlobalMax * sim.unitScaler;
+            YMin = Sim.ColorLUT.GlobalMin * Sim.unitScaler;
+            YMax = Sim.ColorLUT.GlobalMax * Sim.unitScaler;
 
             // Add point to graph
             base.AddValue(x, y);
@@ -100,7 +108,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
         {
             get
             {
-                return sim.transform.localScale;
+                return Sim.transform.localScale;
             }
         }
         private void Update()
@@ -109,23 +117,15 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
             {
                 pointerLines.targetPos = VertPos;
             }
-            if(sim == null || manager == null)
-            {
-                DestroyPlot();
-            }
         }
-
-        private void OnDestroy()
-        {
-            manager.graphs.Remove(this);
-        }   
         
         private void UpdateSize()
         {
             // Reset graph to match original worldspace size
-            transform.localScale = new Vector3(transform.localScale.x / sim.transform.localScale.x,
-                transform.localScale.y / sim.transform.localScale.y,
-                transform.localScale.z / sim.transform.localScale.z);
+            transform.localScale = new Vector3(transform.localScale.x / Sim.transform.localScale.x,
+                transform.localScale.y / Sim.transform.localScale.y,
+                transform.localScale.z / Sim.transform.localScale.z);
         }
+
     }
 }

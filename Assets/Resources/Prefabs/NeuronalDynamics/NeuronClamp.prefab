@@ -233,7 +233,6 @@ GameObject:
   - component: {fileID: 3190543447572195313}
   - component: {fileID: 7203364276282346925}
   - component: {fileID: 9218115778874880341}
-  - component: {fileID: 2030585019643067809}
   - component: {fileID: 1525391653058632939}
   - component: {fileID: 835368085250037502}
   - component: {fileID: 6833795235172258877}
@@ -307,33 +306,6 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!114 &2030585019643067809
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6068296935373676328}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fa5a5446d4c4c934da65530be09c19c2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  radiusRatio: 3
-  heightRatio: 3
-  highlightSphereScale: 3
-  activeMaterial: {fileID: 2100000, guid: 35c891bae7ccbb440a4193edaae59b1a, type: 2}
-  inactiveMaterial: {fileID: 2100000, guid: b5682c8bb520e8a46bbeab52c1a74097, type: 2}
-  previewMaterial: {fileID: 2100000, guid: 1b9e22857f37d024a8aa6aa336a12219, type: 2}
-  destroyMaterial: {fileID: 2100000, guid: cdb984a62adddda4f96228000d103b50, type: 2}
-  simulation: {fileID: 0}
-  defaultCapHolders:
-  - {fileID: 5483127028994316193}
-  destroyCapHolders:
-  - {fileID: 1776878145815968951}
-  clampInfo: {fileID: 5849450844273235413}
-  highlightObj: {fileID: 7733468709602801279}
-  minHighlightGlobalSize: 0.03333333
 --- !u!114 &1525391653058632939
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -363,7 +335,7 @@ MonoBehaviour:
   onHover:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2030585019643067809}
+      - m_Target: {fileID: 0}
         m_MethodName: ShowClampInfo
         m_Mode: 1
         m_Arguments:
@@ -377,7 +349,7 @@ MonoBehaviour:
   onHoverEnd:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2030585019643067809}
+      - m_Target: {fileID: 0}
         m_MethodName: HideClampInfo
         m_Mode: 1
         m_Arguments:
@@ -394,7 +366,7 @@ MonoBehaviour:
   onHoldPress:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2030585019643067809}
+      - m_Target: {fileID: 0}
         m_MethodName: MonitorInput
         m_Mode: 1
         m_Arguments:
@@ -405,7 +377,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 2030585019643067809}
+      - m_Target: {fileID: 0}
         m_MethodName: ShowClampInfo
         m_Mode: 1
         m_Arguments:
@@ -419,7 +391,7 @@ MonoBehaviour:
   onEndPress:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2030585019643067809}
+      - m_Target: {fileID: 0}
         m_MethodName: ResetInput
         m_Mode: 1
         m_Arguments:
@@ -430,7 +402,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 2030585019643067809}
+      - m_Target: {fileID: 0}
         m_MethodName: HideClampInfo
         m_Mode: 1
         m_Arguments:
@@ -621,6 +593,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7905594225063311793}
+  - component: {fileID: 2369892180751481776}
+  - component: {fileID: 1260918011164680841}
   m_Layer: 0
   m_Name: NeuronClamp
   m_TagString: NeuronClamp
@@ -645,6 +619,72 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!23 &2369892180751481776
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7051469727396962550}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+--- !u!114 &1260918011164680841
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7051469727396962550}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa5a5446d4c4c934da65530be09c19c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  simulation: {fileID: 0}
+  highlightObj: {fileID: 7733468709602801279}
+  radiusRatio: 3
+  heightRatio: 3
+  highlightSphereScale: 3
+  activeMaterial: {fileID: 2100000, guid: 35c891bae7ccbb440a4193edaae59b1a, type: 2}
+  inactiveMaterial: {fileID: 2100000, guid: b5682c8bb520e8a46bbeab52c1a74097, type: 2}
+  previewMaterial: {fileID: 2100000, guid: 1b9e22857f37d024a8aa6aa336a12219, type: 2}
+  destroyMaterial: {fileID: 2100000, guid: cdb984a62adddda4f96228000d103b50, type: 2}
+  defaultCapHolders:
+  - {fileID: 5483127028994316193}
+  destroyCapHolders:
+  - {fileID: 1776878145815968951}
+  clampInfo: {fileID: 5849450844273235413}
+  minHighlightGlobalSize: 0.03333333
 --- !u!1 &7733468709602801279
 GameObject:
   m_ObjectHideFlags: 0
