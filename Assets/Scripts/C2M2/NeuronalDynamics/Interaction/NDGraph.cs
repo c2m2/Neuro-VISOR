@@ -29,6 +29,5 @@ public class NDGraph : NDInteractables
 
     public override void Place(int index)
     {
-        throw new System.NotImplementedException();
     } //TO DO
 }

@@ -16,24 +16,11 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
                 return ndgraph.simulation;
             } 
         }
-        
-        /// <summary>
-        /// If true, this object will scale with parent object as per usual.
-        /// If false, this object will maintain worldspace size as parent scales
-        /// </summary>
-        public bool obeyParentScale = false;
 
         // Worldspace position of the vertex
         public Vector3 VertPos { get { return Sim.transform.TransformPoint(Sim.Verts1D[ndgraph.FocusVert]); } }
-        private new RectTransform rt = null;
         // World space size of the graph
-        private Vector3 GraphSize { get { return rt.sizeDelta * rt.localScale; } }
-
-        private void Awake()
-        {
-            // Get width and height of the graph
-            rt = (RectTransform)transform;
-        }
+        private Vector3 GraphSize { get { return ((RectTransform)transform).sizeDelta * transform.localScale; } }
 
         // Start is called before the first frame update
         void Start()
@@ -46,11 +33,11 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
 
             SetLabels();
 
-            rt.position = GetPanelPos();
+            transform.position = GetPanelPos();
 
             // Rotate panel towards camera in y direction
-            rt.LookAt(Camera.main.transform);
-            rt.localRotation = Quaternion.Euler(new Vector3(0f, rt.localRotation.eulerAngles.y - 180, 0f));
+            transform.LookAt(Camera.main.transform);
+            transform.localRotation = Quaternion.Euler(new Vector3(0f, rt.localRotation.eulerAngles.y - 180, 0f));
 
             InitPointerLines();
 
@@ -72,7 +59,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
             {
                 Vector3 cameraPos = Camera.main.transform.position;
                 // Vector pointing from camera to cell
-                Vector3 direction = (VertPos - cameraPos);
+                Vector3 direction = VertPos - cameraPos;
 
                 // Worldspace size of the graph
                 float newMagnitude = GraphSize.x / 2;

@@ -7256,7 +7256,7 @@ MonoBehaviour:
   yMinLabel: {fileID: 2168964936445175920}
   yMaxLabel: {fileID: 2168964936027736413}
   positions: []
-  ndgraph: {fileID: 0}
+  ndgraph: {fileID: 2039472419592228062}
   obeyParentScale: 0
 --- !u!65 &2168964937537411967
 BoxCollider:
