@@ -43,7 +43,7 @@ namespace C2M2.NeuronalDynamics.Interaction
 
         public InfoPanel clampInfo = null;
 
-        private MeshRenderer mr;
+        public MeshRenderer clampPowerMeshRenderer;
         private Vector3 LocalExtents { get { return transform.localScale / 2; } }
         private Vector3 posFocus = Vector3.zero;
 
@@ -54,7 +54,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             private set
             {
                 activeCol = value;
-                mr.material.color = activeCol;
+                clampPowerMeshRenderer.material.color = activeCol;
             }
         }
         private ColorLUT ColorLUT { get { return simulation.ColorLUT; } }
@@ -68,10 +68,6 @@ namespace C2M2.NeuronalDynamics.Interaction
         public float minHighlightGlobalSize = 0.1f * (1/3);
 
         #region Unity Methods
-        private void Awake()
-        {
-            mr = GetComponent<MeshRenderer>();
-        }
 
         private void Start()
         {
@@ -122,8 +118,8 @@ namespace C2M2.NeuronalDynamics.Interaction
             float radiusLength = Math.Max(radiusScalingValue, heightScalingValue) * currentVisualizationScale;
 
             //if (somaClamp) transform.parent.localScale = new Vector3(radiusLength, radiusLength, radiusLength);
-            transform.parent.localScale = new Vector3(radiusLength, radiusLength, heightScalingValue);
-            UpdateHighLightScale(transform.parent.localScale);
+            transform.localScale = new Vector3(radiusLength, radiusLength, heightScalingValue);
+            UpdateHighLightScale(transform.localScale);
         }
 
         /// <summary>
@@ -134,13 +130,13 @@ namespace C2M2.NeuronalDynamics.Interaction
             if (this != null)
             {
                 float modifiedScale = newScale / currentVisualizationScale;
-                Vector3 tempVector = transform.parent.localScale;
+                Vector3 tempVector = transform.localScale;
                 tempVector.x *= modifiedScale;
                 tempVector.y *= modifiedScale;
                 //if (somaClamp) tempVector.z *= modifiedScale;
-                transform.parent.localScale = tempVector;
+                transform.localScale = tempVector;
                 currentVisualizationScale = newScale;
-                UpdateHighLightScale(transform.parent.localScale);
+                UpdateHighLightScale(transform.localScale);
                 
             }
         }
@@ -151,22 +147,20 @@ namespace C2M2.NeuronalDynamics.Interaction
                 (1 / clampScale.y) * max, 
                 (1 / clampScale.z) * max);
 
-            // If tbe clamp is too small, match a minimum global size
+            // If the clamp is too small, match a minimum global size
             if (highlightObj.transform.lossyScale.x < minHighlightGlobalSize)
             {
                 Vector3 globalSize = new Vector3(minHighlightGlobalSize, minHighlightGlobalSize, minHighlightGlobalSize);
-                Transform curParent = transform.parent;
                 // Convert global size to local space
                 do
                 {
-                    globalSize = new Vector3(globalSize.x / curParent.localScale.x,
-                        globalSize.y / curParent.localScale.y,
-                        globalSize.z / curParent.localScale.z);
-                    curParent = curParent.parent;
-                } while (curParent.parent != null);
-                globalSize = new Vector3(globalSize.x / curParent.localScale.x,
-                    globalSize.y / curParent.localScale.y,
-                    globalSize.z / curParent.localScale.z);
+                    globalSize = new Vector3(globalSize.x / transform.localScale.x,
+                        globalSize.y / transform.localScale.y,
+                        globalSize.z / transform.localScale.z);
+                } while (transform.parent != null);
+                globalSize = new Vector3(globalSize.x / transform.localScale.x,
+                    globalSize.y / transform.localScale.y,
+                    globalSize.z / transform.localScale.z);
 
                 highlightObj.transform.localScale = globalSize;
             }
@@ -202,7 +196,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             {
                 rotationVector = Vector3.up; //if a clamp has no neighbors or is soma it will use a default orientation of facing up
             }
-            transform.parent.localRotation = Quaternion.LookRotation(rotationVector);
+            transform.localRotation = Quaternion.LookRotation(rotationVector);
         }
 
         /// <summary>
@@ -268,7 +262,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             SetScale(NodeData);
             SetRotation(NodeData);
 
-            transform.parent.localPosition = FocusPos;
+            transform.localPosition = FocusPos;
         }
         #endregion
 
@@ -287,7 +281,7 @@ namespace C2M2.NeuronalDynamics.Interaction
 
         public void SwitchMaterial(Material material)
         {
-            if (material != null) mr.material = material;
+            if (material != null) clampPowerMeshRenderer.material = material;
         }
 
         public void ToggleClamp()

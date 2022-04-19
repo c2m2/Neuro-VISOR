@@ -16,8 +16,8 @@ namespace C2M2.NeuronalDynamics.Interaction
         public float sensitivity = 5;
         public float Scaler { get { return (MaxPower - MinPower) / sensitivity; } }
 
-        public GameObject clampPrefab { get; private set; } = null;
-        public GameObject somaClampPrefab { get; private set; } = null;
+        public GameObject clampPrefab = null;
+        public GameObject somaClampPrefab = null;
         public bool allActive = false;
         public List<NeuronClamp> Clamps {
             get
@@ -26,8 +26,6 @@ namespace C2M2.NeuronalDynamics.Interaction
                 return currentSimulation.clamps;
             }
         }
-
-        public RaycastPressEvents hitEvent = null;
 
         #region InputButtons
 
@@ -67,41 +65,35 @@ namespace C2M2.NeuronalDynamics.Interaction
 
         #endregion
 
-        private NeuronClamp BuildClamp(RaycastHit hit)
+        protected override void AddHitEventListeners()
         {
-            // Make sure we have valid prefabs
-            if (clampPrefab == null) Debug.LogError("No Clamp prefab found");
-            if (somaClampPrefab == null) Debug.LogError("No Soma Clamp prefab found");
+            HitEvent.OnHover.AddListener((hit) => PreviewClamp(hit));
+            HitEvent.OnHoverEnd.AddListener((hit) => DestroyPreview(hit));
+            HitEvent.OnPress.AddListener((hit) => InstantiateNDInteractable(hit));
+        }
 
-            // Destroy any existing preview clamp
-            DestroyPreview(hit);
-
-            // Find the 1D vertex that we hit
-            int clampIndex = currentSimulation.GetNearestPoint(hit);
-
-            if (VertexAvailable(clampIndex))
+        public override GameObject IdentifyBuildPrefab(int index)
+        {
+            if (currentSimulation.Neuron.somaIDs.Contains(index))
             {
-                // If this vertex is available, instantiate a clamp and attach it to the simulation
-                NeuronClamp clamp;
-                //if (Simulation.Neuron.somaIDs.Contains(clampIndex)) clamp = Instantiate(somaClampPrefab, Simulation.transform).GetComponentInChildren<NeuronClamp>();
-                clamp = Instantiate(clampPrefab, currentSimulation.transform).GetComponent<NeuronClamp>();
-
-                clamp.AttachToSimulation(currentSimulation, clampIndex);
-
-                return clamp;
+                if (somaClampPrefab == null) Debug.LogError("No Soma Clamp prefab found");
+                else return somaClampPrefab;
             }
-
+            else
+            {
+                if (clampPrefab == null) Debug.LogError("No Clamp prefab found");
+                else return clampPrefab;
+            }
             return null;
         }
 
         public void PreviewClamp(RaycastHit hit)
         {
-            currentSimulation = hit.collider.GetComponentInParent<NDSimulation>();
 
             // If we haven't already created a preview clamp, create one
             if (preview == null)
             {
-                preview = BuildClamp(hit);
+                preview = InstantiateNDInteractable(hit);
 
                 // If we couldn't build a preview clamp, don't try to preview the position hit
                 if (preview == null) return;
@@ -125,10 +117,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             }
 
             // Ensure the clamp is enabled
-            preview.transform.parent.gameObject.SetActive(true);
-
-            // Set the size and orientation of the preview clamp
-            preview.Place(currentSimulation.GetNearestPoint(hit));
+            preview.gameObject.SetActive(true);
         }
         /*public void DestroyPreviewClamp(RaycastHit hit)
         {

@@ -260,7 +260,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
                     {
                         Synapse preSynapse = syn.Item1;
                         Synapse postSynapse = syn.Item2;
-                        if (this == postSynapse.attachedSim)
+                        if (this == postSynapse.simulation)
                         {
                             synapses.Add((preSynapse, postSynapse));
                         }

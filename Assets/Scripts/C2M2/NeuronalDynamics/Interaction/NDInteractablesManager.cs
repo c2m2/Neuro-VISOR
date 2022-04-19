@@ -1,4 +1,5 @@
 ﻿using C2M2;
+using C2M2.Interaction;
 using C2M2.NeuronalDynamics.Simulation;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,6 +9,8 @@ public abstract class NDInteractablesManager<T> : MonoBehaviour
 {
     public NDSimulation currentSimulation = null;
     public List<T> interactables = new List<T>();
+
+    public RaycastPressEvents HitEvent { get; protected set; } = null;
 
     public T preview = null;
 
@@ -29,6 +32,22 @@ public abstract class NDInteractablesManager<T> : MonoBehaviour
     void Update()
     {
         
+    }
+
+    private void OnEnable()
+    {
+        /* Trigger events used for raycasting to the neuron
+         * 
+         * hitEvent is a refrence to the RaycastPressEvents script.
+         * Which allows us to use predefined ray casting methods */
+        HitEvent = gameObject.AddComponent<RaycastPressEvents>();
+        AddHitEventListeners();
+    }
+
+    private void OnDisable()
+    {
+        // This prevents adding many RaycastPressEvents scripts each time user enables() this script
+        Destroy(GetComponent<RaycastPressEvents>());
     }
 
     private void OnDestroy()
@@ -68,17 +87,13 @@ public abstract class NDInteractablesManager<T> : MonoBehaviour
     #endregion
 
     #region Behavior
-    /*public void InitiateNDInteractable(RaycastHit hit)
+
+    protected abstract void AddHitEventListeners();
+
+    public T InstantiateNDInteractable(RaycastHit hit)
     {
         currentSimulation = hit.collider.GetComponentInParent<NDSimulation>();
-        if (currentSimulation != null) BuildNDInteractable(hit);
-    }
-
-    public NDInteractables BuildNDInteractable(RaycastHit hit)
-    {
-        // Make sure we have valid prefabs
-        if (clampPrefab == null) Debug.LogError("No Clamp prefab found");
-        if (somaClampPrefab == null) Debug.LogError("No Soma Clamp prefab found");
+        if (currentSimulation == null) return null;
 
         // Destroy any existing preview
         DestroyPreview(hit);
@@ -88,18 +103,20 @@ public abstract class NDInteractablesManager<T> : MonoBehaviour
 
         if (VertexAvailable(index))
         {
-            // If this vertex is available, instantiate an interactable and attach it to the simulation
-            NDInteractables interact;
+            GameObject prefab = IdentifyBuildPrefab(index);
 
-            if (currentSimulation.Neuron.somaIDs.Contains(clampIndex)) clamp = Instantiate(somaClampPrefab, Simulation.transform).GetComponentInChildren<NeuronClamp>();
-            interact = Instantiate(clampPrefab, currentSimulation.transform).GetComponentInChildren<NDInteractables>();
+            T interact = Instantiate(prefab, currentSimulation.transform).GetComponent<T>();
 
             interact.AttachToSimulation(currentSimulation, index);
 
             return interact;
+            //TODO interactables.Add(graph);
         }
+        //TO DO holdCount = 0;
         return null;
-    }*/
+    }
+
+    public abstract GameObject IdentifyBuildPrefab(int index);
 
     public abstract bool VertexAvailable(int index);
 
@@ -124,7 +141,7 @@ public abstract class NDInteractablesManager<T> : MonoBehaviour
     {
         if (preview != null)
         {
-            Destroy(preview);
+            Destroy(preview.gameObject);
             preview = null;
         }
     }

@@ -4,7 +4,7 @@ using UnityEngine;
 public abstract class NDInteractables : MonoBehaviour
 {
     public NDSimulation simulation = null;
-    public int FocusVert { get; protected set; } = -1;
+    public int FocusVert { get; set; } = -1;
 
     /// <summary>
     /// returns the 3D vertex that we have clicked on
@@ -38,5 +38,10 @@ public abstract class NDInteractables : MonoBehaviour
     public void Highlight(bool highlight)
     {
         if (highlightObj != null) highlightObj.SetActive(highlight);
+    }
+
+    override public string ToString()
+    {
+        return name + " " + FocusVert;
     }
 }

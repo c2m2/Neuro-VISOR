@@ -60,7 +60,7 @@ namespace C2M2.NeuronalDynamics.Simulation
             // apply the voltage from the pre-synapse and to the location of the postsynapse
             for (int i = 0; i < synapses.Count; i++)
             {
-                new1DVoltages[i] = new Tuple<int, double>(synapses[i].Item2.nodeIndex, synapses[i].Item1.attachedSim.Get1DValues()[synapses[i].Item1.nodeIndex]);
+                new1DVoltages[i] = new Tuple<int, double>(synapses[i].Item2.FocusVert, synapses[i].Item1.simulation.Get1DValues()[synapses[i].Item1.FocusVert]);
             }
 
             // Pass the tuple so we can set our new voltage value

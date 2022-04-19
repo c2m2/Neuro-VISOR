@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 6795881404616055387}
   - component: {fileID: 6795881404616055385}
-  - component: {fileID: 6795881404616055384}
   m_Layer: 0
   m_Name: NeuronClampManager
   m_TagString: Untagged
@@ -44,80 +43,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 44d31676bc1b53d4eabd97dda90e808e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  currentSimulation: {fileID: 0}
+  interactables: []
+  preview: {fileID: 0}
+  DestroyCount: 1
+  interactOVR: 8192
+  interactOVRS: 2097152
+  highlightOVR: 16384
+  highlightOVRS: 4194304
   sensitivity: 5
   clampPrefab: {fileID: 7051469727396962550, guid: 4565241fccd266147a078e252b27d27f,
     type: 3}
   somaClampPrefab: {fileID: 7706642781083156315, guid: c16f9a23908a54e4f8d89d95e3d7a90d,
     type: 3}
   allActive: 1
-  currentSimulation: {fileID: 0}
-  hitEvent: {fileID: 6795881404616055384}
-  toggleDestroyOVR: 8192
-  toggleDestroyOVRS: 2097152
   powerModifierPlusKey: 273
   powerModifierMinusKey: 274
-  highlightOVR: 16384
-  highlightOVRS: 4194304
   cancelCommand: 2
   cancelCommandS: 8
   cancelKey: 8
---- !u!114 &6795881404616055384
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6795881404616055386}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2066920c5141f0e4ca235394b5f8bd4a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  onHover:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 6795881404616055385}
-        m_MethodName: PreviewClamp
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  onHoverEnd:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 6795881404616055385}
-        m_MethodName: DestroyPreviewClamp
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  onPress:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 6795881404616055385}
-        m_MethodName: InstantiateClamp
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  onHoldPress:
-    m_PersistentCalls:
-      m_Calls: []
-  onEndPress:
-    m_PersistentCalls:
-      m_Calls: []

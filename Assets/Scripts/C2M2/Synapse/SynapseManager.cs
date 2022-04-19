@@ -12,11 +12,8 @@ public class SynapseManager : NDInteractablesManager<Synapse>
     public GameObject PrefabPostSynapse;
     private Synapse synapseInProgress = null; //Contains presynapse when a presynapse has been placed but no post synapse
     public List<(Synapse, Synapse)> synapses = new List<(Synapse, Synapse)>(); //pre (Item1) and post (Item2) synapses
-    public List<Vector3> synapseLocations = new List<Vector3>();
-    public RaycastPressEvents HitEvent { get; private set; } = null;
 
     public GameObject arrow;
-    public int focusVert { get; private set; } = -1;
 
 
     ///<summary> 
@@ -30,78 +27,45 @@ public class SynapseManager : NDInteractablesManager<Synapse>
         }
     }
 
+    public override GameObject IdentifyBuildPrefab(int index)
+    {
+        if (!synapseInProgress)
+        {
+            if (PrefabPreSynapse == null)
+            {
+                Debug.LogError("No PreSynapse prefab found");
+                return null;
+            }
+            else return PrefabPreSynapse;
+        }
+        else
+        {
+            if (PrefabPostSynapse == null)
+            {
+                Debug.LogError("No PostSynapse prefab found");
+                return null;
+            }
+            else return PrefabPostSynapse;
+        }
+    }
+
     /// <summary>
     /// Handles synapse placement
     /// </summary>
     /// <param name="hit"></param>
-    void SynapticPlacement(RaycastHit hit)
+    public void SynapticPlacement(Synapse placedSynapse)
     {
-
-        // from our raycast hit get the 1d node that we raycasted onto
-        int synapticIndex = currentSimulation.GetNearestPoint(hit);
-
-        // check all other synapse node indices and make sure there are not any others there
-        for (int i = 0; i < synapses.Count; i++)
+        if (synapseInProgress == null) //Pre Synapse
         {
-            if (synapses[i].Item1.nodeIndex == synapticIndex || synapses[i].Item2.nodeIndex == synapticIndex)
-            {
-                Debug.LogWarning("Can not place two synapses on top of each other");
-                return;
-            }
+            synapseInProgress = placedSynapse;
         }
-
-        if (!synapseInProgress)
+        else //Post Synapse
         {
-            PreSynapticPlacement(hit, currentSimulation, synapticIndex);
+            synapses.Add((synapseInProgress, placedSynapse));
+            synapseInProgress = null;
+
+            PlaceArrow();
         }
-        else
-        {
-            PostSynapticPlacement(hit, currentSimulation, synapticIndex);
-        }
-
-        holdCount = 0;
-    }
-
-    /// <summary>
-    /// Placement and instantiation for our pre-Synapse.
-    /// This is the same as postsynaptic </summary>
-    /// <param name="hit"></param>
-    /// <param name="curSimulation"></param>
-    /// <param name="index"></param>
-    /// <returns></returns>
-    private void PreSynapticPlacement(RaycastHit hit, NDSimulation curSimulation, int index)
-    {
-        Synapse pre = gameObject.AddComponent<Synapse>();
-        pre.prefab = Instantiate(PrefabPreSynapse, new Vector3(0, 0, 0), Quaternion.identity) as GameObject;
-        pre.nodeIndex = index;
-        pre.attachedSim = curSimulation;
-        pre.transformRayCast(hit);
-        synapseLocations.Add(pre.prefab.transform.localPosition);
-
-        synapseInProgress = pre;
-    }
-
-
-    /// <summary>
-    /// Placement and instantiation for our post-Synapse.
-    /// This is the same as presynaptic </summary>
-    /// <param name="hit"></param>
-    /// <param name="curSimulation"></param>
-    /// <param name="index"></param>
-    /// <returns></returns>
-    private void PostSynapticPlacement(RaycastHit hit, NDSimulation curSimulation, int index)
-    {
-        Synapse post = gameObject.AddComponent<Synapse>();
-        post.prefab = Instantiate(PrefabPostSynapse, new Vector3(0, 0, 0), Quaternion.identity) as GameObject;
-        post.nodeIndex = index;
-        post.attachedSim = curSimulation;
-        post.transformRayCast(hit);
-        synapseLocations.Add(post.prefab.transform.localPosition);
-
-        synapses.Add((synapseInProgress, post));
-        synapseInProgress = null;
-
-        PlaceArrow();
     }
 
     /// <summary>
@@ -122,13 +86,11 @@ public class SynapseManager : NDInteractablesManager<Synapse>
             for (int i = 0; i < synapses.Count; i++)
             {
                 // if user has pressed onto the pre-synapse
-                if (synapses[i].Item1.nodeIndex == hitIndex || synapses[i].Item2.nodeIndex == hitIndex)
+                if (synapses[i].Item1.FocusVert == hitIndex || synapses[i].Item2.FocusVert == hitIndex)
                 {
                     // delete and remove from synapse list
                     Destroy(synapses[i].Item1);
-                    Destroy(synapses[i].Item1.prefab);
                     Destroy(synapses[i].Item2);
-                    Destroy(synapses[i].Item2.prefab);
                     synapses.RemoveAt(i);
                     holdCount = 0;
                     return;
@@ -138,34 +100,12 @@ public class SynapseManager : NDInteractablesManager<Synapse>
         }
     }
     
-    
-    /// <summary>
-    /// When this script has been enabled through the game object it is attached to initialize some values
-    /// </summary>
-    private void OnEnable()
+    protected override void AddHitEventListeners()
     {
-        // Trigger events used for raycasting to the neuron
-
-        /* hitEvent is a refrence to the RaycastPressEvents script.
-         * Which allows us to use predefined ray casting methods*/
-        HitEvent = gameObject.AddComponent<RaycastPressEvents>();
-
-        // Switch default raycasting mode to our new hit event
-        //Simulations.raycastEventManager.LRTrigger = this.hitEvent;
-
-        HitEvent.OnPress.AddListener((hit) => SynapticPlacement(hit));
+        HitEvent.OnPress.AddListener((hit) => InstantiateNDInteractable(hit));
         HitEvent.OnHoldPress.AddListener((hit) => DeleteSynapseHit(hit));
     }
-    
-    /// <summary>
-    /// When the script has been disabled try passing our synapse information to the correct simulations
-    /// </summary>
-    private void OnDisable()
-    {
-        // This prevents adding many RaycastPressEvents scripts each time user enables() this script
-        Destroy(GetComponent<RaycastPressEvents>());
-    }
-    
+
     /// <summary>
     /// This creates an arrow prefab that points the pre-synapse to the post-synapse
     /// </summary>
@@ -174,8 +114,8 @@ public class SynapseManager : NDInteractablesManager<Synapse>
         if (Simulation == null) return;
 
         GameObject arrowHead;
-        Transform preSynapse = synapses[synapses.Count - 1].Item1.prefab.transform;
-        Transform postSynapse = synapses[synapses.Count - 1].Item2.prefab.transform;
+        Transform preSynapse = synapses[synapses.Count - 1].Item1.transform;
+        Transform postSynapse = synapses[synapses.Count - 1].Item2.transform;
 
         // Create a new arrow in 3D space
         arrowHead = Instantiate(arrow, new Vector3(0, 0, 0), Quaternion.identity) as GameObject;
@@ -247,7 +187,7 @@ public class SynapseManager : NDInteractablesManager<Synapse>
         }
         return true;
     }
-
-        //TODO prefab?
+    
+    //TODO prefab?
 
 }

@@ -7,7 +7,6 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
     public class NDGraphManager : NDInteractablesManager<NDGraph>
     {
         public GameObject graphPrefab { get; private set; } = null;
-        public RaycastPressEvents hitEvent { get; private set; } = null;
 
         private void Awake()
         {
@@ -17,33 +16,21 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
                 Debug.LogError("No graph prefab found.");
                 Destroy(this);
             }
-
-            hitEvent = gameObject.AddComponent<RaycastPressEvents>();
-            hitEvent.OnPress.AddListener((hit) => BuildGraph(hit));
         }
 
-        /// <summary>
-        /// Looks for NDSimulation instance and adds neuronClamp object if possible
-        /// </summary>
-        /// <param name="hit"></param>
-        public NDGraph BuildGraph(RaycastHit hit)
+        protected override void AddHitEventListeners()
         {
-            // Make sure we have a valid prefab and simulation
-            if (graphPrefab == null) Debug.LogError("No Graph prefab found");
+            HitEvent.OnPress.AddListener((hit) => InstantiateNDInteractable(hit));
+        }
 
-            int vertIndex = currentSimulation.GetNearestPoint(hit);
-            if (VertexAvailable(vertIndex))
+        public override GameObject IdentifyBuildPrefab(int index)
+        {
+            if (graphPrefab == null)
             {
-                GameObject graphObj = Instantiate(graphPrefab);
-                NDGraph graph = graphObj.GetComponent<NDGraph>();
-                graph.AttachToSimulation(currentSimulation, vertIndex);
-
-                interactables.Add(graph);
-
-                return graph;
+                Debug.LogError("No Graph prefab found");
+                return null;
             }
-
-            return null;
+            else return graphPrefab;
         }
 
         private void OnDestroy()

@@ -52,10 +52,10 @@ namespace C2M2.NeuronalDynamics.Simulation
                             sim.raycastEventManager.LRTrigger = sim.defaultRaycastEvent;
                             break;
                         case (FeatureState.Clamp):
-                            sim.raycastEventManager.LRTrigger = sim.clampManager.hitEvent;
+                            sim.raycastEventManager.LRTrigger = sim.clampManager.HitEvent;
                             break;
                         case (FeatureState.Plot):
-                            sim.raycastEventManager.LRTrigger = sim.graphManager.hitEvent;
+                            sim.raycastEventManager.LRTrigger = sim.graphManager.HitEvent;
                             break;
                         case (FeatureState.Synapse):
                             sim.raycastEventManager.LRTrigger = synapseManager.HitEvent;
