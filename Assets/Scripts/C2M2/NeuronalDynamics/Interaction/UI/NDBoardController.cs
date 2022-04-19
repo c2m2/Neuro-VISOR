@@ -83,7 +83,20 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
 
         public void CloseAllSimulations()
         {
-            for(int i = GameManager.instance.activeSims.Count-1; i >= 0; i--)
+            // set paused to false; it's needed for load function to work properly
+            if (GameManager.instance.simulationManager.Paused)
+                GameManager.instance.simulationManager.Paused = false;
+
+            // delete Synapse scripts under SynapseManager object
+            foreach (Synapse s in GameManager.instance.simulationManager.synapseManager.synapses)
+                Destroy(s);
+
+            // disable Save button
+            Menu m = FindObjectOfType<Menu>();
+            m.CloseFileList();
+            m.SaveButtonVisible(false);
+
+            for (int i = GameManager.instance.activeSims.Count-1; i >= 0; i--)
             {
                 CloseSimulation(i);
             }

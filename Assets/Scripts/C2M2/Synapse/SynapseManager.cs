@@ -17,12 +17,13 @@ public class SynapseManager : MonoBehaviour
     public RaycastPressEvents hitEvent { get; private set; } = null;
 
     public GameObject arrow;
-    private float holdCount = 0;
-    public int focusVert { get; private set; } = -1;
-    public int DestoryCount = 1;
+    private int holdCount = 0;
+    //public int focusVert { get; private set; } = -1;
+    public int focusVert { get; set; } = -1;
+    public int numOfDeletionFrames = 50;
 
 
-    ///<summary> 
+    ///<summary>
     ///Simulation refrence to get the attributes of the current cell
     ///</summary>
     public List<Interactable> Simulation
@@ -39,19 +40,25 @@ public class SynapseManager : MonoBehaviour
     /// Initial placement for the pre-synapse then calls post-synapse placement next
     /// </summary>
     /// <param name="hit"></param>
-    void preSynapticPlacement(RaycastHit hit)
+    public void preSynapticPlacement(RaycastHit hit)
     {
         // Get the current simulation we ray cast onto
-        curSimulation = hit.collider.GetComponentInParent<NDSimulation>();
+        // if loading will set values from file
+        if (!GameManager.instance.Loading)
+            curSimulation = hit.collider.GetComponentInParent<NDSimulation>();
 
         // count = the number of active synapses which is always 0 or 1
         // 0 meaning we can place the pre-synapse and 1 meaning we must place the post-synapse
         if(count == 0)
         {
             // from our raycast hit get the 1d node that we raycasted onto
-            int preSynapticIndex = curSimulation.GetNearestPoint(hit);
+            int preSynapticIndex = 0;
 
-            focusVert = preSynapticIndex;
+            if (!GameManager.instance.Loading)
+            {
+                preSynapticIndex = curSimulation.GetNearestPoint(hit);
+                focusVert = preSynapticIndex;
+            }
 
             // check all other synapse node index's and make sure we can place them on top of each other
             for (int i = 0; i < synapses.Count; i++)
@@ -67,7 +74,8 @@ public class SynapseManager : MonoBehaviour
 
             pre.prefab = Instantiate(PrefabPreSynapse, new Vector3(0, 0, 0), Quaternion.identity) as GameObject;
 
-            pre.nodeIndex = preSynapticIndex;
+            //pre.nodeIndex = preSynapticIndex;
+            pre.nodeIndex = focusVert;
 
             pre.attachedSim = curSimulation;
 
@@ -95,18 +103,25 @@ public class SynapseManager : MonoBehaviour
     /// <param name="hit"></param>
     void postSynapticPlacement(RaycastHit hit)
     {
-        curSimulation = hit.collider.GetComponentInParent<NDSimulation>();
+        // if loading will set values from file
+        if (!GameManager.instance.Loading)
+            curSimulation = hit.collider.GetComponentInParent<NDSimulation>();
+
         if(count == 1)
         {
             Synapse post = gameObject.AddComponent<Synapse>();
 
             post.prefab = Instantiate(PrefabPostSynapse, new Vector3(0, 0, 0), Quaternion.identity) as GameObject;
 
-            int postSynapticIndex = curSimulation.GetNearestPoint(hit);
+            int postSynapticIndex = 0;
+            if (!GameManager.instance.Loading)
+            {
+                postSynapticIndex = curSimulation.GetNearestPoint(hit);
+                focusVert = postSynapticIndex;
+            }
 
-            focusVert = postSynapticIndex;
-
-            post.nodeIndex = postSynapticIndex;
+            //post.nodeIndex = postSynapticIndex;
+            post.nodeIndex = focusVert;
 
             post.attachedSim = curSimulation;
 

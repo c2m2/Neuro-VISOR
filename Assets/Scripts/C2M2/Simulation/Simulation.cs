@@ -194,7 +194,7 @@ namespace C2M2.Simulation
             curentTimeStep = 0;
             while (curentTimeStep < nT)
             {
-                if (!GameManager.instance.simulationManager.Paused)
+                if (!GameManager.instance.simulationManager.Paused && !GameManager.instance.Loading)
                 {
                     PreSolveStep(curentTimeStep);
 

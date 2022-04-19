@@ -108,7 +108,19 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
                 }
             }
 
-            ApplyGrad();
+            // ApplyGrad();
+
+            // set the gradient when loading from file
+            Menu m = FindObjectOfType<Menu>();
+            if (m.loading)
+            {
+                while (!m.finishedLoading)
+                    System.Threading.Thread.Sleep(1);
+                activeGrad = m.gradientIndex;
+                ApplyGrad();
+            }
+            else
+                ApplyGrad();
         }
 
         private void ReadGradients()
@@ -181,5 +193,8 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
             img.color = HoverCol;
         }
 
+        // for saving/loading purposes
+        public int GetActiveGradient() { return activeGrad; }
+        public void SetActiveGradient(int grad) { activeGrad = grad; }
     }
 }

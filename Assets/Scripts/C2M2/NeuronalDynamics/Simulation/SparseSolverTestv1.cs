@@ -341,7 +341,11 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// </summary>
         protected override void PreSolve()
         {
-            InitializeNeuronCell();
+            GameManager g = GameManager.instance;
+            // if loading, the values from file will be set in BuildVectors and Set1DValues
+            if (!g.Loading) InitializeNeuronCell();
+            else BuildVectors(g.U, g.M, g.N, g.H, g.Upre, g.Mpre, g.Npre, g.Hpre);
+
             ///<c>R</c> this is the reaction vector for the reaction solve
             R = Vector.Build.Dense(Neuron.nodes.Count);            
             
@@ -726,5 +730,32 @@ namespace C2M2.NeuronalDynamics.Simulation
             return (1.0E3) * 4.0 / (((40.0 - Vin) / 5.0).PointwiseExp() + 1.0);
         }
         #endregion
+
+        // used by save/load functions in Menu.cs
+        public double[] getM() { return M.AsArray(); }
+        public double[] getN() { return N.AsArray(); }
+        public double[] getH() { return H.AsArray(); }
+
+        public double[] getUpre() { return Upre.AsArray(); }
+        public double[] getMpre() { return Mpre.AsArray(); }
+        public double[] getNpre() { return Npre.AsArray(); }
+        public double[] getHpre() { return Hpre.AsArray(); }
+        public void BuildVectors(double[] u, double[] m, double[] n, double[] h,
+                                    double[] upre, double[] mpre, double[] npre, double[] hpre)
+        {
+            lock (visualizationValuesLock) U = Vector.Build.DenseOfArray(u);
+            lock (visualizationValuesLock) U_Active = U.Clone();
+            Upre = Vector.Build.DenseOfArray(upre);
+
+            M = Vector.Build.DenseOfArray(m);
+            N = Vector.Build.DenseOfArray(n);
+            H = Vector.Build.DenseOfArray(h);
+
+            Mpre = Vector.Build.DenseOfArray(mpre);
+            Npre = Vector.Build.DenseOfArray(npre);
+            Hpre = Vector.Build.DenseOfArray(hpre);
+
+            Isyn = Vector.Build.Dense(Neuron.nodes.Count, 0.0); // will have to save/load
+        }
     }
 }
