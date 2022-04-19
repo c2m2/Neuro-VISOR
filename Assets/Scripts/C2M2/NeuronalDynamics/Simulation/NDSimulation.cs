@@ -255,8 +255,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 ///<c> if we have active synapes apply the voltage values </c>
                 if (Manager.synapseManager.synapses.Count > 0)
                 {
-                    List<Synapse> postSynapse = new List<Synapse>();
-                    List<Synapse> preSynapse = new List<Synapse>();
+                    List<(Synapse, Synapse)> synapses = new List<(Synapse, Synapse)>();
 
                     // Gather a list of each synapse (i.e. the pre and post synapses)
                     for (int i = 0; i < Manager.synapseManager.synapses.Count; i++)
@@ -268,28 +267,23 @@ namespace C2M2.NeuronalDynamics.Simulation {
                             Synapse curPostSynaptic = Manager.synapseManager.synapses[i];
                             if (this == curPostSynaptic.attachedSim)
                             {
-                                postSynapse.Add(curPostSynaptic);
-
                                 // Set the synapse voltage to what the voltage is at the 1D vertex
                                 curPreSynaptic.voltage = curPreSynaptic.attachedSim.Get1DValues()[curPreSynaptic.nodeIndex];
+                                curPreSynaptic.activationTime = 0.0;
 
-                                preSynapse.Add(curPreSynaptic);
+                                curPostSynaptic.voltage = curPostSynaptic.attachedSim.Get1DValues()[curPostSynaptic.nodeIndex];
+                                curPreSynaptic.activationTime = 0.0;
+
+                                synapses.Add((curPreSynaptic, curPostSynaptic));
+
                             }
 
                             
                         }
                     }
 
-                    Tuple<int, double>[] new1Dvalues = new Tuple<int, double>[postSynapse.Count];
-
-                    // apply the voltage from the pre-synapse and the node index from the post-synapse into a tuple
-                    for (int i = 0; i < postSynapse.Count; i++)
-                    {
-                        new1Dvalues[i] = new Tuple<int, double>(postSynapse[i].nodeIndex, preSynapse[i].voltage);
-                    }
-
-                    // Pass the tuple so we can set our new voltage value
-                    Set1DValues(new1Dvalues);
+                    // Set the post synaptic current for each pair of pre/post synapses i.e. each tuple (Synapse,Synapse)
+                    SetSynapseCurrent(synapses);
                 }
 
 
@@ -387,6 +381,8 @@ namespace C2M2.NeuronalDynamics.Simulation {
         /// </summary>
         /// <param name="newValues"> List of 1D vert indices and values to add onto that index. </param>
         public abstract void Set1DValues (Tuple<int, double>[] newValues);
+
+        public abstract void SetSynapseCurrent(List<(Synapse,Synapse)> synapses);
 
         /// <summary>
         /// Requires derived classes to know how to make available one value for each 1D vertex

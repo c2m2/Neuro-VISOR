@@ -51,12 +51,12 @@ namespace C2M2.Simulation
         /// <summary>
         /// Minimum time for each time step to run in seconds
         /// </summary>
-        readonly float minTimeStep = .02f;
+        readonly float minTimeStep = .01f;
 
         /// <summary>
         /// How often the visualization should be updated in seconds. Should never be less than minTime
         /// </summary>
-        readonly float visualizationTimeStep = .04f;
+        readonly float visualizationTimeStep = .02f;
 
         /// <summary>
         /// Require derived classes to make simulation values available
