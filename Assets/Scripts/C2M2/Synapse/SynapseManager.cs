@@ -17,10 +17,10 @@ public class SynapseManager : MonoBehaviour
     public RaycastPressEvents hitEvent { get; private set; } = null;
 
     public GameObject arrow;
-    private int holdCount = 0;
+    private float holdCount = 0;
     //public int focusVert { get; private set; } = -1;
     public int focusVert { get; set; } = -1;
-    public int numOfDeletionFrames = 50;
+    public int DestoryCount = 1;
 
 
     ///<summary>
