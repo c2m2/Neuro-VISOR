@@ -14,8 +14,8 @@ public abstract class NDInteractablesManager<T> : MonoBehaviour
 
     public T preview = null;
 
-    public bool powerClick { get; set; } = false;
-    public float holdCount { get; set; } = 0;
+    public bool PowerClick { get; set; } = false;
+    public float HoldCount { get; set; } = 0;
 
     /// <summary>
     /// Hold down a raycast for this many seconds in order to destroy a clamp
@@ -23,36 +23,15 @@ public abstract class NDInteractablesManager<T> : MonoBehaviour
     public int DestroyCount = 1;
 
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
-    private void OnEnable()
-    {
-        /* Trigger events used for raycasting to the neuron
-         * 
-         * hitEvent is a refrence to the RaycastPressEvents script.
-         * Which allows us to use predefined ray casting methods */
         HitEvent = gameObject.AddComponent<RaycastPressEvents>();
         AddHitEventListeners();
     }
 
-    private void OnDisable()
-    {
-        // This prevents adding many RaycastPressEvents scripts each time user enables() this script
-        Destroy(GetComponent<RaycastPressEvents>());
-    }
-
     private void OnDestroy()
     {
-        
+        RemoveAll();
     }
 
     #region InputButtons
@@ -96,7 +75,7 @@ public abstract class NDInteractablesManager<T> : MonoBehaviour
         if (currentSimulation == null) return null;
 
         // Destroy any existing preview
-        DestroyPreview(hit);
+        DestroyPreview();
 
         // Find the 1D vertex that we hit
         int index = currentSimulation.GetNearestPoint(hit);
@@ -137,7 +116,32 @@ public abstract class NDInteractablesManager<T> : MonoBehaviour
         }
     }
 
-    public void DestroyPreview(RaycastHit hit)
+    public void Preview(RaycastHit hit)
+    {
+
+        // If we haven't already created a preview clamp, create one
+        if (preview == null)
+        {
+            preview = InstantiateNDInteractable(hit);
+
+            // If we couldn't build a preview clamp, don't try to preview the position hit
+            if (preview == null) return;
+
+            foreach (Collider col in preview.GetComponentsInChildren<Collider>())
+            {
+                col.enabled = false;
+            }
+            preview.SwitchMaterial(preview.previewMaterial);
+            preview.name = "Preview";
+            PreviewCustom();
+        }
+
+        preview.gameObject.SetActive(true);
+    }
+
+    protected abstract void PreviewCustom();
+
+    public void DestroyPreview()
     {
         if (preview != null)
         {

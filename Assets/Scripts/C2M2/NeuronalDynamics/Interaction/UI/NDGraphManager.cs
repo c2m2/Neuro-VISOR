@@ -11,15 +11,12 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
         private void Awake()
         {
             graphPrefab = Resources.Load("Prefabs" + Path.DirectorySeparatorChar + "NeuronalDynamics" + Path.DirectorySeparatorChar + "NDLineGraph") as GameObject;
-            if (graphPrefab == null)
-            {
-                Debug.LogError("No graph prefab found.");
-                Destroy(this);
-            }
         }
 
         protected override void AddHitEventListeners()
         {
+            //HitEvent.OnHover.AddListener((hit) => Preview(hit));
+            HitEvent.OnHoverEnd.AddListener((hit) => DestroyPreview());
             HitEvent.OnPress.AddListener((hit) => InstantiateNDInteractable(hit));
         }
 
@@ -70,6 +67,11 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
                 
             }
             return true;
+        }
+
+        protected override void PreviewCustom()
+        {
+
         }
     }
 }

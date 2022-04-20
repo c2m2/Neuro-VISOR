@@ -7117,7 +7117,6 @@ GameObject:
   - component: {fileID: 2168964937537411965}
   - component: {fileID: 2168964937537411962}
   - component: {fileID: 8198696467454360633}
-  - component: {fileID: 856960900527284290}
   - component: {fileID: 4932199581192497660}
   m_Layer: 12
   m_Name: NDLineGraph
@@ -7221,6 +7220,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   simulation: {fileID: 0}
+  meshRenderer: {fileID: 0}
+  defaultMaterial: {fileID: 0}
+  previewMaterial: {fileID: 0}
+  destroyMaterial: {fileID: 0}
   highlightObj: {fileID: 0}
   ndlinegraph: {fileID: 2168964937537411964}
 --- !u!114 &2168964937537411964
@@ -7256,8 +7259,6 @@ MonoBehaviour:
   yMinLabel: {fileID: 2168964936445175920}
   yMaxLabel: {fileID: 2168964936027736413}
   positions: []
-  ndgraph: {fileID: 2039472419592228062}
-  obeyParentScale: 0
 --- !u!65 &2168964937537411967
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -7329,44 +7330,6 @@ MonoBehaviour:
   decKey: 274
   resetKey: 114
   target: {fileID: 0}
---- !u!114 &856960900527284290
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2168964937537411963}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2066920c5141f0e4ca235394b5f8bd4a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  onHover:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 8198696467454360633}
-        m_MethodName: Rescale
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  onHoverEnd:
-    m_PersistentCalls:
-      m_Calls: []
-  onPress:
-    m_PersistentCalls:
-      m_Calls: []
-  onHoldPress:
-    m_PersistentCalls:
-      m_Calls: []
-  onEndPress:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!114 &4932199581192497660
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -4,7 +4,6 @@ using C2M2.NeuronalDynamics.UGX;
 using System;
 using UnityEngine;
 
-[RequireComponent(typeof(MeshRenderer))]
 public class Synapse : NDInteractables
 {
     public Model currentModel = Model.NMDA;
@@ -62,5 +61,10 @@ public class Synapse : NDInteractables
 
             transform.localScale = new Vector3(radiusLength, radiusLength, radiusLength);
         }
+    }
+
+    protected override void AddHitEventListeners()
+    {
+        throw new NotImplementedException();
     }
 }

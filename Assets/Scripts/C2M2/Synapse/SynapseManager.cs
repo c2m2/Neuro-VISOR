@@ -1,20 +1,16 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using C2M2;
-using C2M2.Interaction;
 using C2M2.Simulation;
 using C2M2.NeuronalDynamics.Simulation;
 
 public class SynapseManager : NDInteractablesManager<Synapse>
 {
-    public List<Vector3> SynapticNodeLocation = new List<Vector3>();
     public GameObject PrefabPreSynapse;
     public GameObject PrefabPostSynapse;
+    public GameObject arrowPrefab;
     private Synapse synapseInProgress = null; //Contains presynapse when a presynapse has been placed but no post synapse
     public List<(Synapse, Synapse)> synapses = new List<(Synapse, Synapse)>(); //pre (Item1) and post (Item2) synapses
-
-    public GameObject arrow;
-
 
     ///<summary> 
     ///Simulation refrence to get the attributes of the current cell
@@ -52,7 +48,7 @@ public class SynapseManager : NDInteractablesManager<Synapse>
     /// <summary>
     /// Handles synapse placement
     /// </summary>
-    /// <param name="hit"></param>
+    /// <param name="placedSynapse"></param>
     public void SynapticPlacement(Synapse placedSynapse)
     {
         if (synapseInProgress == null) //Pre Synapse
@@ -63,7 +59,6 @@ public class SynapseManager : NDInteractablesManager<Synapse>
         {
             synapses.Add((synapseInProgress, placedSynapse));
             synapseInProgress = null;
-
             PlaceArrow();
         }
     }
@@ -76,9 +71,9 @@ public class SynapseManager : NDInteractablesManager<Synapse>
     {
         NDSimulation curSimulation = hit.collider.GetComponentInParent<NDSimulation>();
 
-        holdCount++;
+        HoldCount++;
         // Hold count threshhold to check if the user has pressed for x frames
-        if (holdCount >= DestroyCount)
+        if (HoldCount >= DestroyCount)
         {
             // Get the 1d vertex user has pressed
             int hitIndex = curSimulation.GetNearestPoint(hit);
@@ -92,18 +87,20 @@ public class SynapseManager : NDInteractablesManager<Synapse>
                     Destroy(synapses[i].Item1);
                     Destroy(synapses[i].Item2);
                     synapses.RemoveAt(i);
-                    holdCount = 0;
+                    HoldCount = 0;
                     return;
                 }
             }
-            holdCount = 0;
+            HoldCount = 0;
         }
     }
     
     protected override void AddHitEventListeners()
     {
+        //HitEvent.OnHover.AddListener((hit) => Preview(hit));
+        HitEvent.OnHoverEnd.AddListener((hit) => DestroyPreview());
         HitEvent.OnPress.AddListener((hit) => InstantiateNDInteractable(hit));
-        HitEvent.OnHoldPress.AddListener((hit) => DeleteSynapseHit(hit));
+        //HitEvent.OnHoldPress.AddListener((hit) => DeleteSynapseHit(hit));
     }
 
     /// <summary>
@@ -118,7 +115,7 @@ public class SynapseManager : NDInteractablesManager<Synapse>
         Transform postSynapse = synapses[synapses.Count - 1].Item2.transform;
 
         // Create a new arrow in 3D space
-        arrowHead = Instantiate(arrow, new Vector3(0, 0, 0), Quaternion.identity) as GameObject;
+        arrowHead = Instantiate(arrowPrefab, new Vector3(0, 0, 0), Quaternion.identity) as GameObject;
         /* Use Vector3 lerp so the position does not set it to the middle of the pre synapse but rather in the middle of both the pre-synapse and post-synapse*/
         arrowHead.transform.position = Vector3.Lerp(preSynapse.position, postSynapse.position, 0.5f);
         arrowHead.transform.LookAt(postSynapse.position);
@@ -187,7 +184,9 @@ public class SynapseManager : NDInteractablesManager<Synapse>
         }
         return true;
     }
-    
-    //TODO prefab?
 
+    protected override void PreviewCustom()
+    {
+
+    }
 }

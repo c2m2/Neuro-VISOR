@@ -66,16 +66,16 @@ namespace C2M2.NeuronalDynamics.Simulation
                 string s = "";
                 switch (featState)
                 {
-                    case (FeatureState.Direct):
+                    case FeatureState.Direct:
                         s = "Direct mode";
                         break;
-                    case (FeatureState.Clamp):
+                    case FeatureState.Clamp:
                         s = "Clamp mode";
                         break;
-                    case (FeatureState.Plot):
+                    case FeatureState.Plot:
                         s = "Plot mode";
                         break;
-                    case (FeatureState.Synapse):
+                    case FeatureState.Synapse:
                         s = "Synapse mode";
                         break;
                 }

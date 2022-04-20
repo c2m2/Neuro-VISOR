@@ -255,7 +255,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 {
                     List<(Synapse, Synapse)> synapses = new List<(Synapse, Synapse)>(); //pre (Item1) and post (Item2) synapses
                     
-                    // Gather a list of each synapses with their post on the current sim
+                    // Gather a list of each synapse with their post on the current sim
                     foreach ((Synapse, Synapse) syn in Manager.synapseManager.synapses)
                     {
                         Synapse preSynapse = syn.Item1;

@@ -473,7 +473,6 @@ GameObject:
   - component: {fileID: 2369892180751481776}
   - component: {fileID: 1260918011164680841}
   - component: {fileID: 764974224660648451}
-  - component: {fileID: 6116663597231688181}
   - component: {fileID: 5759179178119950721}
   m_Layer: 0
   m_Name: NeuronClamp
@@ -551,20 +550,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   simulation: {fileID: 0}
+  meshRenderer: {fileID: 2369892180751481776}
+  defaultMaterial: {fileID: 2100000, guid: 35c891bae7ccbb440a4193edaae59b1a, type: 2}
+  previewMaterial: {fileID: 2100000, guid: 1b9e22857f37d024a8aa6aa336a12219, type: 2}
+  destroyMaterial: {fileID: 2100000, guid: cdb984a62adddda4f96228000d103b50, type: 2}
   highlightObj: {fileID: 7733468709602801279}
   radiusRatio: 3
   heightRatio: 3
   highlightSphereScale: 3
-  activeMaterial: {fileID: 2100000, guid: 35c891bae7ccbb440a4193edaae59b1a, type: 2}
   inactiveMaterial: {fileID: 2100000, guid: b5682c8bb520e8a46bbeab52c1a74097, type: 2}
-  previewMaterial: {fileID: 2100000, guid: 1b9e22857f37d024a8aa6aa336a12219, type: 2}
-  destroyMaterial: {fileID: 2100000, guid: cdb984a62adddda4f96228000d103b50, type: 2}
   defaultCapHolders:
   - {fileID: 5483127028994316193}
   destroyCapHolders:
   - {fileID: 1776878145815968951}
   clampInfo: {fileID: 5849450844273235413}
-  clampPowerMeshRenderer: {fileID: 9218115778874880341}
   minHighlightGlobalSize: 0.03333333
 --- !u!114 &764974224660648451
 MonoBehaviour:
@@ -580,99 +579,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rightTrigger: {fileID: 0}
   leftTrigger: {fileID: 0}
---- !u!114 &6116663597231688181
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7051469727396962550}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2066920c5141f0e4ca235394b5f8bd4a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  onHover:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1260918011164680841}
-        m_MethodName: ShowClampInfo
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  onHoverEnd:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1260918011164680841}
-        m_MethodName: HideClampInfo
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  onPress:
-    m_PersistentCalls:
-      m_Calls: []
-  onHoldPress:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1260918011164680841}
-        m_MethodName: MonitorInput
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 1260918011164680841}
-        m_MethodName: ShowClampInfo
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  onEndPress:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1260918011164680841}
-        m_MethodName: ResetInput
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 1260918011164680841}
-        m_MethodName: HideClampInfo
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
 --- !u!65 &5759179178119950721
 BoxCollider:
   m_ObjectHideFlags: 0

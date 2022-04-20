@@ -67,8 +67,8 @@ namespace C2M2.NeuronalDynamics.Interaction
 
         protected override void AddHitEventListeners()
         {
-            HitEvent.OnHover.AddListener((hit) => PreviewClamp(hit));
-            HitEvent.OnHoverEnd.AddListener((hit) => DestroyPreview(hit));
+            HitEvent.OnHover.AddListener((hit) => Preview(hit));
+            HitEvent.OnHoverEnd.AddListener((hit) => DestroyPreview());
             HitEvent.OnPress.AddListener((hit) => InstantiateNDInteractable(hit));
         }
 
@@ -87,46 +87,18 @@ namespace C2M2.NeuronalDynamics.Interaction
             return null;
         }
 
-        public void PreviewClamp(RaycastHit hit)
+        protected override void PreviewCustom()
         {
-
-            // If we haven't already created a preview clamp, create one
-            if (preview == null)
+            lock (currentSimulation.clampLock) Clamps.Remove(preview);
+            foreach (GameObject defaultCapHolder in preview.defaultCapHolders)
             {
-                preview = InstantiateNDInteractable(hit);
-
-                // If we couldn't build a preview clamp, don't try to preview the position hit
-                if (preview == null) return;
-
-                lock (currentSimulation.clampLock) Clamps.Remove(preview);
-
-                foreach (Collider col in preview.GetComponentsInChildren<Collider>())
-                {
-                    col.enabled = false;
-                }
-                preview.SwitchMaterial(preview.previewMaterial);
-                preview.name = "PreviewClamp";
-                foreach (GameObject defaultCapHolder in preview.defaultCapHolders)
-                {
-                    Destroy(defaultCapHolder);
-                }
-                foreach (GameObject destroyCapHolder in preview.destroyCapHolders)
-                {
-                    Destroy(destroyCapHolder);
-                }
+                Destroy(defaultCapHolder);
             }
-
-            // Ensure the clamp is enabled
-            preview.gameObject.SetActive(true);
+            foreach (GameObject destroyCapHolder in preview.destroyCapHolders)
+            {
+                Destroy(destroyCapHolder);
+            }
         }
-        /*public void DestroyPreviewClamp(RaycastHit hit)
-        {
-            if (previewClamp != null)
-            {
-                Destroy(previewClamp.transform.parent.gameObject);
-                previewClamp = null;
-            }
-        }*/
 
         /// <summary>
         /// Ensures that no clamp is placed too near to another clamp
@@ -171,13 +143,13 @@ namespace C2M2.NeuronalDynamics.Interaction
         public void MonitorGroupInput()
         {
             if (PressedInteract)
-                holdCount+=Time.deltaTime;
+                HoldCount+=Time.deltaTime;
             else
                 CheckInputResult();
 
             float power = Time.deltaTime*PowerModifier;
             // If clamp power is modified while the user holds a click, don't let the click also toggle/destroy the clamp
-            if (power != 0 && !powerClick) powerClick = true;
+            if (power != 0 && !PowerClick) PowerClick = true;
 
             foreach (NeuronClamp clamp in Clamps)
             {
@@ -193,16 +165,16 @@ namespace C2M2.NeuronalDynamics.Interaction
 
         private void CheckInputResult()
         {
-            if (!powerClick)
+            if (!PowerClick)
             {
-                if (holdCount >= DestroyCount)
+                if (HoldCount >= DestroyCount)
                     RemoveAll();
-                else if (holdCount > 0)
+                else if (HoldCount > 0)
                     ToggleAll();
             }
 
-            holdCount = 0;
-            powerClick = false;
+            HoldCount = 0;
+            PowerClick = false;
         }
 
         private void ToggleAll()

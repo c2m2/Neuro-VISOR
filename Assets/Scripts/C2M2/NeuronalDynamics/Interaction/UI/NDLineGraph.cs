@@ -4,10 +4,11 @@ using C2M2.NeuronalDynamics.Simulation;
 
 namespace C2M2.NeuronalDynamics.Interaction.UI
 {
+    [RequireComponent(typeof(NDGraph))]
     public class NDLineGraph : LineGrapher
     {
 
-        public NDGraph ndgraph;
+        private NDGraph ndgraph;
 
         public NDSimulation Sim
         {
@@ -22,15 +23,14 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
         // World space size of the graph
         private Vector3 GraphSize { get { return ((RectTransform)transform).sizeDelta * transform.localScale; } }
 
-        // Start is called before the first frame update
-        void Start()
+        private void Awake()
         {
-            if(ndgraph.FocusVert == -1)
-            {
-                Debug.LogError("Invalid vertex given to NDLineGraph");
-                Destroy(this);
-            }
+            ndgraph = GetComponent<NDGraph>();
+        }
 
+        // Start is called before the first frame update
+        public void SetUp()
+        {
             SetLabels();
 
             transform.position = GetPanelPos();
@@ -43,8 +43,6 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
 
             //UpdateSize();
             MaxSamples = 500;
-
-            name = "LineGraph(" + Sim.name + ")[vert" + ndgraph.FocusVert + "]";
 
             void SetLabels()
             {
@@ -91,13 +89,6 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
             base.AddValue(x, y);
         }
 
-        private Vector3 SimLocalScale
-        {
-            get
-            {
-                return Sim.transform.localScale;
-            }
-        }
         private void Update()
         {
             if (pointerLines != null)
@@ -106,7 +97,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
             }
         }
         
-        private void UpdateSize()
+        public void UpdateSize()
         {
             // Reset graph to match original worldspace size
             transform.localScale = new Vector3(transform.localScale.x / Sim.transform.localScale.x,

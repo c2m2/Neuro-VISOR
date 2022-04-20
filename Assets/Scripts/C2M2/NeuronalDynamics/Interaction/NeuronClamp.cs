@@ -9,7 +9,6 @@ using System.Linq;
 
 namespace C2M2.NeuronalDynamics.Interaction
 {
-    [RequireComponent(typeof(MeshRenderer))]
     public class NeuronClamp : NDInteractables
     {
         public float radiusRatio = 3f;
@@ -32,29 +31,23 @@ namespace C2M2.NeuronalDynamics.Interaction
                 return simulation.Neuron.nodes[FocusVert];
             }
         }
-
-        public Material activeMaterial = null;
+        
         public Material inactiveMaterial = null;
-        public Material previewMaterial = null;
-        public Material destroyMaterial = null;
 
         public List<GameObject> defaultCapHolders = null;
         public List<GameObject> destroyCapHolders = null;
 
         public InfoPanel clampInfo = null;
 
-        public MeshRenderer clampPowerMeshRenderer;
         private Vector3 LocalExtents { get { return transform.localScale / 2; } }
         private Vector3 posFocus = Vector3.zero;
-
-        private Color32 activeCol = Color.white;
-        public Color32 ActiveColor
+        
+        public Color32 CurrentColor
         {
-            get { return activeCol; }
+            get { return meshRenderer.material.color; }
             private set
             {
-                activeCol = value;
-                clampPowerMeshRenderer.material.color = activeCol;
+                meshRenderer.material.color = value;
             }
         }
         private ColorLUT ColorLUT { get { return simulation.ColorLUT; } }
@@ -80,7 +73,7 @@ namespace C2M2.NeuronalDynamics.Interaction
                 if (ClampLive)
                 {
                     Color newCol = ColorLUT.Evaluate((float)ClampPower);
-                    ActiveColor = newCol;
+                    CurrentColor = newCol;
                 }
             }
         }
@@ -271,17 +264,12 @@ namespace C2M2.NeuronalDynamics.Interaction
         {
             ClampLive = true;
 
-            SwitchMaterial(activeMaterial);
+            SwitchMaterial(defaultMaterial);
         }
         public void DeactivateClamp()
         {
             ClampLive = false;
             SwitchMaterial(inactiveMaterial);
-        }
-
-        public void SwitchMaterial(Material material)
-        {
-            if (material != null) clampPowerMeshRenderer.material = material;
         }
 
         public void ToggleClamp()
@@ -304,18 +292,18 @@ namespace C2M2.NeuronalDynamics.Interaction
 
             if (ClampManager.PressedInteract)
             {
-                ClampManager.holdCount += Time.deltaTime;
+                ClampManager.HoldCount += Time.deltaTime;
 
                 // If we've held the button long enough to destroy, color caps red until user releases button
-                if(ClampManager.holdCount > ClampManager.DestroyCount && !ClampManager.powerClick) SwitchCaps(false);
-                else if (ClampManager.powerClick) SwitchCaps(true);
+                if(ClampManager.HoldCount > ClampManager.DestroyCount && !ClampManager.PowerClick) SwitchCaps(false);
+                else if (ClampManager.PowerClick) SwitchCaps(true);
             }
             else CheckInput();
 
             float power = Time.deltaTime*ClampManager.PowerModifier;
             
             // If clamp power is modified while the user holds a click, don't let the click also toggle/destroy the clamp
-            if (power != 0 && !ClampManager.powerClick) ClampManager.powerClick = true;
+            if (power != 0 && !ClampManager.PowerClick) ClampManager.PowerClick = true;
 
             ClampPower += power;
             Math.Clamp(ClampPower, MinPower, MaxPower);
@@ -336,7 +324,7 @@ namespace C2M2.NeuronalDynamics.Interaction
                 }
                 if (toDefault)
                 {
-                    if (ClampLive) SwitchMaterial(activeMaterial);
+                    if (ClampLive) SwitchMaterial(defaultMaterial);
                     else SwitchMaterial(inactiveMaterial);
                 }
                 else SwitchMaterial(destroyMaterial);
@@ -350,18 +338,28 @@ namespace C2M2.NeuronalDynamics.Interaction
 
         private void CheckInput()
         {
-            if (!ClampManager.PressedCancel && !ClampManager.powerClick)
+            if (!ClampManager.PressedCancel && !ClampManager.PowerClick)
             {
-                if (ClampManager.holdCount >= ClampManager.DestroyCount)
+                if (ClampManager.HoldCount >= ClampManager.DestroyCount)
                 {
                     Destroy(transform.parent.gameObject);
                 }
-                else if (ClampManager.holdCount > 0) ToggleClamp();
+                else if (ClampManager.HoldCount > 0) ToggleClamp();
             }
 
-            ClampManager.holdCount = 0;
-            ClampManager.powerClick = false;
+            ClampManager.HoldCount = 0;
+            ClampManager.PowerClick = false;
             SwitchCaps(true);
+        }
+
+        protected override void AddHitEventListeners()
+        {
+            HitEvent.OnHover.AddListener((hit) => ShowClampInfo());
+            HitEvent.OnHoverEnd.AddListener((hit) => HideClampInfo());
+            HitEvent.OnHoldPress.AddListener((hit) => MonitorInput());
+            HitEvent.OnHoldPress.AddListener((hit) => ShowClampInfo());
+            HitEvent.OnEndPress.AddListener((hit) => ResetInput());
+            HitEvent.OnEndPress.AddListener((hit) => HideClampInfo());
         }
 
         #endregion
