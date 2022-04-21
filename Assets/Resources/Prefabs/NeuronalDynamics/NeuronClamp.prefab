@@ -88,7 +88,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8385132162378278009}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: DestroyCaps
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -199,7 +199,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1046903729288245554}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: DefaultCaps
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -233,7 +233,7 @@ GameObject:
   - component: {fileID: 3190543447572195313}
   - component: {fileID: 7203364276282346925}
   - component: {fileID: 9218115778874880341}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: RaycastTarget
   m_TagString: NeuronClamp
   m_Icon: {fileID: 0}
@@ -474,7 +474,7 @@ GameObject:
   - component: {fileID: 1260918011164680841}
   - component: {fileID: 764974224660648451}
   - component: {fileID: 5759179178119950721}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: NeuronClamp
   m_TagString: NeuronClamp
   m_Icon: {fileID: 0}
@@ -605,7 +605,7 @@ GameObject:
   - component: {fileID: 3389635001864028061}
   - component: {fileID: 4191064570392900090}
   - component: {fileID: 7125117444696267372}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: Highlight
   m_TagString: Untagged
   m_Icon: {fileID: 0}

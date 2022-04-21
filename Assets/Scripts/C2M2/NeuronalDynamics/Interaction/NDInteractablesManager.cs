@@ -12,7 +12,7 @@ public abstract class NDInteractablesManager<T> : MonoBehaviour
 
     public RaycastPressEvents HitEvent { get; protected set; } = null;
 
-    public T preview = null;
+    protected T preview = null;
 
     public bool PowerClick { get; set; } = false;
     public float HoldCount { get; set; } = 0;
@@ -124,7 +124,7 @@ public abstract class NDInteractablesManager<T> : MonoBehaviour
         {
             preview = InstantiateNDInteractable(hit);
 
-            // If we couldn't build a preview clamp, don't try to preview the position hit
+            // If we couldn't build a preview, don't try to preview the position hit
             if (preview == null) return;
 
             foreach (Collider col in preview.GetComponentsInChildren<Collider>())

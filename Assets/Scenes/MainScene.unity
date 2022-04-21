@@ -5217,66 +5217,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2118296217}
   m_CullTransparentMesh: 0
---- !u!1 &2128362492
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2128362493}
-  - component: {fileID: 2128362495}
-  - component: {fileID: 2128362494}
-  m_Layer: 0
-  m_Name: TestManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!4 &2128362493
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2128362492}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 3671467347388522961}
-  m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2128362494
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2128362492}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6749ed9cabe99dd46b312f8f21a9d1ea, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  tickErrorThreshold: 2
---- !u!114 &2128362495
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2128362492}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dc247b72849f56e4494069ee6ca3aa1f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  awakeTests: []
-  startTests: []
-  updateTests: []
 --- !u!1001 &806130742889527368
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5613,36 +5553,6 @@ PrefabInstance:
     - {fileID: 806130743097329639, guid: b8e32f33023aba348a3a271448030708, type: 3}
     - {fileID: 806130743969167615, guid: b8e32f33023aba348a3a271448030708, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: b8e32f33023aba348a3a271448030708, type: 3}
---- !u!4 &3408630297986624582
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3408630297986624587}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 3671467347388522961}
-  m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &3408630297986624587
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 3408630297986624582}
-  m_Layer: 0
-  m_Name: SynapseClampManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
 --- !u!1001 &3671467347388522957
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6085,12 +5995,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f49e57d0c1b71c4418326894ace9a9b5, type: 3}
---- !u!4 &3671467347388522961 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 3671467348768610593, guid: f49e57d0c1b71c4418326894ace9a9b5,
-    type: 3}
-  m_PrefabInstance: {fileID: 3671467347388522957}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &8168634008602244503
 PrefabInstance:
   m_ObjectHideFlags: 0

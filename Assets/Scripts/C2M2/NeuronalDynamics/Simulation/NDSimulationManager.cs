@@ -5,18 +5,7 @@ namespace C2M2.NeuronalDynamics.Simulation
 {
     public class NDSimulationManager : MeshSimulationManager
     {
-        private bool paused = false;
-        public bool Paused
-        {
-            get
-            {
-                return paused;
-            }
-            set
-            {
-                paused = value;
-            }
-        }
+        public bool Paused { get; set; } = false;
         public List<NDSimulation> ActiveSimulations
         {
             get
@@ -48,16 +37,16 @@ namespace C2M2.NeuronalDynamics.Simulation
                 {
                     switch (featState)
                     {
-                        case (FeatureState.Direct):
+                        case FeatureState.Direct:
                             sim.raycastEventManager.LRTrigger = sim.defaultRaycastEvent;
                             break;
-                        case (FeatureState.Clamp):
+                        case FeatureState.Clamp:
                             sim.raycastEventManager.LRTrigger = sim.clampManager.HitEvent;
                             break;
-                        case (FeatureState.Plot):
+                        case FeatureState.Plot:
                             sim.raycastEventManager.LRTrigger = sim.graphManager.HitEvent;
                             break;
-                        case (FeatureState.Synapse):
+                        case FeatureState.Synapse:
                             sim.raycastEventManager.LRTrigger = synapseManager.HitEvent;
                             break;
                     }
