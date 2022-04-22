@@ -6,8 +6,7 @@ using C2M2.NeuronalDynamics.Simulation;
 
 public class SynapseManager : NDInteractablesManager<Synapse>
 {
-    public GameObject PrefabPreSynapse;
-    public GameObject PrefabPostSynapse;
+    public GameObject synapsePrefab;
     public GameObject arrowPrefab;
     private Synapse synapseInProgress = null; //Contains presynapse when a presynapse has been placed but no post synapse
     public List<(Synapse, Synapse)> synapses = new List<(Synapse, Synapse)>(); //pre (Item1) and post (Item2) synapses
@@ -25,24 +24,12 @@ public class SynapseManager : NDInteractablesManager<Synapse>
 
     public override GameObject IdentifyBuildPrefab(int index)
     {
-        if (!synapseInProgress)
+        if (synapsePrefab == null)
         {
-            if (PrefabPreSynapse == null)
-            {
-                Debug.LogError("No PreSynapse prefab found");
-                return null;
-            }
-            else return PrefabPreSynapse;
+            Debug.LogError("No Synapse prefab found");
+            return null;
         }
-        else
-        {
-            if (PrefabPostSynapse == null)
-            {
-                Debug.LogError("No PostSynapse prefab found");
-                return null;
-            }
-            else return PrefabPostSynapse;
-        }
+        else return synapsePrefab;
     }
 
     /// <summary>
@@ -63,35 +50,18 @@ public class SynapseManager : NDInteractablesManager<Synapse>
         }
     }
 
-    /// <summary>
-    /// If a user holds a raycast onto the synapse for x frames delete the synapse
-    /// </summary>
-    /// <param name="hit"></param>
-    void DeleteSynapseHit(RaycastHit hit) //TODO probably could just see if being raycasted on the object like clamps
+    public void DeleteSyn(Synapse syn)
     {
-        NDSimulation curSimulation = hit.collider.GetComponentInParent<NDSimulation>();
-
-        HoldCount++;
-        // Hold count threshhold to check if the user has pressed for x frames
-        if (HoldCount >= DestroyCount)
+        for (int i = 0; i < synapses.Count; i++)
         {
-            // Get the 1d vertex user has pressed
-            int hitIndex = curSimulation.GetNearestPoint(hit);
-
-            for (int i = 0; i < synapses.Count; i++)
+            if (synapses[i].Item1 == syn || synapses[i].Item2 == syn)
             {
-                // if user has pressed onto the pre-synapse
-                if (synapses[i].Item1.FocusVert == hitIndex || synapses[i].Item2.FocusVert == hitIndex)
-                {
-                    // delete and remove from synapse list
-                    Destroy(synapses[i].Item1);
-                    Destroy(synapses[i].Item2);
-                    synapses.RemoveAt(i);
-                    HoldCount = 0;
-                    return;
-                }
+                // delete and remove from synapse list
+                Destroy(synapses[i].Item1.gameObject);
+                Destroy(synapses[i].Item2.gameObject);
+                synapses.RemoveAt(i);
+                return;
             }
-            HoldCount = 0;
         }
     }
     
@@ -187,6 +157,6 @@ public class SynapseManager : NDInteractablesManager<Synapse>
 
     protected override void PreviewCustom()
     {
-
+        //TO DO
     }
 }

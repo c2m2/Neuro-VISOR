@@ -14,8 +14,19 @@ public abstract class NDInteractablesManager<T> : MonoBehaviour
 
     protected T preview = null;
 
-    public bool PowerClick { get; set; } = false;
     public float HoldCount { get; set; } = 0;
+
+    public OVRInput.Button cancelCommand = OVRInput.Button.Two;
+    public OVRInput.Button cancelCommandS = OVRInput.Button.Four;
+    public KeyCode cancelKey = KeyCode.Backspace;
+    public bool PressedCancel
+    {
+        get
+        {
+            if (GameManager.instance.vrDeviceManager.VRActive) return OVRInput.Get(cancelCommand) || OVRInput.Get(cancelCommandS);
+            else return Input.GetKey(cancelKey);
+        }
+    }
 
     /// <summary>
     /// Hold down a raycast for this many seconds in order to destroy a clamp
@@ -25,7 +36,7 @@ public abstract class NDInteractablesManager<T> : MonoBehaviour
     // Start is called before the first frame update
     void Awake()
     {
-        HitEvent = gameObject.AddComponent<RaycastPressEvents>();
+        HitEvent = gameObject.GetComponent<RaycastPressEvents>();
         AddHitEventListeners();
     }
 

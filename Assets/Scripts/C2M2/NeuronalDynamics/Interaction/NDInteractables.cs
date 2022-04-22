@@ -27,7 +27,7 @@ public abstract class NDInteractables : MonoBehaviour
 
     private void Awake()
     {
-        HitEvent = gameObject.AddComponent<RaycastPressEvents>();
+        HitEvent = gameObject.GetComponent<RaycastPressEvents>();
         AddHitEventListeners();
     }
 

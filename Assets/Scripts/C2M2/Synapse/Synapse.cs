@@ -34,23 +34,14 @@ public class Synapse : NDInteractables
     {
         synapseManager.SynapticPlacement(this);
 
+        transform.SetParent(simulation.transform);
+        transform.localPosition = FocusPos;
         if (simulation.Neuron.somaIDs.Contains(FocusVert))
         {
-            //Transform the position of the synapse to where we raycast onto
-            transform.SetParent(simulation.transform);
-            transform.localPosition = FocusPos;
-
             transform.localScale = new Vector3((float)NodeData.NodeRadius, (float)NodeData.NodeRadius, (float)NodeData.NodeRadius);
         }
         else
         {
-            // Set the neuron as the parent of the synapse
-            transform.SetParent(simulation.transform);
-            FocusVert = FocusVert;
-
-            // Make sure to transform locally since we made the neuron the parent of the synapse
-            transform.localPosition = FocusPos;
-
             float currentVisualizationScale = (float)simulation.VisualInflation;
 
             float radiusScalingValue = 3f * (float)NodeData.NodeRadius;
@@ -65,6 +56,36 @@ public class Synapse : NDInteractables
 
     protected override void AddHitEventListeners()
     {
-        throw new NotImplementedException();
+        HitEvent.OnHoldPress.AddListener((hit) => MonitorInput());
+        HitEvent.OnEndPress.AddListener((hit) => CheckInput());
+    }
+
+    public void MonitorInput()
+    {
+        if (synapseManager.PressedCancel || !synapseManager.PressedInteract)
+        {
+            CheckInput();
+        }
+        else
+        {
+            synapseManager.HoldCount += Time.deltaTime;
+
+            // If we've held the button long enough to destroy, color caps red until user releases button
+            if (synapseManager.HoldCount > synapseManager.DestroyCount) SwitchMaterial(destroyMaterial);
+        }
+    }
+
+    private void CheckInput()
+    {
+        if (!synapseManager.PressedCancel)
+        {
+            if (synapseManager.HoldCount >= synapseManager.DestroyCount)
+            {
+                synapseManager.DeleteSyn(this);
+            }
+        }
+
+        synapseManager.HoldCount = 0;
+        SwitchMaterial(defaultMaterial);
     }
 }

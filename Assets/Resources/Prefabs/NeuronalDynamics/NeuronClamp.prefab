@@ -474,6 +474,7 @@ GameObject:
   - component: {fileID: 1260918011164680841}
   - component: {fileID: 764974224660648451}
   - component: {fileID: 5759179178119950721}
+  - component: {fileID: 3607111461616315938}
   m_Layer: 8
   m_Name: NeuronClamp
   m_TagString: NeuronClamp
@@ -550,7 +551,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   simulation: {fileID: 0}
-  meshRenderer: {fileID: 2369892180751481776}
+  meshRenderer: {fileID: 9218115778874880341}
   defaultMaterial: {fileID: 2100000, guid: 35c891bae7ccbb440a4193edaae59b1a, type: 2}
   previewMaterial: {fileID: 2100000, guid: 1b9e22857f37d024a8aa6aa336a12219, type: 2}
   destroyMaterial: {fileID: 2100000, guid: cdb984a62adddda4f96228000d103b50, type: 2}
@@ -577,8 +578,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6dee7b5c4ddc78f44b1b1919d3ea115d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rightTrigger: {fileID: 0}
-  leftTrigger: {fileID: 0}
+  rightTrigger: {fileID: 3607111461616315938}
+  leftTrigger: {fileID: 3607111461616315938}
 --- !u!65 &5759179178119950721
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -592,6 +593,33 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &3607111461616315938
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7051469727396962550}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2066920c5141f0e4ca235394b5f8bd4a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  onHover:
+    m_PersistentCalls:
+      m_Calls: []
+  onHoverEnd:
+    m_PersistentCalls:
+      m_Calls: []
+  onPress:
+    m_PersistentCalls:
+      m_Calls: []
+  onHoldPress:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndPress:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &7733468709602801279
 GameObject:
   m_ObjectHideFlags: 0

@@ -27,6 +27,8 @@ namespace C2M2.NeuronalDynamics.Interaction
             }
         }
 
+        public bool PowerClick { get; set; } = false;
+
         #region InputButtons
 
         public KeyCode powerModifierPlusKey = KeyCode.UpArrow;
@@ -48,18 +50,6 @@ namespace C2M2.NeuronalDynamics.Interaction
                     if (Input.GetKey(powerModifierMinusKey)) return .4f*-Scaler;
                     else return 0;
                 }
-            }
-        }
-
-        public OVRInput.Button cancelCommand = OVRInput.Button.Two;
-        public OVRInput.Button cancelCommandS = OVRInput.Button.Four;
-        public KeyCode cancelKey = KeyCode.Backspace;
-        public bool PressedCancel
-        {
-            get
-            {
-                if (GameManager.instance.vrDeviceManager.VRActive) return OVRInput.Get(cancelCommand) || OVRInput.Get(cancelCommandS);
-                else return Input.GetKey(cancelKey);
             }
         }
 

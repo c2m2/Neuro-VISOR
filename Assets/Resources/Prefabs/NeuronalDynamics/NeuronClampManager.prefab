@@ -10,6 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 6795881404616055387}
   - component: {fileID: 6795881404616055385}
+  - component: {fileID: 4887816165848113819}
+  - component: {fileID: 8932916322702492146}
   m_Layer: 0
   m_Name: NeuronClampManager
   m_TagString: Untagged
@@ -45,7 +47,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currentSimulation: {fileID: 0}
   interactables: []
-  preview: {fileID: 0}
   DestroyCount: 1
   interactOVR: 8192
   interactOVRS: 2097152
@@ -62,3 +63,44 @@ MonoBehaviour:
   cancelCommand: 2
   cancelCommandS: 8
   cancelKey: 8
+--- !u!114 &4887816165848113819
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6795881404616055386}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6dee7b5c4ddc78f44b1b1919d3ea115d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rightTrigger: {fileID: 8932916322702492146}
+  leftTrigger: {fileID: 8932916322702492146}
+--- !u!114 &8932916322702492146
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6795881404616055386}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2066920c5141f0e4ca235394b5f8bd4a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  onHover:
+    m_PersistentCalls:
+      m_Calls: []
+  onHoverEnd:
+    m_PersistentCalls:
+      m_Calls: []
+  onPress:
+    m_PersistentCalls:
+      m_Calls: []
+  onHoldPress:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndPress:
+    m_PersistentCalls:
+      m_Calls: []

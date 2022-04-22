@@ -13,8 +13,10 @@ GameObject:
   - component: {fileID: 4983165590137406637}
   - component: {fileID: 8817972856379196578}
   - component: {fileID: -3632711304237603747}
-  m_Layer: 0
-  m_Name: PreSynapse
+  - component: {fileID: -172088395829924350}
+  - component: {fileID: 5168362966301897455}
+  m_Layer: 8
+  m_Name: Synapse
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -106,6 +108,51 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fd6c9d96730232b418cb9142001957f3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prefab: {fileID: 0}
-  nodeIndex: 0
-  voltage: 0
+  simulation: {fileID: 0}
+  meshRenderer: {fileID: 4983165590137406637}
+  defaultMaterial: {fileID: 2100000, guid: 35c891bae7ccbb440a4193edaae59b1a, type: 2}
+  previewMaterial: {fileID: 2100000, guid: 1b9e22857f37d024a8aa6aa336a12219, type: 2}
+  destroyMaterial: {fileID: 2100000, guid: cdb984a62adddda4f96228000d103b50, type: 2}
+  highlightObj: {fileID: 0}
+  currentModel: 0
+--- !u!114 &-172088395829924350
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 688227186299511278}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6dee7b5c4ddc78f44b1b1919d3ea115d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rightTrigger: {fileID: 5168362966301897455}
+  leftTrigger: {fileID: 5168362966301897455}
+--- !u!114 &5168362966301897455
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 688227186299511278}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2066920c5141f0e4ca235394b5f8bd4a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  onHover:
+    m_PersistentCalls:
+      m_Calls: []
+  onHoverEnd:
+    m_PersistentCalls:
+      m_Calls: []
+  onPress:
+    m_PersistentCalls:
+      m_Calls: []
+  onHoldPress:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndPress:
+    m_PersistentCalls:
+      m_Calls: []

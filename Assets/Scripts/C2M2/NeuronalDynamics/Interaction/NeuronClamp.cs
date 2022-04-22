@@ -285,12 +285,11 @@ namespace C2M2.NeuronalDynamics.Interaction
         /// </summary>
         public void MonitorInput()
         {
-            if (ClampManager.PressedCancel)
+            if (ClampManager.PressedCancel || !ClampManager.PressedInteract)
             {
-                ResetInput();
+                CheckInput();
             }
-
-            if (ClampManager.PressedInteract)
+            else
             {
                 ClampManager.HoldCount += Time.deltaTime;
 
@@ -298,7 +297,6 @@ namespace C2M2.NeuronalDynamics.Interaction
                 if(ClampManager.HoldCount > ClampManager.DestroyCount && !ClampManager.PowerClick) SwitchCaps(false);
                 else if (ClampManager.PowerClick) SwitchCaps(true);
             }
-            else CheckInput();
 
             float power = Time.deltaTime*ClampManager.PowerModifier;
             
@@ -306,7 +304,6 @@ namespace C2M2.NeuronalDynamics.Interaction
             if (power != 0 && !ClampManager.PowerClick) ClampManager.PowerClick = true;
 
             ClampPower += power;
-            Math.Clamp(ClampPower, MinPower, MaxPower);
         }
 
         // Changes clamp to a red aesthetic to signal that destroy is imminent
@@ -331,18 +328,13 @@ namespace C2M2.NeuronalDynamics.Interaction
             }
         }
 
-        public void ResetInput()
-        {
-            CheckInput();
-        }
-
         private void CheckInput()
         {
             if (!ClampManager.PressedCancel && !ClampManager.PowerClick)
             {
                 if (ClampManager.HoldCount >= ClampManager.DestroyCount)
                 {
-                    Destroy(transform.parent.gameObject);
+                    Destroy(gameObject);
                 }
                 else if (ClampManager.HoldCount > 0) ToggleClamp();
             }
@@ -358,7 +350,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             HitEvent.OnHoverEnd.AddListener((hit) => HideClampInfo());
             HitEvent.OnHoldPress.AddListener((hit) => MonitorInput());
             HitEvent.OnHoldPress.AddListener((hit) => ShowClampInfo());
-            HitEvent.OnEndPress.AddListener((hit) => ResetInput());
+            HitEvent.OnEndPress.AddListener((hit) => CheckInput());
             HitEvent.OnEndPress.AddListener((hit) => HideClampInfo());
         }
 
