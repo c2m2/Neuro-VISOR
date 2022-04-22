@@ -115,6 +115,9 @@ MonoBehaviour:
   destroyMaterial: {fileID: 2100000, guid: cdb984a62adddda4f96228000d103b50, type: 2}
   highlightObj: {fileID: 0}
   currentModel: 0
+  inhibitoryMat: {fileID: 2100000, guid: 789ac42e6d85b3c4f9bd257768e6865a, type: 2}
+  excitatoryMat: {fileID: 2100000, guid: c09e4ceba9cbc07479695a453f84be1f, type: 2}
+  modeChangeKey: 122
 --- !u!114 &-172088395829924350
 MonoBehaviour:
   m_ObjectHideFlags: 0

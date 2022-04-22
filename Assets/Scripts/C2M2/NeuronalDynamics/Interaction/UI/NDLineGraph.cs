@@ -8,7 +8,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
     public class NDLineGraph : LineGrapher
     {
 
-        private NDGraph ndgraph;
+        public NDGraph ndgraph;
 
         public NDSimulation Sim
         {

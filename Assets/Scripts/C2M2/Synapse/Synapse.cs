@@ -8,6 +8,11 @@ public class Synapse : NDInteractables
 {
     public Model currentModel = Model.NMDA;
 
+    public Material inhibitoryMat;
+    public Material excitatoryMat;
+
+    public double ActivationTime { get; set; }
+
     public enum Model
     {
         NMDA,
@@ -27,6 +32,22 @@ public class Synapse : NDInteractables
         get
         {
             return GameManager.instance.synapseManagerPrefab.GetComponent<SynapseManager>();
+        }
+    }
+
+    public KeyCode modeChangeKey = KeyCode.Z;
+    public bool ModeChange
+    {
+        get
+        {
+            if (GameManager.instance.vrDeviceManager.VRActive)
+            {
+                return OVRInput.Get(OVRInput.Button.Two);
+            }
+            else
+            {
+                return Input.GetKey(modeChangeKey);
+            }
         }
     }
 
@@ -56,8 +77,18 @@ public class Synapse : NDInteractables
 
     protected override void AddHitEventListeners()
     {
+        HitEvent.OnHover.AddListener((hit) => ChangeModel());
         HitEvent.OnHoldPress.AddListener((hit) => MonitorInput());
         HitEvent.OnEndPress.AddListener((hit) => CheckInput());
+    }
+
+    public void ChangeModel()
+    {
+        if (ModeChange)
+        {
+            if (currentModel == Model.GABA) SwitchModel(Model.NMDA);
+            else SwitchModel(Model.GABA);
+        }
     }
 
     public void MonitorInput()
@@ -87,5 +118,20 @@ public class Synapse : NDInteractables
 
         synapseManager.HoldCount = 0;
         SwitchMaterial(defaultMaterial);
+    }
+
+    public void SwitchModel(Model model)
+    {
+        currentModel = model;
+
+        Material mat;
+        if (model == Model.NMDA)
+        {
+            mat = excitatoryMat;
+        } else
+        {
+            mat = inhibitoryMat;
+        }
+        SwitchMaterial(mat);
     }
 }

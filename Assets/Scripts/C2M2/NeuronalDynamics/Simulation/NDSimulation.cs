@@ -265,13 +265,10 @@ namespace C2M2.NeuronalDynamics.Simulation {
                         if (this == postSynapse.simulation)
                         {
                             // Set the synapse voltage to what the voltage is at the 1D vertex
-							curPreSynaptic.voltage = curPreSynaptic.attachedSim.Get1DValues()[curPreSynaptic.nodeIndex];
-                            curPreSynaptic.activationTime = 0.0;
+                            preSynapse.ActivationTime = 0.0;
+                            postSynapse.ActivationTime = 0.0;
 
-                            curPostSynaptic.voltage = curPostSynaptic.attachedSim.Get1DValues()[curPostSynaptic.nodeIndex];
-                            curPreSynaptic.activationTime = 0.0;
-
-                            synapses.Add((curPreSynaptic, curPostSynaptic));
+                            synapses.Add((preSynapse, postSynapse));
                         }
                     }
 
@@ -293,7 +290,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
         /// Controls Synapses Behavior
         /// </summary>
         /// <param name="synapses">pre (Item1) and post (Item2) synapses</param>
-        internal abstract void HandleSynapses(List<(Synapse, Synapse)> synapses);
+        internal abstract void SetSynapseCurrent(List<(Synapse, Synapse)> synapses);
 
         protected override void OnAwakePost(Mesh viz)
         {
@@ -379,8 +376,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
         /// </summary>
         /// <param name="newValues"> List of 1D vert indices and values to add onto that index. </param>
         public abstract void Set1DValues (Tuple<int, double>[] newValues);
-
-        public abstract void SetSynapseCurrent(List<(Synapse,Synapse)> synapses);
 
         /// <summary>
         /// Requires derived classes to know how to make available one value for each 1D vertex

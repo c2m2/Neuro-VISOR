@@ -23,12 +23,12 @@ namespace C2M2.NeuronalDynamics.Simulation
             }
         }
 
-        public override void SetSynapseCurrent(List<(Synapse, Synapse)> newValues)
+        internal override void SetSynapseCurrent(List<(Synapse, Synapse)> newValues)
         {
             foreach ((Synapse, Synapse) val in newValues)
             {
-                int index = val.Item1.nodeIndex;
-                double value = val.Item2.voltage;
+                int index = val.Item1.FocusVert;
+                double value = val.Item2.simulation.Get1DValues()[val.Item2.FocusVert];
                 vals_active[index] = value;
             }
         }
@@ -64,18 +64,5 @@ namespace C2M2.NeuronalDynamics.Simulation
             lock (visualizationValuesLock) vals = (double[])vals_active.Clone();
         }
 
-        internal override void HandleSynapses(List<(Synapse, Synapse)> synapses)
-        {
-            Tuple<int, double>[] new1DVoltages = new Tuple<int, double>[synapses.Count];
-
-            // apply the voltage from the pre-synapse and to the location of the postsynapse
-            for (int i = 0; i < synapses.Count; i++)
-            {
-                new1DVoltages[i] = new Tuple<int, double>(synapses[i].Item2.FocusVert, synapses[i].Item1.simulation.Get1DValues()[synapses[i].Item1.FocusVert]);
-            }
-
-            // Pass the tuple so we can set our new voltage value
-            Set1DValues(new1DVoltages);
-        }
     }
 }

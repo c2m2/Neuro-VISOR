@@ -165,23 +165,23 @@ namespace C2M2
 
                         for (int j = 0; j < data.clamps.Length; j++)
                         {
-                            data.clamps[j].vertex1D = sim.clamps[j].focusVert;
+                            data.clamps[j].vertex1D = sim.clamps[j].FocusVert;
                             data.clamps[j].live = sim.clamps[j].ClampLive;
                             data.clamps[j].power = sim.clamps[j].ClampPower;
                         }
                     }
 
                     // save graphs
-                    if (graphM.graphs.Count > 0)
+                    if (graphM.interactables.Count > 0)
                     {
-                        data.graphs = new CellData.Graph[graphM.graphs.Count];
+                        data.graphs = new CellData.Graph[graphM.interactables.Count];
                         for (int j = 0; j < data.graphs.Length; j++)
                         {
-                            data.graphs[j].vertex = graphM.graphs[j].vert;
-                            data.graphs[j].positions = new Vector3[graphM.graphs[j].positions.Count];
+                            data.graphs[j].vertex = graphM.interactables[j].FocusVert;
+                            data.graphs[j].positions = new Vector3[graphM.interactables[j].ndlinegraph.positions.Count];
 
-                            for (int k = 0; k < graphM.graphs[j].positions.Count; k++)
-                                data.graphs[j].positions[k] = graphM.graphs[j].positions[k];
+                            for (int k = 0; k < graphM.interactables[j].ndlinegraph.positions.Count; k++)
+                                data.graphs[j].positions[k] = graphM.interactables[j].ndlinegraph.positions[k];
                         }
                     }
 
@@ -201,8 +201,10 @@ namespace C2M2
                     synD.syns = new SynapseData.SynData[synM.synapses.Count];
                     for (int j = 0; j < synM.synapses.Count; j++)
                     {
-                        synD.syns[j].synVert = synM.synapses[j].nodeIndex;
-                        synD.syns[j].simID = synM.synapses[j].curSimulation.simID;
+                        synD.syns[j*2].synVert = synM.synapses[j].Item1.FocusVert;
+                        synD.syns[j*2].simID = synM.synapses[j].Item1.simulation.simID;
+                        synD.syns[(j*2)+1].synVert = synM.synapses[j].Item2.FocusVert;
+                        synD.syns[(j*2)+1].simID = synM.synapses[j].Item2.simulation.simID;
                     }
                 }
                 string jSon = JsonUtility.ToJson(synD);
@@ -332,7 +334,7 @@ namespace C2M2
                         {
                             NeuronClamp clamp;
                             clamp = Instantiate(clampMng.clampPrefab, go.transform).GetComponentInChildren<NeuronClamp>();
-                            clamp.AttachSimulation(sim, data.clamps[j].vertex1D);
+                            clamp.AttachToSimulation(sim, data.clamps[j].vertex1D);
 
                             clamp.ClampPower = data.clamps[j].power;
                             if (data.clamps[j].live) clamp.ActivateClamp();
@@ -348,10 +350,9 @@ namespace C2M2
                         {
                             var graphObj = Instantiate(graphPrefab);
                             NDLineGraph g = graphObj.GetComponent<NDLineGraph>();
-                            g.vert = data.graphs[j].vertex;
-                            g.sim = sim;
-                            g.manager = graphM;
-                            graphM.graphs.Add(g);
+                            g.ndgraph.FocusVert = data.graphs[j].vertex;
+                            g.ndgraph.simulation = sim;
+                            graphM.interactables.Add(g.ndgraph);
                             foreach (Vector3 v in data.graphs[j].positions)
                                 g.positions.Add(v);
                         }
@@ -369,16 +370,18 @@ namespace C2M2
 
                 for (int j = 0; j < synD.syns.Length; j++)
                 {
+                    Synapse syn;
+                    NDSimulation ndsim = null; ;
                     foreach (NDSimulation sim in gm.activeSims)
                     {
                         if (sim.simID == synD.syns[j].simID)
                         {
-                            synM.focusVert = synD.syns[j].synVert;
-                            synM.curSimulation = sim;
-                            // this function automatically takes care of post synapses too
-                            synM.preSynapticPlacement(new RaycastHit());
+                            ndsim = sim;
+                            break;
                         }
                     }
+                    syn = Instantiate(GameManager.instance.synapseManagerPrefab.GetComponent<SynapseManager>().synapsePrefab, ndsim.transform).GetComponentInChildren<Synapse>();
+                    syn.AttachToSimulation(ndsim, synD.syns[j].synVert);
                 }
 
                 finishedLoading = true; // this is for ChangeGradient

@@ -231,17 +231,17 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// newValues = is a list of (presynapse, postsynapse)
         /// </summary>
         /// <param name="newValues"></param>
-        public override void SetSynapseCurrent(List<(Synapse,Synapse)> newValues)
+        internal override void SetSynapseCurrent(List<(Synapse,Synapse)> newValues)
         {
             // iterate through teach (pre,post) synapse pair
             foreach ((Synapse,Synapse) newVal in newValues)
             {
                 if ((newVal.Item1 != null) && (newVal.Item2 != null))
                 {
-                    if (newVal.Item1.nodeIndex >= 0 && newVal.Item1.nodeIndex < Neuron.nodes.Count && newVal.Item2.nodeIndex >= 0 && newVal.Item2.nodeIndex < Neuron.nodes.Count)
+                    if (newVal.Item1.FocusVert >= 0 && newVal.Item1.FocusVert < Neuron.nodes.Count && newVal.Item2.FocusVert >= 0 && newVal.Item2.FocusVert < Neuron.nodes.Count)
                     {
                         // compute the synaptic current at the postsynapse using an explicity SBDF update
-                        Isyn[newVal.Item2.nodeIndex] = synapseExplicitSBDF(newVal);
+                        Isyn[newVal.Item2.FocusVert] = synapseExplicitSBDF(newVal);
                     }
                 }
             }
@@ -262,7 +262,7 @@ namespace C2M2.NeuronalDynamics.Simulation
             List<double> Icurrs = new List<double>();
 
             // compute surface area at postsynaptic location
-            area = 2 * System.Math.PI * Neuron.nodes[newVal.Item2.nodeIndex].NodeRadius * Neuron.TargetEdgeLength * 1e-12;
+            area = 2 * System.Math.PI * Neuron.nodes[newVal.Item2.FocusVert].NodeRadius * Neuron.TargetEdgeLength * 1e-12;
 
             //Icurrs[0] is current synaptic state, and Icurrs[1] is previous synaptic state
             Icurrs = SynapseCurrentFunction(newVal);
@@ -293,12 +293,12 @@ namespace C2M2.NeuronalDynamics.Simulation
             List<double> Icurrs = new List<double>();
 
             // get the pre and post synaptic voltages
-            double presynVoltage = newVal.Item1.attachedSim.Get1DValues()[newVal.Item1.nodeIndex];
-            double presynVoltage0 = Upre[newVal.Item1.nodeIndex];
+            double presynVoltage = newVal.Item1.simulation.Get1DValues()[newVal.Item1.FocusVert];
+            double presynVoltage0 = Upre[newVal.Item1.FocusVert];
             double voltageThreshold = 0.038;
 
             if ((presynVoltage >= voltageThreshold) && (presynVoltage0< voltageThreshold))
-            { newVal.Item1.SetActivationTime(GetSimulationTime()); }
+            { newVal.Item1.ActivationTime = GetSimulationTime(); }
                                    
             // if the presynapse is below a threshold, then the synapse is INACTIVE
             if ((presynVoltage <= voltageThreshold))
@@ -309,12 +309,12 @@ namespace C2M2.NeuronalDynamics.Simulation
             }
             else // if the presynaptic voltage is above threshold, then do not update activation time and compute the new current
             {
-                if ((GetSimulationTime()) > (newVal.Item1.activationTime + 3.0e-3))
-                { newVal.Item1.SetActivationTime(GetSimulationTime()); }
+                if ((GetSimulationTime()) > (newVal.Item1.ActivationTime + 3.0e-3))
+                { newVal.Item1.ActivationTime = GetSimulationTime(); }
 
                 Icurrs = new List<double>();
-                Icurrs.Add(SynFunction(U_Active[newVal.Item2.nodeIndex], GetSimulationTime(), newVal.Item1.activationTime));         // compute current synaptic state using current voltage state
-                Icurrs.Add(SynFunction(Upre[newVal.Item2.nodeIndex], GetSimulationTime(), newVal.Item1.activationTime));             // compute previous synaptic state using previous voltage state
+                Icurrs.Add(SynFunction(U_Active[newVal.Item2.FocusVert], GetSimulationTime(), newVal.Item1.ActivationTime));         // compute current synaptic state using current voltage state
+                Icurrs.Add(SynFunction(Upre[newVal.Item2.FocusVert], GetSimulationTime(), newVal.Item1.ActivationTime));             // compute previous synaptic state using previous voltage state
             }
             
             return Icurrs;
@@ -727,7 +727,6 @@ namespace C2M2.NeuronalDynamics.Simulation
             Vin.Multiply(1.0E3, Vin);
             return (1.0E3) * 4.0 / (((40.0 - Vin) / 5.0).PointwiseExp() + 1.0);
         }
-        #endregion
 
         // used by save/load functions in Menu.cs
         public double[] getM() { return M.AsArray(); }

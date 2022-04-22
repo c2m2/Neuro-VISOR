@@ -88,8 +88,10 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
                 GameManager.instance.simulationManager.Paused = false;
 
             // delete Synapse scripts under SynapseManager object
-            foreach (Synapse s in GameManager.instance.simulationManager.synapseManager.synapses)
-                Destroy(s);
+            foreach ((Synapse, Synapse) s in GameManager.instance.simulationManager.synapseManager.synapses)
+            {
+                GameManager.instance.simulationManager.synapseManager.DeleteSyn(s.Item1);
+            }
 
             // disable Save button
             Menu m = FindObjectOfType<Menu>();
