@@ -19,6 +19,27 @@ namespace C2M2
     {
         public static GameManager instance = null;
 
+        public static int simID = 0; // current simulation ID
+
+        // vectors used in SparseSolve; for loading
+        public double[] U;
+        public double[] M;
+        public double[] N;
+        public double[] H;
+
+        public double[] Upre;
+        public double[] Mpre;
+        public double[] Npre;
+        public double[] Hpre;
+
+        // for loading a file
+        private bool loading = false;
+        public bool Loading
+        {
+            get { return loading; }
+            set { loading = value; }
+        }
+
         public int mainThreadId { get; private set; } = -1;
 
         public VRDeviceManager vrDeviceManager = null;

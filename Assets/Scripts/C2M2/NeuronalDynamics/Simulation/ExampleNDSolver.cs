@@ -22,6 +22,17 @@ namespace C2M2.NeuronalDynamics.Simulation
                 vals_active[index] = value;
             }
         }
+
+        public override void SetSynapseCurrent(List<(Synapse, Synapse)> newValues)
+        {
+            foreach ((Synapse, Synapse) val in newValues)
+            {
+                int index = val.Item1.nodeIndex;
+                double value = val.Item2.voltage;
+                vals_active[index] = value;
+            }
+        }
+
         double diffusionConst = 0.05f;
         protected override void PreSolve()
         {

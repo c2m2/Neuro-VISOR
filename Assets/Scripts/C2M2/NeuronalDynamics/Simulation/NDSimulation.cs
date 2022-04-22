@@ -26,6 +26,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
     /// 1D Neuron surface simulations should derive from this class.
     /// </remarks>
     public abstract class NDSimulation : MeshSimulation {
+        public int simID = -1; // simulation ID
 
         public new NDSimulationManager Manager { get { return GameManager.instance.simulationManager; } }
         private double visualInflation = 1;
@@ -217,7 +218,8 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 int id = GetNearestPoint(hit);
                 infoPanel.unit = unit;
                 infoPanel.Vertex = id;
-                infoPanel.Power = vals1D[id] * unitScaler;
+                //infoPanel.Power = vals1D[id] * unitScaler;
+                infoPanel.Power = Get1DValues()[id] * unitScaler;
                 infoPanel.FocusLocalPosition = Verts1D[id]; //offset so the popup is not in the middle of the dendrite
             }
         }
@@ -262,11 +264,19 @@ namespace C2M2.NeuronalDynamics.Simulation {
                         Synapse postSynapse = syn.Item2;
                         if (this == postSynapse.simulation)
                         {
-                            synapses.Add((preSynapse, postSynapse));
+                            // Set the synapse voltage to what the voltage is at the 1D vertex
+							curPreSynaptic.voltage = curPreSynaptic.attachedSim.Get1DValues()[curPreSynaptic.nodeIndex];
+                            curPreSynaptic.activationTime = 0.0;
+
+                            curPostSynaptic.voltage = curPostSynaptic.attachedSim.Get1DValues()[curPostSynaptic.nodeIndex];
+                            curPreSynaptic.activationTime = 0.0;
+
+                            synapses.Add((curPreSynaptic, curPostSynaptic));
                         }
                     }
 
-                    HandleSynapses(synapses);
+                    // Set the post synaptic current for each pair of pre/post synapses i.e. each tuple (Synapse,Synapse)
+                    SetSynapseCurrent(synapses);
                 }
                 
                 // Apply raycast values
@@ -313,7 +323,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
         /// </summary>
         /// <returns> One scalar value for each 3D vertex based on its 1D vert's scalar value </returns>
         public sealed override float[] GetValues () {
-            vals1D = Get1DValues();
+            double[] vals1D = Get1DValues();
 
             if (vals1D == null) { return null; }
 
@@ -369,6 +379,8 @@ namespace C2M2.NeuronalDynamics.Simulation {
         /// </summary>
         /// <param name="newValues"> List of 1D vert indices and values to add onto that index. </param>
         public abstract void Set1DValues (Tuple<int, double>[] newValues);
+
+        public abstract void SetSynapseCurrent(List<(Synapse,Synapse)> synapses);
 
         /// <summary>
         /// Requires derived classes to know how to make available one value for each 1D vertex
@@ -436,7 +448,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
                     controlPanel = Resources.Load("Prefabs/NeuronalDynamics/ControlPanel/NDControls") as GameObject;
                     controlPanel = Instantiate(controlPanel);
                 }
-
 
                 NDBoardController controller = controlPanel.GetComponent<NDBoardController>();
                 if (controller == null)

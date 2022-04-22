@@ -11,7 +11,7 @@ public class SynapseManager : NDInteractablesManager<Synapse>
     private Synapse synapseInProgress = null; //Contains presynapse when a presynapse has been placed but no post synapse
     public List<(Synapse, Synapse)> synapses = new List<(Synapse, Synapse)>(); //pre (Item1) and post (Item2) synapses
 
-    ///<summary> 
+    ///<summary>
     ///Simulation refrence to get the attributes of the current cell
     ///</summary>
     public List<Interactable> Simulation
