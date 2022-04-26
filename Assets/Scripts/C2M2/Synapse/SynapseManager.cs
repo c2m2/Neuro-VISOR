@@ -50,18 +50,48 @@ public class SynapseManager : NDInteractablesManager<Synapse>
         }
     }
 
-    public void DeleteSyn(Synapse syn)
+    public (Synapse, Synapse)? FindSynapsePair(Synapse syn)
     {
         for (int i = 0; i < synapses.Count; i++)
         {
             if (synapses[i].Item1 == syn || synapses[i].Item2 == syn)
             {
-                // delete and remove from synapse list
-                Destroy(synapses[i].Item1.gameObject);
-                Destroy(synapses[i].Item2.gameObject);
-                synapses.RemoveAt(i);
-                return;
+                return synapses[i];
             }
+        }
+        return null;
+    }
+
+    public bool DeleteSyn(Synapse syn)
+    {
+        if (FindSynapsePair(syn) != null)
+        {
+            (Synapse, Synapse) pair = ((Synapse, Synapse))FindSynapsePair(syn);
+            Destroy(pair.Item1.gameObject);
+            Destroy(pair.Item2.gameObject);
+            synapses.Remove(pair);
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+        
+    }
+
+    public bool ChangeModel(Synapse syn, Synapse.Model model)
+    {
+
+        if (FindSynapsePair(syn) != null)
+        {
+            (Synapse, Synapse) pair = ((Synapse, Synapse))FindSynapsePair(syn);
+            pair.Item1.SwitchModel(model);
+            pair.Item2.SwitchModel(model);
+            return true;
+        }
+        else
+        {
+            return false;
         }
     }
     

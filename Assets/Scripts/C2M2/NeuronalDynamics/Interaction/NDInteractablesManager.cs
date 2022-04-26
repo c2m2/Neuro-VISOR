@@ -16,18 +16,6 @@ public abstract class NDInteractablesManager<T> : MonoBehaviour
 
     public float HoldCount { get; set; } = 0;
 
-    public OVRInput.Button cancelCommand = OVRInput.Button.Two;
-    public OVRInput.Button cancelCommandS = OVRInput.Button.Four;
-    public KeyCode cancelKey = KeyCode.Backspace;
-    public bool PressedCancel
-    {
-        get
-        {
-            if (GameManager.instance.vrDeviceManager.VRActive) return OVRInput.Get(cancelCommand) || OVRInput.Get(cancelCommandS);
-            else return Input.GetKey(cancelKey);
-        }
-    }
-
     /// <summary>
     /// Hold down a raycast for this many seconds in order to destroy a clamp
     /// </summary>
@@ -47,29 +35,41 @@ public abstract class NDInteractablesManager<T> : MonoBehaviour
 
     #region InputButtons
 
+    public OVRInput.Button cancelCommand = OVRInput.Button.Two;
+    public OVRInput.Button cancelCommandS = OVRInput.Button.Four;
+    public KeyCode cancelKey = KeyCode.Backspace;
+    public bool PressedCancel
+    {
+        get
+        {
+            if (GameManager.instance.vrDeviceManager.VRActive) return OVRInput.GetDown(cancelCommand) || OVRInput.GetDown(cancelCommandS);
+            else return Input.GetKeyDown(cancelKey);
+        }
+    }
+
     /// <summary>
     /// Pressing these buttons allows interaction with the interactable
     /// </summary>
     public OVRInput.Button interactOVR = OVRInput.Button.PrimaryIndexTrigger;
     public OVRInput.Button interactOVRS = OVRInput.Button.SecondaryIndexTrigger;
-    public bool PressedInteract
+    public bool InteractHold
     {
         get
         {
             if (GameManager.instance.vrDeviceManager.VRActive)
-                return (OVRInput.Get(interactOVR) || OVRInput.Get(interactOVRS));
+                return OVRInput.Get(interactOVR) || OVRInput.Get(interactOVRS);
             else return true;
         }
     }
 
     public OVRInput.Button highlightOVR = OVRInput.Button.PrimaryHandTrigger;
     public OVRInput.Button highlightOVRS = OVRInput.Button.SecondaryHandTrigger;
-    public bool PressedHighlight
+    public bool HighLightHold
     {
         get
         {
             if (GameManager.instance.vrDeviceManager.VRActive)
-                return (OVRInput.Get(highlightOVR) || OVRInput.Get(highlightOVRS));
+                return OVRInput.Get(highlightOVR) || OVRInput.Get(highlightOVRS);
             else return false; // We cannot highlight through the emulator
         }
     }
@@ -100,6 +100,7 @@ public abstract class NDInteractablesManager<T> : MonoBehaviour
             interact.AttachToSimulation(currentSimulation, index);
 
             return interact;
+            
             //TODO interactables.Add(graph);
         }
         //TO DO holdCount = 0;

@@ -241,7 +241,7 @@ namespace C2M2.NeuronalDynamics.Simulation
                     if (newVal.Item1.FocusVert >= 0 && newVal.Item1.FocusVert < Neuron.nodes.Count && newVal.Item2.FocusVert >= 0 && newVal.Item2.FocusVert < Neuron.nodes.Count)
                     {
                         // compute the synaptic current at the postsynapse using an explicity SBDF update
-                        Isyn[newVal.Item2.FocusVert] = synapseExplicitSBDF(newVal);
+                        Isyn[newVal.Item2.FocusVert] = SynapseExplicitSBDF(newVal);
                     }
                 }
             }
@@ -256,7 +256,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// </summary>
         /// <param name="newVal"></param>
         /// <returns></returns>
-        public double synapseExplicitSBDF((Synapse, Synapse) newVal)
+        public double SynapseExplicitSBDF((Synapse, Synapse) newVal)
         {
             double area = new double();
             List<double> Icurrs = new List<double>();
@@ -265,11 +265,11 @@ namespace C2M2.NeuronalDynamics.Simulation
             area = 2 * System.Math.PI * Neuron.nodes[newVal.Item2.FocusVert].NodeRadius * Neuron.TargetEdgeLength * 1e-12;
 
             //Icurrs[0] is current synaptic state, and Icurrs[1] is previous synaptic state
-            Icurrs = SynapseCurrentFunction(newVal);
+            Icurrs = SynapseCurrentFunction(newVal, newVal.Item1.currentModel);
 
             // If the user should use unrealistic biological parameters, this will check the current and set the current appropriately if the current goes beyond
             // biologically accurate currents
-            if ((Double.IsNaN(Icurrs[0]) || Double.IsNaN(Icurrs[1])) || ((Icurrs[0] > 0.5e-9)||(Icurrs[1]>0.5e-9)) )
+            if (Double.IsNaN(Icurrs[0]) || Double.IsNaN(Icurrs[1]) || (Icurrs[0] > 0.5e-9) || (Icurrs[1]>0.5e-9))
             {   
                 Icurrs[0] = 1.0e-16; Icurrs[1] = 0.9e-16;
             }
@@ -287,7 +287,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// </summary>
         /// <param name="newVal"></param>
         /// <returns></returns>
-        public List<double> SynapseCurrentFunction((Synapse, Synapse) newVal)
+        public List<double> SynapseCurrentFunction((Synapse, Synapse) newVal, Synapse.Model model)
         {
             // allocate a small for the two currents, one for current state, and one for previous state
             List<double> Icurrs = new List<double>();
@@ -295,44 +295,80 @@ namespace C2M2.NeuronalDynamics.Simulation
             // get the pre and post synaptic voltages
             double presynVoltage = newVal.Item1.simulation.Get1DValues()[newVal.Item1.FocusVert];
             double presynVoltage0 = Upre[newVal.Item1.FocusVert];
-            double voltageThreshold = 0.038;
+            double voltageThreshold;
+            if (model == Synapse.Model.NMDA)
+            {
+                voltageThreshold = 0.038;
+            }
+            else
+            {
+                voltageThreshold = -0.05;
+            }
 
             if ((presynVoltage >= voltageThreshold) && (presynVoltage0< voltageThreshold))
             { newVal.Item1.ActivationTime = GetSimulationTime(); }
                                    
             // if the presynapse is below a threshold, then the synapse is INACTIVE
-            if ((presynVoltage <= voltageThreshold))
+            if (presynVoltage <= voltageThreshold)
             {
-                Icurrs = new List<double>();
-                Icurrs.Add(0.0);    // zero current at postsynapse while INACTIVE
-                Icurrs.Add(0.0);    // zero current at postsynapse while INACTIVE
+                Icurrs = new List<double>
+                {
+                    0.0,    // zero current at postsynapse while INACTIVE
+                    0.0    // zero current at postsynapse while INACTIVE
+                };
             }
             else // if the presynaptic voltage is above threshold, then do not update activation time and compute the new current
             {
-                if ((GetSimulationTime()) > (newVal.Item1.ActivationTime + 3.0e-3))
+                if (GetSimulationTime() > (newVal.Item1.ActivationTime + 3.0e-3))
                 { newVal.Item1.ActivationTime = GetSimulationTime(); }
 
                 Icurrs = new List<double>();
-                Icurrs.Add(SynFunction(U_Active[newVal.Item2.FocusVert], GetSimulationTime(), newVal.Item1.ActivationTime));         // compute current synaptic state using current voltage state
-                Icurrs.Add(SynFunction(Upre[newVal.Item2.FocusVert], GetSimulationTime(), newVal.Item1.ActivationTime));             // compute previous synaptic state using previous voltage state
-            }
+                if (model == Synapse.Model.NMDA)
+                {
+                    Icurrs.Add(NMDAFunction(U_Active[newVal.Item2.FocusVert], GetSimulationTime(), newVal.Item1.ActivationTime));         // compute current synaptic state using current voltage state
+                    Icurrs.Add(NMDAFunction(Upre[newVal.Item2.FocusVert], GetSimulationTime(), newVal.Item1.ActivationTime));             // compute previous synaptic state using previous voltage state
+                }
+                else
+                {
+                    Icurrs.Add(GABAFunction(U_Active[newVal.Item2.FocusVert], GetSimulationTime(), newVal.Item1.ActivationTime));         // compute current synaptic state using current voltage state
+                    Icurrs.Add(GABAFunction(Upre[newVal.Item2.FocusVert], GetSimulationTime(), newVal.Item1.ActivationTime));             // compute previous synaptic state using previous voltage state
+                }
+                
+                };
             
             return Icurrs;
         }
+
         /// <summary>
-        /// This is the Synapse function borrowed from Rothman, Jason S. "Modeling Synapses." (2014).
+        /// This is the NMDA Synapse function borrowed from Rothman, Jason S. "Modeling Synapses." (2014).
         /// </summary>
         /// <param name="v"></param> this is the postsynaptic voltage
         /// <param name="t"></param> this is the current simulation time
         /// <param name="ts"></param> this is the activation time of the synapse, this is NOT the time the synapse is placed
         /// <returns></returns>
-        public double SynFunction(double v, double t, double ts)
+        public double NMDAFunction(double v, double t, double ts)
         {            
             double Erev = -0.0125;              // reversal potential for synapse
-            double taud = 3.0e-3;               // decay constant from function
-            double Gnmdar = 25e-9;              // borrowed from Rothman Paper they  mention 10's of nanosiemens
+            double taud = 3.0e-4;               // decay constant from function
+            double g = 25e-9;              // borrowed from Rothman Paper they mention 10's of nanosiemens
                         
-            return Gnmdar * (1.0 / (1.0 + System.Math.Exp(-1.0 * (v + 0.0128) / 0.0224))) * System.Math.Exp(-1.0 * (t - ts) / taud) * (v - Erev);           
+            return g * (1.0 / (1.0 + System.Math.Exp(-1.0 * (v + 0.0128) / 0.0224))) * System.Math.Exp(-1.0 * (t - ts) / taud) * (v - Erev);           
+        }
+
+        /// <summary>
+        /// This is the GABA Synapse function borrowed from Rothman, Jason S. "Modeling Synapses." (2014).
+        /// </summary>
+        /// <param name="v"></param> this is the postsynaptic voltage
+        /// <param name="t"></param> this is the current simulation time
+        /// <param name="ts"></param> this is the activation time of the synapse, this is NOT the time the synapse is placed
+        /// <returns></returns>
+        public double GABAFunction(double v, double t, double ts)
+        {
+            double Erev = -0.065;              // reversal potential for synapse
+            double taud = 3.0e-4;               // decay constant from function
+            double g = 30e-12;              // borrowed from Rothman Paper this is conductance of GABA receptor
+
+            return g * System.Math.Exp(-1.0 * (t - ts) / taud) * (v - Erev);
         }
 
         /// <summary>

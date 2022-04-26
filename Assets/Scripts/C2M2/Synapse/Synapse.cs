@@ -27,11 +27,11 @@ public class Synapse : NDInteractables
         }
     }
 
-    public SynapseManager synapseManager
+    public SynapseManager SynapseManager
     {
         get
         {
-            return GameManager.instance.synapseManagerPrefab.GetComponent<SynapseManager>();
+            return GameManager.instance.simulationManager.synapseManager;
         }
     }
 
@@ -42,18 +42,18 @@ public class Synapse : NDInteractables
         {
             if (GameManager.instance.vrDeviceManager.VRActive)
             {
-                return OVRInput.Get(OVRInput.Button.Two);
+                return OVRInput.GetDown(OVRInput.Button.Two);
             }
             else
             {
-                return Input.GetKey(modeChangeKey);
+                return Input.GetKeyDown(modeChangeKey);
             }
         }
     }
 
     public override void Place(int index)
     {
-        synapseManager.SynapticPlacement(this);
+        SynapseManager.SynapticPlacement(this);
 
         transform.SetParent(simulation.transform);
         transform.localPosition = FocusPos;
@@ -93,30 +93,30 @@ public class Synapse : NDInteractables
 
     public void MonitorInput()
     {
-        if (synapseManager.PressedCancel || !synapseManager.PressedInteract)
+        if (SynapseManager.PressedCancel || !SynapseManager.InteractHold)
         {
             CheckInput();
         }
         else
         {
-            synapseManager.HoldCount += Time.deltaTime;
+            SynapseManager.HoldCount += Time.deltaTime;
 
             // If we've held the button long enough to destroy, color caps red until user releases button
-            if (synapseManager.HoldCount > synapseManager.DestroyCount) SwitchMaterial(destroyMaterial);
+            if (SynapseManager.HoldCount > SynapseManager.DestroyCount) SwitchMaterial(destroyMaterial);
         }
     }
 
     private void CheckInput()
     {
-        if (!synapseManager.PressedCancel)
+        if (!SynapseManager.PressedCancel)
         {
-            if (synapseManager.HoldCount >= synapseManager.DestroyCount)
+            if (SynapseManager.HoldCount >= SynapseManager.DestroyCount)
             {
-                synapseManager.DeleteSyn(this);
+                SynapseManager.DeleteSyn(this);
             }
         }
 
-        synapseManager.HoldCount = 0;
+        SynapseManager.HoldCount = 0;
         SwitchMaterial(defaultMaterial);
     }
 

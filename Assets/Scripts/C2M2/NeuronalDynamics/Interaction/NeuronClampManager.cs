@@ -124,7 +124,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         public void MonitorHighlight()
         {
             // Highlight all clamps if either hand trigger is held down
-            HighlightAll(PressedHighlight);
+            HighlightAll(HighLightHold);
         }
 
         /// <summary>
@@ -132,7 +132,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         /// </summary>
         public void MonitorGroupInput()
         {
-            if (PressedInteract)
+            if (InteractHold)
                 HoldCount+=Time.deltaTime;
             else
                 CheckInputResult();

@@ -285,7 +285,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         /// </summary>
         public void MonitorInput()
         {
-            if (ClampManager.PressedCancel || !ClampManager.PressedInteract)
+            if (ClampManager.PressedCancel || !ClampManager.InteractHold)
             {
                 CheckInput();
             }
