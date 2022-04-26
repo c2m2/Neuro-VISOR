@@ -65,16 +65,10 @@ namespace C2M2.NeuronalDynamics.Interaction
         private void Start()
         {
             ClampPower = (MaxPower - MinPower) / 2;
-        }
-        private void Update()
-        {
-            if(simulation != null)
+            if (ClampLive)
             {
-                if (ClampLive)
-                {
-                    Color newCol = ColorLUT.Evaluate((float)ClampPower);
-                    CurrentColor = newCol;
-                }
+                Color newCol = ColorLUT.Evaluate((float)ClampPower);
+                CurrentColor = newCol;
             }
         }
         private void OnDestroy()
@@ -211,6 +205,15 @@ namespace C2M2.NeuronalDynamics.Interaction
             clampInfo.gameObject.SetActive(false);
         }
 
+        public void UpdateColor()
+        {
+            if (ClampLive)
+            {
+                Color newCol = ColorLUT.Evaluate((float)ClampPower);
+                CurrentColor = newCol;
+            }
+        }
+
         #endregion
 
         #region Simulation Checks
@@ -304,6 +307,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             if (power != 0 && !ClampManager.PowerClick) ClampManager.PowerClick = true;
 
             ClampPower += power;
+            UpdateColor();
         }
 
         // Changes clamp to a red aesthetic to signal that destroy is imminent

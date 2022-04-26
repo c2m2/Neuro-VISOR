@@ -45,7 +45,7 @@ namespace C2M2.Simulation
         public float unitScaler = 1000f;
 
         public double raycastHitValue = 55;
-        public Tuple<int, double>[] raycastHits = new Tuple<int, double>[0];
+        public (int, double)[] raycastHits = new (int, double)[0];
 
         private Mesh visualMesh = null;
         public Mesh VisualMesh
@@ -183,7 +183,7 @@ namespace C2M2.Simulation
 
         public void ResetRaycastHits()
         {
-            raycastHits = new Tuple<int, double>[0];
+            raycastHits = new (int, double)[0];
         }
     }
 }

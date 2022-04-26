@@ -143,7 +143,11 @@ namespace C2M2.NeuronalDynamics.Interaction
 
             foreach (NeuronClamp clamp in Clamps)
             {
-                if (clamp != null) clamp.ClampPower += power;
+                if (clamp != null)
+                {
+                    clamp.ClampPower += power;
+                    clamp.UpdateColor();
+                }
             }       
         }
 
@@ -184,18 +188,5 @@ namespace C2M2.NeuronalDynamics.Interaction
                 allActive = !allActive;
             }
         }
-
-        /*private void DestroyAll()
-        {
-            if (Clamps.Count > 0)
-            {
-                
-                foreach (NeuronClamp clamp in Clamps)
-                {
-                    if (clamp != null && clamp.focusVert != -1)
-                        Destroy(clamp.transform.parent.gameObject);
-                }
-            }
-        }*/
     }
 }

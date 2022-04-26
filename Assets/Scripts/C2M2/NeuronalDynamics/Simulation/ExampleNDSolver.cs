@@ -13,9 +13,9 @@ namespace C2M2.NeuronalDynamics.Simulation
         {
             lock (visualizationValuesLock) return vals;
         }
-        public override void Set1DValues(Tuple<int, double>[] newValues)
+        public override void Set1DValues((int, double)[] newValues)
         {
-            foreach(Tuple<int, double> val in newValues)
+            foreach ((int, double) val in newValues)
             {
                 int index = val.Item1;
                 double value = val.Item2;

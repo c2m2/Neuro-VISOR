@@ -177,19 +177,16 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// the hit value is in [mV] and the solver uses [V]
         /// </summary>
         /// <param name="newValues"></param>
-        public override void Set1DValues(Tuple<int, double>[] newValues)
+        public override void Set1DValues((int, double)[] newValues)
         {
-            foreach (Tuple<int, double> newVal in newValues)
+            foreach ((int, double) newVal in newValues)
             {
-                if (newVal != null)
-                {                    
-                    if (newVal.Item1 >= 0 && newVal.Item1 < Neuron.nodes.Count)
-                    {
-                        // perform a rank1 update solve to properly update with added dirichelet boundary conditions
-                        // from a raycast, or voltage clamp. This is done because with a voltage clamp you are imposing
-                        // a dirichelet B.C. which requires solving an updated diffusion problem with identity rows.
-                        U_Active = Vector.Build.DenseOfVector(DircheletRank1UpdateSolve(newVal));                        
-                    }
+                if (newVal.Item1 >= 0 && newVal.Item1 < Neuron.nodes.Count)
+                {
+                    // perform a rank1 update solve to properly update with added dirichelet boundary conditions
+                    // from a raycast, or voltage clamp. This is done because with a voltage clamp you are imposing
+                    // a dirichelet B.C. which requires solving an updated diffusion problem with identity rows.
+                    U_Active = Vector.Build.DenseOfVector(DircheletRank1UpdateSolve(newVal));
                 }
             }
         }
@@ -199,7 +196,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// </summary>
         /// <param name="newVal"></param>
         /// <returns></returns>
-        public Vector DircheletRank1UpdateSolve(Tuple<int, double> newVal)
+        public Vector DircheletRank1UpdateSolve((int, double) newVal)
         {
             double[] bj = new double[Neuron.nodes.Count];
             double[] z = new double[Neuron.nodes.Count];

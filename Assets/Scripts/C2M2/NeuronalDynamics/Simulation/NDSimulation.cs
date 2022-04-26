@@ -69,7 +69,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
         public NeuronClampManager clampManager = null;
         public List<NeuronClamp> clamps = new List<NeuronClamp>();
         internal readonly object clampLock = new object();
-        private static readonly Tuple<int, double> nullClamp = new Tuple<int, double>(-1, -1);
 
         public NDGraphManager graphManager { get; private set; } = null;
         public List<NDGraph> Graphs
@@ -233,23 +232,19 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 /// Apply clamp values, if there are any clamps
                 if (clamps.Count > 0)
                 {
-                    Tuple<int, double>[] clampValues = new Tuple<int, double>[clamps.Count];
+                    List<(int, double)> clampValues = new List<(int, double)>();
                     lock (clampLock)
                     {
                         for (int i = 0; i < clamps.Count; i++)
                         {
                             if (clamps[i] != null && clamps[i].FocusVert != -1 && clamps[i].ClampLive)
                             {
-                                clampValues[i] = new Tuple<int, double>(clamps[i].FocusVert, clamps[i].ClampPower);
-                            }
-                            else
-                            {
-                                clampValues[i] = nullClamp;
+                                clampValues.Add((clamps[i].FocusVert, clamps[i].ClampPower));
                             }
                         }
                     }
 
-                    Set1DValues(clampValues);
+                    Set1DValues(clampValues.ToArray<(int, double)>());
                 }
 
                 /// Apply synapse values, if there are any synapses
@@ -345,19 +340,19 @@ namespace C2M2.NeuronalDynamics.Simulation {
         /// </summary>
         public sealed override void SetValues (RaycastHit hit) {
             int[] verts = HitToVertices(hit);
-            Tuple<int, double>[] newValues = new Tuple<int, double>[verts.Length];
+            (int, double)[] newValues = new (int, double)[verts.Length];
             for (int i = 0; i < verts.Length; i++)
             {
-                newValues[i] = new Tuple<int, double>(verts[i], raycastHitValue);
+                newValues[i] = (verts[i], raycastHitValue);
             }
             SetValues(newValues);
         }
         /// <summary>
         /// Translate 3D vertex values to 1D values, and store the values to be applied to simulation values
         /// </summary>
-        public void SetValues (Tuple<int, double>[] newValues) {
+        public void SetValues ((int, double)[] newValues) {
             // Reserve space for new1DValuess
-            Tuple<int, double>[] new1Dvalues = new Tuple<int, double>[newValues.Length];
+            (int, double)[] new1Dvalues = new (int, double)[newValues.Length];
             // Receive values given to 3D vertices, translate them onto 1D vertices and apply values there
             for (int i = 0; i < newValues.Length; i++)
             {
@@ -366,7 +361,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
 
                 // If lambda > 0.5, the vert is closer to v2 so apply val3D there
                 int vert1D = (map[vert3D].lambda > 0.5) ? map[vert3D].v2 : map[vert3D].v1;
-                new1Dvalues[i] = new Tuple<int, double>(vert1D, val3D);
+                new1Dvalues[i] = (vert1D, val3D);
             }
             raycastHits = new1Dvalues;
         }
@@ -375,7 +370,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
         /// Requires deived classes to know how to receive one value to add onto each 1D vert index
         /// </summary>
         /// <param name="newValues"> List of 1D vert indices and values to add onto that index. </param>
-        public abstract void Set1DValues (Tuple<int, double>[] newValues);
+        public abstract void Set1DValues((int, double)[] newValues);
 
         /// <summary>
         /// Requires derived classes to know how to make available one value for each 1D vertex
