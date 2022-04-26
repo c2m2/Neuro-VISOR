@@ -110,7 +110,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   simulation: {fileID: 0}
   meshRenderer: {fileID: 4983165590137406637}
-  defaultMaterial: {fileID: 2100000, guid: 35c891bae7ccbb440a4193edaae59b1a, type: 2}
+  defaultMaterial: {fileID: 2100000, guid: c9ced4b79f79d584c896ef6bff63a354, type: 2}
   previewMaterial: {fileID: 2100000, guid: 1b9e22857f37d024a8aa6aa336a12219, type: 2}
   destroyMaterial: {fileID: 2100000, guid: cdb984a62adddda4f96228000d103b50, type: 2}
   highlightObj: {fileID: 0}

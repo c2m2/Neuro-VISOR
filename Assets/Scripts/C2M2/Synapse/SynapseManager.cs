@@ -41,7 +41,6 @@ public class SynapseManager : NDInteractablesManager<Synapse>
         if (synapseInProgress == null) //Pre Synapse
         {
             synapseInProgress = placedSynapse;
-            placedSynapse.SwitchMaterial(placedSynapse.defaultMaterial);
         }
         else //Post Synapse
         {

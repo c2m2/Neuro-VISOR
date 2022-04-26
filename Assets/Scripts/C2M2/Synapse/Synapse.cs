@@ -73,6 +73,8 @@ public class Synapse : NDInteractables
 
             transform.localScale = new Vector3(radiusLength, radiusLength, radiusLength);
         }
+
+        SetToModeMaterial();
     }
 
     protected override void AddHitEventListeners()

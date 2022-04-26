@@ -70,7 +70,6 @@ namespace C2M2
         public Room[] roomOptions = null;
         public Color wallColor = Color.white;
         [Header("Materials")]
-        public Material defaultMaterial = null;
         public Material vertexColorationMaterial = null;
         public Material lineRendMaterial = null;
 
