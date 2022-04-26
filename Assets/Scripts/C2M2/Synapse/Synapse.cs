@@ -86,8 +86,8 @@ public class Synapse : NDInteractables
     {
         if (ModeChange)
         {
-            if (currentModel == Model.GABA) SwitchModel(Model.NMDA);
-            else SwitchModel(Model.GABA);
+            if (currentModel == Model.GABA) SynapseManager.ChangeModel(this, Model.NMDA);
+            else SynapseManager.ChangeModel(this, Model.GABA);
         }
     }
 
@@ -117,21 +117,20 @@ public class Synapse : NDInteractables
         }
 
         SynapseManager.HoldCount = 0;
-        SwitchMaterial(defaultMaterial);
+
+        SetToModeMaterial();
     }
 
     public void SwitchModel(Model model)
     {
         currentModel = model;
 
-        Material mat;
-        if (model == Model.NMDA)
-        {
-            mat = excitatoryMat;
-        } else
-        {
-            mat = inhibitoryMat;
-        }
-        SwitchMaterial(mat);
+        SetToModeMaterial();
+    }
+
+    public void SetToModeMaterial()
+    {
+        if (currentModel == Model.NMDA) SwitchMaterial(excitatoryMat);
+        else SwitchMaterial(inhibitoryMat);
     }
 }
