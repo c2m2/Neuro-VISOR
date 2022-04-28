@@ -29,32 +29,6 @@ namespace C2M2.NeuronalDynamics.Interaction
 
         public bool PowerClick { get; set; } = false;
 
-        #region InputButtons
-
-        public KeyCode powerModifierPlusKey = KeyCode.UpArrow;
-        public KeyCode powerModifierMinusKey = KeyCode.DownArrow;
-        public float PowerModifier
-        {
-            get
-            {
-                if (GameManager.instance.vrDeviceManager.VRActive)
-                {
-                    // Uses the value of both joysticks added together
-                    float scaler = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick).y + OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick).y;
-
-                    return Scaler * scaler;
-                }
-                else
-                {
-                    if (Input.GetKey(powerModifierPlusKey)) return .4f*Scaler;
-                    if (Input.GetKey(powerModifierMinusKey)) return .4f*-Scaler;
-                    else return 0;
-                }
-            }
-        }
-
-        #endregion
-
         protected override void AddHitEventListeners()
         {
             HitEvent.OnHover.AddListener((hit) => Preview(hit));
@@ -137,7 +111,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             else
                 CheckInputResult();
 
-            float power = Time.deltaTime*PowerModifier;
+            float power = Time.deltaTime*PowerModifier*Scaler;
             // If clamp power is modified while the user holds a click, don't let the click also toggle/destroy the clamp
             if (power != 0 && !PowerClick) PowerClick = true;
 

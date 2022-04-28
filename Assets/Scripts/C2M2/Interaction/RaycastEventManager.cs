@@ -18,7 +18,6 @@ namespace C2M2.Interaction
         public RaycastPressEvents rightTrigger = null;
         public RaycastPressEvents leftTrigger = null;
         private RaycastPressEvents emptyTrigger = null;
-        public enum EventType { Hit, Hold, End }
         private static RaycastHit nullHit = new RaycastHit();
         private void Awake()
         { // If we have no default trigger on the left or right, supply an empty trigger

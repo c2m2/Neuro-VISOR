@@ -11,10 +11,11 @@ namespace C2M2.Interaction
     {
         [Serializable]
         public class RaycastHitEvent : UnityEvent<RaycastHit> { }
-        // Event for when we click on an object for the first time
+        // Event for when we hover on an object for the first time
         [SerializeField]
         private RaycastHitEvent onHover = new RaycastHitEvent();
         public RaycastHitEvent OnHover { get { return onHover; } set { onHover = value; } }
+        // Event for when we end hovering on an object
         [SerializeField]
         private RaycastHitEvent onHoverEnd = new RaycastHitEvent();
         public RaycastHitEvent OnHoverEnd { get { return onHoverEnd; } set { onHoverEnd = value; } }

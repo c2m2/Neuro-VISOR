@@ -35,22 +35,6 @@ public class Synapse : NDInteractables
         }
     }
 
-    public KeyCode modeChangeKey = KeyCode.Z;
-    public bool ModeChange
-    {
-        get
-        {
-            if (GameManager.instance.vrDeviceManager.VRActive)
-            {
-                return OVRInput.GetDown(OVRInput.Button.Two);
-            }
-            else
-            {
-                return Input.GetKeyDown(modeChangeKey);
-            }
-        }
-    }
-
     public override void Place(int index)
     {
         SynapseManager.SynapticPlacement(this);
@@ -79,43 +63,27 @@ public class Synapse : NDInteractables
 
     protected override void AddHitEventListeners()
     {
-        HitEvent.OnHover.AddListener((hit) => ChangeModel());
         HitEvent.OnHoldPress.AddListener((hit) => MonitorInput());
         HitEvent.OnEndPress.AddListener((hit) => CheckInput());
     }
 
-    public void ChangeModel()
-    {
-        if (ModeChange)
-        {
-            if (currentModel == Model.GABA) SynapseManager.ChangeModel(this, Model.NMDA);
-            else SynapseManager.ChangeModel(this, Model.GABA);
-        }
-    }
-
     public void MonitorInput()
     {
-        if (SynapseManager.PressedCancel || !SynapseManager.InteractHold)
-        {
-            CheckInput();
-        }
-        else
-        {
-            SynapseManager.HoldCount += Time.deltaTime;
-
-            // If we've held the button long enough to destroy, color caps red until user releases button
-            if (SynapseManager.HoldCount > SynapseManager.DestroyCount) SwitchMaterial(destroyMaterial);
-        }
+        SynapseManager.HoldCount += Time.deltaTime;
+        // If we've held the button long enough to destroy, color caps red until user releases button
+        if (SynapseManager.HoldCount > SynapseManager.DestroyCount) SwitchMaterial(destroyMaterial);
     }
 
     private void CheckInput()
     {
-        if (!SynapseManager.PressedCancel)
+        if (SynapseManager.HoldCount >= SynapseManager.DestroyCount)
         {
-            if (SynapseManager.HoldCount >= SynapseManager.DestroyCount)
-            {
-                SynapseManager.DeleteSyn(this);
-            }
+            SynapseManager.DeleteSyn(this);
+        }
+        else
+        {
+            if (currentModel == Model.GABA) SynapseManager.ChangeModel(this, Model.NMDA);
+            else SynapseManager.ChangeModel(this, Model.GABA);
         }
 
         SynapseManager.HoldCount = 0;

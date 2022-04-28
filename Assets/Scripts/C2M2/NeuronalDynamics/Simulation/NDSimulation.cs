@@ -128,7 +128,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
         }
 
         public Vector3[] Verts1D { get { return grid1D.Mesh.vertices; } }
-        public double[] vals1D = null;
 
         private Grid grid2D = null;
         public Grid Grid2D
@@ -217,9 +216,9 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 int id = GetNearestPoint(hit);
                 infoPanel.unit = unit;
                 infoPanel.Vertex = id;
-                //infoPanel.Power = vals1D[id] * unitScaler;
                 infoPanel.Power = Get1DValues()[id] * unitScaler;
-                infoPanel.FocusLocalPosition = Verts1D[id]; //offset so the popup is not in the middle of the dendrite
+                Vector3 pos = new Vector3(Verts1D[id].x, Verts1D[id].y+2, Verts1D[id].z); //offset so the popup is not in the middle of the dendrite
+                infoPanel.transform.localPosition = pos;
             }
         }
 
@@ -290,7 +289,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
         protected override void OnAwakePost(Mesh viz)
         {
             base.OnAwakePost(viz);
-            infoPanelPrefab = (GameObject)Resources.Load("Prefabs" + Path.DirectorySeparatorChar + "NeuronalDynamics" + Path.DirectorySeparatorChar + "HoverInfo");
+            infoPanelPrefab = (GameObject)Resources.Load("Prefabs" + Path.DirectorySeparatorChar + "NeuronalDynamics" + Path.DirectorySeparatorChar + "PointInfo");
 
             defaultRaycastEvent.OnHover.AddListener((hit) =>
             {

@@ -19,10 +19,8 @@ namespace C2M2.NeuronalDynamics.Interaction
 
         public bool ClampLive { get; private set; } = false;
 
-        public double ClampPower { get; set; } = double.PositiveInfinity;
+        public double ClampPower { get; set; } = 0;
         public NeuronClampManager ClampManager { get { return simulation.clampManager; } }
-        public double MinPower { get { return ClampManager.MinPower; } }
-        public double MaxPower { get { return ClampManager.MaxPower; } }
 
         public Neuron.NodeData NodeData
         {
@@ -38,9 +36,6 @@ namespace C2M2.NeuronalDynamics.Interaction
         public List<GameObject> destroyCapHolders = null;
 
         public InfoPanel clampInfo = null;
-
-        private Vector3 LocalExtents { get { return transform.localScale / 2; } }
-        private Vector3 posFocus = Vector3.zero;
         
         public Color32 CurrentColor
         {
@@ -64,12 +59,8 @@ namespace C2M2.NeuronalDynamics.Interaction
 
         private void Start()
         {
-            ClampPower = (MaxPower - MinPower) / 2;
-            if (ClampLive)
-            {
-                Color newCol = ColorLUT.Evaluate((float)ClampPower);
-                CurrentColor = newCol;
-            }
+            ClampPower = (ClampManager.MaxPower - ClampManager.MinPower) / 2;
+            UpdateColor();
         }
         private void OnDestroy()
         {
@@ -78,18 +69,6 @@ namespace C2M2.NeuronalDynamics.Interaction
         #endregion
 
         #region Appearance
-
-        /// <summary>
-        /// Sets the design of the clamp based on whether it is on the soma
-        /// </summary>
-        private void CheckSoma(Neuron.NodeData cellNodeData)
-        {
-            if (somaClamp)
-            {
-                //Lowers the highlight radius
-                highlightSphereScale = 1.1f;
-            }
-        }
 
         /// <summary>
         /// Sets the radius and height of the clamp
@@ -194,7 +173,6 @@ namespace C2M2.NeuronalDynamics.Interaction
             clampInfo.gameObject.SetActive(true);
             clampInfo.Vertex = FocusVert;
             clampInfo.Power = ClampPower * simulation.unitScaler;
-            clampInfo.FocusLocalPosition = transform.localPosition;
         }
 
         /// <summary>
@@ -215,34 +193,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         }
 
         #endregion
-
-        #region Simulation Checks
-        /*/// <summary>
-        /// Attempt to latch a clamp onto a given simulation
-        /// </summary>
-        public NDSimulation AttachSimulation(NDSimulation simulation, int clampIndex)
-        {
-            if (this.simulation == null)
-            {
-                this.simulation = simulation;
-
-                transform.parent.parent = this.simulation.transform;
-
-                if (this.simulation.Neuron.somaIDs.Contains(clampIndex)) somaClamp = true;
-
-
-                PlaceClamp(clampIndex);
-
-                this.simulation.OnVisualInflationChange += VisualInflationChangeHandler;
-
-                // wait for clamp list access, add to list
-                lock (simulation.clampLock) this.simulation.clamps.Add(this);
-                
-            }
-
-            return this.simulation;
-        } */
-
+        
         override public void Place(int clampIndex)
         {
             if (simulation.Neuron.somaIDs.Contains(clampIndex)) somaClamp = true;
@@ -254,13 +205,16 @@ namespace C2M2.NeuronalDynamics.Interaction
 
             FocusVert = clampIndex;
 
-            CheckSoma(NodeData);
+            if (somaClamp)
+            {
+                //Lowers the highlight radius
+                highlightSphereScale = 1.1f;
+            }
             SetScale(NodeData);
             SetRotation(NodeData);
 
             transform.localPosition = FocusPos;
         }
-        #endregion
 
         #region Clamp Controls
         public void ActivateClamp()
@@ -268,6 +222,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             ClampLive = true;
 
             SwitchMaterial(defaultMaterial);
+            UpdateColor();
         }
         public void DeactivateClamp()
         {
@@ -283,31 +238,41 @@ namespace C2M2.NeuronalDynamics.Interaction
         #endregion
 
         #region Input
+        
         /// <summary>
         /// If the user holds a raycast down for X seconds on a clamp, it should destroy the clamp
         /// </summary>
         public void MonitorInput()
         {
-            if (ClampManager.PressedCancel || !ClampManager.InteractHold)
-            {
-                CheckInput();
-            }
-            else
-            {
-                ClampManager.HoldCount += Time.deltaTime;
+            ClampManager.HoldCount += Time.deltaTime;
 
-                // If we've held the button long enough to destroy, color caps red until user releases button
-                if(ClampManager.HoldCount > ClampManager.DestroyCount && !ClampManager.PowerClick) SwitchCaps(false);
-                else if (ClampManager.PowerClick) SwitchCaps(true);
-            }
+            // If we've held the button long enough to destroy, color caps red until user releases button
+            if (ClampManager.HoldCount > ClampManager.DestroyCount && !ClampManager.PowerClick) SwitchCaps(false);
+            else if (ClampManager.PowerClick) SwitchCaps(true);
 
-            float power = Time.deltaTime*ClampManager.PowerModifier;
+            float power = Time.deltaTime*ClampManager.PowerModifier*ClampManager.Scaler;
             
             // If clamp power is modified while the user holds a click, don't let the click also toggle/destroy the clamp
             if (power != 0 && !ClampManager.PowerClick) ClampManager.PowerClick = true;
 
             ClampPower += power;
             UpdateColor();
+        }
+
+        private void CheckInput()
+        {
+            if (!ClampManager.PowerClick)
+            {
+                if (ClampManager.HoldCount >= ClampManager.DestroyCount)
+                {
+                    Destroy(gameObject);
+                }
+                else if (ClampManager.HoldCount > 0) ToggleClamp();
+            }
+
+            ClampManager.HoldCount = 0;
+            ClampManager.PowerClick = false;
+            SwitchCaps(true);
         }
 
         // Changes clamp to a red aesthetic to signal that destroy is imminent
@@ -325,27 +290,15 @@ namespace C2M2.NeuronalDynamics.Interaction
                 }
                 if (toDefault)
                 {
-                    if (ClampLive) SwitchMaterial(defaultMaterial);
+                    if (ClampLive)
+                    {
+                        SwitchMaterial(defaultMaterial);
+                        UpdateColor();
+                    }
                     else SwitchMaterial(inactiveMaterial);
                 }
                 else SwitchMaterial(destroyMaterial);
             }
-        }
-
-        private void CheckInput()
-        {
-            if (!ClampManager.PressedCancel && !ClampManager.PowerClick)
-            {
-                if (ClampManager.HoldCount >= ClampManager.DestroyCount)
-                {
-                    Destroy(gameObject);
-                }
-                else if (ClampManager.HoldCount > 0) ToggleClamp();
-            }
-
-            ClampManager.HoldCount = 0;
-            ClampManager.PowerClick = false;
-            SwitchCaps(true);
         }
 
         protected override void AddHitEventListeners()
@@ -353,9 +306,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             HitEvent.OnHover.AddListener((hit) => ShowClampInfo());
             HitEvent.OnHoverEnd.AddListener((hit) => HideClampInfo());
             HitEvent.OnHoldPress.AddListener((hit) => MonitorInput());
-            HitEvent.OnHoldPress.AddListener((hit) => ShowClampInfo());
             HitEvent.OnEndPress.AddListener((hit) => CheckInput());
-            HitEvent.OnEndPress.AddListener((hit) => HideClampInfo());
         }
 
         #endregion

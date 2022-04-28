@@ -45,7 +45,7 @@ namespace C2M2.Interaction
                     {
                         // Clean up hover, press events on previous object
                         OnHoverEnd();
-                        OnPressEnd();
+                        if (Pressing) OnPressEnd();
                         
                         // Update object
                         curObj = hit.collider.gameObject;
@@ -56,8 +56,8 @@ namespace C2M2.Interaction
 
                     // Get user press state
                     Pressing = PressCondition();
-                    // If the user is not pressing, we are hovering over the object
-                    Hovering = !Pressing;
+
+                    Hovering = true;
                 }
                 else
                 {
@@ -68,9 +68,6 @@ namespace C2M2.Interaction
                     curEvent = null;
                     curObj = null;
                 }
-
-                // TODO: If you hover over a different raycastable object immediately, this will not end the hover on the old object
-                //      This needs to track if the raycastHit object changes
             }
             else
             {

@@ -51,34 +51,14 @@ namespace C2M2.Interaction.UI
         }
         private readonly string powerFormat = "{0} {1} {2}";
 
-        /// <summary>
-        /// Position to focus panel on.
-        /// </summary>
-        /// <remarks>
-        /// Panel will automatically place itself at this position, and shift itself to the side if requested.
-        /// </remarks>
-        public Vector3 FocusLocalPosition
-        {
-            get { return transform.localPosition; }
-            set
-            {
-                // Position the panel at desired location, and then shift it over to match the shift anchor
-                transform.localPosition = new Vector3(value.x, value.y, value.z);
-                transform.position = shiftAnchor.position;
-            }
-        }
-
         public Vector3 GlobalSize = new Vector3(.0005f, .0005f, .0005f);
 
         private RectTransform rt;
         // We want the panel to hover to the side of the cursor, instead of directly over it.
         // Shift anchor provides the position to shift the panel over to.
-        private Transform shiftAnchor;
         private void Awake()
         {
             rt = (RectTransform)transform;
-            shiftAnchor = transform.Find("ShiftAnchor");
-            if (shiftAnchor == null) Debug.LogError("No shift anchor found for panel.");
         }
         void Update()
         {

@@ -35,18 +35,6 @@ public abstract class NDInteractablesManager<T> : MonoBehaviour
 
     #region InputButtons
 
-    public OVRInput.Button cancelCommand = OVRInput.Button.Two;
-    public OVRInput.Button cancelCommandS = OVRInput.Button.Four;
-    public KeyCode cancelKey = KeyCode.Backspace;
-    public bool PressedCancel
-    {
-        get
-        {
-            if (GameManager.instance.vrDeviceManager.VRActive) return OVRInput.GetDown(cancelCommand) || OVRInput.GetDown(cancelCommandS);
-            else return Input.GetKeyDown(cancelKey);
-        }
-    }
-
     /// <summary>
     /// Pressing these buttons allows interaction with the interactable
     /// </summary>
@@ -59,6 +47,28 @@ public abstract class NDInteractablesManager<T> : MonoBehaviour
             if (GameManager.instance.vrDeviceManager.VRActive)
                 return OVRInput.Get(interactOVR) || OVRInput.Get(interactOVRS);
             else return true;
+        }
+    }
+
+    public KeyCode powerIncreaseKey = KeyCode.UpArrow;
+    public KeyCode powerDecreaseKey = KeyCode.DownArrow;
+    public float PowerModifier
+    {
+        get
+        {
+            if (GameManager.instance.vrDeviceManager.VRActive)
+            {
+                // Uses the value of both joysticks added together
+                float scaler = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick).y + OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick).y;
+
+                return scaler;
+            }
+            else
+            {
+                if (Input.GetKey(powerIncreaseKey)) return .4f;
+                if (Input.GetKey(powerDecreaseKey)) return -.4f;
+                else return 0;
+            }
         }
     }
 
