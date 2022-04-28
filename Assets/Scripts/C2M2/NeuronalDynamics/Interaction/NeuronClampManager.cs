@@ -54,14 +54,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         protected override void PreviewCustom()
         {
             lock (currentSimulation.clampLock) Clamps.Remove(preview);
-            foreach (GameObject defaultCapHolder in preview.defaultCapHolders)
-            {
-                Destroy(defaultCapHolder);
-            }
-            foreach (GameObject destroyCapHolder in preview.destroyCapHolders)
-            {
-                Destroy(destroyCapHolder);
-            }
+            Destroy(preview.capHolder);
         }
 
         /// <summary>

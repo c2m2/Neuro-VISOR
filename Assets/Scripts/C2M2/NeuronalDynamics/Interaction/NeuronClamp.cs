@@ -32,8 +32,10 @@ namespace C2M2.NeuronalDynamics.Interaction
         
         public Material inactiveMaterial = null;
 
-        public List<GameObject> defaultCapHolders = null;
-        public List<GameObject> destroyCapHolders = null;
+        public GameObject capHolder = null;
+
+        public Color defaultCapColor = Color.black;
+        public Color destroyCapColor = Color.red;
 
         public InfoPanel clampInfo = null;
         
@@ -78,7 +80,9 @@ namespace C2M2.NeuronalDynamics.Interaction
             currentVisualizationScale = (float)simulation.VisualInflation;
 
             float radiusScalingValue = radiusRatio * (float)cellNodeData.NodeRadius;
-            float heightScalingValue = heightRatio * simulation.AverageDendriteRadius;
+            float heightScalingValue;
+            if (!somaClamp) heightScalingValue = heightRatio * simulation.AverageDendriteRadius;
+            else heightScalingValue = radiusScalingValue;
 
             //Ensures clamp is always at least as wide as tall when Visual Inflation is 1
             float radiusLength = Math.Max(radiusScalingValue, heightScalingValue) * currentVisualizationScale;
@@ -99,7 +103,7 @@ namespace C2M2.NeuronalDynamics.Interaction
                 Vector3 tempVector = transform.localScale;
                 tempVector.x *= modifiedScale;
                 tempVector.y *= modifiedScale;
-                //if (somaClamp) tempVector.z *= modifiedScale;
+                if (somaClamp) tempVector.z *= modifiedScale;
                 transform.localScale = tempVector;
                 currentVisualizationScale = newScale;
                 UpdateHighLightScale(transform.localScale);
@@ -278,15 +282,12 @@ namespace C2M2.NeuronalDynamics.Interaction
         // Changes clamp to a red aesthetic to signal that destroy is imminent
         private void SwitchCaps(bool toDefault)
         {
-            if (defaultCapHolders != null && destroyCapHolders != null)
+            if (capHolder != null)
             {
-                foreach (GameObject defaultCapHolder in defaultCapHolders)
+                foreach (MeshRenderer cap in capHolder.GetComponentsInChildren<MeshRenderer>())
                 {
-                    defaultCapHolder.SetActive(toDefault);
-                }
-                foreach (GameObject destroyCapHolder in destroyCapHolders)
-                {
-                    destroyCapHolder.SetActive(!toDefault);
+                    if (toDefault) cap.material.color = defaultCapColor;
+                    else cap.material.color = destroyCapColor;
                 }
                 if (toDefault)
                 {

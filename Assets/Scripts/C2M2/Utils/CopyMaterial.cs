@@ -2,7 +2,7 @@
 
 public class CopyMaterial : MonoBehaviour
 {
-    public MeshRenderer meshRendererTopCopy = null;
+    public MeshRenderer meshRendererToCopy = null;
     private MeshRenderer mr = null;
 
     // Start is called before the first frame update
@@ -15,7 +15,7 @@ public class CopyMaterial : MonoBehaviour
     void Update()
     {
         if (mr == null) Debug.LogError("No MeshRenderer on Object");
-        else if (meshRendererTopCopy == null) Debug.LogError("No MeshRenderer to Copy Set");
-        else if (mr.material != meshRendererTopCopy.material) mr.material = meshRendererTopCopy.material;
+        else if (meshRendererToCopy == null) Debug.LogError("No MeshRenderer to Copy Set");
+        else if (mr.material != meshRendererToCopy.material) mr.material = meshRendererToCopy.material;
     }
 }
