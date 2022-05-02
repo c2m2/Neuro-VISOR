@@ -191,19 +191,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
             }
         }
 
-        private double[] scalars3D = new double[0];
-        private double[] Scalars3D
-        {
-            get
-            {
-                if(scalars3D.Length == 0)
-                {
-                    scalars3D = new double[Mapping.Data.Count];
-                }
-                return scalars3D;
-            }
-        }
-
         void ShowInfoPanel(bool show, RaycastHit hit)
         {
             if (infoPanel == null)
@@ -315,6 +302,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
         /// <returns> One scalar value for each 3D vertex based on its 1D vert's scalar value </returns>
         public sealed override float[] GetValues () {
             double[] vals1D = Get1DValues();
+            double[] scalars3D = new double[Mapping.Data.Count];
 
             if (vals1D == null) { return null; }
 
@@ -322,7 +310,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
 
                 // Take an weighted average using lambda
                 // Equivalent to [lambda * v2 + (1 - lambda) * v1]
-                Scalars3D[i] = map[i].lambda * (vals1D[map[i].v2] - vals1D[map[i].v1]) + vals1D[map[i].v1];
+                scalars3D[i] = map[i].lambda * (vals1D[map[i].v2] - vals1D[map[i].v1]) + vals1D[map[i].v1];
             }
 
             // Update graphs
@@ -331,7 +319,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 graph.ndlinegraph.AddValue(1000*GetSimulationTime(), (float)vals1D[graph.FocusVert] * unitScaler);
             }
 
-            return Scalars3D.ToFloat();
+            return scalars3D.ToFloat();
         }
 
         /// <summary>
