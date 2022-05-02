@@ -369,7 +369,8 @@ MonoBehaviour:
   heightRatio: 3
   highlightSphereScale: 3
   inactiveMaterial: {fileID: 2100000, guid: b5682c8bb520e8a46bbeab52c1a74097, type: 2}
-  capHolder: {fileID: 5483127028994316193}
+  capHolders:
+  - {fileID: 5483127028994316193}
   defaultCapColor: {r: 0, g: 0, b: 0, a: 1}
   destroyCapColor: {r: 1, g: 0, b: 0, a: 1}
   clampInfo: {fileID: 8913851682526108927}

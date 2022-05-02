@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using C2M2.NeuronalDynamics.Simulation;
-using C2M2.Interaction;
 
 namespace C2M2.NeuronalDynamics.Interaction
 {
@@ -54,7 +52,10 @@ namespace C2M2.NeuronalDynamics.Interaction
         protected override void PreviewCustom()
         {
             lock (currentSimulation.clampLock) Clamps.Remove(preview);
-            Destroy(preview.capHolder);
+            foreach (GameObject capHolder in preview.capHolders)
+            {
+                Destroy(capHolder);
+            }
         }
 
         /// <summary>

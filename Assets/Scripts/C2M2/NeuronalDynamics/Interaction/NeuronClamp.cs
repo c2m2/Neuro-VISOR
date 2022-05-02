@@ -32,7 +32,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         
         public Material inactiveMaterial = null;
 
-        public GameObject capHolder = null;
+        public List<GameObject> capHolders = null;
 
         public Color defaultCapColor = Color.black;
         public Color destroyCapColor = Color.red;
@@ -282,12 +282,16 @@ namespace C2M2.NeuronalDynamics.Interaction
         // Changes clamp to a red aesthetic to signal that destroy is imminent
         private void SwitchCaps(bool toDefault)
         {
-            if (capHolder != null)
+            if (capHolders != null)
             {
-                foreach (MeshRenderer cap in capHolder.GetComponentsInChildren<MeshRenderer>())
+                foreach (GameObject capHolder in capHolders)
                 {
-                    if (toDefault) cap.material.color = defaultCapColor;
-                    else cap.material.color = destroyCapColor;
+                    foreach(MeshRenderer cap in capHolder.GetComponentsInChildren<MeshRenderer>())
+                    {
+                        if (toDefault) cap.material.color = defaultCapColor;
+                        else cap.material.color = destroyCapColor;
+                    }
+                    
                 }
                 if (toDefault)
                 {
