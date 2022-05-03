@@ -16479,6 +16479,12 @@ PrefabInstance:
         type: 3}
     - target: {fileID: 3671467348768610598, guid: f49e57d0c1b71c4418326894ace9a9b5,
         type: 3}
+      propertyPath: graphManagerPrefab
+      value: 
+      objectReference: {fileID: 3453167406562641770, guid: 05219a8ee13138549853bf08123a3aae,
+        type: 3}
+    - target: {fileID: 3671467348768610598, guid: f49e57d0c1b71c4418326894ace9a9b5,
+        type: 3}
       propertyPath: ovrRightHandAnchor
       value: 
       objectReference: {fileID: 396515144}

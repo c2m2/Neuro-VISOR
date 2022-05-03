@@ -365,6 +365,7 @@ MonoBehaviour:
   previewMaterial: {fileID: 2100000, guid: 1b9e22857f37d024a8aa6aa336a12219, type: 2}
   destroyMaterial: {fileID: 2100000, guid: cdb984a62adddda4f96228000d103b50, type: 2}
   highlightObj: {fileID: 7733468709602801279}
+  sensitivity: 5
   radiusRatio: 3
   heightRatio: 3
   highlightSphereScale: 3
@@ -548,6 +549,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: ClampInfo
+      objectReference: {fileID: 0}
+    - target: {fileID: 9086472247997349700, guid: 57399df721125f74c806f4650c2bc6ce,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9086472247997349709, guid: 57399df721125f74c806f4650c2bc6ce,
         type: 3}

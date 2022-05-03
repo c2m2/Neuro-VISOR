@@ -45,24 +45,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 44d31676bc1b53d4eabd97dda90e808e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentSimulation: {fileID: 0}
   interactables: []
+  previewPrefab: {fileID: 8491212328184020626, guid: c4a980554d5c40045870deb578f06e8f,
+    type: 3}
   DestroyCount: 1
   interactOVR: 8192
   interactOVRS: 2097152
+  powerIncreaseKey: 273
+  powerDecreaseKey: 274
   highlightOVR: 16384
   highlightOVRS: 4194304
-  sensitivity: 5
   clampPrefab: {fileID: 7051469727396962550, guid: 4565241fccd266147a078e252b27d27f,
     type: 3}
   somaClampPrefab: {fileID: 7706642781083156315, guid: c16f9a23908a54e4f8d89d95e3d7a90d,
     type: 3}
   allActive: 1
-  powerModifierPlusKey: 273
-  powerModifierMinusKey: 274
-  cancelCommand: 2
-  cancelCommandS: 8
-  cancelKey: 8
 --- !u!114 &4887816165848113819
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -7,12 +7,12 @@ using UnityEngine;
 public abstract class NDInteractablesManager<T> : MonoBehaviour
     where T:NDInteractables
 {
-    public NDSimulation currentSimulation = null;
     public List<T> interactables = new List<T>();
+    public GameObject previewPrefab = null;
 
     public RaycastPressEvents HitEvent { get; protected set; } = null;
 
-    protected T preview = null;
+    private GameObject preview = null;
 
     public float HoldCount { get; set; } = 0;
 
@@ -88,38 +88,40 @@ public abstract class NDInteractablesManager<T> : MonoBehaviour
 
     #region Behavior
 
-    protected abstract void AddHitEventListeners();
+    private void AddHitEventListeners()
+    {
+        HitEvent.OnHover.AddListener((hit) => Preview(hit));
+        HitEvent.OnHoverEnd.AddListener((hit) => DestroyPreview());
+        HitEvent.OnPress.AddListener((hit) => InstantiateNDInteractable(hit));
+    }
 
     public T InstantiateNDInteractable(RaycastHit hit)
     {
-        currentSimulation = hit.collider.GetComponentInParent<NDSimulation>();
-        if (currentSimulation == null) return null;
-
-        // Destroy any existing preview
-        DestroyPreview();
-
-        // Find the 1D vertex that we hit
-        int index = currentSimulation.GetNearestPoint(hit);
-
-        if (VertexAvailable(index))
+        NDSimulation currentSimulation = hit.collider.GetComponentInParent<NDSimulation>();
+        if (currentSimulation != null)
         {
-            GameObject prefab = IdentifyBuildPrefab(index);
+            // Destroy any existing preview
+            DestroyPreview();
 
-            T interact = Instantiate(prefab, currentSimulation.transform).GetComponent<T>();
+            // Find the 1D vertex that we hit
+            int index = currentSimulation.GetNearestPoint(hit);
 
-            interact.AttachToSimulation(currentSimulation, index);
+            if (VertexAvailable(currentSimulation, index))
+            {
+                GameObject prefab = IdentifyBuildPrefab(currentSimulation, index);
+                T interact = Instantiate(prefab, currentSimulation.transform).GetComponent<T>();
+                interact.AttachToSimulation(currentSimulation, index);
+                return interact;
 
-            return interact;
-            
-            //TODO interactables.Add(graph);
+                //TODO interactables.Add(graph);
+            }
         }
-        //TO DO holdCount = 0;
         return null;
     }
 
-    public abstract GameObject IdentifyBuildPrefab(int index);
+    public abstract GameObject IdentifyBuildPrefab(NDSimulation sim, int index);
 
-    public abstract bool VertexAvailable(int index);
+    public abstract bool VertexAvailable(NDSimulation sim, int index);
 
     public void Remove(T NDInteractable)
     {
@@ -140,28 +142,26 @@ public abstract class NDInteractablesManager<T> : MonoBehaviour
 
     public void Preview(RaycastHit hit)
     {
-
-        // If we haven't already created a preview clamp, create one
+        // If we haven't already created a preview interactable, create one
         if (preview == null)
         {
-            preview = InstantiateNDInteractable(hit);
+            NDSimulation currentSimulation = hit.collider.GetComponentInParent<NDSimulation>();
+            if (currentSimulation == null) return;
 
-            // If we couldn't build a preview, don't try to preview the position hit
-            if (preview == null) return;
+            // Find the 1D vertex that we hit
+            int index = currentSimulation.GetNearestPoint(hit);
 
-            foreach (Collider col in preview.GetComponentsInChildren<Collider>())
+            if (VertexAvailable(currentSimulation, index))
             {
-                col.enabled = false;
+                preview = Instantiate(previewPrefab, currentSimulation.transform);
+
+                float radius = (float)(3 * currentSimulation.VisualInflation * currentSimulation.Neuron.nodes[index].NodeRadius);
+                
+                preview.transform.localScale = new Vector3(radius, radius, radius);
+                preview.transform.localPosition = currentSimulation.Verts1D[index];
             }
-            preview.SwitchMaterial(preview.previewMaterial);
-            preview.name = "Preview";
-            PreviewCustom();
         }
-
-        preview.gameObject.SetActive(true);
     }
-
-    protected abstract void PreviewCustom();
 
     public void DestroyPreview()
     {

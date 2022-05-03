@@ -22,7 +22,7 @@ public class SynapseManager : NDInteractablesManager<Synapse>
         }
     }
 
-    public override GameObject IdentifyBuildPrefab(int index)
+    public override GameObject IdentifyBuildPrefab(NDSimulation sim, int index)
     {
         if (synapsePrefab == null)
         {
@@ -94,14 +94,6 @@ public class SynapseManager : NDInteractablesManager<Synapse>
             return false;
         }
     }
-    
-    protected override void AddHitEventListeners()
-    {
-        //HitEvent.OnHover.AddListener((hit) => Preview(hit));
-        HitEvent.OnHoverEnd.AddListener((hit) => DestroyPreview());
-        HitEvent.OnPress.AddListener((hit) => InstantiateNDInteractable(hit));
-        //HitEvent.OnHoldPress.AddListener((hit) => DeleteSynapseHit(hit));
-    }
 
     /// <summary>
     /// This creates an arrow prefab that points the pre-synapse to the post-synapse
@@ -133,14 +125,14 @@ public class SynapseManager : NDInteractablesManager<Synapse>
     /// <summary>
     /// Ensures that no synapse is placed too near to another synapse
     /// </summary>
-    override public bool VertexAvailable(int index)
+    override public bool VertexAvailable(NDSimulation sim, int index)
     {
         // minimum distance between synapses
-        float distanceBetweenSynapses = currentSimulation.AverageDendriteRadius * 2;
+        float distanceBetweenSynapses = sim.AverageDendriteRadius * 2;
 
         foreach ((Synapse,Synapse) syns in synapses)
         {
-            if (syns.Item1.simulation == currentSimulation)
+            if (syns.Item1.simulation == sim)
             {
                 int focusVert = syns.Item1.FocusVert;
                 // If there is a synapse on that 1D vertex, the spot is not open
@@ -152,7 +144,7 @@ public class SynapseManager : NDInteractablesManager<Synapse>
                 // If there is a synapse within distanceBetweenSynapses, the spot is not open
                 else
                 {
-                    float dist = (currentSimulation.Verts1D[focusVert] - currentSimulation.Verts1D[index]).magnitude;
+                    float dist = (sim.Verts1D[focusVert] - sim.Verts1D[index]).magnitude;
                     if (dist < distanceBetweenSynapses)
                     {
                         Debug.LogWarning("Synapse too close to synapse located on vert [" + focusVert + "].");
@@ -160,7 +152,7 @@ public class SynapseManager : NDInteractablesManager<Synapse>
                     }
                 }
             }
-            if (syns.Item2.simulation == currentSimulation)
+            if (syns.Item2.simulation == sim)
             {
                 int focusVert = syns.Item2.FocusVert;
                 // If there is a synapse on that 1D vertex, the spot is not open
@@ -172,7 +164,7 @@ public class SynapseManager : NDInteractablesManager<Synapse>
                 // If there is a synapse within distanceBetweenSynapses, the spot is not open
                 else
                 {
-                    float dist = (currentSimulation.Verts1D[focusVert] - currentSimulation.Verts1D[index]).magnitude;
+                    float dist = (sim.Verts1D[focusVert] - sim.Verts1D[index]).magnitude;
                     if (dist < distanceBetweenSynapses)
                     {
                         Debug.LogWarning("Synapse too close to synapse located on vert [" + focusVert + "].");
@@ -183,10 +175,5 @@ public class SynapseManager : NDInteractablesManager<Synapse>
 
         }
         return true;
-    }
-
-    protected override void PreviewCustom()
-    {
-        //TO DO
     }
 }

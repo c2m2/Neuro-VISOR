@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using C2M2.Interaction;
 using System.IO;
+using C2M2.NeuronalDynamics.Simulation;
 
 namespace C2M2.NeuronalDynamics.Interaction.UI
 {
@@ -13,14 +14,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
             graphPrefab = Resources.Load("Prefabs" + Path.DirectorySeparatorChar + "NeuronalDynamics" + Path.DirectorySeparatorChar + "NDLineGraph") as GameObject;
         }
 
-        protected override void AddHitEventListeners()
-        {
-            //HitEvent.OnHover.AddListener((hit) => Preview(hit));
-            HitEvent.OnHoverEnd.AddListener((hit) => DestroyPreview());
-            HitEvent.OnPress.AddListener((hit) => InstantiateNDInteractable(hit));
-        }
-
-        public override GameObject IdentifyBuildPrefab(int index)
+        public override GameObject IdentifyBuildPrefab(NDSimulation sim, int index)
         {
             if (graphPrefab == null)
             {
@@ -38,14 +32,14 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
             }
         }
 
-        public override bool VertexAvailable(int index)
+        override public bool VertexAvailable(NDSimulation sim, int index)
         {
             // minimum distance between graphs 
-            float distanceBetweenGraphs = currentSimulation.AverageDendriteRadius * 2;
+            float distanceBetweenGraphs = sim.AverageDendriteRadius * 2;
 
             foreach (NDGraph graph in interactables)
             {
-                if (graph.simulation == currentSimulation)
+                if (graph.simulation == sim)
                 {
                     // If there is a graph on that 1D vertex, the spot is not open
                     if (graph.FocusVert == index)
@@ -56,7 +50,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
                     // If there is a clamp within distanceBetweenGraphs, the spot is not open
                     else
                     {
-                        float dist = (currentSimulation.Verts1D[graph.FocusVert] - currentSimulation.Verts1D[index]).magnitude;
+                        float dist = (sim.Verts1D[graph.FocusVert] - sim.Verts1D[index]).magnitude;
                         if (dist < distanceBetweenGraphs)
                         {
                             Debug.LogWarning("Graph too close to graph located on vert [" + graph.FocusVert + "].");
@@ -67,11 +61,6 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
                 
             }
             return true;
-        }
-
-        protected override void PreviewCustom()
-        {
-
         }
     }
 }

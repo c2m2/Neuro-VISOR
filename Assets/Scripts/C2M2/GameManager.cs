@@ -57,6 +57,8 @@ namespace C2M2
 
         public GameObject synapseManagerPrefab = null;
 
+        public GameObject graphManagerPrefab = null;
+
         /// <summary>
         /// Allows solver threads to be synched
         /// </summary>

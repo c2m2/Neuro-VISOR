@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using C2M2.NeuronalDynamics.Simulation;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace C2M2.NeuronalDynamics.Interaction
@@ -8,28 +9,15 @@ namespace C2M2.NeuronalDynamics.Interaction
     /// </summary>
     public class NeuronClampManager : NDInteractablesManager<NeuronClamp>
     {
-        public float MinPower { get { return currentSimulation.ColorLUT.GlobalMin; } }
-        public float MaxPower { get { return currentSimulation.ColorLUT.GlobalMax; } }
-        // Sensitivity of the clamp power control. Lower sensitivity means clamp power changes more quickly
-        public float sensitivity = 5;
-        public float Scaler { get { return (MaxPower - MinPower) / sensitivity; } }
-
         public GameObject clampPrefab = null;
         public GameObject somaClampPrefab = null;
         public bool allActive = false;
 
         public bool PowerClick { get; set; } = false;
 
-        protected override void AddHitEventListeners()
+        public override GameObject IdentifyBuildPrefab(NDSimulation sim, int index)
         {
-            HitEvent.OnHover.AddListener((hit) => Preview(hit));
-            HitEvent.OnHoverEnd.AddListener((hit) => DestroyPreview());
-            HitEvent.OnPress.AddListener((hit) => InstantiateNDInteractable(hit));
-        }
-
-        public override GameObject IdentifyBuildPrefab(int index)
-        {
-            if (currentSimulation.Neuron.somaIDs.Contains(index))
+            if (sim.Neuron.somaIDs.Contains(index))
             {
                 if (somaClampPrefab == null) Debug.LogError("No Soma Clamp prefab found");
                 else return somaClampPrefab;
@@ -42,26 +30,17 @@ namespace C2M2.NeuronalDynamics.Interaction
             return null;
         }
 
-        protected override void PreviewCustom()
-        {
-            lock (currentSimulation.clampLock) currentSimulation.clamps.Remove(preview); //TODO
-            foreach (GameObject capHolder in preview.capHolders)
-            {
-                Destroy(capHolder);
-            }
-        }
-
         /// <summary>
         /// Ensures that no clamp is placed too near to another clamp
         /// </summary>
-        override public bool VertexAvailable(int index)
+        override public bool VertexAvailable(NDSimulation sim, int index)
         {
             // minimum distance between clamps 
-            float distanceBetweenClamps = currentSimulation.AverageDendriteRadius * 2;
+            float distanceBetweenClamps = sim.AverageDendriteRadius * 2;
 
-            lock(currentSimulation.clampLock)
+            lock(sim.clampLock)
             {
-                foreach (NeuronClamp clamp in currentSimulation.clamps)
+                foreach (NeuronClamp clamp in sim.clamps)
                 {
                     // If there is a clamp on that 1D vertex, the spot is not open
                     if (clamp.FocusVert == index)
@@ -72,7 +51,7 @@ namespace C2M2.NeuronalDynamics.Interaction
                     // If there is a clamp within distanceBetweenClamps, the spot is not open
                     else
                     {
-                        float dist = (currentSimulation.Verts1D[clamp.FocusVert] - currentSimulation.Verts1D[index]).magnitude;
+                        float dist = (sim.Verts1D[clamp.FocusVert] - sim.Verts1D[index]).magnitude;
                         if (dist < distanceBetweenClamps)
                         {
                             Debug.LogWarning("Clamp too close to clamp located on vert [" + clamp.FocusVert + "].");
@@ -101,18 +80,21 @@ namespace C2M2.NeuronalDynamics.Interaction
             else
                 CheckInputResult();
 
-            float power = Time.deltaTime*PowerModifier*Scaler;
+            float power = Time.deltaTime * PowerModifier; // TODO *Scaler;
             // If clamp power is modified while the user holds a click, don't let the click also toggle/destroy the clamp
             if (power != 0 && !PowerClick) PowerClick = true;
 
-            lock(currentSimulation.clampLock)
+            foreach (NDSimulation ndSim in GameManager.instance.activeSims)
             {
-                foreach (NeuronClamp clamp in currentSimulation.clamps)
+                lock (ndSim.clampLock)
                 {
-                    if (clamp != null)
+                    foreach (NeuronClamp clamp in ndSim.clamps)
                     {
-                        clamp.ClampPower += power;
-                        clamp.UpdateColor();
+                        if (clamp != null)
+                        {
+                            clamp.ClampPower += power;
+                            clamp.UpdateColor();
+                        }
                     }
                 }
             }
@@ -140,20 +122,22 @@ namespace C2M2.NeuronalDynamics.Interaction
 
         private void ToggleAll()
         {
-            lock(currentSimulation.clampLock)
+            foreach (NDSimulation ndSim in GameManager.instance.activeSims)
             {
-                if (currentSimulation.clamps.Count > 0)
+                lock (ndSim.clampLock)
                 {
-                    foreach (NeuronClamp clamp in currentSimulation.clamps)
+                    if (ndSim.clamps.Count > 0)
                     {
-                        if (clamp != null && clamp.FocusVert != -1) {
-                            if (allActive)
-                                clamp.DeactivateClamp();
-                            else
-                                clamp.ActivateClamp();
+                        foreach (NeuronClamp clamp in ndSim.clamps)
+                        {
+                            if (clamp != null && clamp.FocusVert != -1)
+                            {
+                                if (allActive) clamp.DeactivateClamp();
+                                else clamp.ActivateClamp();
+                            }
                         }
+                        allActive = !allActive;
                     }
-                    allActive = !allActive;
                 }
             }
         }

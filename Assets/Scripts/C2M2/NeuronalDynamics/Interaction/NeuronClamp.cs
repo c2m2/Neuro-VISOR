@@ -11,6 +11,12 @@ namespace C2M2.NeuronalDynamics.Interaction
 {
     public class NeuronClamp : NDInteractables
     {
+        public float MinPower { get { return simulation.ColorLUT.GlobalMin; } }
+        public float MaxPower { get { return simulation.ColorLUT.GlobalMax; } }
+        // Sensitivity of the clamp power control. Lower sensitivity means clamp power changes more quickly
+        public float sensitivity = 5;
+        public float Scaler { get { return (MaxPower - MinPower) / sensitivity; } }
+
         public float radiusRatio = 3f;
         public float heightRatio = 1f;
         [Tooltip("The highlight sphere's radius is some real multiple of the clamp's radius")]
@@ -61,7 +67,7 @@ namespace C2M2.NeuronalDynamics.Interaction
 
         private void Start()
         {
-            ClampPower = (ClampManager.MaxPower - ClampManager.MinPower) / 2;
+            ClampPower = (MaxPower - MinPower) / 2;
             UpdateColor();
         }
         private void OnDestroy()
@@ -81,14 +87,14 @@ namespace C2M2.NeuronalDynamics.Interaction
 
             float radiusScalingValue = radiusRatio * (float)cellNodeData.NodeRadius;
             float heightScalingValue;
-            if (!somaClamp) heightScalingValue = heightRatio * simulation.AverageDendriteRadius;
-            else heightScalingValue = radiusScalingValue;
+            if (somaClamp) heightScalingValue = radiusScalingValue;
+            else heightScalingValue = heightRatio * simulation.AverageDendriteRadius; 
 
             //Ensures clamp is always at least as wide as tall when Visual Inflation is 1
             float radiusLength = Math.Max(radiusScalingValue, heightScalingValue) * currentVisualizationScale;
 
-            //if (somaClamp) transform.parent.localScale = new Vector3(radiusLength, radiusLength, radiusLength);
-            transform.localScale = new Vector3(radiusLength, radiusLength, heightScalingValue);
+            if (somaClamp) transform.parent.localScale = new Vector3(radiusLength, radiusLength, radiusLength);
+            else transform.localScale = new Vector3(radiusLength, radiusLength, heightScalingValue);
             UpdateHighLightScale(transform.localScale);
         }
 
@@ -207,8 +213,6 @@ namespace C2M2.NeuronalDynamics.Interaction
             // wait for clamp list access, add to list
             lock(simulation.clampLock) simulation.clamps.Add(this);
 
-            FocusVert = clampIndex;
-
             if(somaClamp)
             {
                 //Lowers the highlight radius
@@ -254,7 +258,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             if (ClampManager.HoldCount > ClampManager.DestroyCount && !ClampManager.PowerClick) SwitchCaps(false);
             else if (ClampManager.PowerClick) SwitchCaps(true);
 
-            float power = Time.deltaTime*ClampManager.PowerModifier*ClampManager.Scaler;
+            float power = Time.deltaTime*ClampManager.PowerModifier*Scaler;
             
             // If clamp power is modified while the user holds a click, don't let the click also toggle/destroy the clamp
             if (power != 0 && !ClampManager.PowerClick) ClampManager.PowerClick = true;

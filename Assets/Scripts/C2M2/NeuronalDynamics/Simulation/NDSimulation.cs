@@ -368,9 +368,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
             UpdateGrid1D();
 
             // Add clamp manager
-            var clampManagerObj = Instantiate(GameManager.instance.clampManagerPrefab);
-            // parent new clamp manager under this simulation
-            clampManagerObj.transform.parent = transform;
+            GameObject clampManagerObj = Instantiate(GameManager.instance.clampManagerPrefab, transform);
             clampManager = clampManagerObj.GetComponent<NeuronClampManager>();
 
             base.OnAwakePre();
@@ -411,12 +409,8 @@ namespace C2M2.NeuronalDynamics.Simulation {
 
             void InitUI()
             {
-                GameObject gm = new GameObject
-                {
-                    name = "LineGraphManager"
-                };
-                gm.transform.parent = transform;
-                graphManager = gm.AddComponent<NDGraphManager>();
+                GameObject gm = Instantiate(GameManager.instance.graphManagerPrefab, transform);
+                graphManager = gm.GetComponent<NDGraphManager>();
 
                 controlPanel = GameObject.FindGameObjectWithTag("ControlPanel");
                 if(controlPanel == null)

@@ -327,7 +327,6 @@ namespace C2M2
                     sim.curentTimeStep = t.currentTimeStep;
 
                     // recreate clamps
-                    clampMng.currentSimulation = sim;
                     if (data.clamps.Length > 0)
                     {
                         for (int j = 0; j < data.clamps.Length; j++)

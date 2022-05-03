@@ -45,11 +45,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a88abe41ec92854cb921791a0e7ae0e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentSimulation: {fileID: 0}
   interactables: []
+  previewPrefab: {fileID: 8491212328184020626, guid: c4a980554d5c40045870deb578f06e8f,
+    type: 3}
   DestroyCount: 1
   interactOVR: 8192
   interactOVRS: 2097152
+  powerIncreaseKey: 273
+  powerDecreaseKey: 274
   highlightOVR: 16384
   highlightOVRS: 4194304
   synapsePrefab: {fileID: 688227186299511278, guid: 19572d8d06f0512458da9103e290bc40,

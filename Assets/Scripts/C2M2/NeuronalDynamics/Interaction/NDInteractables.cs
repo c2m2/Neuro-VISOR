@@ -39,11 +39,7 @@ public abstract class NDInteractables : MonoBehaviour
         if (simulation == null)
         {
             simulation = sim;
-
-            transform.parent = simulation.transform;
-
             FocusVert = index;
-
             Place(index);
         }
     }

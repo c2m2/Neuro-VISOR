@@ -39,7 +39,6 @@ public class Synapse : NDInteractables
     {
         SynapseManager.SynapticPlacement(this);
 
-        transform.SetParent(simulation.transform);
         transform.localPosition = FocusPos;
         if (simulation.Neuron.somaIDs.Contains(FocusVert))
         {
