@@ -200,16 +200,16 @@ namespace C2M2.NeuronalDynamics.Interaction
         
         override public void Place(int clampIndex)
         {
-            if (simulation.Neuron.somaIDs.Contains(clampIndex)) somaClamp = true;
+            if(simulation.Neuron.somaIDs.Contains(clampIndex)) somaClamp = true;
             
             simulation.OnVisualInflationChange += VisualInflationChangeHandler;
 
             // wait for clamp list access, add to list
-            lock (simulation.clampLock) simulation.clamps.Add(this);
+            lock(simulation.clampLock) simulation.clamps.Add(this);
 
             FocusVert = clampIndex;
 
-            if (somaClamp)
+            if(somaClamp)
             {
                 //Lowers the highlight radius
                 highlightSphereScale = 1.1f;

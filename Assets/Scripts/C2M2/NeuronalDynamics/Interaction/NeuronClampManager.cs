@@ -17,13 +17,6 @@ namespace C2M2.NeuronalDynamics.Interaction
         public GameObject clampPrefab = null;
         public GameObject somaClampPrefab = null;
         public bool allActive = false;
-        public List<NeuronClamp> Clamps {
-            get
-            {
-                if (currentSimulation == null) return null;
-                return currentSimulation.clamps;
-            }
-        }
 
         public bool PowerClick { get; set; } = false;
 
@@ -51,7 +44,7 @@ namespace C2M2.NeuronalDynamics.Interaction
 
         protected override void PreviewCustom()
         {
-            lock (currentSimulation.clampLock) Clamps.Remove(preview);
+            lock (currentSimulation.clampLock) currentSimulation.clamps.Remove(preview); //TODO
             foreach (GameObject capHolder in preview.capHolders)
             {
                 Destroy(capHolder);
@@ -66,26 +59,29 @@ namespace C2M2.NeuronalDynamics.Interaction
             // minimum distance between clamps 
             float distanceBetweenClamps = currentSimulation.AverageDendriteRadius * 2;
 
-            foreach (NeuronClamp clamp in currentSimulation.clamps)
+            lock(currentSimulation.clampLock)
             {
-                // If there is a clamp on that 1D vertex, the spot is not open
-                if (clamp.FocusVert == index)
+                foreach (NeuronClamp clamp in currentSimulation.clamps)
                 {
-                    Debug.LogWarning("Clamp already exists on focus vert [" + index + "]");
-                    return false;
-                }
-                // If there is a clamp within distanceBetweenClamps, the spot is not open
-                else
-                {
-
-                    float dist = (currentSimulation.Verts1D[clamp.FocusVert] - currentSimulation.Verts1D[index]).magnitude;
-                    if (dist < distanceBetweenClamps)
+                    // If there is a clamp on that 1D vertex, the spot is not open
+                    if (clamp.FocusVert == index)
                     {
-                        Debug.LogWarning("Clamp too close to clamp located on vert [" + clamp.FocusVert + "].");
+                        Debug.LogWarning("Clamp already exists on focus vert [" + index + "]");
                         return false;
+                    }
+                    // If there is a clamp within distanceBetweenClamps, the spot is not open
+                    else
+                    {
+                        float dist = (currentSimulation.Verts1D[clamp.FocusVert] - currentSimulation.Verts1D[index]).magnitude;
+                        if (dist < distanceBetweenClamps)
+                        {
+                            Debug.LogWarning("Clamp too close to clamp located on vert [" + clamp.FocusVert + "].");
+                            return false;
+                        }
                     }
                 }
             }
+            
             return true;
         }
 
@@ -109,14 +105,17 @@ namespace C2M2.NeuronalDynamics.Interaction
             // If clamp power is modified while the user holds a click, don't let the click also toggle/destroy the clamp
             if (power != 0 && !PowerClick) PowerClick = true;
 
-            foreach (NeuronClamp clamp in Clamps)
+            lock(currentSimulation.clampLock)
             {
-                if (clamp != null)
+                foreach (NeuronClamp clamp in currentSimulation.clamps)
                 {
-                    clamp.ClampPower += power;
-                    clamp.UpdateColor();
+                    if (clamp != null)
+                    {
+                        clamp.ClampPower += power;
+                        clamp.UpdateColor();
+                    }
                 }
-            }       
+            }
         }
 
         public void ResetGroupInput()
@@ -141,19 +140,21 @@ namespace C2M2.NeuronalDynamics.Interaction
 
         private void ToggleAll()
         {
-            if (Clamps.Count > 0)
+            lock(currentSimulation.clampLock)
             {
-                foreach (NeuronClamp clamp in Clamps)
+                if (currentSimulation.clamps.Count > 0)
                 {
-                    if (clamp != null && clamp.FocusVert != -1) {
-                        if (allActive)
-                            clamp.DeactivateClamp();
-                        else
-                            clamp.ActivateClamp();
+                    foreach (NeuronClamp clamp in currentSimulation.clamps)
+                    {
+                        if (clamp != null && clamp.FocusVert != -1) {
+                            if (allActive)
+                                clamp.DeactivateClamp();
+                            else
+                                clamp.ActivateClamp();
+                        }
                     }
+                    allActive = !allActive;
                 }
-
-                allActive = !allActive;
             }
         }
     }

@@ -216,21 +216,20 @@ namespace C2M2.NeuronalDynamics.Simulation {
             void ApplyInteractionVals()
             {
                 /// Apply clamp values, if there are any clamps
-                if (clamps.Count > 0)
+                lock(clampLock)
                 {
-                    List<(int, double)> clampValues = new List<(int, double)>();
-                    lock (clampLock)
+                    if(clamps.Count > 0)
                     {
-                        for (int i = 0; i < clamps.Count; i++)
+                        List<(int, double)> clampValues = new List<(int, double)>();
+                        for(int i = 0; i < clamps.Count; i++)
                         {
-                            if (clamps[i] != null && clamps[i].FocusVert != -1 && clamps[i].ClampLive)
+                            if(clamps[i] != null && clamps[i].FocusVert != -1 && clamps[i].ClampLive)
                             {
                                 clampValues.Add((clamps[i].FocusVert, clamps[i].ClampPower));
                             }
                         }
+                        Set1DValues(clampValues.ToArray<(int, double)>());
                     }
-
-                    Set1DValues(clampValues.ToArray<(int, double)>());
                 }
 
                 /// Apply synapse values, if there are any synapses
