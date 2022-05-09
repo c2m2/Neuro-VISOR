@@ -10,6 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 3372661916959848912}
   - component: {fileID: 3319808730944772551}
+  - component: {fileID: 4283616512501170990}
+  - component: {fileID: 3855478655628065852}
   m_Layer: 0
   m_Name: GraphManager
   m_TagString: Untagged
@@ -43,7 +45,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3225ceff84c28904aa19bf3d47edc33e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactables: []
   previewPrefab: {fileID: 8491212328184020626, guid: c4a980554d5c40045870deb578f06e8f,
     type: 3}
   DestroyCount: 1
@@ -53,3 +54,47 @@ MonoBehaviour:
   powerDecreaseKey: 274
   highlightOVR: 16384
   highlightOVRS: 4194304
+  graphPrefab: {fileID: 2168964937537411963, guid: c5526a4be310562429c06526deae21f9,
+    type: 3}
+  graphs: []
+--- !u!114 &4283616512501170990
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3453167406562641770}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6dee7b5c4ddc78f44b1b1919d3ea115d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rightTrigger: {fileID: 3855478655628065852}
+  leftTrigger: {fileID: 3855478655628065852}
+--- !u!114 &3855478655628065852
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3453167406562641770}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2066920c5141f0e4ca235394b5f8bd4a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  onHover:
+    m_PersistentCalls:
+      m_Calls: []
+  onHoverEnd:
+    m_PersistentCalls:
+      m_Calls: []
+  onPress:
+    m_PersistentCalls:
+      m_Calls: []
+  onHoldPress:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndPress:
+    m_PersistentCalls:
+      m_Calls: []

@@ -69,12 +69,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
         public NeuronClampManager clampManager = null;
         internal readonly object clampLock = new object();
 
-        public NDGraphManager graphManager { get; private set; } = null;
-        public List<NDGraph> Graphs
-        {
-            get { return graphManager.graphs; }
-        }
-
+        public NDGraphManager graphManager = null;
 
         [Header ("1D Visualization")]
         public bool visualize1D = false;
@@ -311,7 +306,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
             }
 
             // Update graphs
-            foreach(NDGraph graph in Graphs)
+            foreach(NDGraph graph in graphManager.graphs)
             {
                 graph.ndlinegraph.AddValue(1000*GetSimulationTime(), (float)vals1D[graph.FocusVert] * unitScaler);
             }

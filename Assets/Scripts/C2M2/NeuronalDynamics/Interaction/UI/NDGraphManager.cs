@@ -7,13 +7,8 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
 {
     public class NDGraphManager : NDInteractablesManager<NDGraph>
     {
-        public GameObject graphPrefab { get; private set; } = null;
+        public GameObject graphPrefab = null;
         public List<NDGraph> graphs = new List<NDGraph>();
-
-        private void Awake()
-        {
-            graphPrefab = Resources.Load("Prefabs" + Path.DirectorySeparatorChar + "NeuronalDynamics" + Path.DirectorySeparatorChar + "NDLineGraph") as GameObject;
-        }
 
         public override GameObject IdentifyBuildPrefab(NDSimulation sim, int index)
         {
