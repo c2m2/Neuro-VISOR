@@ -151,6 +151,19 @@ namespace C2M2.NeuronalDynamics.Visualization
                 loader.Load(hit);
             }
         }
+
+        public void ForceLoadThisCell()
+        {
+            loader.vrnFileName = vrnFileName;
+            loader.refinementLevel = refinement;
+
+            int numOfNeurons = 1; //Set how many neurons you want here
+            for (int i = 0; i < numOfNeurons; i++)
+            {
+                loader.ForceLoad();
+            }
+        }
+
         public bool RemoveRefinement(int refinement)
         {
             bool removeSuccessful = false;

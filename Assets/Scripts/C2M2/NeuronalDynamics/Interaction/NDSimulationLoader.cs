@@ -133,5 +133,77 @@ namespace C2M2.NeuronalDynamics.Interaction
                 }
             }
         }
+
+        public void ForceLoad()
+        {
+            GameObject solveObj = new GameObject();
+            solveObj.AddComponent<MeshFilter>();
+            solveObj.AddComponent<MeshRenderer>();
+
+            Type solverType = Type.GetType(solverName);
+            if (solverType == null || !solverType.IsSubclassOf(typeof(NDSimulation)))
+            {
+                if (solverType == null) Debug.LogError(solverName + " could not be found.");
+                else if (!solverType.IsSubclassOf(typeof(NDSimulation))) Debug.LogError(solverName + " is not a NDSimulation.");
+                Destroy(solveObj);
+                return;
+            }
+
+            // The name of the object should take the form "[cellName](solverType)"
+            solveObj.name = "Cell:[" + vrnFileName + "] Solver:(" + solverName.Substring(solverName.LastIndexOf('.') + 1) + ")";
+
+            NDSimulation solver = (NDSimulation)solveObj.AddComponent(solverType);
+
+            // Store the new active simulation
+            GameManager.instance.activeSims.Add(solver);
+
+            TransferValues();
+
+            solver.Initialize();
+
+            solver.Manager.FeatState = solver.Manager.FeatState;
+
+            transform.gameObject.SetActive(false);
+
+            if (GameManager.instance.activeSims.Count == 1) //no other sims present
+            {
+                GameManager.instance.simulationSpace.transform.localScale = solver.transform.localScale;
+
+                // Instantiate ruler when the first simulation is added
+                // TODO create better method of handling object generation and removal for ruler and similar objects
+                GameObject rulerObj = Instantiate(Resources.Load("Prefabs/Ruler") as GameObject);
+                rulerObj.transform.position = rulerInitPos;
+                rulerObj.transform.eulerAngles = rulerInitRot;
+                rulerObj.name = "Ruler";
+                rulerObj.GetComponent<GrabRescaler>().target = GameManager.instance.simulationSpace.transform;
+            }
+            solveObj.transform.parent = GameManager.instance.simulationSpace.transform;
+            solver.transform.localScale = Vector3.one;
+
+            void TransferValues()
+            {
+                // Set solver values
+                solver.vrnFileName = vrnFileName;
+                solver.GlobalMin = globalMin;
+                solver.GlobalMax = globalMax;
+                solver.timeStep = timestepSize;
+                solver.endTime = endTime;
+                solver.raycastHitValue = raycastHitValue;
+                solver.unit = unit;
+                solver.unitScaler = unitScaler;
+
+                try
+                {
+                    solver.RefinementLevel = refinementLevel;
+                }
+                catch (Exception e)
+                {
+                    Debug.LogWarning("Refinement level " + refinementLevel + " not found. Reverting to 0 refinement.");
+                    refinementLevel = 0;
+                    solver.RefinementLevel = 0;
+                    Debug.LogError(e);
+                }
+            }
+        }
     }
 }
