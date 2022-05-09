@@ -9,11 +9,20 @@ namespace C2M2.NeuronalDynamics.Interaction
     /// </summary>
     public class NeuronClampManager : NDInteractablesManager<NeuronClamp>
     {
+        public List<NeuronClamp> clamps = new List<NeuronClamp>();
         public GameObject clampPrefab = null;
         public GameObject somaClampPrefab = null;
         public bool allActive = false;
 
         public bool PowerClick { get; set; } = false;
+
+        private void OnDestroy()
+        {
+            foreach (NeuronClamp clamp in clamps)
+            {
+                Destroy(clamp);
+            }
+        }
 
         public override GameObject IdentifyBuildPrefab(NDSimulation sim, int index)
         {
@@ -40,7 +49,7 @@ namespace C2M2.NeuronalDynamics.Interaction
 
             lock(sim.clampLock)
             {
-                foreach (NeuronClamp clamp in sim.clamps)
+                foreach (NeuronClamp clamp in clamps)
                 {
                     // If there is a clamp on that 1D vertex, the spot is not open
                     if (clamp.FocusVert == index)
@@ -88,7 +97,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             {
                 lock (ndSim.clampLock)
                 {
-                    foreach (NeuronClamp clamp in ndSim.clamps)
+                    foreach (NeuronClamp clamp in ndSim.clampManager.clamps)
                     {
                         if (clamp != null)
                         {
@@ -111,7 +120,10 @@ namespace C2M2.NeuronalDynamics.Interaction
             if (!PowerClick)
             {
                 if (HoldCount >= DestroyCount)
-                    RemoveAll();
+                    foreach (NeuronClamp clamp in clamps)
+                    {
+                        Destroy(clamp);
+                    }
                 else if (HoldCount > 0)
                     ToggleAll();
             }
@@ -120,15 +132,26 @@ namespace C2M2.NeuronalDynamics.Interaction
             PowerClick = false;
         }
 
+        public void HighlightAll(bool highlight)
+        {
+            if (clamps.Count > 0)
+            {
+                foreach (NeuronClamp clamp in clamps)
+                {
+                    clamp.Highlight(highlight);
+                }
+            }
+        }
+
         private void ToggleAll()
         {
             foreach (NDSimulation ndSim in GameManager.instance.activeSims)
             {
                 lock (ndSim.clampLock)
                 {
-                    if (ndSim.clamps.Count > 0)
+                    if (ndSim.clampManager.clamps.Count > 0)
                     {
-                        foreach (NeuronClamp clamp in ndSim.clamps)
+                        foreach (NeuronClamp clamp in ndSim.clampManager.clamps)
                         {
                             if (clamp != null && clamp.FocusVert != -1)
                             {

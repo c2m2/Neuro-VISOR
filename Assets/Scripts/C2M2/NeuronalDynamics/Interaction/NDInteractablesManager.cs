@@ -7,7 +7,6 @@ using UnityEngine;
 public abstract class NDInteractablesManager<T> : MonoBehaviour
     where T:NDInteractables
 {
-    public List<T> interactables = new List<T>();
     public GameObject previewPrefab = null;
 
     public RaycastPressEvents HitEvent { get; protected set; } = null;
@@ -26,11 +25,6 @@ public abstract class NDInteractablesManager<T> : MonoBehaviour
     {
         HitEvent = gameObject.GetComponent<RaycastPressEvents>();
         AddHitEventListeners();
-    }
-
-    private void OnDestroy()
-    {
-        RemoveAll();
     }
 
     #region InputButtons
@@ -112,8 +106,6 @@ public abstract class NDInteractablesManager<T> : MonoBehaviour
                 T interact = Instantiate(prefab, currentSimulation.transform).GetComponent<T>();
                 interact.AttachToSimulation(currentSimulation, index);
                 return interact;
-
-                //TODO interactables.Add(graph);
             }
         }
         return null;
@@ -122,23 +114,6 @@ public abstract class NDInteractablesManager<T> : MonoBehaviour
     public abstract GameObject IdentifyBuildPrefab(NDSimulation sim, int index);
 
     public abstract bool VertexAvailable(NDSimulation sim, int index);
-
-    public void Remove(T NDInteractable)
-    {
-        interactables.Remove(NDInteractable);
-        Destroy(NDInteractable);
-    }
-
-    public void RemoveAll()
-    {
-        if (interactables.Count > 0)
-        {
-            foreach (T interact in interactables)
-            {
-                if (interact != null) Remove(interact);
-            }
-        }
-    }
 
     public void Preview(RaycastHit hit)
     {
@@ -169,17 +144,6 @@ public abstract class NDInteractablesManager<T> : MonoBehaviour
         {
             Destroy(preview.gameObject);
             preview = null;
-        }
-    }
-
-    public void HighlightAll(bool highlight)
-    {
-        if (interactables.Count > 0)
-        {
-            foreach (T interact in interactables)
-            {
-                interact.Highlight(highlight);
-            }
         }
     }
 

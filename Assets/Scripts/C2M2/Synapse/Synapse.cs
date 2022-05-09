@@ -35,6 +35,11 @@ public class Synapse : NDInteractables
         }
     }
 
+    private void OnDestroy()
+    {
+        SynapseManager.DeleteSyn(this);
+    }
+
     public override void Place(int index)
     {
         SynapseManager.SynapticPlacement(this);

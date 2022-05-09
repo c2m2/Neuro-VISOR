@@ -67,14 +67,12 @@ namespace C2M2.NeuronalDynamics.Simulation {
         private Dictionary<double, Mesh> meshCache = new Dictionary<double, Mesh>();
 
         public NeuronClampManager clampManager = null;
-        public List<NeuronClamp> clamps = new List<NeuronClamp>();
         internal readonly object clampLock = new object();
 
         public NDGraphManager graphManager { get; private set; } = null;
         public List<NDGraph> Graphs
         {
-            get { return graphManager.interactables; }
-            set { graphManager.interactables = value; }
+            get { return graphManager.graphs; }
         }
 
 
@@ -218,14 +216,14 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 /// Apply clamp values, if there are any clamps
                 lock(clampLock)
                 {
-                    if(clamps.Count > 0)
+                    if(clampManager.clamps.Count > 0)
                     {
                         List<(int, double)> clampValues = new List<(int, double)>();
-                        for(int i = 0; i < clamps.Count; i++)
+                        for(int i = 0; i < clampManager.clamps.Count; i++)
                         {
-                            if(clamps[i] != null && clamps[i].FocusVert != -1 && clamps[i].ClampLive)
+                            if(clampManager.clamps[i] != null && clampManager.clamps[i].FocusVert != -1 && clampManager.clamps[i].ClampLive)
                             {
-                                clampValues.Add((clamps[i].FocusVert, clamps[i].ClampPower));
+                                clampValues.Add((clampManager.clamps[i].FocusVert, clampManager.clamps[i].ClampPower));
                             }
                         }
                         Set1DValues(clampValues.ToArray<(int, double)>());

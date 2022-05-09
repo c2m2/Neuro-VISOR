@@ -1,13 +1,14 @@
 ﻿using UnityEngine;
-using C2M2.Interaction;
 using System.IO;
 using C2M2.NeuronalDynamics.Simulation;
+using System.Collections.Generic;
 
 namespace C2M2.NeuronalDynamics.Interaction.UI
 {
     public class NDGraphManager : NDInteractablesManager<NDGraph>
     {
         public GameObject graphPrefab { get; private set; } = null;
+        public List<NDGraph> graphs = new List<NDGraph>();
 
         private void Awake()
         {
@@ -26,7 +27,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
 
         private void OnDestroy()
         {
-            foreach(var graph in interactables)
+            foreach(NDGraph graph in graphs)
             {
                 graph.ndlinegraph.DestroyPlot();
             }
@@ -37,7 +38,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
             // minimum distance between graphs 
             float distanceBetweenGraphs = sim.AverageDendriteRadius * 2;
 
-            foreach (NDGraph graph in interactables)
+            foreach (NDGraph graph in graphs)
             {
                 if (graph.simulation == sim)
                 {

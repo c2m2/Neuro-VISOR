@@ -32,6 +32,16 @@ public class SynapseManager : NDInteractablesManager<Synapse>
         else return synapsePrefab;
     }
 
+    private void OnDestroy()
+    {
+        foreach ((Synapse, Synapse) synapsePair in synapses)
+        {
+            Destroy(synapsePair.Item1);
+            Destroy(synapsePair.Item2);
+            synapses.Remove(synapsePair);
+        }
+    }
+
     /// <summary>
     /// Handles synapse placement
     /// </summary>

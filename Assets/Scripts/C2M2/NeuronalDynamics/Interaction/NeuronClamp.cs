@@ -72,7 +72,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         }
         private void OnDestroy()
         {
-            lock (simulation.clampLock) simulation.clamps.Remove(this);
+            lock (simulation.clampLock) ClampManager.clamps.Remove(this);
         }
         #endregion
 
@@ -126,19 +126,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             // If the clamp is too small, match a minimum global size
             if (highlightObj.transform.lossyScale.x < minHighlightGlobalSize)
             {
-                Vector3 globalSize = new Vector3(minHighlightGlobalSize, minHighlightGlobalSize, minHighlightGlobalSize);
-                // Convert global size to local space
-                do
-                {
-                    globalSize = new Vector3(globalSize.x / transform.localScale.x,
-                        globalSize.y / transform.localScale.y,
-                        globalSize.z / transform.localScale.z);
-                } while (transform.parent != null);
-                globalSize = new Vector3(globalSize.x / transform.localScale.x,
-                    globalSize.y / transform.localScale.y,
-                    globalSize.z / transform.localScale.z);
-
-                highlightObj.transform.localScale = globalSize;
+                highlightObj.transform.localScale *= minHighlightGlobalSize/highlightObj.transform.lossyScale.x;
             }
         }
 
@@ -211,7 +199,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             simulation.OnVisualInflationChange += VisualInflationChangeHandler;
 
             // wait for clamp list access, add to list
-            lock(simulation.clampLock) simulation.clamps.Add(this);
+            lock(simulation.clampLock) ClampManager.clamps.Add(this);
 
             if(somaClamp)
             {

@@ -29,7 +29,7 @@ public class NDGraph : NDInteractables
 
     private void OnDestroy()
     {
-        GraphManager.interactables.Remove(this);
+        GraphManager.graphs.Remove(this);
     }
 
     public override void Place(int index)
@@ -42,7 +42,7 @@ public class NDGraph : NDInteractables
         name = "LineGraph(" + simulation.name + ")[vert" + FocusVert + "]";
         ndlinegraph.SetUp();
 
-        GraphManager.interactables.Add(this);
+        GraphManager.graphs.Add(this);
     } //TO DO
 
     protected override void AddHitEventListeners()

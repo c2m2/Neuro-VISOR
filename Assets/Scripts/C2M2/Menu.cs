@@ -159,29 +159,29 @@ namespace C2M2
                     data.endTime = sim.endTime;
 
                     // save clamps
-                    if (sim.clamps.Count > 0)
+                    if (sim.clampManager.clamps.Count > 0)
                     {
-                        data.clamps = new CellData.ClampData[sim.clamps.Count];
+                        data.clamps = new CellData.ClampData[sim.clampManager.clamps.Count];
 
                         for (int j = 0; j < data.clamps.Length; j++)
                         {
-                            data.clamps[j].vertex1D = sim.clamps[j].FocusVert;
-                            data.clamps[j].live = sim.clamps[j].ClampLive;
-                            data.clamps[j].power = sim.clamps[j].ClampPower;
+                            data.clamps[j].vertex1D = sim.clampManager.clamps[j].FocusVert;
+                            data.clamps[j].live = sim.clampManager.clamps[j].ClampLive;
+                            data.clamps[j].power = sim.clampManager.clamps[j].ClampPower;
                         }
                     }
 
                     // save graphs
-                    if (graphM.interactables.Count > 0)
+                    if (graphM.graphs.Count > 0)
                     {
-                        data.graphs = new CellData.Graph[graphM.interactables.Count];
+                        data.graphs = new CellData.Graph[graphM.graphs.Count];
                         for (int j = 0; j < data.graphs.Length; j++)
                         {
-                            data.graphs[j].vertex = graphM.interactables[j].FocusVert;
-                            data.graphs[j].positions = new Vector3[graphM.interactables[j].ndlinegraph.positions.Count];
+                            data.graphs[j].vertex = graphM.graphs[j].FocusVert;
+                            data.graphs[j].positions = new Vector3[graphM.graphs[j].ndlinegraph.positions.Count];
 
-                            for (int k = 0; k < graphM.interactables[j].ndlinegraph.positions.Count; k++)
-                                data.graphs[j].positions[k] = graphM.interactables[j].ndlinegraph.positions[k];
+                            for (int k = 0; k < graphM.graphs[j].ndlinegraph.positions.Count; k++)
+                                data.graphs[j].positions[k] = graphM.graphs[j].ndlinegraph.positions[k];
                         }
                     }
 
@@ -351,7 +351,7 @@ namespace C2M2
                             NDLineGraph g = graphObj.GetComponent<NDLineGraph>();
                             g.ndgraph.FocusVert = data.graphs[j].vertex;
                             g.ndgraph.simulation = sim;
-                            graphM.interactables.Add(g.ndgraph);
+                            graphM.graphs.Add(g.ndgraph);
                             foreach (Vector3 v in data.graphs[j].positions)
                                 g.positions.Add(v);
                         }
