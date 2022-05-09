@@ -103,7 +103,10 @@ public abstract class NDInteractablesManager<T> : MonoBehaviour
             if (VertexAvailable(currentSimulation, index))
             {
                 GameObject prefab = IdentifyBuildPrefab(currentSimulation, index);
-                T interact = Instantiate(prefab, currentSimulation.transform).GetComponent<T>();
+                T interact;
+                //TODO remove this
+                if (typeof(T).Equals(typeof(NDGraph))) interact = Instantiate(prefab).GetComponent<T>();
+                else interact = Instantiate(prefab, currentSimulation.transform).GetComponent<T>();
                 interact.AttachToSimulation(currentSimulation, index);
                 return interact;
             }

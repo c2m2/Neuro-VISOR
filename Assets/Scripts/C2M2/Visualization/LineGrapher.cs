@@ -212,20 +212,18 @@ namespace C2M2.Visualization
         // Keeping one list of Vector3's saves list operation time over storing a separate x and y list
         public List<Vector3> positions;
 
-        public RectTransform rt { get; private set; }
+        public RectTransform Rt { get
+            {
+                return (RectTransform)transform;
+            }
+        }
 
         private void Awake()
         {
-            rt = (RectTransform)transform;
-
             NullChecks();
-
             InitInfoPanel();
-
             InitOutline();
-
             InitInfoPanelButton();
-        
             MaxSamples = maxSamples;
 
             void InitInfoPanel()
@@ -236,11 +234,11 @@ namespace C2M2.Visualization
                 closeButton.anchoredPosition = new Vector3(-(graphWidth / 2) - (buttonWidth / 2), (graphWidth / 2) + (buttonWidth / 2));
                 closeButton.GetComponent<BoxCollider>().size = new Vector3(buttonWidth, buttonWidth);
 
-                infoPanel.sizeDelta = new Vector2(graphWidth / 2, rt.sizeDelta.y);
+                infoPanel.sizeDelta = new Vector2(graphWidth / 2, Rt.sizeDelta.y);
 
                 Vector3 lwh = infoPanel.sizeDelta;
 
-                infoPanel.anchoredPosition = new Vector2((rt.sizeDelta.x + lwh.x) / 2, 0f);
+                infoPanel.anchoredPosition = new Vector2((Rt.sizeDelta.x + lwh.x) / 2, 0f);
 
                 Image backgroundImg = infoPanel.GetComponentInChildren<Image>();
                 backgroundImg.rectTransform.sizeDelta = lwh;

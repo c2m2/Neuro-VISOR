@@ -39,11 +39,10 @@ public class NDGraph : NDInteractables
             Debug.LogError("Invalid vertex given to NDLineGraph");
             Destroy(this);
         }
-        name = "LineGraph(" + simulation.name + ")[vert" + FocusVert + "]";
-        ndlinegraph.SetUp();
+        name = "Graph(" + simulation.name + ")[vert" + FocusVert + "]";
 
         GraphManager.graphs.Add(this);
-    } //TO DO
+    }
 
     protected override void AddHitEventListeners()
     {

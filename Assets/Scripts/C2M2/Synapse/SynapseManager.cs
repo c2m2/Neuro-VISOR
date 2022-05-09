@@ -38,8 +38,8 @@ public class SynapseManager : NDInteractablesManager<Synapse>
         {
             Destroy(synapsePair.Item1);
             Destroy(synapsePair.Item2);
-            synapses.Remove(synapsePair);
         }
+        synapses.Clear();
     }
 
     /// <summary>

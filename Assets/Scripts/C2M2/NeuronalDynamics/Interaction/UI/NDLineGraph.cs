@@ -29,7 +29,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
         }
 
         // Start is called before the first frame update
-        public void SetUp()
+        private void Start()
         {
             SetLabels();
 
@@ -37,11 +37,11 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
 
             // Rotate panel towards camera in y direction
             transform.LookAt(Camera.main.transform);
-            transform.localRotation = Quaternion.Euler(new Vector3(0f, rt.localRotation.eulerAngles.y - 180, 0f));
+            transform.localRotation = Quaternion.Euler(new Vector3(0f, Rt.localRotation.eulerAngles.y - 180, 0f));
 
             InitPointerLines();
 
-            //UpdateSize();
+            UpdateSize();
             MaxSamples = 500;
 
             void SetLabels()
