@@ -11,17 +11,6 @@ public class SynapseManager : NDInteractablesManager<Synapse>
     private Synapse synapseInProgress = null; //Contains presynapse when a presynapse has been placed but no post synapse
     public List<(Synapse, Synapse)> synapses = new List<(Synapse, Synapse)>(); //pre (Item1) and post (Item2) synapses
 
-    ///<summary>
-    ///Simulation refrence to get the attributes of the current cell
-    ///</summary>
-    public List<Interactable> Simulation
-    {
-        get
-        {
-            return GameManager.instance.activeSims;
-        }
-    }
-
     public override GameObject IdentifyBuildPrefab(NDSimulation sim, int index)
     {
         if (synapsePrefab == null)
@@ -110,8 +99,6 @@ public class SynapseManager : NDInteractablesManager<Synapse>
     /// </summary>
     private void PlaceArrow()
     {
-        if (Simulation == null) return;
-
         GameObject arrowHead;
         Transform preSynapse = synapses[synapses.Count - 1].Item1.transform;
         Transform postSynapse = synapses[synapses.Count - 1].Item2.transform;
