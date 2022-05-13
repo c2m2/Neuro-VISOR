@@ -198,13 +198,17 @@ namespace C2M2
 
                 if (synM.synapses.Count > 0)
                 {
-                    synD.syns = new SynapseData.SynData[synM.synapses.Count];
+                    // the list of synapses in SynapseManager is of the form List(Synapse, Synpase)
+                    // so the array needs Count * 2 elements to store all of them
+                    synD.syns = new SynapseData.SynData[synM.synapses.Count*2];
                     for (int j = 0; j < synM.synapses.Count; j++)
                     {
-                        synD.syns[j*2].synVert = synM.synapses[j].Item1.FocusVert;
-                        synD.syns[j*2].simID = synM.synapses[j].Item1.simulation.simID;
-                        synD.syns[(j*2)+1].synVert = synM.synapses[j].Item2.FocusVert;
-                        synD.syns[(j*2)+1].simID = synM.synapses[j].Item2.simulation.simID;
+                        synD.syns[j * 2].synVert = synM.synapses[j].Item1.FocusVert;
+                        synD.syns[j * 2].simID = synM.synapses[j].Item1.simulation.simID;
+                        synD.syns[j * 2].model = synM.synapses[j].Item1.currentModel;
+                        synD.syns[(j * 2) + 1].synVert = synM.synapses[j].Item2.FocusVert;
+                        synD.syns[(j * 2) + 1].simID = synM.synapses[j].Item2.simulation.simID;
+                        synD.syns[(j * 2) + 1].model = synM.synapses[j].Item2.currentModel;
                     }
                 }
                 string jSon = JsonUtility.ToJson(synD);
@@ -212,7 +216,7 @@ namespace C2M2
 
                 sw.Close();
 
-                StartCoroutine(ShowSaveButton()); // show save button after 1.5 seconds
+                StartCoroutine(ShowSaveButton()); // hide save button for 1.5 seconds
             }
         }
 
@@ -370,7 +374,7 @@ namespace C2M2
                 for (int j = 0; j < synD.syns.Length; j++)
                 {
                     Synapse syn;
-                    NDSimulation ndsim = null; ;
+                    NDSimulation ndsim = null;
                     foreach (NDSimulation sim in gm.activeSims)
                     {
                         if (sim.simID == synD.syns[j].simID)
@@ -381,6 +385,7 @@ namespace C2M2
                     }
                     syn = Instantiate(GameManager.instance.synapseManagerPrefab.GetComponent<SynapseManager>().synapsePrefab, ndsim.transform).GetComponentInChildren<Synapse>();
                     syn.AttachToSimulation(ndsim, synD.syns[j].synVert);
+                    syn.SwitchModel(synD.syns[j].model);
                 }
 
                 finishedLoading = true; // this is for ChangeGradient

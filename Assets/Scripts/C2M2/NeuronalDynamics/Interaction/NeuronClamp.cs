@@ -67,8 +67,12 @@ namespace C2M2.NeuronalDynamics.Interaction
 
         private void Start()
         {
-            ClampPower = (MaxPower - MinPower) / 2;
-            UpdateColor();
+            // only assign ClampPower if it's not loading; otherwise it will overwrite the loaded value
+            if (GameManager.instance.Loading)
+            {
+                ClampPower = (MaxPower - MinPower) / 2;
+                UpdateColor();
+            }
         }
         private void OnDestroy()
         {
