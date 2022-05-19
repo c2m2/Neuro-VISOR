@@ -19,10 +19,11 @@ public class ArrowUpdate : MonoBehaviour
             transform.SetParent(preSynapse);
 
             //TODO rewrite this section
-            Color synapseColor = preSynapse.gameObject.GetComponent<Synapse>().meshRenderer.material.color;
+            Color preSynapseColor = preSynapse.GetComponent<Synapse>().meshRenderer.material.color;
+            Color newColor = new Color(preSynapseColor.r, preSynapseColor.g, preSynapseColor.b, 0.5f);
             foreach (MeshRenderer mr in GetComponentsInChildren<MeshRenderer>())
             {
-                mr.material.color = synapseColor;
+                mr.material.color = newColor;
             }
         }
 
