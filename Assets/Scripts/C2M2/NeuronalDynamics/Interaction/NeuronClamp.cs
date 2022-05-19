@@ -68,7 +68,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         private void Start()
         {
             // only assign ClampPower if it's not loading; otherwise it will overwrite the loaded value
-            if (GameManager.instance.Loading)
+            if (!GameManager.instance.Loading)
             {
                 ClampPower = (MaxPower - MinPower) / 2;
                 UpdateColor();
@@ -97,7 +97,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             //Ensures clamp is always at least as wide as tall when Visual Inflation is 1
             float radiusLength = Math.Max(radiusScalingValue, heightScalingValue) * currentVisualizationScale;
 
-            if (somaClamp) transform.parent.localScale = new Vector3(radiusLength, radiusLength, radiusLength);
+            if (somaClamp) transform.localScale = new Vector3(radiusLength, radiusLength, radiusLength);
             else transform.localScale = new Vector3(radiusLength, radiusLength, heightScalingValue);
             UpdateHighLightScale(transform.localScale);
         }
