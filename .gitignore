@@ -74,6 +74,9 @@ crashlytics-build.properties
 
 # C2M2-relevant ignores
 
+## Ignore Neuron Saves
+/Assets/Save
+
 # Exclude csv
 *.csv
 *.csv.meta
