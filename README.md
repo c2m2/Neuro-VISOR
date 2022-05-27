@@ -13,9 +13,10 @@ The original VR framework used for Neuro-VISOR is implemented using the [Oculus 
 
 ## Features/Limitations
 * The current XR adaptation is not perfect which results in limited functionalities compared to [the original release](https://github.com/c2m2/Neuro-VISOR/releases/tag/v2.0.0) in which this work is modified from.
-* The current branch preserves much of the desktop control as the original version, but is limited in its VR control mechanism. The user would be able to initialize the 3D neuron to the simulation space and perform grabbing interaction. Much of the advanced interactions such as applying voltage to the 3D neuron and placing plot, clamp, and synapse on the neuron would need to perform using the desktop mode. (For specific details on each of the feature work in the greater details, please refer to this [link](https://github.com/c2m2/Neuro-VISOR).
+* The current branch preserves much of the desktop control as the original version but is limited in its VR control mechanism. The user would be able to initialize the 3D neuron to the simulation space and perform grabbing interaction. Much of the advanced interactions such as applying a voltage to the 3D neuron and placing a plot, clamp, and synapse on the neuron would need to perform using the desktop mode. (For specific details on each of the feature work in the greater details, please refer to this [link](https://github.com/c2m2/Neuro-VISOR).
 
 ## Reference
+**This [file](https://github.com/c2m2/Neuro-VISOR/files/8783083/URPReport.pdf) contains more information on how I attempt to apply the Unity XR Plug-in framework to the software.**
 1. Oculus Developers. Map Controllers. url:https://developer.oculus.com/documentation/unity/unity-ovrinput/.
 2. Unity Technologies. Unity XR Input. url:https://docs.unity3d.com/2019.4/Documentation/Manual/xr_input.html.
 3. Unity Technologies. XR Interaction Toolkit Manual 1.0.0-pre.8. url:https://docs.unity3d.com/Packages/com.unity.xr.interaction.toolkit@1.0/manual/index.html.
