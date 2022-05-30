@@ -100,29 +100,19 @@ Make sure that your HMD is set up and that you have gone through the first-time 
 ### Running as a Standalone Application
 
 1. Download the latest build release.
-
 2. Place desired neuron cell files in `Neuro-VISOR_Data/StreamingAssets/NeuronalDynamics/Geometries`. Any cells found in this directory will be available at runtime.
-
 3. Start the application by running Neuro-VISOR.exe.
-
 4. Upon startup, the user is placed in a model of C2M2's lab. The application will detect a VR headset and launch in VR/keyboard emulator mode automatically.
-
 5. Our control scheme is outlined below. Try moving around and looking at your hands.
 
 ### Running in Unity Editor
 
 1. Clone project to any location.
-
 2. Ensure the correct version of the Unity Editor is installed
-
 3. Open project in Unity and open Assets/Scenes/MainScene
-
 4. Place desired neuron cell files in `Assets/StreamingAssets/NeuronalDynamics/Geometries`. Any cells found in this directory will be available at runtime.
-
 5. Start the application by pressing play in the editor.
-
 6. Upon startup, the user is placed in a model of C2M2's lab. The application will detect a VR headset and launch in VR/keyboard emulator mode automatically.
-
 7. Our control scheme is outlined below. Try moving around and looking at your hands.
 
 ## Controls
@@ -133,13 +123,13 @@ are used analogously throughout the project, as are the terms 'Index Trigger' an
 | Action      | Rift Touch Controllers    | Keyboard/Mouse   |
 | :------------- | :---------- | :----------- |
 |  Toggle raycasting | (P) Button one (A/X)   | Always on   |
+| Interact | Raycast + (P/H) Index trigger  | (P/H) Left mouse button |
 | Grab | (H) Hand trigger | (H) Right mouse button |
 | Reset Position | Grab + (P) Thumbstick | Raycast + 'X' key |
-| Interact | Raycast + (P/H) Index trigger  | (P/H) Left mouse button |
-| Scale object | Grab Ruler + Thumbstick up/down | Raycast Ruler + up/down arrow keys |
+| Scale Object | Grab Ruler + Thumbstick up/down | Raycast Ruler + up/down arrow keys |
 | Reset Scale | Grab Ruler + (P) Thumbstick | Raycast Ruler + 'R' key |
-| Move camera | Walk around! | WASD |
-| Rotate camera | Look around! | (H) Left-Ctrl + move mouse cursor |
+| Move Camera | Walk around! | WASD |
+| Rotate Camera | Look around! | (H) Left-Ctrl + move mouse cursor |
 | Quit | Oculus button | Escape key |
 
 | Abbreviation | Meaning |
@@ -150,11 +140,9 @@ are used analogously throughout the project, as are the terms 'Index Trigger' an
 ### Selecting a Cell
 <img src="https://i.imgur.com/knL8vTZ.png" alt="cell previewer" width="500" align="right">
 
-1.  A cell previewer stands against the whiteboard near the window. It attempts to render the 1D mesh of any neuron `.vrn` cell file archives found in `StreamingAssets/NeuronalDynamics/Geometries`. Six example cells are included with this repo. Several more cells can be found [here](https://drive.google.com/drive/folders/1kyz8S-txISfarPegJSMzABrF_UprH3Y-?usp=sharing).
-
-2.  Enable raycast mode. The hand with raycast mode enabled should be constantly pointing forward.
-
-3.  With raycast mode enabled, hover over a cell preview window by pointing at it. A blue guide line should be drawn between your pointer finger and the preview window. Continue hovering to see more information about the cell, or press the Interact button to load the cell and launch solve code. The guide line should turn orange while pressing/holding if in VR. The geometry should render in the middle of the room, scaled to fit within the room.
+1. A cell previewer stands against the whiteboard near the window. It attempts to render the 1D mesh of any neuron `.vrn` cell file archives found in `StreamingAssets/NeuronalDynamics/Geometries`. Six example cells are included with this repo. Several more cells can be found [here](https://drive.google.com/drive/folders/1kyz8S-txISfarPegJSMzABrF_UprH3Y-?usp=sharing).
+2. Enable raycast mode. The hand with raycast mode enabled should be constantly pointing forward.
+3. With raycast mode enabled, hover over a cell preview window by pointing at it. A blue guide line should be drawn between your pointer finger and the preview window. Continue hovering to see more information about the cell, or press the Interact button to load the cell and launch solve code. The guide line should turn orange while pressing/holding if in VR. The geometry should render in the middle of the room, scaled to fit within the room.
 
 ### Simple Cell Interaction
 
@@ -229,7 +217,9 @@ The number of samples in the graph can be altered by opening the "more info" pan
 ## Branches
 
 Master: The latest stable version of the project
+
 Development: The active beta, contains the latest features but at a higher risk of bugs
+
 multiHeadsetsSupport: Based off of 2.0.0, adds rudimentary support for all headsets
 
 ## Changelog
