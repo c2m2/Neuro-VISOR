@@ -25,10 +25,10 @@ This project is produced at the Center for Computational Mathematics and Modelin
 
 Project Leads: [Dr. Benjamin Seibold](https://math.temple.edu/~seibold/) [(Github)](https://github.com/benjaminseibold), [Dr. Gillian Queisser](https://math.temple.edu/~tug29557/about-gillian-queisser.html)
 
-Researchers and Developers: Rujeko Chinomona, [Craig Fox](https://github.com/CraigFox0) [(in)](https://www.linkedin.com/in/craig-fox-738951192/), [Calin Pescaru](https://github.com/calin-pescaru), [Garret Quallet](https://github.com/Gquallet001), [James Rosado](https://github.com/jarosado0911) [(in)](https://www.linkedin.com/in/rosado-james-3239b2119/), [Jacob Wells](https://github.com/jacobwells97) [(in)](https://www.linkedin.com/in/jacob-wells/), [Wayne Zheng](https://github.com/WayneJWZLemon)
+Researchers and Developers: Rujeko Chinomona, [Craig Fox](https://github.com/CraigFox0) [(in)](https://www.linkedin.com/in/craig-fox-738951192/), [Calin Pescaru](https://github.com/calin-pescaru), [Garret Quallet](https://github.com/Gquallet001), [James Rosado](https://github.com/jarosado0911) [(in)](https://www.linkedin.com/in/rosado-james-3239b2119/), [Wayne Zheng](https://github.com/WayneJWZLemon)
 
 ## Code Documentation
-Our [code documentation](https://c2m2.github.io/doxyhtml/index.html) is generated using [Doxygen](https://www.doxygen.nl/index.html). The completeness of this documentation is dependent on code commenting, so there may be gaps and imperfections. If you notice issues with this documentation, please report it to <jacob.wells@temple.edu>.
+Our [code documentation](https://c2m2.github.io/doxyhtml/index.html) is generated using [Doxygen](https://www.doxygen.nl/index.html). The completeness of this documentation is dependent on code commenting, so there may be gaps and imperfections. If you notice issues with this documentation, please report it to <seibold@temple.edu>.
 
 ## Other Code (Realted to this Project)
 Stephan Grein maintains a [separate project for generating neuron grids](https://github.com/stephanmg/vr-grids), as well as [a project containing additional custom attributes](https://github.com/stephanmg/vr-utils) which proved useful during development of Neuro-VISOR.
@@ -38,7 +38,7 @@ Our [blog](https://c2m2vr.wordpress.com/) goes into finer detail about some of o
 
 Inquiries about the project can be made to <seibold@temple.edu>.
 
-Performance issues and code-related questions can be sent to <jacob.wells@temple.edu>.
+Performance issues and code-related questions can be sent to <craig.fox@temple.edu>.
 
 # Use Guide
 
@@ -134,12 +134,15 @@ are used analogously throughout the project, as are the terms 'Index Trigger' an
 | :------------- | :---------- | :----------- |
 |  Toggle raycasting | (P) Button one (A/X)   | Always on   |
 | Grab | (H) Hand trigger | (H) Right mouse button |
-| Interact   | Raycast + (P/H) Index trigger  | (P/H) Left mouse button |
-Scale object | Grab + Thumbstick up/down | Raycast + up/down arrow keys |
-Move camera | Walk around! | WASD |
-Rotate camera | Look around! | (H) Left-Ctrl + move mouse cursor |
+| Reset Position | Grab + (P) Thumbstick | Raycast + 'X' key |
+| Interact | Raycast + (P/H) Index trigger  | (P/H) Left mouse button |
+| Scale object | Grab Ruler + Thumbstick up/down | Raycast Ruler + up/down arrow keys |
+| Reset Scale | Grab Ruler + (P) Thumbstick | Raycast Ruler + 'R' key |
+| Move camera | Walk around! | WASD |
+| Rotate camera | Look around! | (H) Left-Ctrl + move mouse cursor |
+| Quit | Oculus button | Escape key |
 
-|  |  |
+| Abbreviation | Meaning |
 | :----: | :-----: |
 | (P) | Press button once |
 | (H) | Hold button down |
@@ -217,7 +220,28 @@ The user can hover over the graph-plane with their raycasting finger or the mous
 
 The number of samples in the graph can be altered by opening the "more info" panel (top-right corner of the graph), hovering over "number of samples", and holding up or down on the joystick (or holding the up or down arrows on the keyboard).
 
+## Known Issues Log
+
+- The programs freezes while a new neuron loads in
+- Adding in a neuron while the simulation is paused, makes it appear white and buggy (resuming the simulation will fix this)
+- Changing the color scale introduces various bugs
+
+## Branches
+
+Master: The latest stable version of the project
+Development: The active beta, contains the latest features but at a higher risk of bugs
+multiHeadsetsSupport: Based off of 2.0.0, adds rudimentary support for all headsets
+
 ## Changelog
+
+### 2.1.0
+
+Contributors: Rujeko Chinomona, [Craig Fox](https://github.com/CraigFox0) [(in)](https://www.linkedin.com/in/craig-fox-738951192/), [Calin Pescaru](https://github.com/calin-pescaru), [Garret Quallet](https://github.com/Gquallet001), [James Rosado](https://github.com/jarosado0911) [(in)](https://www.linkedin.com/in/rosado-james-3239b2119/), [Wayne Zheng](https://github.com/WayneJWZLemon).
+
+- Both excitatory and inhibitory synapses can now be added
+- Synapses accutarely model real-world behavior
+- Simulation configurations can be saved and loaded in
+- Various performance improvements and consistence improvements were made
 
 ### 2.0.0
 
