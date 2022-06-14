@@ -127,6 +127,9 @@ public class SynapseManager : NDInteractablesManager<Synapse>
         // minimum distance between synapses
         float distanceBetweenSynapses = sim.AverageDendriteRadius * 2;
 
+        // The soma is exempt from maximum number of synapses
+        if (sim.Neuron.somaIDs.Contains(index)) return true;
+
         foreach ((Synapse,Synapse) syns in synapses)
         {
             if (syns.Item1.simulation == sim)
