@@ -5,8 +5,6 @@ namespace C2M2.Interaction
 {
     public class MouseEventSignaler : RaycastEventSignaler
     {
-        public KeyCode[] grabKeys = new KeyCode[] { KeyCode.G };
-
         Transform grabTransform;
         PublicOVRGrabber grabber;
         SphereCollider grabVolume;
