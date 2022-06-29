@@ -198,7 +198,7 @@ In addition to each clamp being individually interactable, the "finger clamps" m
 
 The user can highlight all clamps with a red sphere to clarify their position to the user. This is particularly useful on complicated geometries with many clamps attached. While pointing at the finger clamp and holding the Interact button, hold down the hand trigger to highlight all existing spheres.
 
-## Point-plotter interaction
+### Point-plotter interaction
 <img src="https://i.imgur.com/LG0Xa2P.png" alt="clamps" width="400" align="right">
 The user is able to spawn line graphs that are attached to specific 1D vertices on the neuron cell. These graphs will show the voltage at that 1D point over time.
 
@@ -207,6 +207,32 @@ To spawn a graph panel, the user simply needs to toggle "Plot" on the [board UI]
 The user can hover over the graph-plane with their raycasting finger or the mouse in order to spawn a cursor at the point of hovering. The cursor will display the exact value of the graph at that point. The user can then press the index trigger (or click on the mouse) to lock the cursor at that position. Clicking again will free the cursor.
 
 The number of samples in the graph can be altered by opening the "more info" panel (top-right corner of the graph), hovering over "number of samples", and holding up or down on the joystick (or holding the up or down arrows on the keyboard).
+
+### Synapse interaction
+
+With the addition of principled synapse models into a multi-neuron network, one is now able to build a network of neurons and connect them via synapses, simulating transmission of electrical signals from one neuron to another. The project is equipped with two functional types of chemical synapse models found within the mammalian cerebellum. The two implemented synapse models are the excitatory NMDA-receptor-based and the GABAergic inhibitory synapse. The mathematical equation describing the NMDA receptor-based model is I<sub>NMDAR</sub> = G<sub>NMDAR</sub> * a(t) * b(V<sub>postsyn</sub>) *(V<sub>postsyn</sub> – E<sub>NMDAR</sub>). Each term in this equation describes a experimental value like the conductance of the receptor, or the membrane voltage at the postsynaptic site. The other terms in the equation, namely a(t) and b(V<sub>m</sub>) are probability functions. The a(t) term describes the time course of the conductance and takes two variables, time of the presynaptic action potential as well as the postsynaptic membrane voltage. The other term, b(V<sub>m</sub>) is a simple Boltzmann function that describes the fraction of NMDA receptors left unblocked. The term is used to simulate the magnesium ion block of the NMDA receptor which prevents excessive activation. When a given voltage threshold is reached on the presynaptic membrane the voltage of the postsynaptic membrane will be increased. The GABAergic synapse model is described by I<sub>GABAR</sub> = G<sub>GABAR</sub> * a(t) * (V<sub>postsyn</sub> – E<sub>GABAR</sub>). Like the NMDA Receptor model, the GABA current has many of the same terms, just with differing constants and conductance. The GABAergic synapse model doesn’t include the Boltzmann function. The chemical signal received when using the GABAergic model will activate the GABA receptor, which will polarize the postsynaptic cell and produce an inhibitory effect. In the simulation, when the user seeks to employ the GABAergic model, the voltage at the postsynaptic membrane will decrease until it reaches a designated voltage threshold.
+
+1. To interact with synapses in the simulation, select and place neurons to be worked
+with into the main scene.
+2.  Left click in desktop mode or Raycast in the VR environment onto the mode 
+titled “Synapse” and select a node on the cell. The selected node will be the 
+presynaptic membrane.
+3. Next select a node on another neuron to be the postsynaptic site (It is possible to 
+select a different vertex on the same cell to be the postsynaptic site, however the 
+action potential propagation is clearer when there are synapses connecting two 
+neurons).
+4. The same Synapse mode allows a user to switch between two different types of 
+synapse models, namely excitatory or inhibitory.
+5. To switch between these two modes, select the presynaptic site the same way as 
+before and the mode will change from either excitatory to inhibitory or vice versa.
+If using the headset, Raycast to select the presynaptic site, however if using the 
+desktop mode left click on the postsynaptic site. Which synapse model is active is
+denoted by the synapse color displayed by the pre and postsynaptic sites as well 
+as the arrow that points in the direction from these two membranes.
+6. Note that the NMDA receptor in our simulation is colored red as to distinguish 
+between the GABA receptor which is colored green. The two types of synapse 
+models, combined with the neuron signaling, represent the key ingredients needed
+to build micro-circuits with realistic signal processing capabilities.
 
 ## Known Issues Log
 
