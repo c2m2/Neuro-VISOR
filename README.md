@@ -229,8 +229,8 @@ If using the headset, raycast to select the presynaptic site, however if using t
 desktop mode left click on the postsynaptic site. Which synapse model is active is
 denoted by the synapse color displayed by the pre and postsynaptic sites as well 
 as the arrow that points in the direction from these two membranes.
-6. Note that the NMDA receptor in our simulation is colored red as to distinguish 
-between the GABA receptor which is colored green. The two types of synapse 
+6. Note that the GABA receptor in our simulation is colored red as to distinguish 
+between the NMDA receptor which is colored green. The two types of synapse 
 models, combined with the neuron signaling, represent the key ingredients needed
 to build micro-circuits with realistic signal processing capabilities.
 
