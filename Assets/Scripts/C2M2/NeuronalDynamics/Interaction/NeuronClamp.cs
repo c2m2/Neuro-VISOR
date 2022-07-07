@@ -90,9 +90,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             currentVisualizationScale = (float)simulation.VisualInflation;
 
             float radiusScalingValue = radiusRatio * (float)cellNodeData.NodeRadius;
-            float heightScalingValue;
-            if (somaClamp) heightScalingValue = radiusScalingValue;
-            else heightScalingValue = heightRatio * simulation.AverageDendriteRadius; 
+            float heightScalingValue = heightRatio * simulation.AverageDendriteRadius; 
 
             //Ensures clamp is always at least as wide as tall when Visual Inflation is 1
             float radiusLength = Math.Max(radiusScalingValue, heightScalingValue) * currentVisualizationScale;

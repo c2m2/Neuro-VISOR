@@ -45,22 +45,15 @@ public class Synapse : NDInteractables
         SynapseManager.SynapticPlacement(this);
 
         transform.localPosition = FocusPos;
-        if (simulation.Neuron.somaIDs.Contains(FocusVert))
-        {
-            transform.localScale = new Vector3((float)NodeData.NodeRadius, (float)NodeData.NodeRadius, (float)NodeData.NodeRadius);
-        }
-        else
-        {
-            float currentVisualizationScale = (float)simulation.VisualInflation;
+        float currentVisualizationScale = (float)simulation.VisualInflation;
 
-            float radiusScalingValue = 3f * (float)NodeData.NodeRadius;
-            float heightScalingValue = 1f * simulation.AverageDendriteRadius;
+        float radiusScalingValue = 3f * (float)NodeData.NodeRadius;
+        float heightScalingValue = 1f * simulation.AverageDendriteRadius;
 
-            //Ensures synapse is always at least as wide as tall when Visual Inflation is 1
-            float radiusLength = Math.Max(radiusScalingValue, heightScalingValue) * currentVisualizationScale;
+        //Ensures synapse is always at least as wide as tall when Visual Inflation is 1
+        float radiusLength = Math.Max(radiusScalingValue, heightScalingValue) * currentVisualizationScale;
 
-            transform.localScale = new Vector3(radiusLength, radiusLength, radiusLength);
-        }
+        transform.localScale = new Vector3(radiusLength, radiusLength, radiusLength);
 
         SetToModeMaterial();
     }
