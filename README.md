@@ -159,7 +159,7 @@ A large user interface is spawned upon selecting a cell. This board contains use
 
 The board contains a color table that shows the current color gradient applied to the cell. The voltage value corresponding to different color values is diosplayed to the left of the color table. The user can change the value corresponding to the top or bottom of the color scale by hovering their finger cursor over either number and holding up/down on the joystick (or the up/down arrow key). The user can also change the color scheme by interacting with the arrows beneath the color table.
 
-The board contains a subpanel for selecting the type of interaction. The user can select any of these toggles to change the effect of directly interacting with the surface. See [direct](#direct-cell-interaction), [clamp](#clamp-cell-interaction), and [plot](#point-plotter-interaction) interactions for explanations of each.
+The board contains a subpanel for selecting the type of interaction. The user can select any of these toggles to change the effect of directly interacting with the surface. See [direct](#direct-cell-interaction), [clamp](#clamp-cell-interaction), [synapse](#synapse-cell-interaction) and [plot](#point-plotter-interaction) interactions for explanations of each.
 
 The board also contains a play/pause button. The user can use this to pause solver code at the current time step. Beneath is displayed the current simulation time.
 
@@ -199,7 +199,7 @@ In addition to each clamp being individually interactable, the "finger clamps" m
 The user can highlight all clamps with a red sphere to clarify their position to the user. This is particularly useful on complicated geometries with many clamps attached. While pointing at the finger clamp and holding the Interact button, hold down the hand trigger to highlight all existing spheres.
 
 ### Point-plotter interaction
-<img src="https://i.imgur.com/LG0Xa2P.png" alt="clamps" width="400" align="right">
+<img src="https://i.imgur.com/LG0Xa2P.png" alt="point plotter" width="400" align="right"/>
 The user is able to spawn line graphs that are attached to specific 1D vertices on the neuron cell. These graphs will show the voltage at that 1D point over time.
 
 To spawn a graph panel, the user simply needs to toggle "Plot" on the [board UI](#board-info-and-controls). At this point the user can raycast onto the surface of the mesh and press the index trigger (or click with the mouse) in order to spawn a graph attached to the nearest 1D vertex. Panels are grabbable and resizeable in the same way that the cell or the ruler is.
@@ -209,6 +209,8 @@ The user can hover over the graph-plane with their raycasting finger or the mous
 The number of samples in the graph can be altered by opening the "more info" panel (top-right corner of the graph), hovering over "number of samples", and holding up or down on the joystick (or holding the up or down arrows on the keyboard).
 
 ### Synapse interaction
+
+<img src="https://i.imgur.com/foTasYW.png" alt="synapse" width="400" align="right"/>
 
 With the addition of principled synapse models into a multi-neuron network, one is now able to build a network of neurons and connect them via synapses, simulating transmission of electrical signals from one neuron to another. The project is equipped with two functional types of chemical synapse models found within the mammalian cerebellum. The two implemented synapse models are the excitatory NMDA-receptor-based and the GABAergic inhibitory synapse. The mathematical equation describing the NMDA receptor-based model is I<sub>NMDAR</sub> = G<sub>NMDAR</sub> * a(t) * b(V<sub>postsyn</sub>) *(V<sub>postsyn</sub> – E<sub>NMDAR</sub>). G<sub>NMDAR</sub> is an experimental value for the conductance of the receptor. V<sub>postsyn</sub> is the membrane voltage at the postsynaptic site computed by Neuro-VISOR. E<sub>NMDAR</sub> is an experimental value for the reversal potential assigned to the synapse. The other terms in the equation, a(t) and b(V<sub>m</sub>), are probability functions. The a(t) term describes the time course of the conductance and takes two variables, time of the presynaptic action potential as well as the postsynaptic membrane voltage. The other term, b(V<sub>m</sub>) is a simple Boltzmann function that describes the fraction of NMDA receptors left unblocked. The term is used to simulate the magnesium ion block of the NMDA receptor which prevents excessive activation. When a given voltage threshold is reached on the presynaptic membrane the voltage of the postsynaptic membrane will be increased. The GABAergic synapse model is described by I<sub>GABAR</sub> = G<sub>GABAR</sub> * a(t) * (V<sub>postsyn</sub> – E<sub>GABAR</sub>). Like the NMDA Receptor model, the GABA current has many of the same terms, just with differing constants and conductance. The GABAergic synapse model doesn’t include the Boltzmann function. The chemical signal received when using the GABAergic model will activate the GABA receptor, which will polarize the postsynaptic cell and produce an inhibitory effect. In the simulation, when the user seeks to employ the GABAergic model, the voltage at the postsynaptic membrane will decrease until it reaches a designated voltage threshold.
 
