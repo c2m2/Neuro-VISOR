@@ -159,7 +159,7 @@ A large user interface is spawned upon selecting a cell. This board contains use
 
 The board contains a color table that shows the current color gradient applied to the cell. The voltage value corresponding to different color values is diosplayed to the left of the color table. The user can change the value corresponding to the top or bottom of the color scale by hovering their finger cursor over either number and holding up/down on the joystick (or the up/down arrow key). The user can also change the color scheme by interacting with the arrows beneath the color table.
 
-The board contains a subpanel for selecting the type of interaction. The user can select any of these toggles to change the effect of directly interacting with the surface. See [direct](#direct-cell-interaction), [clamp](#clamp-cell-interaction), [synapse](#synapse-cell-interaction) and [plot](#point-plotter-interaction) interactions for explanations of each.
+The board contains a subpanel for selecting the type of interaction. The user can select any of these toggles to change the effect of directly interacting with the surface. See [direct](#direct-cell-interaction), [clamp](#clamp-interaction), [synapse](#synapse-interaction) and [plot](#point-plotter-interaction) interactions for explanations of each.
 
 The board also contains a play/pause button. The user can use this to pause solver code at the current time step. Beneath is displayed the current simulation time.
 
@@ -173,7 +173,7 @@ The measurements on the ruler will adapt to the world-space size of the geometry
 ### Direct cell interaction
 With raycast mode enabled, point at the surface of the geometry. A blue line should be drawn between your pointer finger and the surface of the geometry. Tap the geometry from up close, or press the Interact button from a distance to directly alter simulation value at the nearest 1D vertex to the point of interaction. The guide line should turn orange upon pressing, and the surface of the geometry should change color to reflect the affected potential at the nearest 1D vertex on the geometry.
 
-### Clamp cell interaction
+### Clamp interaction
 <img src="https://i.imgur.com/rpFsqNO.png" alt="clamps" width="500"/>
 Clamps can be used to continuously alter the value of a single vertex on the 1D mesh.
 
