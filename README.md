@@ -31,7 +31,7 @@ Researchers and Developers: Rujeko Chinomona, [Craig Fox](https://github.com/Cra
 Our [code documentation](https://c2m2.github.io/doxyhtml/index.html) is generated using [Doxygen](https://www.doxygen.nl/index.html). The completeness of this documentation is dependent on code commenting, so there may be gaps and imperfections. If you notice issues with this documentation, please report it to <seibold@temple.edu>.
 
 ## Other Code (Related to this project)
-[Stephan Grein](https://github.com/stephanmg/) maintains a [separate project for generating neuron grids](https://github.com/stephanmg/vr-grids), as well as [a project containing additional custom attributes](https://github.com/stephanmg/vr-utils) which proved useful during development of Neuro-VISOR.
+[Stephan Grein](https://github.com/stephanmg/) [(in)](https://www.linkedin.com/in/stephan-grein-8520ba101/) maintains a [separate project for generating neuron grids](https://github.com/stephanmg/vr-grids), as well as [a project containing additional custom attributes](https://github.com/stephanmg/vr-utils) which proved useful during development of Neuro-VISOR.
 
 ## Connect with Us
 Our [blog](https://c2m2vr.wordpress.com/) goes into finer detail about some of our past and current code solutions. This blog contains interesting details about various areas of the project.
