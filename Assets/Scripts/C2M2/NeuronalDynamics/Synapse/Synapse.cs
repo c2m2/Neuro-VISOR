@@ -42,19 +42,12 @@ public class Synapse : NDInteractables
 
     public override void Place(int index)
     {
-        SynapseManager.SynapticPlacement(this);
-
         transform.localPosition = FocusPos;
         float currentVisualizationScale = (float)simulation.VisualInflation;
-
         float radiusScalingValue = 3f * (float)NodeData.NodeRadius;
         float heightScalingValue = 1f * simulation.AverageDendriteRadius;
-
-        //Ensures synapse is always at least as wide as tall when Visual Inflation is 1
         float radiusLength = Math.Max(radiusScalingValue, heightScalingValue) * currentVisualizationScale;
-
         transform.localScale = new Vector3(radiusLength, radiusLength, radiusLength);
-
         SetToModeMaterial();
     }
 
@@ -79,12 +72,10 @@ public class Synapse : NDInteractables
         }
         else
         {
-            if (currentModel == Model.GABA) SynapseManager.ChangeModel(this, Model.NMDA);
-            else SynapseManager.ChangeModel(this, Model.GABA);
+            SynapseManager.SynapticPlacement(this);
         }
-
+        
         SynapseManager.HoldCount = 0;
-
         SetToModeMaterial();
     }
 
