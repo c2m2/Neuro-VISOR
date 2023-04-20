@@ -238,7 +238,7 @@ namespace C2M2.NeuronalDynamics.Simulation
                     if (newVal.Item1.FocusVert >= 0 && newVal.Item1.FocusVert < Neuron.nodes.Count && newVal.Item2.FocusVert >= 0 && newVal.Item2.FocusVert < Neuron.nodes.Count)
                     {
                         // compute the synaptic current at the postsynapse using an explicity SBDF update
-                        Isyn[newVal.Item2.FocusVert] = SynapseExplicitSBDF(newVal);
+                        Isyn[newVal.Item2.FocusVert] += SynapseExplicitSBDF(newVal);
                     }
                 }
             }
