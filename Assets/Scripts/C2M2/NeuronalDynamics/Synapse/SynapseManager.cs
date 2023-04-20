@@ -49,50 +49,53 @@ public class SynapseManager : NDInteractablesManager<Synapse>
         }
     }
 
-    public (Synapse, Synapse)? FindSynapsePair(Synapse syn)
+    public List<(Synapse, Synapse)> FindSynapsePair(Synapse syn)
     {
-        for (int i = 0; i < synapses.Count; i++)
+        List<(Synapse, Synapse)> syns = new List<(Synapse, Synapse)>();
+        if (synapses.Count != 0) 
         {
-            if (synapses[i].Item1 == syn || synapses[i].Item2 == syn)
+            for (int i = 0; i < synapses.Count; i++)
             {
-                return synapses[i];
+                if (synapses[i].Item1 == syn || synapses[i].Item2 == syn)
+                {
+                    syns.Add((synapses[i].Item1, synapses[i].Item2));
+                }
             }
+            return syns;
         }
-        return null;
+        else return null;
     }
 
     public bool DeleteSyn(Synapse syn)
     {
         if (FindSynapsePair(syn) != null)
         {
-            (Synapse, Synapse) pair = ((Synapse, Synapse))FindSynapsePair(syn);
-            Destroy(pair.Item1.gameObject);
-            Destroy(pair.Item2.gameObject);
-            synapses.Remove(pair);
+            foreach ((Synapse, Synapse) pair in FindSynapsePair(syn))
+            {
+                Destroy(pair.Item1.gameObject);
+                Destroy(pair.Item2.gameObject);
+                synapses.Remove(pair);
+            }
             return true;
         }
-        else
-        {
-            return false;
-        }
-        
+        else return false;
     }
 
-    public bool ChangeModel(Synapse syn, Synapse.Model model)
-    {
+//     public bool ChangeModel(Synapse syn, Synapse.Model model)
+//     {
 
-        if (FindSynapsePair(syn) != null)
-        {
-            (Synapse, Synapse) pair = ((Synapse, Synapse))FindSynapsePair(syn);
-            pair.Item1.SwitchModel(model);
-            pair.Item2.SwitchModel(model);
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
+//         if (FindSynapsePair(syn) != null)
+//         {
+//             (Synapse, Synapse) pair = ((Synapse, Synapse))FindSynapsePair(syn);
+//             pair.Item1.SwitchModel(model);
+//             pair.Item2.SwitchModel(model);
+//             return true;
+//         }
+//         else
+//         {
+//             return false;
+//         }
+//     }
 
     /// <summary>
     /// This creates an arrow prefab that points the pre-synapse to the post-synapse
@@ -126,53 +129,28 @@ public class SynapseManager : NDInteractablesManager<Synapse>
     {
         // minimum distance between synapses
         float distanceBetweenSynapses = sim.AverageDendriteRadius * 2;
-
-        // The soma is exempt from maximum number of synapses
-        if (sim.Neuron.somaIDs.Contains(index)) return true;
-
         foreach ((Synapse,Synapse) syns in synapses)
         {
             if (syns.Item1.simulation == sim)
             {
                 int focusVert = syns.Item1.FocusVert;
-                // If there is a synapse on that 1D vertex, the spot is not open
-                if (focusVert == index)
+                float dist = (sim.Verts1D[focusVert] - sim.Verts1D[index]).magnitude;
+                if (dist < distanceBetweenSynapses)
                 {
-                    Debug.LogWarning("Clamp already exists on focus vert [" + index + "]");
+                    Debug.LogWarning("Synapse too close to synapse located on vert [" + focusVert + "].");
                     return false;
-                }
-                // If there is a synapse within distanceBetweenSynapses, the spot is not open
-                else
-                {
-                    float dist = (sim.Verts1D[focusVert] - sim.Verts1D[index]).magnitude;
-                    if (dist < distanceBetweenSynapses)
-                    {
-                        Debug.LogWarning("Synapse too close to synapse located on vert [" + focusVert + "].");
-                        return false;
-                    }
                 }
             }
             if (syns.Item2.simulation == sim)
             {
                 int focusVert = syns.Item2.FocusVert;
-                // If there is a synapse on that 1D vertex, the spot is not open
-                if (focusVert == index)
+                float dist = (sim.Verts1D[focusVert] - sim.Verts1D[index]).magnitude;
+                if (dist < distanceBetweenSynapses)
                 {
-                    Debug.LogWarning("Clamp already exists on focus vert [" + index + "]");
+                    Debug.LogWarning("Synapse too close to synapse located on vert [" + focusVert + "].");
                     return false;
                 }
-                // If there is a synapse within distanceBetweenSynapses, the spot is not open
-                else
-                {
-                    float dist = (sim.Verts1D[focusVert] - sim.Verts1D[index]).magnitude;
-                    if (dist < distanceBetweenSynapses)
-                    {
-                        Debug.LogWarning("Synapse too close to synapse located on vert [" + focusVert + "].");
-                        return false;
-                    }
-                }
             }
-
         }
         return true;
     }
