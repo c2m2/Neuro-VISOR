@@ -66,15 +66,20 @@ public class Synapse : NDInteractables
 
     private void CheckInput()
     {
-        if (SynapseManager.HoldCount >= SynapseManager.DestroyCount)
+        if (SynapseManager.HoldCount >= SynapseManager.ChangeCount && SynapseManager.HoldCount <= SynapseManager.DestroyCount)
+        {
+            if (currentModel == Model.GABA) SynapseManager.ChangeModel(this, Model.NMDA);
+            else SynapseManager.ChangeModel(this, Model.GABA);
+        }
+        else if (SynapseManager.HoldCount >= SynapseManager.DestroyCount)
         {
             SynapseManager.DeleteSyn(this);
         }
-        else
+        else if (GameManager.instance.simulationManager.FeatState == NDSimulationManager.FeatureState.Synapse)
         {
-            SynapseManager.SynapticPlacement(this);
+            SynapseManager.SynapticPlacement(this); 
         }
-        
+
         SynapseManager.HoldCount = 0;
         SetToModeMaterial();
     }
