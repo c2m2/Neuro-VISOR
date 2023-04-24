@@ -81,21 +81,22 @@ public class SynapseManager : NDInteractablesManager<Synapse>
         else return false;
     }
 
-//     public bool ChangeModel(Synapse syn, Synapse.Model model)
-//     {
-
-//         if (FindSynapsePair(syn) != null)
-//         {
-//             (Synapse, Synapse) pair = ((Synapse, Synapse))FindSynapsePair(syn);
-//             pair.Item1.SwitchModel(model);
-//             pair.Item2.SwitchModel(model);
-//             return true;
-//         }
-//         else
-//         {
-//             return false;
-//         }
-//     }
+    public bool ChangeModel(Synapse syn, Synapse.Model model)
+    {
+        if (FindSynapsePair(syn) != null)
+        {
+            foreach ((Synapse, Synapse) pair in (FindSynapsePair(syn)))
+            {
+                pair.Item1.SwitchModel(model);
+                pair.Item2.SwitchModel(model);
+            }
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
 
     /// <summary>
     /// This creates an arrow prefab that points the pre-synapse to the post-synapse
