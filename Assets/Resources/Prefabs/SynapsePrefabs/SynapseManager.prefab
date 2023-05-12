@@ -48,7 +48,8 @@ MonoBehaviour:
   interactables: []
   previewPrefab: {fileID: 8491212328184020626, guid: c4a980554d5c40045870deb578f06e8f,
     type: 3}
-  DestroyCount: 1
+  DestroyCount: 2.0
+  ChangeCount: 0.75
   interactOVR: 8192
   interactOVRS: 2097152
   powerIncreaseKey: 273
