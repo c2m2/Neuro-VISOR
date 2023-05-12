@@ -39,7 +39,7 @@ public class Synapse : NDInteractables
 
     private void OnDestroy()
     {
-        SynapseManager.DeleteSyn(this);
+        SynapseManager.DeleteSyn(SynapseManager.FindSelectedSyn(this));
     }
     
     // Creates a unique synapse instance 
