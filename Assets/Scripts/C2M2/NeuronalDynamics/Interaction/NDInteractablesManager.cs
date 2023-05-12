@@ -18,7 +18,7 @@ public abstract class NDInteractablesManager<T> : MonoBehaviour
     /// <summary>
     /// Hold down a raycast for this many seconds in order to destroy a clamp
     /// </summary>
-    public float DestroyCount = 3f;
+    public float DestroyCount = 2f;
     
     // Hold down a raycast for this many seconds to change the synapse model
     public float ChangeCount = .75f;
