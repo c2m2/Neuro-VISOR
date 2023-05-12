@@ -10,6 +10,8 @@ public class Synapse : NDInteractables
 
     public Material inhibitoryMat;
     public Material excitatoryMat;
+    
+    public int Id;
 
     public double ActivationTime { get; set; }
 
@@ -39,6 +41,15 @@ public class Synapse : NDInteractables
     {
         SynapseManager.DeleteSyn(this);
     }
+    
+    // Creates a unique synapse instance 
+    public Synapse Clone()
+    {
+        System.Random rnd = new System.Random();
+        Synapse other = (Synapse) this.MemberwiseClone();
+        other.Id = rnd.Next();
+        return other;
+    }
 
     public override void Place(int index)
     {
@@ -63,31 +74,31 @@ public class Synapse : NDInteractables
         // If we've held the button long enough to destroy, color caps red until user releases button
         if (SynapseManager.HoldCount > SynapseManager.DestroyCount) SwitchMaterial(destroyMaterial);
     }
-
+    
     private void CheckInput()
     {
+        // Change model 
         if (SynapseManager.HoldCount >= SynapseManager.ChangeCount && SynapseManager.HoldCount <= SynapseManager.DestroyCount)
         {
-            if (currentModel == Model.GABA) SynapseManager.ChangeModel(this, Model.NMDA);
-            else SynapseManager.ChangeModel(this, Model.GABA);
+            if (SynapseManager.FindSelectedSyn(this).currentModel == Model.GABA) SynapseManager.ChangeModel(SynapseManager.FindSelectedSyn(this), Model.NMDA);
+            else SynapseManager.ChangeModel(SynapseManager.FindSelectedSyn(this), Model.GABA);
         }
+        // Delete synapse
         else if (SynapseManager.HoldCount >= SynapseManager.DestroyCount)
         {
-            SynapseManager.DeleteSyn(this);
+            SynapseManager.DeleteSyn(SynapseManager.FindSelectedSyn(this));
         }
+        // Place synapse 
         else if (GameManager.instance.simulationManager.FeatState == NDSimulationManager.FeatureState.Synapse)
         {
             SynapseManager.SynapticPlacement(this); 
         }
-
         SynapseManager.HoldCount = 0;
-        SetToModeMaterial();
     }
 
     public void SwitchModel(Model model)
     {
         currentModel = model;
-
         SetToModeMaterial();
     }
 
