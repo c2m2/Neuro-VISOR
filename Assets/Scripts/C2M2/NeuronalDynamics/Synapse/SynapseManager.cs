@@ -30,6 +30,23 @@ public class SynapseManager : NDInteractablesManager<Synapse>
         }
         synapses.Clear();
     }
+    
+    // Returns the synapse object corresponding to the currently selected synapse 
+    public  Synapse FindSelectedSyn(Synapse syn)
+    {
+        for (int i=0; i<synapses.Count; i++)
+        {
+            if (synapses[i].Item1.FocusVert == syn.FocusVert && synapses[i].Item1.simulation.Neuron == syn.simulation.Neuron)
+            {
+                return synapses[i].Item1;
+            }
+            else if (synapses[i].Item2.FocusVert == syn.FocusVert && synapses[i].Item2.simulation.Neuron == syn.simulation.Neuron)
+            {
+                return synapses[i].Item2;
+            }
+        }
+        return null;
+    }
 
     /// <summary>
     /// Handles synapse placement
@@ -39,10 +56,12 @@ public class SynapseManager : NDInteractablesManager<Synapse>
     {
         if (synapseInProgress == null) //Pre Synapse
         {
+            Synapse prePlaced = placedSynapse.Clone();
             synapseInProgress = placedSynapse;
         }
         else //Post Synapse
         {
+            Synapse postPlaced = placedSynapse.Clone();
             synapses.Add((synapseInProgress, placedSynapse));
             synapseInProgress = null;
             PlaceArrow();
@@ -106,6 +125,9 @@ public class SynapseManager : NDInteractablesManager<Synapse>
         GameObject arrowHead;
         Transform preSynapse = synapses[synapses.Count - 1].Item1.transform;
         Transform postSynapse = synapses[synapses.Count - 1].Item2.transform;
+        
+        Synapse pre = synapses[synapses.Count - 1].Item1;
+        Synapse post = synapses[synapses.Count - 1].Item2;
 
         // Create a new arrow in 3D space
         arrowHead = Instantiate(arrowPrefab, new Vector3(0, 0, 0), Quaternion.identity) as GameObject;
@@ -121,6 +143,10 @@ public class SynapseManager : NDInteractablesManager<Synapse>
         arrowHead.AddComponent<ArrowUpdate>();
         arrowHead.GetComponent<ArrowUpdate>().preSynapse = preSynapse;
         arrowHead.GetComponent<ArrowUpdate>().postSynapse = postSynapse;
+        
+        // Assign current synapses to fields of ArrowUpdate to ensure color changes with synapse model
+        arrowHead.GetComponent<ArrowUpdate>().pre = pre;
+        arrowHead.GetComponent<ArrowUpdate>().post = post;
     }
 
     /// <summary>
