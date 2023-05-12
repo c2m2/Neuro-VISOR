@@ -57,12 +57,12 @@ public class SynapseManager : NDInteractablesManager<Synapse>
         if (synapseInProgress == null) //Pre Synapse
         {
             Synapse prePlaced = placedSynapse.Clone();
-            synapseInProgress = placedSynapse;
+            synapseInProgress = prePlaced;
         }
         else //Post Synapse
         {
             Synapse postPlaced = placedSynapse.Clone();
-            synapses.Add((synapseInProgress, placedSynapse));
+            synapses.Add((synapseInProgress, postPlaced));
             synapseInProgress = null;
             PlaceArrow();
         }
