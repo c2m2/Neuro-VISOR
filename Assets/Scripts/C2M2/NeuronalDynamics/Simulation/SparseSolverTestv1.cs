@@ -388,7 +388,7 @@ namespace C2M2.NeuronalDynamics.Simulation
 
             /// this sets the target time step size
             timeStep = SetTargetTimeStep(cap, 2 * Neuron.MaxRadius,2*Neuron.MinRadius, Neuron.TargetEdgeLength, gna, gk,gl, res, 1.0);
-            ///UnityEngine.Debug.Log("Target Time Step = " + timeStep);
+            UnityEngine.Debug.Log("Target Time Step = " + timeStep);
 
             ///<c>List<CoordinateStorage<double>> sparse_stencils = makeSparseStencils(Neuron, res, cap, k);</c> Construct sparse RHS and LHS in coordinate storage format, no zeros are stored \n
             /// <c>sparse_stencils</c> this is a list which contains only two matrices the LHS and RHS matrices for the Crank-Nicolson solve
@@ -400,6 +400,12 @@ namespace C2M2.NeuronalDynamics.Simulation
             b = new double[Neuron.nodes.Count];
             ///<c>var lu = SparseLU.Create(l_csc, ColumnOrdering.MinimumDegreeAtA, 0.1);</c> this creates the LU decomposition of the HINES matrix which is defined by <c>l_csc</c>
             lu = SparseLU.Create(l_csc, ColumnOrdering.MinimumDegreeAtA, 0.1);
+            /// here I was debugging to figure out matrix sizes and compare with number of nodes 
+            /// CompressedColumnStorage.cs, coordinateStorage.cs, SolverHelper.cs were relevant to seeing 
+            /// what the data structures looked like 
+            UnityEngine.Debug.Log("Number of nodes = " + Neuron.nodes.Count);
+            UnityEngine.Debug.Log("rhs matrix numrows = " + sparse_stencils[0].RowCount);
+            UnityEngine.Debug.Log("rhs matrix numcolumns = " + sparse_stencils[0].ColumnCount);
         }
 
         /// <summary>
