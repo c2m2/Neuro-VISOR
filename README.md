@@ -25,7 +25,7 @@ This project is produced at the Center for Computational Mathematics and Modelin
 
 Project Leads: [Dr. Benjamin Seibold](https://math.temple.edu/~seibold/) [(Github)](https://github.com/benjaminseibold), [Dr. Gillian Queisser](https://math.temple.edu/~tug29557/about-gillian-queisser.html)
 
-Researchers and Developers: Rujeko Chinomona, [Craig Fox](https://github.com/CraigFox0) [(in)](https://www.linkedin.com/in/craig-fox-738951192/), [Calin Pescaru](https://github.com/calin-pescaru), [Garret Quallet](https://github.com/Gquallet001), [James Rosado](https://github.com/jarosado0911) [(in)](https://www.linkedin.com/in/rosado-james-3239b2119/), [Wayne Zheng](https://github.com/WayneJWZLemon)
+Researchers and Developers: [Rujeko Chinomona](https://rujekoc.github.io/)
 
 ## Code Documentation
 Our [code documentation](https://c2m2.github.io/doxyhtml/index.html) is generated using [Doxygen](https://www.doxygen.nl/index.html). The completeness of this documentation is dependent on code commenting, so there may be gaps and imperfections. If you notice issues with this documentation, please report it to <seibold@temple.edu>.
@@ -38,7 +38,7 @@ Our [blog](https://c2m2vr.wordpress.com/) goes into finer detail about some of o
 
 Inquiries about the project can be made to <seibold@temple.edu>.
 
-Performance issues and code-related questions can be sent to <craig.fox@temple.edu>.
+Performance issues and code-related questions can be sent to <rchinomona@temple.edu>. We also encourage use of GitHub Issues.
 
 # Use Guide
 
@@ -225,22 +225,22 @@ action potential propagation is clearer when there are synapses connecting two
 neurons).
 4. The same synapse mode allows a user to switch between two different types of 
 synapse models, namely excitatory or inhibitory.
-5. To switch between these two modes, select the presynaptic site the same way as 
-before and the mode will change from either excitatory to inhibitory or vice versa.
-If using the headset, raycast to select the presynaptic site, however if using the 
-desktop mode left click on the postsynaptic site. Which synapse model is active is
-denoted by the synapse color displayed by the pre and postsynaptic sites as well 
+5. To switch between these two modes, select(long-press) at the postsynaptic site, the mode will change from either excitatory to inhibitory or vice versa.
+6. The active synapse model is denoted by the synapse color displayed by the pre and postsynaptic sites as well 
 as the arrow that points in the direction from these two membranes.
-6. Note that the GABA receptor in our simulation is colored red as to distinguish 
+7. Note that the GABA receptor in our simulation is colored red as to distinguish 
 between the NMDA receptor which is colored green. The two types of synapse 
 models, combined with the neuron signaling, represent the key ingredients needed
 to build micro-circuits with realistic signal processing capabilities.
+8. Multiple synaptic connections can be placed on any vertex
+9. Deleting one synapse connection triggers deletion of all other synapse connections associated with the vertex
 
 ## Known Issues Log
 
 - The programs freezes while a new neuron loads in
 - Adding in a neuron while the simulation is paused, makes it appear white and buggy (resuming the simulation will fix this)
 - Changing the color scale introduces various bugs
+- The joystick is very sensitive when rescaling neuron
 
 ## Branches
 
@@ -252,9 +252,18 @@ multiHeadsetsSupport: Based off of 2.0.0, adds rudimentary support for all heads
 
 ## Changelog
 
+### 2.1.1
+Contributors: [Brandon Calia](https://github.com/brandoncalia), [Rujeko Chinomona](https://rujekoc.github.io/)
+
+Beta Testers: Amy Ollomani, Shreya Shah
+- Multiple synaptic connections can be placed on the same vertex
+- If a user deletes a synapse pair that has a pre or postsynaptic connection on a vertex that also
+contains other synapses, all involved synapses will be deleted
+- Updates to some necessary packages
+
 ### 2.1.0
 
-Contributors: Rujeko Chinomona, [Craig Fox](https://github.com/CraigFox0) [(in)](https://www.linkedin.com/in/craig-fox-738951192/), [Calin Pescaru](https://github.com/calin-pescaru), [Garret Quallet](https://github.com/Gquallet001), [James Rosado](https://github.com/jarosado0911) [(in)](https://www.linkedin.com/in/rosado-james-3239b2119/), [Wayne Zheng](https://github.com/WayneJWZLemon).
+Contributors: [Rujeko Chinomona](https://rujekoc.github.io/), [Craig Fox](https://github.com/CraigFox0) [(in)](https://www.linkedin.com/in/craig-fox-738951192/), [Calin Pescaru](https://github.com/calin-pescaru), [Garret Quallet](https://github.com/Gquallet001), [James Rosado](https://github.com/jarosado0911) [(in)](https://www.linkedin.com/in/rosado-james-3239b2119/), [Wayne Zheng](https://github.com/WayneJWZLemon).
 
 - Both excitatory and inhibitory synapses can now be added
 - Synapses accutarely model real-world behavior
@@ -263,7 +272,7 @@ Contributors: Rujeko Chinomona, [Craig Fox](https://github.com/CraigFox0) [(in)]
 
 ### 2.0.0
 
-Contributors: [Michael Bennett](https://github.com/CWRMB), Rujeko Chinomona, [Craig Fox](https://github.com/CraigFox0) [(in)](https://www.linkedin.com/in/craig-fox-738951192/), [James Rosado](https://github.com/jarosado0911) [(in)](https://www.linkedin.com/in/rosado-james-3239b2119/), [Jacob Wells](https://github.com/jacobwells97) [(in)](https://www.linkedin.com/in/jacob-wells/), [Noah Williams](https://github.com/U-K-L), [Wayne Zheng](https://github.com/WayneJWZLemon).
+Contributors: [Michael Bennett](https://github.com/CWRMB), [Rujeko Chinomona](https://rujekoc.github.io/), [Craig Fox](https://github.com/CraigFox0) [(in)](https://www.linkedin.com/in/craig-fox-738951192/), [James Rosado](https://github.com/jarosado0911) [(in)](https://www.linkedin.com/in/rosado-james-3239b2119/), [Jacob Wells](https://github.com/jacobwells97) [(in)](https://www.linkedin.com/in/jacob-wells/), [Noah Williams](https://github.com/U-K-L), [Wayne Zheng](https://github.com/WayneJWZLemon).
 
 Beta Testers: [Calin Pescaru](https://github.com/calin-pescaru), [Garret Quallet](https://github.com/Gquallet001)
 
