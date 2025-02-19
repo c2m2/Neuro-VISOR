@@ -293,14 +293,16 @@ namespace C2M2.NeuronalDynamics.Simulation
             double presynVoltage = newVal.Item1.simulation.Get1DValues()[newVal.Item1.FocusVert];
             double presynVoltage0 = Upre[newVal.Item1.FocusVert];
             double voltageThreshold;
-            if (model == Synapse.Model.NMDA)
-            {
-                voltageThreshold = 0.038;
-            }
-            else
-            {
-                voltageThreshold = -0.05;
-            }
+
+            // if (model == Synapse.Model.NMDA || model == Synapse.Model.AMPA)
+            // {
+            voltageThreshold = 0.038;   //Volts
+            // }
+            // else
+            // {
+            //     voltageThreshold = -0.05;
+            // }
+
 
             if ((presynVoltage >= voltageThreshold) && (presynVoltage0< voltageThreshold))
             { newVal.Item1.ActivationTime = GetSimulationTime(); }
@@ -325,10 +327,15 @@ namespace C2M2.NeuronalDynamics.Simulation
                     Icurrs.Add(NMDAFunction(U_Active[newVal.Item2.FocusVert], GetSimulationTime(), newVal.Item1.ActivationTime));         // compute current synaptic state using current voltage state
                     Icurrs.Add(NMDAFunction(Upre[newVal.Item2.FocusVert], GetSimulationTime(), newVal.Item1.ActivationTime));             // compute previous synaptic state using previous voltage state
                 }
-                else
+                else if (model == Synapse.Model.GABA)
                 {
                     Icurrs.Add(GABAFunction(U_Active[newVal.Item2.FocusVert], GetSimulationTime(), newVal.Item1.ActivationTime));         // compute current synaptic state using current voltage state
                     Icurrs.Add(GABAFunction(Upre[newVal.Item2.FocusVert], GetSimulationTime(), newVal.Item1.ActivationTime));             // compute previous synaptic state using previous voltage state
+                }
+                else
+                {
+                    Icurrs.Add(AMPAFunction(U_Active[newVal.Item2.FocusVert], GetSimulationTime(), newVal.Item1.ActivationTime));         // compute current synaptic state using current voltage state
+                    Icurrs.Add(AMPAFunction(Upre[newVal.Item2.FocusVert], GetSimulationTime(), newVal.Item1.ActivationTime));             // compute previous synaptic state using previous voltage state                    
                 }
                 
                 };
@@ -349,7 +356,7 @@ namespace C2M2.NeuronalDynamics.Simulation
             double taud = 3.0e-4;               // decay constant from function
             double g = 25e-9;              // borrowed from Rothman Paper they mention 10's of nanosiemens
                         
-            return g * (1.0 / (1.0 + System.Math.Exp(-1.0 * (v + 0.0128) / 0.0224))) * System.Math.Exp(-1.0 * (t - ts) / taud) * (v - Erev);           
+            return g * (1.0 / (1.0 + System.Math.Exp(-1.0 * (v + 0.0128) / 0.0224))) * System.Math.Exp(-1.0 * (t - ts) / taud) * (v - Erev);    
         }
 
         /// <summary>
@@ -365,7 +372,56 @@ namespace C2M2.NeuronalDynamics.Simulation
             double taud = 3.0e-4;               // decay constant from function
             double g = 30e-12;              // borrowed from Rothman Paper this is conductance of GABA receptor
 
-            return g * System.Math.Exp(-1.0 * (t - ts) / taud) * (v - Erev);
+            return -g * System.Math.Exp(-1.0 * (t - ts) / taud) * (v - Erev);
+        }
+
+        /// <summary>
+        /// This is the AMPA Synapse function borrowed from Rothman, Jason S. "Modeling Synapses." (2014).
+        /// </summary>
+        /// <param name="v"></param> this is the postsynaptic voltage
+        /// <param name="t"></param> this is the current simulation time
+        /// <param name="ts"></param> this is the activation time of the synapse, this is NOT the time the synapse is placed
+        /// <returns></returns>
+        public double AMPAFunction(double v, double t, double ts)
+        {
+            //double Erev = -0.0125;              // reversal potential for synapse
+            //double taud1 = 0.0003;               // decay constant from function
+            //double g = 25e-9;              // borrowed from Rothman Paper they mention 10's of nanosiemens
+                        
+            //return g * (0.9 * System.Math.Exp(-1.0 * (t - ts) / taud1) * (v - Erev));   
+
+            
+            double Erev = -0.0125;
+            double taud1 = 0.0003;
+            double taud2 = 0.002;
+            double taur = 0.0002;
+            double n = 2.0;
+            double anorm = 1.0;
+
+            double g = 25e-9;     //"A few picosiemens at small bouton synapses" - 2.5 pS
+            
+            return (((0.9 * System.Math.Exp(-1.0*(t-ts)/taud1)) * (0.1 * System.Math.Exp(-1.0*(t-ts)/taud2)))/anorm) * g * (v - Erev);
+
+            //return g * ( System.Math.Pow((1.0-System.Math.Exp(-1.0*(t-ts)/taur)), n) * ((0.9 * System.Math.Exp(-1.0*(t-ts)/taud1)) * (0.1 * System.Math.Exp(-1.0*(t-ts)/taud2)))/anorm) * (v - Erev);
+
+            /**Base Equation:
+            //Iampar = GampaR * a(t) * (V(m) - Eampar)
+
+            //another paper, "Regulation of AMPA and NMDA receptor-mediated EPSPs in dendritic trees of thalamocortical cells" by Lajeunesse references 2.5 nS
+
+
+            //Using equation 6 for a(t), ignoring 'extrasynaptic receptors'
+            //[1-exp(-(t-ts)/Tr)]^n * [a1* exp(-(t-ts)/taud) + (a2*exp(-(t-ts)/taud2))]/(anorm)
+
+            //from figure 2;
+            //n=2, Tr = 0.2ms, a1=0.9, taud1=0.3ms, a2=0.1, taud2=2.0ms
+
+            //Eampar is "typically 0 mv
+
+            //To find Anorm: can be computed numerically by computing the product of the expressions
+            //in square brackets at high temporalresolution and setting anorm equal to the peak of the resulting waveform
+
+            //Debug.Log("Ampa Fired");*/
         }
 
         /// <summary>
