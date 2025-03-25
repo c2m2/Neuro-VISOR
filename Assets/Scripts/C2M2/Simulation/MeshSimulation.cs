@@ -90,8 +90,24 @@ namespace C2M2.Simulation
         /// </summary>
         protected override void UpdateVisualization(in float[] newValues)
         {
+            // Find current extrema from simulation values
+            float currentMax = Mathf.Max(newValues);
+            float currentMin = Mathf.Min(newValues);
+
+            // Dynamically update GlobalMax and GlobalMin if new extrema are found
+            if (currentMax > GlobalMax)
+                GlobalMax = currentMax;
+
+            if (currentMin < GlobalMin)
+                GlobalMin = currentMin;
+
+            // Reflect updated extrema in ColorLUT
+            ColorLUT.GlobalMax = GlobalMax;
+            ColorLUT.GlobalMin = GlobalMin;
+
+            // Evaluate colors from the updated LUT
             Color32[] newCols = ColorLUT.Evaluate(newValues);
-            if(newCols != null)
+            if (newCols != null)
             {
                 mf.mesh.colors32 = newCols;
             }

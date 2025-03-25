@@ -70,7 +70,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             // only assign ClampPower if it's not loading; otherwise it will overwrite the loaded value
             if (!GameManager.instance.Loading)
             {
-                ClampPower = (MaxPower - MinPower) / 2;
+                ClampPower = .025;
                 UpdateColor();
             }
         }
