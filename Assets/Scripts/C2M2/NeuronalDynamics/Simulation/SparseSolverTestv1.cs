@@ -710,8 +710,7 @@ namespace C2M2.NeuronalDynamics.Simulation
                 "Original Leakage Channel",
                 // "NEURON Potassium Channel",
                 // "NEURON Sodium Channel",
-                // "NEURON Leakage Channel",
-                "Low Threshold Calcium Channel",
+                // "Low Threshold Calcium Channel",
                 "Slow Potassium Channel"
             };
 
@@ -943,9 +942,9 @@ namespace C2M2.NeuronalDynamics.Simulation
                         prod.SetSubVector(0, V.Count, state.PointwisePower(gatingVariable.Exponent).PointwiseMultiply(prod));
                     }
                     prod.SetSubVector(0, V.Count, (V.Subtract(channel.ReversalPotential)).PointwiseMultiply(prod));
+                    output.Add(prod.Multiply(channel.Conductance), output);
                 }
 
-                output.Add(prod.Multiply(channel.Conductance), output);
             }
             output.Multiply(-1.0 / cap, output);
             return output;

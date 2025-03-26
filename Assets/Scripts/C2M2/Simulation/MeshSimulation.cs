@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using C2M2.Visualization;
 using System;
+using C2M2.NeuronalDynamics.UGX;
 
 namespace C2M2.Simulation
 {

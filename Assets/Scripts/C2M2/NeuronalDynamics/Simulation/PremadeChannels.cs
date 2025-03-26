@@ -13,8 +13,10 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// </summary>
         public static IonChannel OriginalPotassiumChannel(int nodeCount)
         {
-            double gk = 5.0 * 1.0E1;   
-            double ek = -90.0 * 1.0E-3;
+            double gk = 0.005 * 1.0E4; // S/m2
+            double ek = -90.0 * 1.0E-3; // mV
+            double vT = -67.9 * 1.0E-3; // mV
+            // double vT = 0.0;
 
             IonChannel potassiumChannel = new IonChannel("Original Potassium Channel", gk, ek);
 
@@ -22,14 +24,14 @@ namespace C2M2.NeuronalDynamics.Simulation
             {
                 var Vin = voltage.Clone();
                 Vin.Multiply(1.0E3, Vin); 
-                return (1.0E3) * (0.032) * (15.0 - Vin).PointwiseDivide(((15.0 - Vin) / 5.0).PointwiseExp() - 1.0);
+                return (1.0E3) * (0.032) * (15.0 + vT - Vin).PointwiseDivide(((15.0 + vT - Vin) / 5.0).PointwiseExp() - 1.0);
             };
 
             Func<Vector, Vector> beta_n = voltage =>
             {
                 var Vin = voltage.Clone();
                 Vin.Multiply(1.0E3, Vin);
-                return (1.0E3) * (0.5) * ((10.0 - Vin) / 40.0).PointwiseExp();
+                return (1.0E3) * (0.5) * ((10.0 + vT - Vin) / 40.0).PointwiseExp();
             };
 
             potassiumChannel.AddGatingVariable(
@@ -46,8 +48,10 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// </summary>
         public static IonChannel OriginalSodiumChannel(int nodeCount)
         {
-            double gna = 60.0 * 1.0E1;    // 600 S/m²
-            double ena = 50.0 * 1.0E-3;   // 0.050 V
+            double gna = 0.05 * 1.0E4;    // S/m2
+            double ena = 50.0 * 1.0E-3;   // mV
+            double vT = -67.9 * 1.0E-3; // mV
+            // double vT = 0.0;
 
             IonChannel sodiumChannel = new IonChannel("Original Sodium Channel", gna, ena);
 
@@ -56,28 +60,28 @@ namespace C2M2.NeuronalDynamics.Simulation
             {
                 var Vin = voltage.Clone();
                 Vin.Multiply(1.0E3, Vin);
-                return (1.0E3) * (0.32) * (13.0 - Vin).PointwiseDivide(((13.0 - Vin) / 4.0).PointwiseExp() - 1.0);
+                return (1.0E3) * (0.32) * (13.0 + vT - Vin).PointwiseDivide(((13.0 + vT - Vin) / 4.0).PointwiseExp() - 1.0);
             };
 
             Func<Vector, Vector> beta_m = voltage =>
             {
                 var Vin = voltage.Clone();
                 Vin.Multiply(1.0E3, Vin);
-                return (1.0E3) * (0.28) * (Vin - 40.0).PointwiseDivide(((Vin - 40.0) / 5.0).PointwiseExp() - 1.0);
+                return (1.0E3) * (0.28) * (Vin - vT - 40.0).PointwiseDivide(((Vin - vT - 40.0) / 5.0).PointwiseExp() - 1.0);
             };
 
             Func<Vector, Vector> alpha_h = voltage =>
             {
                 var Vin = voltage.Clone();
                 Vin.Multiply(1.0E3, Vin);
-                return (1.0E3) * (0.128) * ((17.0 - Vin) / 18.0).PointwiseExp();
+                return (1.0E3) * (0.128) * ((17.0 + vT - Vin) / 18.0).PointwiseExp();
             };
 
             Func<Vector, Vector> beta_h = voltage =>
             {
                 var Vin = voltage.Clone();
                 Vin.Multiply(1.0E3, Vin);
-                return (1.0E3) * 4.0 / (((40.0 - Vin) / 5.0).PointwiseExp() + 1.0);
+                return (1.0E3) * 4.0 / (((40.0 + vT - Vin) / 5.0).PointwiseExp() + 1.0);
             };
 
             sodiumChannel.AddGatingVariable(
@@ -99,8 +103,8 @@ namespace C2M2.NeuronalDynamics.Simulation
         
         public static IonChannel OriginalLeakageChannel(int nodeCount)
         {
-            double gl = 2.5 * 1.0E-5;
-            double el = -70.3 * 1.0E-3;
+            double gl = 1E-5 * 1.0E4; // S/m2
+            double el = -85.0 * 1.0E-3;
             return new IonChannel("Original Leakage Channel", gl, el);
         }
             
@@ -112,7 +116,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// </summary>
         public static IonChannel CalciumChannel(int nodeCount)
         {
-            double gca = 1.0 * 1.0E1;
+            double gca = 1.7e-4 * 1.0E3;
             double eca = 120.0 * 1.0E-3;
 
             IonChannel calciumChannel = new IonChannel("Calcium Channel", gca, eca);
@@ -160,16 +164,16 @@ namespace C2M2.NeuronalDynamics.Simulation
         ///   p∞(V) = 1 / [1 + exp(-(V+35)/10)]
         ///   τp(V) = τmax / [3.3 * exp((V+35)/20) + exp(-(V+35)/20)]
         ///   dp/dt = ( p∞(V) - p ) / τp(V)
-        /// We use alpha_p(V) = p∞(V)/τp(V), beta_p(V) = [1 - p∞(V)]/τp(V).
+        /// We use alpha_p(V) = p∞(V/)τp(V), beta_p(V) = [1 - p∞(V)]/τp(V).
         /// Default gM = 0.004 mS/cm² = 0.004 * 10 = 0.04 S/m², τmax = 4.0 s
         /// </summary>
         public static IonChannel SlowPotassiumChannel(int nodeCount)
         {
             // Convert 0.004 mS/cm² to S/m² by multiplying by 10.
             // 0.004 mS/cm² => 0.04 S/m²
-            double gM   = 0.04;          // S/m^2
+            double gM   = 3.0E-5 * 1.0E4; // S/m^2
             double eK   = -90.0 * 1.0E-3; // -90 mV in [V]
-            double tMax = 4.0;          // 4 s, per Yamada et al.
+            double tMax = 0.934;          // 4 s, per Yamada et al.
 
             // Create an IonChannel object with the specified max conductance and reversal potential
             IonChannel slowKChannel = new IonChannel("Slow Potassium Channel", gM, eK);
@@ -241,9 +245,9 @@ namespace C2M2.NeuronalDynamics.Simulation
         public static IonChannel LowThresholdCalciumChannel(int nodeCount)
         {
             // Maximal conductance in S/m² (adjust as needed)
-            double gT = 0.05;       
+            double gT = 0.05 * 1.0E4;       
             // Reversal potential for Ca²⁺ in volts
-            double eCa = 120.0e-3;   
+            double eCa = 120.0 * 1.0E-3;   
             // Voltage shift (in mV) used in the equations
             double Vx = 2.0;     
 
@@ -429,13 +433,6 @@ namespace C2M2.NeuronalDynamics.Simulation
 
             return sodiumChannel;
         }
-
-        public static IonChannel NEURONLeakageChannel(int nodeCount)
-        {
-            double gl = 3 * 1.0E1;           // S/cm^2
-            double el = -54.3 * 1.0E-3;     // -54.3 mV converted to V
-            return new IonChannel("NEURON Leakage Channel", gl, el);
-        }
         /// <summary>
         /// NEURON Sodium Channel with HH kinetics (fast Na+ current).
         /// Equation: I_Na = gNa * m^3 * h * (V - E_Na)
@@ -533,20 +530,6 @@ namespace C2M2.NeuronalDynamics.Simulation
             );
 
             return potassiumChannel;
-        }
-
-        /// <summary>
-        /// NEURON Leakage Channel.
-        /// Equation: I_L = gL * (V - E_L)
-        /// Parameters:
-        ///   gL = 0.05 mS/cm², E_L = -65 mV (converted to -65e-3 V)
-        /// </summary>
-        public static IonChannel PinkyLeakageChannel(int nodeCount)
-        {
-            double gl = 0.05;            // S/cm²
-            double el = -65.0 * 1e-3;      // V
-
-            return new IonChannel("Pinky Leakage Channel", gl, el);
         }
 
         /// <summary>
