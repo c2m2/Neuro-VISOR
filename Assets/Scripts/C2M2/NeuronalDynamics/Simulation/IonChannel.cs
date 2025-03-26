@@ -18,14 +18,18 @@ namespace C2M2.NeuronalDynamics.Simulation
         public double Probability { get; set; }
         public Vector CurrentState { get; set; }
         public Vector PreviousState { get; set; }
+        
+        // New flag: if true, this gating variable is computed instantaneously. Default: set to false.
+        public bool IsInstant { get; set; }
 
-        public GatingVariable(string name, Func<Vector, Vector> alpha, Func<Vector, Vector> beta, double exponent, double probability, int nodeCount)
+        public GatingVariable(string name, Func<Vector, Vector> alpha, Func<Vector, Vector> beta, double exponent, double probability, int nodeCount, bool isInstant = false)
         {
             Name = name;
             Alpha = alpha;
             Beta = beta;
             Exponent = exponent;
             Probability = probability;
+            IsInstant = isInstant;
             CurrentState = Vector.Build.Dense(nodeCount, probability);
             PreviousState = CurrentState.Clone();
         }

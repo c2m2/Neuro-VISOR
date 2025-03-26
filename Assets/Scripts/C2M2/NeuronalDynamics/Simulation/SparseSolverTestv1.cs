@@ -481,18 +481,20 @@ namespace C2M2.NeuronalDynamics.Simulation
             {
                 foreach (var gatingVariable in channel.GatingVariables)
                 {
-                    tempState = currentStates[gatingVariable.Name].Clone();
-                    // Use stateexplicitSBDF2 to update the gating variable
-                    stateexplicitSBDF2(
-                        currentStates[gatingVariable.Name],
-                        previousStates[gatingVariable.Name],
-                        fS(currentStates[gatingVariable.Name], gatingVariable.Alpha(U_Active), gatingVariable.Beta(U_Active)),
-                        fS(previousStates[gatingVariable.Name], gatingVariable.Alpha(Upre), gatingVariable.Beta(Upre)), 
-                        timeStep
-                    );
+                    if (!gatingVariable.IsInstant){
+                        tempState = currentStates[gatingVariable.Name].Clone();
+                        // Use stateexplicitSBDF2 to update the gating variable
+                        stateexplicitSBDF2(
+                            currentStates[gatingVariable.Name],
+                            previousStates[gatingVariable.Name],
+                            fS(currentStates[gatingVariable.Name], gatingVariable.Alpha(U_Active), gatingVariable.Beta(U_Active)),
+                            fS(previousStates[gatingVariable.Name], gatingVariable.Alpha(Upre), gatingVariable.Beta(Upre)), 
+                            timeStep
+                        );
 
-                    // Update previous state for the next time step
-                    previousStates[gatingVariable.Name] = tempState.Clone();
+                        // Update previous state for the next time step
+                        previousStates[gatingVariable.Name] = tempState.Clone();
+                    }
                 }
             }
             Upre = U_Active.Clone();
@@ -927,13 +929,16 @@ namespace C2M2.NeuronalDynamics.Simulation
                 {
                     output.Add((V.Subtract(channel.ReversalPotential)).Multiply(channel.Conductance), output);
                 }
-
                 else
                 {
                     foreach (var gatingVariable in channel.GatingVariables)
                     {
                         Vector state = gatingStates[gatingVariable.Name];
-
+                        // Adding a state to Gating Variables specifically for Low Threshold Calcium From Pospischil_Minimal_HH_2008.
+                        // A better solution may be available. For my current use case this is sufficient.
+                        if (gatingVariable.IsInstant) {
+                            state = gatingVariable.Alpha(V);
+                        }
                         // Calculate contribution for this channel and gating variable
                         prod.SetSubVector(0, V.Count, state.PointwisePower(gatingVariable.Exponent).PointwiseMultiply(prod));
                     }
