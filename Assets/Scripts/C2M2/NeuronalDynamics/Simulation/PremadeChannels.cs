@@ -99,8 +99,8 @@ namespace C2M2.NeuronalDynamics.Simulation
         
         public static IonChannel OriginalLeakageChannel(int nodeCount)
         {
-            double gl = 0.05;
-            double el = -70.0 * 1.0E-3;
+            double gl = 2.5 * 1.0E-5;
+            double el = -70.3 * 1.0E-3;
             return new IonChannel("Original Leakage Channel", gl, el);
         }
             
@@ -224,7 +224,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// Where:
         ///   s∞(V) = 1 / [1 + exp(-(V + Vx + 57)/6.2)]
         ///   u∞(V) = 1 / [1 + exp((V + Vx + 81)/4)]
-        ///   τu(V) = [ 30.8 + 211.4 * exp((V + Vx + 113.2)/5) ]
+        ///   τu(V) = [ 30.8 + 211.4 + exp((V + Vx + 113.2)/5) ]
         ///            / [ 3.7 * (1 + exp((V + Vx + 84)/3.2)) ]
         /// 
         /// The activation s∞(V) is "instantaneous," so we do not create
@@ -250,10 +250,6 @@ namespace C2M2.NeuronalDynamics.Simulation
             // Create the IonChannel object with name, conductance, and reversal potential
             IonChannel lowTCalciumChannel = new IonChannel("Low Threshold Calcium Channel", gT, eCa);
 
-            // Define the functions for the gating variable "u"
-            // u∞(V) = 1 / (1 + exp((Vin + Vx + 81)/4))
-            // τu(V) = [30.8 + 211.4*exp((Vin + Vx + 113.2)/5)] / [3.7*(1 + exp((Vin + Vx + 84)/3.2))]
-            // All calculations are done in mV (hence the conversion from [V] to [mV]).
             Func<Vector, Vector> alpha_u = voltage =>
             {
                 var Vin = voltage.Clone();
@@ -262,7 +258,7 @@ namespace C2M2.NeuronalDynamics.Simulation
                 // Compute u∞(V)
                 Vector uInf = 1.0 / (1.0 + ((Vin + Vx + 81.0) / 4.0).PointwiseExp());
                 // Compute τu(V)
-                Vector tauU = (30.8 + 211.4 * ((Vin + Vx + 113.2) / 5.0).PointwiseExp())
+                Vector tauU = (30.8 + 211.4 + ((Vin + Vx + 113.2) / 5.0).PointwiseExp())
                             .PointwiseDivide(3.7 * (1.0 + ((Vin + Vx + 84.0) / 3.2).PointwiseExp()));
                 // Return alpha_u(V) = u∞(V) / τu(V)
                 return uInf.PointwiseDivide(tauU);
@@ -276,7 +272,7 @@ namespace C2M2.NeuronalDynamics.Simulation
                 // Compute u∞(V)
                 Vector uInf = 1.0 / (1.0 + ((Vin + Vx + 81.0) / 4.0).PointwiseExp());
                 // Compute τu(V)
-                Vector tauU = (30.8 + 211.4 * ((Vin + Vx + 113.2) / 5.0).PointwiseExp())
+                Vector tauU = (30.8 + 211.4 + ((Vin + Vx + 113.2) / 5.0).PointwiseExp())
                             .PointwiseDivide(3.7 * (1.0 + ((Vin + Vx + 84.0) / 3.2).PointwiseExp()));
                 // Return beta_u(V) = [1 - u∞(V)] / τu(V)
                 return (1.0 - uInf).PointwiseDivide(tauU);
@@ -291,18 +287,18 @@ namespace C2M2.NeuronalDynamics.Simulation
             {
                 var Vin = voltage.Clone();
                 Vin.Multiply(1.0E3, Vin); // Convert to mV
-                return 1.0 / (1.0 + (-(Vin + Vx + 50.0) / 10.0).PointwiseExp());
+                return 1.0 / (1.0 + (-(Vin + Vx + 57.0) / 6.2).PointwiseExp());
             };
 
             // Add the gating variable "u" (ODE variable) with exponent 1 and initial probability 0.0.
             lowTCalciumChannel.AddGatingVariable(
-                new GatingVariable("u", alpha_u, beta_u, 1, 0.0, nodeCount)
+                new GatingVariable("u", alpha_u, beta_u, 1, 0.1, nodeCount)
             );
 
             // Create the instantaneous gating variable "s" with exponent 1.
             // We assume that the GatingVariable class has a Boolean property IsInstant.
             lowTCalciumChannel.AddGatingVariable(
-                new GatingVariable("s", sInf, null, 1, 0.0, nodeCount, true)
+                new GatingVariable("s", sInf, null, 1, 0.1, nodeCount, true)
             );
 
             return lowTCalciumChannel;
