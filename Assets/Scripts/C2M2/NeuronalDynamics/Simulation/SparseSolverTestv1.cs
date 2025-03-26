@@ -705,10 +705,12 @@ namespace C2M2.NeuronalDynamics.Simulation
                 "Original Potassium Channel",
                 "Original Sodium Channel",
                 // "Calcium Channel",
-                "Original Leakage Channel"
+                // "Original Leakage Channel"
                 // "NEURON Potassium Channel",
                 // "NEURON Sodium Channel",
-                // "NEURON Leakage Channel"
+                // "NEURON Leakage Channel",
+                "Low Threshold Calcium Channel",
+                "Slow Potassium Channel"
             };
 
 

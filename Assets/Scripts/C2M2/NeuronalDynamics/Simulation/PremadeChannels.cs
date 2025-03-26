@@ -22,18 +22,14 @@ namespace C2M2.NeuronalDynamics.Simulation
             {
                 var Vin = voltage.Clone();
                 Vin.Multiply(1.0E3, Vin); 
-                return (1.0E3) * (0.032)
-                    * (15.0 - Vin)
-                    .PointwiseDivide(((15.0 - Vin) / 5.0).PointwiseExp() - 1.0);
+                return (1.0E3) * (0.032) * (15.0 - Vin).PointwiseDivide(((15.0 - Vin) / 5.0).PointwiseExp() - 1.0);
             };
 
             Func<Vector, Vector> beta_n = voltage =>
             {
                 var Vin = voltage.Clone();
                 Vin.Multiply(1.0E3, Vin);
-                return (1.0E3) * (0.5)
-                    * ((10.0 - Vin) / 40.0)
-                    .PointwiseExp();
+                return (1.0E3) * (0.5) * ((10.0 - Vin) / 40.0).PointwiseExp();
             };
 
             potassiumChannel.AddGatingVariable(
@@ -60,35 +56,28 @@ namespace C2M2.NeuronalDynamics.Simulation
             {
                 var Vin = voltage.Clone();
                 Vin.Multiply(1.0E3, Vin);
-                return (1.0E3) * (0.32)
-                    * (13.0 - Vin)
-                    .PointwiseDivide(((13.0 - Vin) / 4.0).PointwiseExp() - 1.0);
+                return (1.0E3) * (0.32) * (13.0 - Vin).PointwiseDivide(((13.0 - Vin) / 4.0).PointwiseExp() - 1.0);
             };
 
             Func<Vector, Vector> beta_m = voltage =>
             {
                 var Vin = voltage.Clone();
                 Vin.Multiply(1.0E3, Vin);
-                return (1.0E3) * (0.28)
-                    * (Vin - 40.0)
-                    .PointwiseDivide(((Vin - 40.0) / 5.0).PointwiseExp() - 1.0);
+                return (1.0E3) * (0.28) * (Vin - 40.0).PointwiseDivide(((Vin - 40.0) / 5.0).PointwiseExp() - 1.0);
             };
 
             Func<Vector, Vector> alpha_h = voltage =>
             {
                 var Vin = voltage.Clone();
                 Vin.Multiply(1.0E3, Vin);
-                return (1.0E3) * (0.128)
-                    * ((17.0 - Vin) / 18.0)
-                    .PointwiseExp();
+                return (1.0E3) * (0.128) * ((17.0 - Vin) / 18.0).PointwiseExp();
             };
 
             Func<Vector, Vector> beta_h = voltage =>
             {
                 var Vin = voltage.Clone();
                 Vin.Multiply(1.0E3, Vin);
-                return (1.0E3) * 4.0
-                    / (((40.0 - Vin) / 5.0).PointwiseExp() + 1.0);
+                return (1.0E3) * 4.0 / (((40.0 - Vin) / 5.0).PointwiseExp() + 1.0);
             };
 
             sodiumChannel.AddGatingVariable(
@@ -132,33 +121,28 @@ namespace C2M2.NeuronalDynamics.Simulation
             {
                 var Vin = voltage.Clone();
                 Vin.Multiply(1.0E3, Vin);
-                return (1.0E3) * (0.055)
-                    * (27.0 - Vin)
-                    / (((-27.0 - Vin) / 3.8).PointwiseExp() - 1.0);
+                return (1.0E3) * (0.055) * (27.0 - Vin) / (((-27.0 - Vin) / 3.8).PointwiseExp() - 1.0);
             };
 
             Func<Vector, Vector> beta_q = voltage =>
             {
                 var Vin = voltage.Clone();
                 Vin.Multiply(1.0E3, Vin);
-                return (1.0E3) * (0.94)
-                    * (((-75.0 - Vin) / 17.0).PointwiseExp());
+                return (1.0E3) * (0.94) * (((-75.0 - Vin) / 17.0).PointwiseExp());
             };
 
             Func<Vector, Vector> alpha_r = voltage =>
             {
                 var Vin = voltage.Clone();
                 Vin.Multiply(1.0E3, Vin);
-                return (1.0E3) * (0.000457)
-                    * (((-13.0 - Vin) / 50.0).PointwiseExp());
+                return (1.0E3) * (0.000457) * (((-13.0 - Vin) / 50.0).PointwiseExp());
             };
 
             Func<Vector, Vector> beta_r = voltage =>
             {
                 var Vin = voltage.Clone();
                 Vin.Multiply(1.0E3, Vin);
-                return (1.0E3) * (0.0065)
-                    / (((-15.0 - Vin) / 28.0).PointwiseExp() + 1.0);
+                return (1.0E3) * (0.0065) / (((-15.0 - Vin) / 28.0).PointwiseExp() + 1.0);
             };
 
             calciumChannel.AddGatingVariable(
@@ -185,65 +169,45 @@ namespace C2M2.NeuronalDynamics.Simulation
             // 0.004 mS/cm² => 0.04 S/m²
             double gM   = 0.04;          // S/m^2
             double eK   = -90.0 * 1.0E-3; // -90 mV in [V]
-            double tauMax = 4.0;          // 4 s, per Yamada et al.
+            double tMax = 4.0;          // 4 s, per Yamada et al.
 
             // Create an IonChannel object with the specified max conductance and reversal potential
-            IonChannel slowK = new IonChannel("Slow Potassium Channel", gM, eK);
+            IonChannel slowKChannel = new IonChannel("Slow Potassium Channel", gM, eK);
 
-            // alpha_p(V) = p∞(V)/τp(V)
+            // alpha_p(V) = p∞(V) / τp(V)
             Func<Vector, Vector> alpha_p = voltage =>
             {
-                // Convert voltage from [V] to [mV] for the exponent math
-                var Vin = voltage.Clone(); 
-                Vin.Multiply(1.0E3, Vin); // V -> mV
+                var Vin = voltage.Clone();
+                Vin.Multiply(1.0E3, Vin);
+                // Compute steady-state value p∞(V)
+                Vector pInf = Vin.Map(v => 1.0 / (1.0 + Math.Exp(-(v + 35) / 10)));
 
-                pInf = 1 / (1 + exp(-(Vin + 35)/10))
-                
-                Vector A = Vin.Add(35.0).Divide(20.0).PointwiseExp().Multiply(3.3);
-                Vector B = Vin.Add(35.0).Divide(-20.0).PointwiseExp();
-                Vector denom = A.Add(B);
-                // tauP = tmax / [3.3 * exp((Vin+35)/20) + exp(-(Vin+35)/20)]
+                // Compute time constant τp(V) = tMax / (3.3 * exp((V+35)/20) + exp(-(V+35)/20))
+                Vector tauP = Vin.Map(v => tMax / (3.3 * Math.Exp((v + 35) / 20) + Math.Exp(-(v + 35) / 20)));
 
-                // handle corner cases if denom ~ 0
-                Vector tauP = denom.Map(d => d == 0.0 ? tauMax : (tauMax / d));
-
-                // alpha_p = pInf / tauP
-                Vector alpha = pInf.PointwiseDivide(tauP);
-                return alpha;
+                // Return alpha_p(V) = p∞(V) / τp(V)
+                return pInf.PointwiseDivide(tauP);
             };
-
+            
             // beta_p(V) = [1 - p∞(V)] / τp(V)
             Func<Vector, Vector> beta_p = voltage =>
             {
                 var Vin = voltage.Clone();
                 Vin.Multiply(1.0E3, Vin);
+                Vector pInf = Vin.Map(v => 1.0 / (1.0 + Math.Exp(-(v + 35) / 10)));
+                Vector tauP = Vin.Map(v => tMax / (3.3 * Math.Exp((v + 35) / 20) + Math.Exp(-(v + 35) / 20)));
 
-                Vector pInf = Vin.Add(35.0)
-                                .Divide(-10.0)
-                                .PointwiseExp()
-                                .Add(1.0)
-                                .Map(x => 1.0 / x);
-
-                Vector A = Vin.Add(35.0).Divide(20.0).PointwiseExp().Multiply(3.3);
-                Vector B = Vin.Add(35.0).Divide(-20.0).PointwiseExp();
-                Vector denom = A.Add(B);
-                Vector tauP = denom.Map(d => d == 0.0 ? tauMax : (tauMax / d));
-
-                // (1 - p∞)
-                Vector oneMinus = pInf.Map(x => 1.0 - x);
-                // beta_p = (1 - p∞)/τp
-                Vector bet = oneMinus.PointwiseDivide(tauP);
-                return bet;
+                return (1 - pInf).PointwiseDivide(tauP);
             };
 
             // Add a single gating variable 'p' with exponent=1
             // p is initialized to 0.0 by default, or you could set
             // an approximate resting value if you like.
-            slowK.AddGatingVariable(
+            slowKChannel.AddGatingVariable(
                 new GatingVariable("p", alpha_p, beta_p, 1, 0.0, nodeCount)
             );
 
-            return slowK;
+            return slowKChannel;
         }
 
         /// <summary>
@@ -269,72 +233,72 @@ namespace C2M2.NeuronalDynamics.Simulation
         ///   I_T = gT * s∞(V)^2 * u * (V - Eca).
         /// </summary>
         public static IonChannel LowThresholdCalciumChannel(int nodeCount)
-        {
-            // Example maximal conductance in S/m²:
-            // If your references say 0.05 S/m², you can use that
-            double gT  = 0.05;            
-            // Reversal potential for Ca2+ in volts
-            double eCa = 120.0e-3;       
-            // Typical shift, if the paper uses Vx=2 mV, we add 2 to the (Vin) in the exponent
-            double vShift = 2.0;  // mV
+{
+    // Example maximal conductance in S/m² (adjust as needed)
+    // If references say 0.05 S/m² or 0.1 S/m², etc., plug that in here
+    double gT  = 0.05;       
+    // Reversal potential for Ca²⁺ in volts
+    double eCa = 120.0e-3;   
+    // Typical shift used in some references (in mV)
+    double Vx = 2.0;     
 
-            // Create the channel object
-            IonChannel LowCa = new IonChannel("Low Threshold Calcium", gT, eCa);
+    // Create the IonChannel object with name, conductance, and reversal potential
+    IonChannel tChannel = new IonChannel("Low Threshold Calcium Channel", gT, eCa);
 
-            // We define the inactivation gating variable "u" with alpha_u(V), beta_u(V).
-            // alpha_u(V) = u∞(V)/τu(V)
-            // beta_u(V)  = [1 - u∞(V)]/τu(V)
+    Func<Vector, Vector> alpha_u = voltage =>
+    {
+        var Vin = voltage.Clone();
+        Vin.Multiply(1.0e3, Vin);
 
-            Func<Vector, Vector> alpha_u = voltage =>
-            {
-                var Vin = voltage.Clone();
-                Vin.Multiply(1.0E3, Vin);
+        // u∞(V)
+        //   = 1 / (1 + exp( (Vin + Vx + 81)/4 ))
+        //   (the sign in the exponent depends on the original equation)
+        Vector uInf = Vin.Add(Vx + 81.0)
+                         .Divide(4.0)
+                         .PointwiseExp()
+                         .Add(1.0)
+                         .Map(x => 1.0 / x);
 
-                // u∞(mV) = 1 / [1 + exp((Vin + vShift + 81)/4)]
-                Vector uInf = Vin.Add(vShift + 81.0)
-                                .Divide(4.0)
-                                .PointwiseExp()
-                                .Add(1.0)
-                                .Map(x => 1.0 / x);
+        // τu(V)
+        //   = [30.8 + 211.4*exp((Vin + Vx + 113.2)/5)] /
+        //     [3.7 * (1 + exp((Vin + Vx + 84)/3.2))]
+        Vector top = Vin.Add(Vx + 113.2).Divide(5.0).PointwiseExp().Multiply(211.4).Add(30.8);
+        Vector bot = Vin.Add(Vx + 84.0).Divide(3.2).PointwiseExp().Add(1.0).Multiply(3.7);
+        Vector tauU = top.PointwiseDivide(bot);
 
-                // τu(mV) = [ 30.8 + 211.4 * exp((Vin + vShift + 113.2)/5) ]
-                //          / [ 3.7 * (1 + exp((Vin + vShift + 84)/3.2)) ]
-                Vector topExp = Vin.Add(vShift + 113.2).Divide(5.0).PointwiseExp().Multiply(211.4).Add(30.8);
-                Vector bottomExp = Vin.Add(vShift + 84.0).Divide(3.2).PointwiseExp().Add(1.0).Multiply(3.7);
-                Vector tauU = topExp.PointwiseDivide(bottomExp);
+        // alpha_u = uInf / tauU
+        return uInf.PointwiseDivide(tauU);
+    };
 
-                // alpha_u = u∞ / τu
-                return uInf.PointwiseDivide(tauU);
-            };
+    Func<Vector, Vector> beta_u = voltage =>
+    {
+        var Vin = voltage.Clone();
+        Vin.Multiply(1.0e3, Vin);
 
-            Func<Vector, Vector> beta_u = voltage =>
-            {
-                var Vin = voltage.Clone();
-                Vin.Multiply(1.0E3, Vin);
+        Vector uInf = Vin.Add(Vx + 81.0)
+                         .Divide(4.0)
+                         .PointwiseExp()
+                         .Add(1.0)
+                         .Map(x => 1.0 / x);
 
-                Vector uInf = Vin.Add(vShift + 81.0)
-                                .Divide(4.0)
-                                .PointwiseExp()
-                                .Add(1.0)
-                                .Map(x => 1.0 / x);
+        Vector top = Vin.Add(Vx + 113.2).Divide(5.0).PointwiseExp().Multiply(211.4).Add(30.8);
+        Vector bot = Vin.Add(Vx + 84.0).Divide(3.2).PointwiseExp().Add(1.0).Multiply(3.7);
+        Vector tauU = top.PointwiseDivide(bot);
 
-                Vector topExp = Vin.Add(vShift + 113.2).Divide(5.0).PointwiseExp().Multiply(211.4).Add(30.8);
-                Vector bottomExp = Vin.Add(vShift + 84.0).Divide(3.2).PointwiseExp().Add(1.0).Multiply(3.7);
-                Vector tauU = topExp.PointwiseDivide(bottomExp);
+        // beta_u = [1 - uInf]/ tauU
+        return uInf.Map(val => 1.0 - val).PointwiseDivide(tauU);
+    };
 
-                // beta_u = (1 - u∞)/ τu
-                Vector oneMinus = uInf.Map(val => 1.0 - val);
-                return oneMinus.PointwiseDivide(tauU);
-            };
+    // Add the gating variable "u" with exponent=1. 
+    // The activation s∞(V) is not an ODE gating variable; 
+    // it is used in the reaction function as s∞(V)^2 * u.
+    tChannel.AddGatingVariable(
+        new GatingVariable("u", alpha_u, beta_u, exponent: 1, probability: 0.0, nodeCount)
+    );
 
-            // We add a single gating variable "u" with exponent=1
-            // and an initial probability ~0 or some small value if desired
-            tChannel.AddGatingVariable(
-                new GatingVariable("u", alpha_u, beta_u, exponent: 1, initialProbability: 0.0, nodeCount)
-            );
+    return tChannel;
+}
 
-            return tChannel;
-        }
 
 
         /// <summary>
