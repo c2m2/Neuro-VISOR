@@ -377,7 +377,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
             
             if (csv != null)
             {
-                csv.WriteToCSV(1000 * GetSimulationTime(), Get1DValues(), solver.getM(), solver.getH(),solver.getN());
+                csv.WriteToCSV(1000 * GetSimulationTime(), Get1DValues());
             }
         }
 

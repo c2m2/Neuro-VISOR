@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System;
@@ -59,7 +59,8 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// [ohm.m] resistance.length, this is the axial resistence of the neuron, increasing this value has the effect of making the AP waves more localized and slower conduction speed
         /// decreasing this value has the effect of make the AP waves larger and have a faster conduction speed
         /// </summary>
-        private double res = 300.0 * 1.0E-2;
+        // private double res = 300.0 * 1.0E-2;
+        private double res = 100.0 * 1.0E-2;
         /// <summary>
         /// [F/m2] capacitance per unit area, this is the plasma membrane capacitance, this a standard value for the capacitance
         /// </summary>
@@ -81,7 +82,9 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// \f[\bar{g}_{l}(V-V_l)\f]
         /// \f$V_l\f$ is the leak reversal potential.
         /// </summary>
-        private double gl = 0.0 * 1.0E1;
+        // private double gl = 0.0 * 1.0E1;
+        private double gl = 0.00015 * 1.0E4; 
+
         /// <summary>
         /// [V] potassium reversal potential
         /// </summary>
@@ -322,10 +325,52 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// </summary>
         /// <param name="newVal"></param>
         /// <returns></returns>
+        public bool voltageClampMode = false;
+        double stimDelay = 300e-3;      // 3 ms delay
+        double stimDuration = 400e-3;   // 400 ms duration
+        double stimAmplitude = 0.05e-9;
+
         public List<double> SynapseCurrentFunction((Synapse, Synapse) newVal, Synapse.Model model)
         {
             // allocate a small for the two currents, one for current state, and one for previous state
             List<double> Icurrs = new List<double>();
+
+            if (!voltageClampMode)  // IClamp
+            {
+                // Check if we are within the stimulation window.
+                newVal.Item1.ActivationTime = GetSimulationTime();
+                if (newVal.Item1.ActivationTime >= stimDelay && newVal.Item1.ActivationTime < (stimDelay + stimDuration))
+                {
+                    // Inject a fixed current.
+                    Icurrs.Add(stimAmplitude);
+                    Icurrs.Add(stimAmplitude);
+                }
+                else
+                {
+                    // Outside the stimulus window, no injection.
+                    Icurrs.Add(0.0);
+                    Icurrs.Add(0.0);
+                }
+                return Icurrs;
+            }
+
+            if (voltageClampMode)
+            {
+                // Target postsynaptic voltage: 25 mV (0.025 V)
+                double targetVoltage = 0.005;
+                // Get the current voltage at the postsynaptic node.
+                int postIndex = newVal.Item2.FocusVert;
+                double currentVoltage = U_Active[postIndex];
+                // // Compute the error (difference) between target and current voltage.
+                double voltageError = targetVoltage - currentVoltage;
+                // // Use a proportional gain (adjust this constant as needed)
+                double clampGain = 1e-9;
+                double clampCurrent = clampGain * voltageError;
+                // Return the same current for both current and previous state.
+                Icurrs.Add(clampCurrent);
+                Icurrs.Add(clampCurrent);
+                return Icurrs;
+            }
 
             // get the pre and post synaptic voltages
             double presynVoltage = newVal.Item1.simulation.Get1DValues()[newVal.Item1.FocusVert];
@@ -573,16 +618,17 @@ namespace C2M2.NeuronalDynamics.Simulation
             /// the dtmin is based on prior numerical experiments that revealed that for each refinement level the 
             /// voltage profiles were visually accurate when compared to Yale Neuron for delta t at least 2 microseconds
             /// we want to avoid using dtmin; therefore I compute the upper bound (and lower bound for reference)
-            //double dtmin = 2e-6;  
-            double dtmax = 50e-6;
+            // double dtmin = 2e-6;  
+            double dtmax = 5.0e-5;
+            // double dtmax = 5.0e-6;
             double dt;
 
             double gll = gl; double scf = 1E-6; // to convert to micrometer of edgelengths and radii don't forget this!!!!
 
             // what happens if the leak conductance is 0
             if (gll == 0.0) { gll = 1.0; }
-            
-            double upper_bound = cap * edgeLength*scf * System.Math.Sqrt(res / (gll*minDiameter*scf));
+            double upper_bound = 100;
+            // double upper_bound = cap * edgeLength*scf * System.Math.Sqrt(res / (gll*minDiameter*scf));
             //double lower_bound = cap * edgeLength*scf * System.Math.Sqrt(res / (gna + gk + gl) * maxDiameter*scf);
             //GameManager.instance.DebugLogSafe("upper_bound = " + upper_bound.ToString());
 
@@ -605,7 +651,7 @@ namespace C2M2.NeuronalDynamics.Simulation
             //     return (1.0E3) * (0.032) * (15.0 - Vin).PointwiseDivide(((15.0 - Vin) / 5.0).PointwiseExp() - 1.0);
             // };
 
-            // Func<Vector, Vector> beta_n = voltage => {
+            // Func<Vector, Vector> beta n = voltage => {
             //     var Vin = voltage.Clone();
             //     Vin.Multiply(1.0E3, Vin);
             //     return (1.0E3) * (0.5) * ((10.0 - Vin) / 40.0).PointwiseExp();
@@ -706,12 +752,12 @@ namespace C2M2.NeuronalDynamics.Simulation
             {
                 "Original Potassium Channel",
                 "Original Sodium Channel",
-                "Calcium Channel",
+                // "Calcium Channel",
                 "Original Leakage Channel",
                 // "NEURON Potassium Channel",
                 // "NEURON Sodium Channel",
                 // "Low Threshold Calcium Channel",
-                "Slow Potassium Channel"
+                // "Slow Potassium Channel"
             };
 
 
@@ -750,16 +796,29 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// </summary>
         private void InitializeNeuronCell()
         {
+            // Initialize ion channels and associated gating variables
+            InitializeIonChannel();
+
+            double starting_voltage = 0.0;
+            
+            foreach (var channel in activeIonChannels)
+            {
+
+                // Apply leakage reversal potential as vstart if leakage exists
+                if (channel.Name.Contains("Leak")) {
+                    starting_voltage = channel.ReversalPotential;
+                    Debug.Log(channel.ReversalPotential);
+                }
+            }
+
             lock (visualizationValuesLock)
             {
-                U = Vector.Build.Dense(Neuron.nodes.Count, 0.0);
+                U = Vector.Build.Dense(Neuron.nodes.Count, starting_voltage); // Here is where initial voltage is set. -0.07 implies a start voltage of -70 mV for all vectors
                 U_Active = U.Clone();
             }
             Upre = U_Active.Clone();
             Isyn = Vector.Build.Dense(Neuron.nodes.Count, 0.0);
 
-            // Initialize ion channels and associated gating variables
-            InitializeIonChannel();
             
             currentStates = new Dictionary<string, Vector>();
             previousStates = new Dictionary<string, Vector>();

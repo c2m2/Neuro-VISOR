@@ -64,7 +64,7 @@ namespace C2M2.Utils
             return filename;
         }
 
-        public void WriteToCSV(float sTime, double [] cellData, double [] M, double [] H, double []N)
+        public void WriteToCSV(float sTime, double [] cellData)
         {
             Stopwatch stopWatch = new Stopwatch();
             
@@ -89,25 +89,6 @@ namespace C2M2.Utils
                             bw.Write(cellData[i] * sim.unitScaler);
                         }
                     }
-
-           
-                    for (int i = 0; i < size; i++)
-                    {
-                        bw.Write(M[i]);
-                    }
-
-         
-                    for (int i = 0; i < size; i++)
-                    {
-                        bw.Write(H[i]);
-                    }
-
-          
-                    for (int i = 0; i < size; i++)
-                    {
-                        bw.Write(N[i]);
-                    }
-                
 
                 stopWatch.Stop();
                 
@@ -149,33 +130,6 @@ namespace C2M2.Utils
                     {
                         double cellValue = reader.ReadDouble();
                         csvWriter.Write(cellValue + ",");
-                    }
-                    csvWriter.WriteLine();
-
-         
-                    csvWriter.Write("M,");
-                    for (int i = 0; i < size; i++)
-                    {
-                        double mValue = reader.ReadDouble();
-                        csvWriter.Write(mValue + (i < size-1 ? "," : ""));
-                    }
-                    csvWriter.WriteLine();
-
-              
-                    csvWriter.Write("H,");
-                    for (int i = 0; i < size; i++)
-                    {
-                        double hValue = reader.ReadDouble();
-                        csvWriter.Write(hValue + (i < size-1 ? "," : ""));
-                    }
-
-                    csvWriter.WriteLine();
-                    
-                    csvWriter.Write("N,");
-                    for (int i = 0; i < size; i++)
-                    {
-                        double nValue = reader.ReadDouble();
-                        csvWriter.Write(nValue + (i < size-1 ? "," : ""));
                     }
                     csvWriter.WriteLine();
                 }
