@@ -326,9 +326,11 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// <param name="newVal"></param>
         /// <returns></returns>
         public bool voltageClampMode = false;
-        double stimDelay = 300e-3;      // 3 ms delay
+        // double stimDelay = 3e-3;      // 300 ms delay
+        double stimDelay = 0;      // 300 ms delay
         double stimDuration = 400e-3;   // 400 ms duration
-        double stimAmplitude = 0.05e-9;
+        // double stimAmplitude = 0.014e-9;
+        double stimAmplitude = 0.5e-9;
 
         public List<double> SynapseCurrentFunction((Synapse, Synapse) newVal, Synapse.Model model)
         {
@@ -619,8 +621,8 @@ namespace C2M2.NeuronalDynamics.Simulation
             /// voltage profiles were visually accurate when compared to Yale Neuron for delta t at least 2 microseconds
             /// we want to avoid using dtmin; therefore I compute the upper bound (and lower bound for reference)
             // double dtmin = 2e-6;  
-            double dtmax = 5.0e-5;
-            // double dtmax = 5.0e-6;
+            // double dtmax = 5.0e-5;
+            double dtmax = 5.0e-6;
             double dt;
 
             double gll = gl; double scf = 1E-6; // to convert to micrometer of edgelengths and radii don't forget this!!!!
