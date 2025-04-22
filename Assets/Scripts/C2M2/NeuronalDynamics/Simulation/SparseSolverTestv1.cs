@@ -54,13 +54,13 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// This is the voltage for the voltage clamp, this is primarily used for when we do the convergence analysis of the code using a 
         /// soma clamp at 50 [mV], the units for voltage in the solver is [V] that is why <c>vstart</c> is set to 0.05
         ///</summary>
-        public double vstart = 1.000;         
+        public double vstart = 0.050;         
         ///<summary>
         /// [ohm.m] resistance.length, this is the axial resistence of the neuron, increasing this value has the effect of making the AP waves more localized and slower conduction speed
         /// decreasing this value has the effect of make the AP waves larger and have a faster conduction speed
         /// </summary>
-        // private double res = 300.0 * 1.0E-2;
-        private double res = 100.0 * 1.0E-2;
+        private double res = 300.0 * 1.0E-2;
+        // private double res = 100.0 * 1.0E-2;
         /// <summary>
         /// [F/m2] capacitance per unit area, this is the plasma membrane capacitance, this a standard value for the capacitance
         /// </summary>
@@ -76,15 +76,14 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// \f[\bar{g}_{Na}m^3h(V-V_{Na})\f]
         /// where \f$m,h\f$ are the state variables, and \f$V_{Na}\f$ is the reversal potential for sodium.
         /// </summary>
-        private double gna = 60.0 * 1.0E1;
+        private double gna = 50.0 * 1.0E1;
         /// <summary>
         /// [S/m2] leak conductance per unit area, this is the leak conductance per unit area, it is used in this term
         /// \f[\bar{g}_{l}(V-V_l)\f]
         /// \f$V_l\f$ is the leak reversal potential.
         /// </summary>
         // private double gl = 0.0 * 1.0E1;
-        private double gl = 0.00015 * 1.0E4; 
-
+        private double gl = 0.0 * 1.0E4; 
         /// <summary>
         /// [V] potassium reversal potential
         /// </summary>
@@ -326,11 +325,11 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// <param name="newVal"></param>
         /// <returns></returns>
         public bool voltageClampMode = false;
-        // double stimDelay = 3e-3;      // 300 ms delay
-        double stimDelay = 0;      // 300 ms delay
+        double stimDelay = 300e-3;      // 300 ms delay
+        // double stimDelay = 0;      // 300 ms delay
         double stimDuration = 400e-3;   // 400 ms duration
         // double stimAmplitude = 0.014e-9;
-        double stimAmplitude = 0.5e-9;
+        double stimAmplitude = 0.011535e-9;
 
         public List<double> SynapseCurrentFunction((Synapse, Synapse) newVal, Synapse.Model model)
         {
@@ -620,9 +619,9 @@ namespace C2M2.NeuronalDynamics.Simulation
             /// the dtmin is based on prior numerical experiments that revealed that for each refinement level the 
             /// voltage profiles were visually accurate when compared to Yale Neuron for delta t at least 2 microseconds
             /// we want to avoid using dtmin; therefore I compute the upper bound (and lower bound for reference)
-            // double dtmin = 2e-6;  
-            // double dtmax = 5.0e-5;
-            double dtmax = 5.0e-6;
+            // double dtmin = 2e-6;
+            double dtmax = 5.0e-5;
+            // double dtmax = 5.0e-6;
             double dt;
 
             double gll = gl; double scf = 1E-6; // to convert to micrometer of edgelengths and radii don't forget this!!!!
@@ -645,109 +644,6 @@ namespace C2M2.NeuronalDynamics.Simulation
             ionChannels = new List<IonChannel>();
             activeIonChannels = new List<IonChannel>();
 
-            // // Alpha and Beta functions
-            // // For Potassium Channels
-            // Func<Vector, Vector> alpha_n = voltage => {
-            //     var Vin = voltage.Clone();
-            //     Vin.Multiply(1.0E3, Vin); 
-            //     return (1.0E3) * (0.032) * (15.0 - Vin).PointwiseDivide(((15.0 - Vin) / 5.0).PointwiseExp() - 1.0);
-            // };
-
-            // Func<Vector, Vector> beta n = voltage => {
-            //     var Vin = voltage.Clone();
-            //     Vin.Multiply(1.0E3, Vin);
-            //     return (1.0E3) * (0.5) * ((10.0 - Vin) / 40.0).PointwiseExp();
-            // };
-
-            // // For Sodium Channels
-
-            // Func<Vector, Vector> alpha_m = voltage => {
-            //     var Vin = voltage.Clone();
-            //     Vin.Multiply(1.0E3, Vin);
-            //     return (1.0E3) * (0.32) * (13.0 - Vin).PointwiseDivide(((13.0 - Vin) / 4.0).PointwiseExp() - 1.0);
-            // };
-
-            // Func<Vector, Vector> beta_m = voltage => {
-            //     var Vin = voltage.Clone();
-            //     Vin.Multiply(1.0E3, Vin);
-            //     return (1.0E3) * (0.28) * (Vin - 40.0).PointwiseDivide(((Vin - 40.0) / 5.0).PointwiseExp() - 1.0);
-            // };
-
-            // Func<Vector, Vector> alpha_h = voltage => {
-            //     var Vin = voltage.Clone();
-            //     Vin.Multiply(1.0E3, Vin);
-            //     return (1.0E3) * (0.128) * ((17.0 - Vin) / 18.0).PointwiseExp();
-            // };
-
-            // Func<Vector, Vector> beta_h = voltage => {
-            //     var Vin = voltage.Clone();
-            //     Vin.Multiply(1.0E3, Vin);
-            //     return (1.0E3) * (4.0) / (((40.0 - Vin) / 5.0).PointwiseExp() + 1.0);
-            // };
-
-            // // For Calcium Channels
-
-            // Func<Vector, Vector> alpha_q = voltage => {
-            //     var Vin = voltage.Clone();
-            //     Vin.Multiply(1.0E3, Vin);
-            //     return (1.0E3) * (0.055) * (27.0 - Vin) / (((-27 - Vin) / 3.8).PointwiseExp() - 1.0);
-            // };
-            
-            // Func<Vector, Vector> beta_q = voltage => {
-            //     var Vin = voltage.Clone();
-            //     Vin.Multiply(1.0E3, Vin);
-            //     return (1.0E3) * (0.94) * (((-75.0 - Vin) / 17.0).PointwiseExp());
-            // };
-
-            // Func<Vector, Vector> alpha_r = voltage => {
-            //     var Vin = voltage.Clone();
-            //     Vin.Multiply(1.0E3, Vin);
-            //     return (1.0E3) * (0.000457) * (((-13 - Vin) / 50.0).PointwiseExp());
-            // };
-            
-            // Func<Vector, Vector> beta_r = voltage => {
-            //     var Vin = voltage.Clone();
-            //     Vin.Multiply(1.0E3, Vin);
-            //     return (1.0E3) * (0.0065) / (((-15.0 - Vin) / 28.0).PointwiseExp() + 1.0);
-            // };
-
-            // // For Chloride Channel
-            // Func<Vector, Vector> alpha_cl = voltage =>
-            // {
-            //     var Vin = voltage.Clone();
-            //     Vin.Multiply(1.0E3, Vin);
-            //     // α₍Cl₎(V) = 0.07*(V+20) / (1 - exp(-(V+20)/10))
-            //     return (1.0E3) * (0.07) * (Vin.Add(20.0)).PointwiseDivide(((Vin.Add(20.0)).Divide(10.0)).PointwiseExp().Subtract(1.0));
-            // };
-
-
-            // Func<Vector, Vector> beta_cl = voltage =>
-            // {
-            //     var Vin = voltage.Clone();
-            //     Vin.Multiply(1.0E3, Vin);
-            //     // β₍Cl₎(V) = 0.1 * exp(-(V+30)/10)
-            //     return (1.0E3) * (0.1) * ((-(Vin.Add(30.0)).Divide(10.0)).PointwiseExp());
-            // };
-
-            // Initialize ion channels and gating variables
-            // IonChannel potassiumChannel = new IonChannel("Potassium Channel", gk, ek);
-            // potassiumChannel.AddGatingVariable(new GatingVariable("n", alpha_n, beta_n, nx, ni, Neuron.nodes.Count));
-
-            // IonChannel sodiumChannel = new IonChannel("Sodium Channel", gna, ena);
-            // sodiumChannel.AddGatingVariable(new GatingVariable("m", alpha_m, beta_m, mx, mi, Neuron.nodes.Count));
-            // sodiumChannel.AddGatingVariable(new GatingVariable("h", alpha_h, beta_h, hx, hi, Neuron.nodes.Count));
-
-            
-            // IonChannel calciumChannel = new IonChannel("Calcium Channel", gca, eca);
-            // calciumChannel.AddGatingVariable(new GatingVariable("q", alpha_q, beta_q, qx, qi, Neuron.nodes.Count));
-            // calciumChannel.AddGatingVariable(new GatingVariable("r", alpha_r, beta_r, rx, ri, Neuron.nodes.Count));
-            
-            // IonChannel chlorideChannel = new IonChannel("Chloride Channel", gcl, ecl);
-            // chlorideChannel.AddGatingVariable(new GatingVariable("x", alpha_cl, beta_cl, 1, 0.5, Neuron.nodes.Count));
-
-
-            // IonChannel leakageChannel = new IonChannel("Leakage Channel", gl, el);
-
             // The following lines are adding all channels from PremadeChannels.cs
 
             List<string> wantedChannels = new List<string>
@@ -755,7 +651,7 @@ namespace C2M2.NeuronalDynamics.Simulation
                 "Original Potassium Channel",
                 "Original Sodium Channel",
                 // "Calcium Channel",
-                "Original Leakage Channel",
+                // "Original Leakage Channel",
                 // "NEURON Potassium Channel",
                 // "NEURON Sodium Channel",
                 // "Low Threshold Calcium Channel",
@@ -778,13 +674,6 @@ namespace C2M2.NeuronalDynamics.Simulation
                         }
                 }
             }
-
-
-            // AddIonChannel(potassiumChannel);
-            // AddIonChannel(sodiumChannel);
-            // AddIonChannel(chlorideChannel);
-            // AddIonChannel(calciumChannel);
-            // AddIonChannel(leakageChannel);
         }
 
         /// <summary>
@@ -801,21 +690,21 @@ namespace C2M2.NeuronalDynamics.Simulation
             // Initialize ion channels and associated gating variables
             InitializeIonChannel();
 
-            double starting_voltage = 0.0;
+            double starting_voltage = -0.008;
             
-            foreach (var channel in activeIonChannels)
-            {
+            // foreach (var channel in activeIonChannels)
+            // {
 
-                // Apply leakage reversal potential as vstart if leakage exists
-                if (channel.Name.Contains("Leak")) {
-                    starting_voltage = channel.ReversalPotential;
-                    Debug.Log(channel.ReversalPotential);
-                }
-            }
+            //     // Apply leakage reversal potential as vstart if leakage exists
+            //     if (channel.Name.Contains("Leak")) {
+            //         starting_voltage = channel.ReversalPotential;
+            //         Debug.Log(channel.ReversalPotential);
+            //     }
+            // }
 
             lock (visualizationValuesLock)
             {
-                U = Vector.Build.Dense(Neuron.nodes.Count, starting_voltage); // Here is where initial voltage is set. -0.07 implies a start voltage of -70 mV for all vectors
+                U = Vector.Build.Dense(Neuron.nodes.Count, 0.0); // Here is where initial voltage is set. -0.07 implies a start voltage of -70 mV for all vectors
                 U_Active = U.Clone();
             }
             Upre = U_Active.Clone();

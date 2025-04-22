@@ -72,7 +72,7 @@ namespace C2M2.Utils
             
             
          
-            if (cellData.Length!=0& numRows<60*50)
+            if (cellData.Length!=0& numRows<10000*10000)
             {
                 numRows++;
                 

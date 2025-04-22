@@ -13,10 +13,10 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// </summary>
         public static IonChannel OriginalPotassiumChannel(int nodeCount)
         {
-            double gk = 0.01 * 1.0E4;     // => 100 S/m²
-            double ek = -100.0 * 1.0E-3;  // => -100 V
-            double vT = -55.0;
-            // double vT = 0.0;
+            double gk = 5.0 * 1.0E1;     // => 100 S/m²
+            double ek = -90.0 * 1.0E-3;  // => -100 V
+            // double vT = -55.0;
+            double vT = 0.0;
 
             IonChannel potassiumChannel = new IonChannel("Original Potassium Channel", gk, ek);
 
@@ -48,10 +48,10 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// </summary>
         public static IonChannel OriginalSodiumChannel(int nodeCount)
         {
-            double gna = 0.05 * 1.0E4;    // S/m2
+            double gna = 50.0 * 1.0E1;    // S/m2
             double ena = 50.0 * 1.0E-3;
-            double vT = -55.0;
-            // double vT = 0.0;
+            // double vT = -55.0;
+            double vT = 0.0;
 
             IonChannel sodiumChannel = new IonChannel("Original Sodium Channel", gna, ena);
 
@@ -100,7 +100,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         
         public static IonChannel OriginalLeakageChannel(int nodeCount)
         {
-            double gl = 1.5E-4 * 1.0E4;  // S/m²
+            double gl = 1.0E-4 * 1.0E4;  // S/m²
             double el = -70.0 * 1.0E-3;   // mV
             return new IonChannel("Original Leakage Channel", gl, el);
         }

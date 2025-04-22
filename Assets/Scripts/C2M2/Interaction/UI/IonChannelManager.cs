@@ -13,6 +13,7 @@ namespace C2M2.NeuronalDynamics.Simulation
             ionChannels = new List<IonChannel>();
             activeIonChannels = new List<IonChannel>();
         }
+        
         // public void UpdateConductance(string channelName, double newConductance)
         // {
         //     IonChannel channel = ionChannels.FirstOrDefault(ch => ch.Name.Equals(channelName));
