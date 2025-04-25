@@ -225,22 +225,31 @@ namespace C2M2.NeuronalDynamics.Simulation {
                     }
                 }
 
-                /// Apply synapse values, if there are any synapses
+                //Checks if there are currently any synapses by using the list kept in synapseManager
                 if (Manager.synapseManager.synapses.Count > 0)
                 {
+                    //Creates a list of (Synapse, Synapse) pairs to keep track of corresponding pre- and post-synapses
+                    //Note: a Synapse refers to the prefab Synapse, a type of marker attached to a node when it is either the pre- or post- synaptic node
                     List<(Synapse, Synapse)> synapses = new List<(Synapse, Synapse)>(); //pre (Item1) and post (Item2) synapses
                     
-                    // Gather a list of each synapse with their post on the current sim
+                    // Iterates through every (Synapse, Synapse) pair in the synapse list kept in the synapse manager
+                    // Checks if the neuron attached to this simulation class contains any post-synapse nodes
                     foreach ((Synapse, Synapse) syn in Manager.synapseManager.synapses)
                     {
                         Synapse preSynapse = syn.Item1;
                         Synapse postSynapse = syn.Item2;
+
                         if (this == postSynapse.simulation)
                         {
-                            // Set the synapse voltage to what the voltage is at the 1D vertex
-                            preSynapse.ActivationTime = 0.0;
-                            postSynapse.ActivationTime = 0.0;
+                            //Initializes the activation time of both synapses
+                            //NOTE: This code is an additional cause of the (t-ts) bug: since it runs on every frame of the program,
+                            //it resets activation time back to zero even after sparseSolver updates it.
 
+                            // preSynapse.ActivationTime = 0.0;
+                            // postSynapse.ActivationTime = 0.0;
+
+                            //After the foreach loop, the synapses list will contain a list of all the synapses with a post-synaptic side on the
+                            //current neuron, which this simulation is attached to
                             synapses.Add((preSynapse, postSynapse));
                         }
                     }

@@ -49,6 +49,11 @@ namespace C2M2.NeuronalDynamics.Simulation
     public class SparseSolverTestv1 : NDSimulation
     {
         ///<summary>
+        /// This is the voltage threshold for an action potential, used in rate functions and the synapse current:
+        /// I Believe it is in mv?
+        public static double Vt = 0.0;
+
+        ///<summary>
         /// This is the voltage for the voltage clamp, this is primarily used for when we do the convergence analysis of the code using a 
         /// soma clamp at 50 [mV], the units for voltage in the solver is [V] that is why <c>vstart</c> is set to 0.05
         ///</summary>
@@ -68,30 +73,38 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// where \f$n\f$ is the state variable, and \f$V_k\f$ is the reversal potential.
         /// </summary>
         private double gk = 5.0 * 1.0E1;
+        // private double gk = 36;
         /// <summary>
         /// [S/m2] sodium conductance per unit area, this is the Sodium conductance per unit area, it is used in this term
         /// \f[\bar{g}_{Na}m^3h(V-V_{Na})\f]
         /// where \f$m,h\f$ are the state variables, and \f$V_{Na}\f$ is the reversal potential for sodium.
         /// </summary>
         private double gna = 50.0 * 1.0E1;
+        // private double gna = 120;
+        
         /// <summary>
         /// [S/m2] leak conductance per unit area, this is the leak conductance per unit area, it is used in this term
         /// \f[\bar{g}_{l}(V-V_l)\f]
         /// \f$V_l\f$ is the leak reversal potential.
         /// </summary>
-        private double gl = 0.0 * 1.0E1;
+        private double gl = 0.0;
         /// <summary>
         /// [V] potassium reversal potential
         /// </summary>
-        private double ek = -90.0 * 1.0E-3;
+        // private double ek = -90.0 * 1.0E-3;
+        private double ek = -77.0 * 1.0E-3;
+
         /// <summary>
         /// [V] sodium reversal potential
         /// </summary>
         private double ena = 50.0 * 1.0E-3;
+
         /// <summary>
         /// [V] leak reversal potential
         /// </summary>
-        private double el = -70.0 * 1.0E-3;
+        // private double el = -70.0 * 1.0E-3;
+        private double el = -54.3 * 1.0E-3;
+
         /// <summary>
         /// [] potassium channel state probability, unitless
         /// </summary>
@@ -103,7 +116,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// <summary>
         /// [] sodium channel state probability, unitless  
         /// </summary>
-        private double hi = 0.9959410;        
+        private double hi = 0.9959410;
         /// <summary>
         /// These are the solution vectors for the voltage <code>U</code>
         /// the state <c>M</c>, state <c>N</c>, and state <c>H</c>
@@ -222,7 +235,6 @@ namespace C2M2.NeuronalDynamics.Simulation
 
             return YY.Add(ZZ.Multiply(rj.DotProduct(YY) / (1 - rj.DotProduct(ZZ))));
         }
-
         /// <summary>
         /// Receives 1D information for synaptic communication
         /// newValues = is a list of (presynapse, postsynapse)
@@ -262,12 +274,13 @@ namespace C2M2.NeuronalDynamics.Simulation
             area = 2 * System.Math.PI * Neuron.nodes[newVal.Item2.FocusVert].NodeRadius * Neuron.TargetEdgeLength * 1e-12;
 
             //Icurrs[0] is current synaptic state, and Icurrs[1] is previous synaptic state
-            Icurrs = SynapseCurrentFunction(newVal, newVal.Item1.currentModel);
+            Icurrs = SynapseCurrentFunction(newVal, newVal.Item1.currentModel.Value);
 
             // If the user should use unrealistic biological parameters, this will check the current and set the current appropriately if the current goes beyond
             // biologically accurate currents
             if (Double.IsNaN(Icurrs[0]) || Double.IsNaN(Icurrs[1]) || (Icurrs[0] > 0.5e-9) || (Icurrs[1]>0.5e-9))
             {   
+                Debug.Log("CURRENT OUT OF RANGE");
                 Icurrs[0] = 1.0e-16; Icurrs[1] = 0.9e-16;
             }
 
@@ -284,28 +297,32 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// </summary>
         /// <param name="newVal"></param>
         /// <returns></returns>
-        public List<double> SynapseCurrentFunction((Synapse, Synapse) newVal, Synapse.Model model)
+        public List<double> SynapseCurrentFunction((Synapse, Synapse) newVal, ISynapseModel model)
         {
-            // allocate a small for the two currents, one for current state, and one for previous state
+            //List contains the current synaptic current at index 0 and previous synaptic current at index 1
             List<double> Icurrs = new List<double>();
 
-            // get the pre and post synaptic voltages
+            // get the pre-synaptic voltage at current and previous timeStep
+            // newVal is the (Synapse, Synapse) pair that refers to the superstructure of synapse
+            // Item1 refers to the presynaptic node, Item2 refers to the postsynaptic node
+            // Calling Item1.simulation grabs the SparseSolver attached to the neuron containing the presynaptic node
+            // From here, we either use .Get1DValues() for current timestep Vm array, or getUpre for previous timestep Vm array
+            // newVal.Item1.FocusVert refers to the index of the node on the neuron which the pre- or postsynapse is placed
+            // Since getUpre() isn't a virtual method declared in the abstract class NDSimulation.cs, the solver obtained
+            // from the presynaptic neuron must be cast as a SparseSolverTestv1 class
             double presynVoltage = newVal.Item1.simulation.Get1DValues()[newVal.Item1.FocusVert];
-            double presynVoltage0 = Upre[newVal.Item1.FocusVert];
+            double presynVoltagePrev = ((SparseSolverTestv1)newVal.Item1.simulation).getUpre()[newVal.Item1.FocusVert];
             double voltageThreshold;
 
-            // if (model == Synapse.Model.NMDA || model == Synapse.Model.AMPA)
-            // {
             voltageThreshold = 0.038;   //Volts
-            // }
-            // else
-            // {
-            //     voltageThreshold = -0.05;
-            // }
 
-
-            if ((presynVoltage >= voltageThreshold) && (presynVoltage0< voltageThreshold))
-            { newVal.Item1.ActivationTime = GetSimulationTime(); }
+            //Used to update the activation time of the Synapse. This occurs on the timeStep in which the presynaptic membrane potential
+            //crosses the voltageThreshold
+            if ((presynVoltage >= voltageThreshold) && (presynVoltagePrev < voltageThreshold))
+            { 
+                Debug.Log("Activation Time Updated");
+                newVal.Item1.ActivationTime = GetSimulationTime(); 
+            }
                                    
             // if the presynapse is below a threshold, then the synapse is INACTIVE
             if (presynVoltage <= voltageThreshold)
@@ -313,36 +330,40 @@ namespace C2M2.NeuronalDynamics.Simulation
                 Icurrs = new List<double>
                 {
                     0.0,    // zero current at postsynapse while INACTIVE
-                    0.0    // zero current at postsynapse while INACTIVE
+                    0.0     // zero current at postsynapse while INACTIVE
                 };
             }
+            
             else // if the presynaptic voltage is above threshold, then do not update activation time and compute the new current
             {
-                if (GetSimulationTime() > (newVal.Item1.ActivationTime + 3.0e-3))
-                { newVal.Item1.ActivationTime = GetSimulationTime(); }
+                //If sufficient time has passed since the action potential started and the presynaptic membrane potential has remained above the
+                //action potential threshold, then it updates activation to reset the decay of the synaptic current function
+                //Also resets action potential threshold when current falls under a certain threshold close to zero
+                if (GetSimulationTime() > (newVal.Item1.ActivationTime + 3.0e-3) || model.getModelCurrent(presynVoltage, GetSimulationTime(),newVal.Item1.ActivationTime) < 10e-12) {
+                // if (GetSimulationTime() > (newVal.Item1.ActivationTime + 3.0e-3)) {
+                    newVal.Item1.ActivationTime = GetSimulationTime();
+                    // Debug.Log("Activation Time Updated - 3 millliseconds since last AP");
+                }
+
 
                 Icurrs = new List<double>();
-                if (model == Synapse.Model.NMDA)
-                {
-                    Icurrs.Add(NMDAFunction(U_Active[newVal.Item2.FocusVert], GetSimulationTime(), newVal.Item1.ActivationTime));         // compute current synaptic state using current voltage state
-                    Icurrs.Add(NMDAFunction(Upre[newVal.Item2.FocusVert], GetSimulationTime(), newVal.Item1.ActivationTime));             // compute previous synaptic state using previous voltage state
-                }
-                else if (model == Synapse.Model.GABA)
-                {
-                    Icurrs.Add(GABAFunction(U_Active[newVal.Item2.FocusVert], GetSimulationTime(), newVal.Item1.ActivationTime));         // compute current synaptic state using current voltage state
-                    Icurrs.Add(GABAFunction(Upre[newVal.Item2.FocusVert], GetSimulationTime(), newVal.Item1.ActivationTime));             // compute previous synaptic state using previous voltage state
-                }
-                else
-                {
-                    Icurrs.Add(AMPAFunction(U_Active[newVal.Item2.FocusVert], GetSimulationTime(), newVal.Item1.ActivationTime));         // compute current synaptic state using current voltage state
-                    Icurrs.Add(AMPAFunction(Upre[newVal.Item2.FocusVert], GetSimulationTime(), newVal.Item1.ActivationTime));             // compute previous synaptic state using previous voltage state                    
-                }
-                
+
+                // Debug.Log("Time Step: " + GetSimulationTime() + "     presynVoltage: " + presynVoltage + "     presynVoltagePrev: " + presynVoltagePrev);
+
+                //Adds the synaptic currents for the current and previous timesteps
+                Icurrs.Add(model.getModelCurrent(presynVoltage, GetSimulationTime(), newVal.Item1.ActivationTime));
+                Icurrs.Add(model.getModelCurrent(presynVoltagePrev, GetSimulationTime()-timeStep, newVal.Item1.ActivationTime));
                 };
-            
+
+            //Prints the current synaptic Current: used to graph the decay over time
+            // if (Icurrs[0] != 0) {
+            //     Debug.Log(GetSimulationTime() + "\t" + Icurrs[0]);
+            // }
+
             return Icurrs;
         }
 
+        //The following three functions are deprecated, and have been moved to discrete synapse model classes 
         /// <summary>
         /// This is the NMDA Synapse function borrowed from Rothman, Jason S. "Modeling Synapses." (2014).
         /// </summary>
@@ -373,55 +394,6 @@ namespace C2M2.NeuronalDynamics.Simulation
             double g = 30e-12;              // borrowed from Rothman Paper this is conductance of GABA receptor
 
             return -g * System.Math.Exp(-1.0 * (t - ts) / taud) * (v - Erev);
-        }
-
-        /// <summary>
-        /// This is the AMPA Synapse function borrowed from Rothman, Jason S. "Modeling Synapses." (2014).
-        /// </summary>
-        /// <param name="v"></param> this is the postsynaptic voltage
-        /// <param name="t"></param> this is the current simulation time
-        /// <param name="ts"></param> this is the activation time of the synapse, this is NOT the time the synapse is placed
-        /// <returns></returns>
-        public double AMPAFunction(double v, double t, double ts)
-        {
-            //double Erev = -0.0125;              // reversal potential for synapse
-            //double taud1 = 0.0003;               // decay constant from function
-            //double g = 25e-9;              // borrowed from Rothman Paper they mention 10's of nanosiemens
-                        
-            //return g * (0.9 * System.Math.Exp(-1.0 * (t - ts) / taud1) * (v - Erev));   
-
-            
-            double Erev = -0.0125;
-            double taud1 = 0.0003;
-            double taud2 = 0.002;
-            double taur = 0.0002;
-            double n = 2.0;
-            double anorm = 1.0;
-
-            double g = 25e-9;     //"A few picosiemens at small bouton synapses" - 2.5 pS
-            
-            return (((0.9 * System.Math.Exp(-1.0*(t-ts)/taud1)) * (0.1 * System.Math.Exp(-1.0*(t-ts)/taud2)))/anorm) * g * (v - Erev);
-
-            //return g * ( System.Math.Pow((1.0-System.Math.Exp(-1.0*(t-ts)/taur)), n) * ((0.9 * System.Math.Exp(-1.0*(t-ts)/taud1)) * (0.1 * System.Math.Exp(-1.0*(t-ts)/taud2)))/anorm) * (v - Erev);
-
-            /**Base Equation:
-            //Iampar = GampaR * a(t) * (V(m) - Eampar)
-
-            //another paper, "Regulation of AMPA and NMDA receptor-mediated EPSPs in dendritic trees of thalamocortical cells" by Lajeunesse references 2.5 nS
-
-
-            //Using equation 6 for a(t), ignoring 'extrasynaptic receptors'
-            //[1-exp(-(t-ts)/Tr)]^n * [a1* exp(-(t-ts)/taud) + (a2*exp(-(t-ts)/taud2))]/(anorm)
-
-            //from figure 2;
-            //n=2, Tr = 0.2ms, a1=0.9, taud1=0.3ms, a2=0.1, taud2=2.0ms
-
-            //Eampar is "typically 0 mv
-
-            //To find Anorm: can be computed numerically by computing the product of the expressions
-            //in square brackets at high temporalresolution and setting anorm equal to the peak of the resulting waveform
-
-            //Debug.Log("Ampa Fired");*/
         }
 
         /// <summary>
@@ -488,7 +460,6 @@ namespace C2M2.NeuronalDynamics.Simulation
 
             Upre = U_Active.Clone();
             U_Active.SetSubVector(0, Neuron.nodes.Count, Vector.Build.DenseOfArray(b));
-                       
         }
 
         internal override void SetOutputValues()
@@ -737,7 +708,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         {
             Vector Vin = Vector.Build.DenseOfVector(V);
             Vin.Multiply(1.0E3, Vin);
-            return (1.0E3) * (0.032) * (15.0 - Vin).PointwiseDivide(((15.0 - Vin) / 5.0).PointwiseExp() - 1.0);
+            return (1.0E3) * (0.032) * (15.0 + Vt - Vin).PointwiseDivide(((15.0 + Vt - Vin) / 5.0).PointwiseExp() - 1.0);
         }
         /// <summary>
         /// This is \f$\beta_n\f$ rate function, the rate functions take the form of
@@ -753,7 +724,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         {
             Vector Vin = Vector.Build.DenseOfVector(V);
             Vin.Multiply(1.0E3, Vin);
-            return (1.0E3) * (0.5) * ((10.0 - Vin) / 40.0).PointwiseExp();
+            return (1.0E3) * (0.5) * ((10.0 + Vt - Vin) / 40.0).PointwiseExp();
         }
         /// <summary>
         /// This is \f$\alpha_m\f$ rate function, the rate functions take the form of
@@ -769,7 +740,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         {
             Vector Vin = Vector.Build.DenseOfVector(V);
             Vin.Multiply(1.0E3, Vin);
-            return (1.0E3) * (0.32) * (13.0 - Vin).PointwiseDivide(((13.0 - Vin) / 4.0).PointwiseExp() - 1.0);
+            return (1.0E3) * (0.32) * (13.0 + Vt - Vin).PointwiseDivide(((13.0 + Vt - Vin) / 4.0).PointwiseExp() - 1.0);
         }
         /// <summary>
         /// This is \f$\beta_m\f$ rate function, the rate functions take the form of
@@ -785,7 +756,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         {
             Vector Vin = Vector.Build.DenseOfVector(V);
             Vin.Multiply(1.0E3, Vin);
-            return (1.0E3) * (0.28) * (Vin - 40.0).PointwiseDivide(((Vin - 40.0) / 5.0).PointwiseExp() - 1.0);
+            return (1.0E3) * (0.28) * (Vin - Vt - 40.0).PointwiseDivide(((Vin - Vt - 40.0) / 5.0).PointwiseExp() - 1.0);
         }
         /// <summary>
         /// This is \f$\alpha_h\f$ rate function, the rate functions take the form of
@@ -801,7 +772,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         {
             Vector Vin = Vector.Build.DenseOfVector(V);
             Vin.Multiply(1.0E3, Vin);
-            return (1.0E3) * (0.128) * ((17.0 - Vin) / 18.0).PointwiseExp();
+            return (1.0E3) * (0.128) * ((17.0 + Vt - Vin) / 18.0).PointwiseExp();
         }
         /// <summary>
         /// This is \f$\beta_h\f$ rate function, the rate functions take the form of
@@ -817,7 +788,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         {
             Vector Vin = Vector.Build.DenseOfVector(V);
             Vin.Multiply(1.0E3, Vin);
-            return (1.0E3) * 4.0 / (((40.0 - Vin) / 5.0).PointwiseExp() + 1.0);
+            return (1.0E3) * 4.0 / (((40.0 + Vt - Vin) / 5.0).PointwiseExp() + 1.0);
         }
 
         // used by save/load functions in Menu.cs
