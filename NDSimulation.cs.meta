@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: c6c25025d0924de41ad77252525d4560
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - raycastEventManager: {instanceID: 0}
+  - defaultRaycastEvent: {instanceID: 0}
+  - ruler: {instanceID: 0}
+  - clampManager: {instanceID: 0}
+  - infoPanelPrefab: {fileID: 9086472247997349700, guid: 82c906217c9a03f4786f866a02a0ffb8,
+      type: 3}
+  - controlPanel: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
