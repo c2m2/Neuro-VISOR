@@ -10,7 +10,7 @@ using UnityEngine;
 public class Synapse : NDInteractables
 {
     //Defines a List to be used as the list of available synaptic models
-    static ISynapseModel[] modelArray = {new ModelNMDA(), new ModelGABA(), new ModelAMPA(), new CurrentClamp()};
+    static ISynapseModel[] modelArray = {new ModelNMDA(), new ModelGABA(), new ModelAMPA()};
     static LinkedList<ISynapseModel> modelList = new LinkedList<ISynapseModel>(modelArray);
     public LinkedListNode<ISynapseModel> currentModel = modelList.First;
 
@@ -106,7 +106,7 @@ public class Synapse : NDInteractables
 
     public void SwitchModel(ISynapseModel model)
     {
-        currentModel = modelList.Find(model);   //As far as I can tell, this statement doesn't actually change the value of currentModel? something to look into
+        currentModel = modelList.Find(model);
         SetToModeMaterial();
     }
 

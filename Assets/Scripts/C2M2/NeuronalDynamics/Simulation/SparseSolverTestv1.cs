@@ -49,11 +49,6 @@ namespace C2M2.NeuronalDynamics.Simulation
     public class SparseSolverTestv1 : NDSimulation
     {
         ///<summary>
-        /// This is the voltage threshold for an action potential, used in rate functions and the synapse current:
-        /// I Believe it is in mv?
-        public static double Vt = 0.0;
-
-        ///<summary>
         /// This is the voltage for the voltage clamp, this is primarily used for when we do the convergence analysis of the code using a 
         /// soma clamp at 50 [mV], the units for voltage in the solver is [V] that is why <c>vstart</c> is set to 0.05
         ///</summary>
@@ -80,19 +75,17 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// where \f$m,h\f$ are the state variables, and \f$V_{Na}\f$ is the reversal potential for sodium.
         /// </summary>
         private double gna = 50.0 * 1.0E1;
-        // private double gna = 120;
         
         /// <summary>
         /// [S/m2] leak conductance per unit area, this is the leak conductance per unit area, it is used in this term
         /// \f[\bar{g}_{l}(V-V_l)\f]
         /// \f$V_l\f$ is the leak reversal potential.
         /// </summary>
-        private double gl = 0.0;
+        private double gl = 0.0 * 1.0E1;
         /// <summary>
         /// [V] potassium reversal potential
         /// </summary>
-        // private double ek = -90.0 * 1.0E-3;
-        private double ek = -77.0 * 1.0E-3;
+        private double ek = -90.0 * 1.0E-3;
 
         /// <summary>
         /// [V] sodium reversal potential
@@ -102,9 +95,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// <summary>
         /// [V] leak reversal potential
         /// </summary>
-        // private double el = -70.0 * 1.0E-3;
-        private double el = -54.3 * 1.0E-3;
-
+        private double el = -70.0 * 1.0E-3;
         /// <summary>
         /// [] potassium channel state probability, unitless
         /// </summary>
@@ -302,7 +293,7 @@ namespace C2M2.NeuronalDynamics.Simulation
             //List contains the current synaptic current at index 0 and previous synaptic current at index 1
             List<double> Icurrs = new List<double>();
 
-            // get the pre-synaptic voltage at current and previous timeStep
+            // Explanation of local variables:
             // newVal is the (Synapse, Synapse) pair that refers to the superstructure of synapse
             // Item1 refers to the presynaptic node, Item2 refers to the postsynaptic node
             // Calling Item1.simulation grabs the SparseSolver attached to the neuron containing the presynaptic node
@@ -310,6 +301,8 @@ namespace C2M2.NeuronalDynamics.Simulation
             // newVal.Item1.FocusVert refers to the index of the node on the neuron which the pre- or postsynapse is placed
             // Since getUpre() isn't a virtual method declared in the abstract class NDSimulation.cs, the solver obtained
             // from the presynaptic neuron must be cast as a SparseSolverTestv1 class
+
+            // get the pre-synaptic voltage at current and previous timeStep
             double presynVoltage = newVal.Item1.simulation.Get1DValues()[newVal.Item1.FocusVert];
             double presynVoltagePrev = ((SparseSolverTestv1)newVal.Item1.simulation).getUpre()[newVal.Item1.FocusVert];
             double voltageThreshold;
@@ -336,64 +329,20 @@ namespace C2M2.NeuronalDynamics.Simulation
             
             else // if the presynaptic voltage is above threshold, then do not update activation time and compute the new current
             {
-                //If sufficient time has passed since the action potential started and the presynaptic membrane potential has remained above the
+                //If sufficient time (3.0e-4 sec = 0.3 ms) has passed since the action potential started and the presynaptic membrane potential has remained above the
                 //action potential threshold, then it updates activation to reset the decay of the synaptic current function
-                //Also resets action potential threshold when current falls under a certain threshold close to zero
-                if (GetSimulationTime() > (newVal.Item1.ActivationTime + 3.0e-3) || model.getModelCurrent(presynVoltage, GetSimulationTime(),newVal.Item1.ActivationTime) < 10e-12) {
-                // if (GetSimulationTime() > (newVal.Item1.ActivationTime + 3.0e-3)) {
+                if (GetSimulationTime() > (newVal.Item1.ActivationTime + 3.0e-4)) {
                     newVal.Item1.ActivationTime = GetSimulationTime();
-                    // Debug.Log("Activation Time Updated - 3 millliseconds since last AP");
                 }
 
-
                 Icurrs = new List<double>();
-
-                // Debug.Log("Time Step: " + GetSimulationTime() + "     presynVoltage: " + presynVoltage + "     presynVoltagePrev: " + presynVoltagePrev);
 
                 //Adds the synaptic currents for the current and previous timesteps
                 Icurrs.Add(model.getModelCurrent(presynVoltage, GetSimulationTime(), newVal.Item1.ActivationTime));
                 Icurrs.Add(model.getModelCurrent(presynVoltagePrev, GetSimulationTime()-timeStep, newVal.Item1.ActivationTime));
                 };
 
-            //Prints the current synaptic Current: used to graph the decay over time
-            // if (Icurrs[0] != 0) {
-            //     Debug.Log(GetSimulationTime() + "\t" + Icurrs[0]);
-            // }
-
             return Icurrs;
-        }
-
-        //The following three functions are deprecated, and have been moved to discrete synapse model classes 
-        /// <summary>
-        /// This is the NMDA Synapse function borrowed from Rothman, Jason S. "Modeling Synapses." (2014).
-        /// </summary>
-        /// <param name="v"></param> this is the postsynaptic voltage
-        /// <param name="t"></param> this is the current simulation time
-        /// <param name="ts"></param> this is the activation time of the synapse, this is NOT the time the synapse is placed
-        /// <returns></returns>
-        public double NMDAFunction(double v, double t, double ts)
-        {            
-            double Erev = -0.0125;              // reversal potential for synapse
-            double taud = 3.0e-4;               // decay constant from function
-            double g = 25e-9;              // borrowed from Rothman Paper they mention 10's of nanosiemens
-                        
-            return g * (1.0 / (1.0 + System.Math.Exp(-1.0 * (v + 0.0128) / 0.0224))) * System.Math.Exp(-1.0 * (t - ts) / taud) * (v - Erev);    
-        }
-
-        /// <summary>
-        /// This is the GABA Synapse function borrowed from Rothman, Jason S. "Modeling Synapses." (2014).
-        /// </summary>
-        /// <param name="v"></param> this is the postsynaptic voltage
-        /// <param name="t"></param> this is the current simulation time
-        /// <param name="ts"></param> this is the activation time of the synapse, this is NOT the time the synapse is placed
-        /// <returns></returns>
-        public double GABAFunction(double v, double t, double ts)
-        {
-            double Erev = -0.065;              // reversal potential for synapse
-            double taud = 3.0e-4;               // decay constant from function
-            double g = 30e-12;              // borrowed from Rothman Paper this is conductance of GABA receptor
-
-            return -g * System.Math.Exp(-1.0 * (t - ts) / taud) * (v - Erev);
         }
 
         /// <summary>
@@ -708,7 +657,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         {
             Vector Vin = Vector.Build.DenseOfVector(V);
             Vin.Multiply(1.0E3, Vin);
-            return (1.0E3) * (0.032) * (15.0 + Vt - Vin).PointwiseDivide(((15.0 + Vt - Vin) / 5.0).PointwiseExp() - 1.0);
+            return (1.0E3) * (0.032) * (15.0 - Vin).PointwiseDivide(((15.0 - Vin) / 5.0).PointwiseExp() - 1.0);
         }
         /// <summary>
         /// This is \f$\beta_n\f$ rate function, the rate functions take the form of
@@ -724,7 +673,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         {
             Vector Vin = Vector.Build.DenseOfVector(V);
             Vin.Multiply(1.0E3, Vin);
-            return (1.0E3) * (0.5) * ((10.0 + Vt - Vin) / 40.0).PointwiseExp();
+            return (1.0E3) * (0.5) * ((10.0 - Vin) / 40.0).PointwiseExp();
         }
         /// <summary>
         /// This is \f$\alpha_m\f$ rate function, the rate functions take the form of
@@ -740,7 +689,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         {
             Vector Vin = Vector.Build.DenseOfVector(V);
             Vin.Multiply(1.0E3, Vin);
-            return (1.0E3) * (0.32) * (13.0 + Vt - Vin).PointwiseDivide(((13.0 + Vt - Vin) / 4.0).PointwiseExp() - 1.0);
+            return (1.0E3) * (0.32) * (13.0 - Vin).PointwiseDivide(((13.0 - Vin) / 4.0).PointwiseExp() - 1.0);
         }
         /// <summary>
         /// This is \f$\beta_m\f$ rate function, the rate functions take the form of
@@ -756,7 +705,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         {
             Vector Vin = Vector.Build.DenseOfVector(V);
             Vin.Multiply(1.0E3, Vin);
-            return (1.0E3) * (0.28) * (Vin - Vt - 40.0).PointwiseDivide(((Vin - Vt - 40.0) / 5.0).PointwiseExp() - 1.0);
+            return (1.0E3) * (0.28) * (Vin - 40.0).PointwiseDivide(((Vin - 40.0) / 5.0).PointwiseExp() - 1.0);
         }
         /// <summary>
         /// This is \f$\alpha_h\f$ rate function, the rate functions take the form of
@@ -772,7 +721,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         {
             Vector Vin = Vector.Build.DenseOfVector(V);
             Vin.Multiply(1.0E3, Vin);
-            return (1.0E3) * (0.128) * ((17.0 + Vt - Vin) / 18.0).PointwiseExp();
+            return (1.0E3) * (0.128) * ((17.0 - Vin) / 18.0).PointwiseExp();
         }
         /// <summary>
         /// This is \f$\beta_h\f$ rate function, the rate functions take the form of
@@ -788,7 +737,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         {
             Vector Vin = Vector.Build.DenseOfVector(V);
             Vin.Multiply(1.0E3, Vin);
-            return (1.0E3) * 4.0 / (((40.0 + Vt - Vin) / 5.0).PointwiseExp() + 1.0);
+            return (1.0E3) * 4.0 / (((40.0 - Vin) / 5.0).PointwiseExp() + 1.0);
         }
 
         // used by save/load functions in Menu.cs

@@ -241,13 +241,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
 
                         if (this == postSynapse.simulation)
                         {
-                            //Initializes the activation time of both synapses
-                            //NOTE: This code is an additional cause of the (t-ts) bug: since it runs on every frame of the program,
-                            //it resets activation time back to zero even after sparseSolver updates it.
-
-                            // preSynapse.ActivationTime = 0.0;
-                            // postSynapse.ActivationTime = 0.0;
-
                             //After the foreach loop, the synapses list will contain a list of all the synapses with a post-synaptic side on the
                             //current neuron, which this simulation is attached to
                             synapses.Add((preSynapse, postSynapse));

@@ -117,7 +117,6 @@ MonoBehaviour:
   currentModel: 0
   inhibitoryMat: {fileID: 2100000, guid: 789ac42e6d85b3c4f9bd257768e6865a, type: 2}
   excitatoryMat: {fileID: 2100000, guid: c09e4ceba9cbc07479695a453f84be1f, type: 2}
-  dopamineMat: {fileID: 2100000, guid: c1d49b49cccbde446bc707d2b31d82e8, type: 2}
   prePlaceMat: {fileID: 2100000, guid: 8c22a2946d07df74893ab7f5496eaf31, type: 2}
   Id: 0
 --- !u!114 &-172088395829924350
