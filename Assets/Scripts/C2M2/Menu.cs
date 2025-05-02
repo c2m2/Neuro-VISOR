@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using TMPro;
+using System.Linq;
 
 namespace C2M2
 {
@@ -11,6 +12,7 @@ namespace C2M2
     using NeuronalDynamics.Simulation;
     using NeuronalDynamics.Interaction;
     using NeuronalDynamics.Interaction.UI;
+
 
     /// <summary>
     /// Provides Save and Load functionality for cells
@@ -141,14 +143,34 @@ namespace C2M2
                     data = new CellData();
 
                     data.U = sim.Get1DValues(); // voltage at every node
-                    data.M = sim.getM(); // M vector
-                    data.N = sim.getN(); // N vector
-                    data.H = sim.getH(); // H vector
-
                     data.Upre = sim.getUpre(); // Upre vector
-                    data.Mpre = sim.getMpre(); // Mpre vector
-                    data.Npre = sim.getNpre(); // Npre vector
-                    data.Hpre = sim.getHpre(); // Hpre vector
+
+                    // Gating Variable Vectors
+                    var curr = sim.getCurrentStates();
+                    var prev = sim.getPreviousStates();
+
+                    var gatingVariableList = new List<CellData.GatingVariableData>();
+                    foreach (var kvp in curr)
+                    {
+                        gatingVariableList.Add(new CellData.GatingVariableData {
+                            name     = kvp.Key,
+                            current  = kvp.Value,
+                            previous = prev[kvp.Key],    // lookup by the same key
+                        });
+                    }
+
+                    data.gates = gatingVariableList.ToArray();
+
+                    // Save active ion channels
+                    var channelList = new List<CellData.ChannelData>();
+                    foreach (var channel in sim.ionChannels) {
+                        bool active = sim.activeIonChannels.Contains(channel);
+                        channelList.Add(new CellData.ChannelData{ 
+                            name = channel.Name,
+                            isActive = active
+                        });
+                    }
+                    data.channels = channelList.ToArray();
 
                     data.simID = sim.simID;
                     data.pos = sim.transform.position;
@@ -279,6 +301,7 @@ namespace C2M2
 
                 int ID = 0; // this will be the current ID when placing a new cell after loading
 
+
                 for (; i <= limit; i++)
                 {
                     // retrieve saved data
@@ -290,16 +313,23 @@ namespace C2M2
 
                     // restore vectors
                     gm.U = data.U;
-                    gm.M = data.M;
-                    gm.N = data.N;
-                    gm.H = data.H;
-
                     gm.Upre = data.Upre;
-                    gm.Mpre = data.Mpre;
-                    gm.Npre = data.Npre;
-                    gm.Hpre = data.Hpre;
+
+                    // Build Gating Variables and Ion Channels
+
+                    var currStates  = new Dictionary<string,double[]>();
+                    var prevStates = new Dictionary<string,double[]>();
+
+                    foreach(var g in data.gates) {
+                        currStates[g.name] = g.current;
+                        prevStates[g.name] = g.previous;
+                    }
+
+                    gm.currentStates = currStates;
+                    gm.previousStates = prevStates;
 
                     GameObject go;
+
                     try
                     {
                         go = loader.Load(new RaycastHit()); // load the cell
@@ -315,8 +345,19 @@ namespace C2M2
                         finishedLoading = true;
                         return false;
                     }
-
+                    
                     SparseSolverTestv1 sim = go.GetComponent<SparseSolverTestv1>();
+
+                    // 1) initialize ion channels (so sim.ionChannels is populated)
+                    sim.InitializeIonChannel();  
+                    // 2) clear active channels then enable/disable each one according to what was saved
+                    sim.activeIonChannels.Clear();
+                    // Load Ion Channels 
+                    foreach (var cd in data.channels) {
+                        // find the matching IonChannel object
+                        var match = sim.ionChannels.FirstOrDefault(ch => ch.Name == cd.name);
+                        if (match != null && cd.isActive) sim.activeIonChannels.Add(match);
+                    }
 
                     // restore cell ID
                     sim.simID = data.simID;

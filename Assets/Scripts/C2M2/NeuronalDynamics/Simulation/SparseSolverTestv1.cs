@@ -60,81 +60,16 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// decreasing this value has the effect of make the AP waves larger and have a faster conduction speed
         /// </summary>
         private double res = 300.0 * 1.0E-2;
-        // private double res = 100.0 * 1.0E-2;
         /// <summary>
         /// [F/m2] capacitance per unit area, this is the plasma membrane capacitance, this a standard value for the capacitance
         /// </summary>
         private double cap = 1.0 * 1.0E-2;
         /// <summary>
-        /// [S/m2] potassium conductance per unit area, this is the Potassium conductance per unit area, it is used in this term
-        /// \f[\bar{g}_{K}n^4(V-V_k)\f]
-        /// where \f$n\f$ is the state variable, and \f$V_k\f$ is the reversal potential.
+        /// leakConductance is used when setting the target time step. This value is updated in InitializeIonChannel 
         /// </summary>
-        private double gk = 5.0 * 1.0E1;
-        /// <summary>
-        /// [S/m2] sodium conductance per unit area, this is the Sodium conductance per unit area, it is used in this term
-        /// \f[\bar{g}_{Na}m^3h(V-V_{Na})\f]
-        /// where \f$m,h\f$ are the state variables, and \f$V_{Na}\f$ is the reversal potential for sodium.
-        /// </summary>
-        private double gna = 50.0 * 1.0E1;
-        /// <summary>
-        /// [S/m2] leak conductance per unit area, this is the leak conductance per unit area, it is used in this term
-        /// \f[\bar{g}_{l}(V-V_l)\f]
-        /// \f$V_l\f$ is the leak reversal potential.
-        /// </summary>
-        // private double gl = 0.0 * 1.0E1;
-        private double gl = 0.0 * 1.0E4; 
-        /// <summary>
-        /// [V] potassium reversal potential
-        /// </summary>
-        private double ek = -90.0 * 1.0E-3;
-        /// <summary>
-        /// [V] sodium reversal potential
-        /// </summary>
-        private double ena = 50.0 * 1.0E-3;
-        /// <summary>
-        /// [V] leak reversal potential
-        /// </summary>
-        private double el = -70.0 * 1.0E-3;
-        /// <summary>
-        /// [] potassium channel state probability, unitless
-        /// </summary>
-        private double ni = 0.0376969;
-        /// <summary>
-        /// [] sodium channel state probability, unitless
-        /// </summary>
-        private double mi = 0.0147567;
-        /// <summary>
-        /// [] sodium channel state probability, unitless  
-        /// </summary>
-        private double hi = 0.9959410;        
-        // Calcium Conductance and Reversal Potential
-        private double gca = 1.0 * 1.0E1;
-        private double eca = 120.0 * 1.0E-3;
-        private double qx = 2;
-        private double rx = 1;
-        // Chloride Constants
-        private double gcl = 10.0 * 1.0E1;
-        private double ecl = -80.0 * 1.0E-3;
-        private double clx = 1;
-        // These initial probability states need to be verified
-        private double qi = 0.0;
-        private double ri = 0.0;
-        /// </summary>
-        /// [n] potassium channel state exponent, unitless
-        /// </summary>
-        private double nx = 4;
-        /// </summary>
-        /// [m] sodoium channel state exponent, unitless
-        /// </summary>
-        private double mx = 3;
-        /// </summary>
-        /// [h] sodium channel state exponent, unitless
-        /// </summary>
-        private double hx = 1;
+        private double leakConductance = 0.0;
         /// <summary>
         /// These are the solution vectors for the voltage <code>U</code>
-        /// the state <c>M</c>, state <c>N</c>, and state <c>H</c>
         /// </summary>
         private Vector U;
         /// <summary>
@@ -142,10 +77,8 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// </summary>
         private Vector U_Active;
         /// <summary>
-        /// These are the solution vectors for the voltage <code>U</code>
-        /// the state <c>M</c>, state <c>N</c>, and state <c>H</c>
+        /// this is for storing previous states
         /// </summary>
-        private Vector M, N, H; //Replaced with currentStates[] array
         private Dictionary<string, Vector> currentStates;
         /// <summary>
         /// This is for the synaptic current, it is not the current but the SBDF2 explicit component for the additional current term
@@ -154,8 +87,8 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// <summary>
         /// this is for storing previous states
         /// </summary>
-        private Vector Upre, Npre, Mpre, Hpre; // Replace with previousStates[] array
         private Dictionary<string, Vector> previousStates;
+        private Vector Upre;
         /// <summary>
         /// This is a vector the Reaction terms
         /// </summary>
@@ -167,11 +100,11 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// <summary>
         /// Declaration for the list of IonChannels
         /// </summary>
-        private List<IonChannel> ionChannels;
+        public List<IonChannel> ionChannels;
         /// <summary>
         /// Declaration for the list of active IonChannels
         /// </summary>
-        private List<IonChannel> activeIonChannels;
+        public List<IonChannel> activeIonChannels;
         /// <summary>
         /// Temporary state vector
         /// </summary>
@@ -324,54 +257,10 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// </summary>
         /// <param name="newVal"></param>
         /// <returns></returns>
-        public bool voltageClampMode = false;
-        double stimDelay = 300e-3;      // 300 ms delay
-        // double stimDelay = 0;      // 300 ms delay
-        double stimDuration = 400e-3;   // 400 ms duration
-        // double stimAmplitude = 0.014e-9;
-        double stimAmplitude = 0.011535e-9;
-
         public List<double> SynapseCurrentFunction((Synapse, Synapse) newVal, Synapse.Model model)
         {
             // allocate a small for the two currents, one for current state, and one for previous state
             List<double> Icurrs = new List<double>();
-
-            if (!voltageClampMode)  // IClamp
-            {
-                // Check if we are within the stimulation window.
-                newVal.Item1.ActivationTime = GetSimulationTime();
-                if (newVal.Item1.ActivationTime >= stimDelay && newVal.Item1.ActivationTime < (stimDelay + stimDuration))
-                {
-                    // Inject a fixed current.
-                    Icurrs.Add(stimAmplitude);
-                    Icurrs.Add(stimAmplitude);
-                }
-                else
-                {
-                    // Outside the stimulus window, no injection.
-                    Icurrs.Add(0.0);
-                    Icurrs.Add(0.0);
-                }
-                return Icurrs;
-            }
-
-            if (voltageClampMode)
-            {
-                // Target postsynaptic voltage: 25 mV (0.025 V)
-                double targetVoltage = 0.005;
-                // Get the current voltage at the postsynaptic node.
-                int postIndex = newVal.Item2.FocusVert;
-                double currentVoltage = U_Active[postIndex];
-                // // Compute the error (difference) between target and current voltage.
-                double voltageError = targetVoltage - currentVoltage;
-                // // Use a proportional gain (adjust this constant as needed)
-                double clampGain = 1e-9;
-                double clampCurrent = clampGain * voltageError;
-                // Return the same current for both current and previous state.
-                Icurrs.Add(clampCurrent);
-                Icurrs.Add(clampCurrent);
-                return Icurrs;
-            }
 
             // get the pre and post synaptic voltages
             double presynVoltage = newVal.Item1.simulation.Get1DValues()[newVal.Item1.FocusVert];
@@ -464,19 +353,16 @@ namespace C2M2.NeuronalDynamics.Simulation
             {
                 InitializeNeuronCell();
             }
-            else BuildVectors(g.U, g.M, g.N, g.H, g.Upre, g.Mpre, g.Npre, g.Hpre);
+            else BuildVectors(g.U, g.Upre, g.currentStates, g.previousStates);
 
             ///<c>R</c> this is the reaction vector for the reaction solve
             R = Vector.Build.Dense(Neuron.nodes.Count);            
             
             tempState = Vector.Build.Dense(Neuron.nodes.Count, 0);
-            ///<c>reactConst</c> this is a small list for collecting the conductances and reversal potential which is sent to the reaction solve routine
-            // Commented out, delete whenever.
-            reactConst = new List<double> { gk, gna, gl, ek, ena, el };
 
             /// this sets the target time step size
             // timeStep = SetTargetTimeStep(cap, 2 * Neuron.MaxRadius, 2 * Neuron.MinRadius, Neuron.TargetEdgeLength, ionChannels, res, 1.0);
-            timeStep = SetTargetTimeStep(cap, 2 * Neuron.MaxRadius,2*Neuron.MinRadius, Neuron.TargetEdgeLength, gl, res, 1.0);
+            timeStep = SetTargetTimeStep(cap, 2 * Neuron.MaxRadius,2*Neuron.MinRadius, Neuron.TargetEdgeLength, leakConductance, res, 1.0);
             // UnityEngine.Debug.Log("Target Time Step = " + timeStep);
 
             ///<c>List<CoordinateStorage<double>> sparse_stencils = makeSparseStencils(Neuron, res, cap, k);</c> Construct sparse RHS and LHS in coordinate storage format, no zeros are stored \n
@@ -503,25 +389,11 @@ namespace C2M2.NeuronalDynamics.Simulation
             R.Add(reactF(activeIonChannels, U_Active, currentStates, cap).Multiply((4.0 / 3.0) * timeStep), R);
             R.Add(Upre.Multiply(-1.0 / 3.0), R);
             R.Add(reactF(activeIonChannels, Upre, previousStates, cap).Multiply((-2.0 / 3.0) * timeStep), R);
-            // R.Add(reactF(reactConst, U_Active, N, M, H, cap).Multiply((4.0 / 3.0) * timeStep), R);
-            // R.Add(Upre.Multiply(-1.0 / 3.0), R);
-            // R.Add(reactF(reactConst, Upre, Npre, Mpre, Hpre, cap).Multiply((-2.0 / 3.0) * timeStep), R);
+
             R.Add(Isyn, R);
             Isyn.Multiply(0.0, Isyn); // reset synaptic source this ensures that when you remove the synapse that Isyn becomes 0; therefore, current is not being sent to postsynapse once synapse is removed
 
             lu.Solve(R.ToArray(), b);
-
-            // tempState = N.Clone();
-            // stateexplicitSBDF2(N, Npre, fS(N, an(U_Active), bn(U_Active)), fS(Npre, an(Upre), bn(Upre)), timeStep);
-            // Npre = tempState.Clone();
-
-            // tempState = M.Clone();
-            // stateexplicitSBDF2(M, Mpre, fS(M, am(U_Active), bm(U_Active)), fS(Mpre, am(Upre), bm(Upre)), timeStep);
-            // Mpre = tempState.Clone();
-
-            // tempState = H.Clone();
-            // stateexplicitSBDF2(H, Hpre, fS(H, ah(U_Active), bh(U_Active)), fS(Hpre, ah(Upre), bh(Upre)), timeStep);
-            // Hpre = tempState.Clone();
 
             foreach (var channel in activeIonChannels)
             {
@@ -613,15 +485,15 @@ namespace C2M2.NeuronalDynamics.Simulation
         //     //GameManager.instance.DebugLogSafe("lower_bound = " + lower_bound.ToString());
         //     return dt;       
         // }
-            public static double SetTargetTimeStep(double cap, double maxDiameter, double minDiameter, double edgeLength, double gl, double res, double cfl)
+        public static double SetTargetTimeStep(double cap, double maxDiameter, double minDiameter, double edgeLength, double gl, double res, double cfl)
         {
             /// here we set the minimum time step size and maximum time step size
             /// the dtmin is based on prior numerical experiments that revealed that for each refinement level the 
             /// voltage profiles were visually accurate when compared to Yale Neuron for delta t at least 2 microseconds
             /// we want to avoid using dtmin; therefore I compute the upper bound (and lower bound for reference)
             // double dtmin = 2e-6;
-            double dtmax = 5.0e-5;
-            // double dtmax = 5.0e-6;
+            // double dtmax = 5.0e-5;
+            double dtmax = 50e-6;
             double dt;
 
             double gll = gl; double scf = 1E-6; // to convert to micrometer of edgelengths and radii don't forget this!!!!
@@ -644,34 +516,37 @@ namespace C2M2.NeuronalDynamics.Simulation
             ionChannels = new List<IonChannel>();
             activeIonChannels = new List<IonChannel>();
 
-            // The following lines are adding all channels from PremadeChannels.cs
+            // The following lines are adding all channels from IonChannelModels.cs
 
-            List<string> wantedChannels = new List<string>
+            var channelSettings = new Dictionary<string,bool>()
             {
-                "Original Potassium Channel",
-                "Original Sodium Channel",
-                // "Calcium Channel",
-                // "Original Leakage Channel",
-                // "NEURON Potassium Channel",
-                // "NEURON Sodium Channel",
-                // "Low Threshold Calcium Channel",
-                // "Slow Potassium Channel"
+                { "Original Potassium Channel",     true  },
+                { "Original Sodium Channel",        true  },  // true to activate chanenl in simulation
+                { "Calcium Channel",                false },  // false to deactive channel in simulation
+                { "Original Leakage Channel",       false },
+                { "Low Threshold Calcium Channel",  false },
+                { "Slow Potassium Channel",         false },
             };
 
 
-            MethodInfo[] channelMethods = typeof(PremadeChannels).GetMethods(BindingFlags.Public | BindingFlags.Static);
+            var channelMethods = typeof(IonChannelModels).GetMethods(BindingFlags.Public | BindingFlags.Static);
 
-            foreach (MethodInfo method in channelMethods)
+            foreach (var method in channelMethods)
             {
                 if (method.ReturnType == typeof(IonChannel))
                 {
-                    IonChannel channel = (IonChannel)method.Invoke(null, new object[] { Neuron.nodes.Count });
+                    // add all channels to the ion channel list
+                    var channel = (IonChannel)method.Invoke(null, new object[] { Neuron.nodes.Count });
                     ionChannels.Add(channel);
-                    // AddIonChannel(channel);
-                    if (wantedChannels.Contains(channel.Name))
-                        {
-                            AddIonChannel(channel);
-                        }
+                    
+                    // add active channels to the simulation
+                    if (channelSettings.TryGetValue(channel.Name, out bool enabled) && enabled)
+                    {
+                        activeIonChannels.Add(channel);
+                        // Update leakConductance for timestep
+                        if (channel.Name.Contains("Leak")) leakConductance = channel.Conductance;
+                    }
+
                 }
             }
         }
@@ -687,10 +562,8 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// </summary>
         private void InitializeNeuronCell()
         {
-            // Initialize ion channels and associated gating variables
-            InitializeIonChannel();
 
-            double starting_voltage = -0.008;
+            // double starting_voltage = -0.008;
             
             // foreach (var channel in activeIonChannels)
             // {
@@ -704,20 +577,17 @@ namespace C2M2.NeuronalDynamics.Simulation
 
             lock (visualizationValuesLock)
             {
-                U = Vector.Build.Dense(Neuron.nodes.Count, 0.0); // Here is where initial voltage is set. -0.07 implies a start voltage of -70 mV for all vectors
+                U = Vector.Build.Dense(Neuron.nodes.Count, 0.0); // Here is where initial voltage is set, i.e. -0.07 implies a start voltage of -70 mV for all vectors
                 U_Active = U.Clone();
             }
             Upre = U_Active.Clone();
             Isyn = Vector.Build.Dense(Neuron.nodes.Count, 0.0);
 
-            
+            // Initialize ion channels
+            InitializeIonChannel();
+
             currentStates = new Dictionary<string, Vector>();
             previousStates = new Dictionary<string, Vector>();
-
-            M = Vector.Build.Dense(Neuron.nodes.Count, mi);
-            N = Vector.Build.Dense(Neuron.nodes.Count, ni);
-            H = Vector.Build.Dense(Neuron.nodes.Count, hi);
-            Mpre = M.Clone(); Npre = N.Clone(); Hpre = H.Clone();
 
             foreach (var channel in activeIonChannels)
             {
@@ -829,41 +699,6 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// <param name="HH"></param> this is the state vector h
         /// <param name="cap"></param> this is the capacitance
         /// <returns></returns>
-        // private static Vector reactF(List<double> reactConst, Vector V, Vector NN, Vector MM, Vector HH, double cap)
-        // {
-        //     /// initialize the output vector and prod vector these will be used to assemble the different parts of the reaction calculation \n
-        //     /// <c>Vector output = Vector.Build.Dense(V.Count, 0.0);</c> initializes the output vector of length equation to number of entries in voltage vector, initialized to 0 \n
-        //     /// <c>Vector prod = Vector.Build.Dense(V.Count, 0.0);</c> initializes the product vector of length equation to number of entries in voltage vector, initialized to 0 \n
-        //     /// <c>double ek, ena, el, gk, gna, gl; </c> these are the conductances and reversal potentials that we need to assign using <c>reactConst</c> parameter that is sent \n
-        //     Vector output = Vector.Build.Dense(V.Count, 0.0);
-        //     Vector prod = Vector.Build.Dense(V.Count, 0.0);
-        //     double ek, ena, el, gk, gna, gl;
-        //     /// this sets the constants for the conductances \n
-        //     /// <c>gk = reactConst[0]; gna = reactConst[1]; gl = reactConst[2];</c>
-        //     gk = reactConst[0]; gna = reactConst[1]; gl = reactConst[2];
-        //     /// this sets constants for reversal potentials \n
-        //     /// <c>ek = reactConst[3]; ena = reactConst[4]; el = reactConst[5];</c>
-        //     ek = reactConst[3]; ena = reactConst[4]; el = reactConst[5];
-        //     /// <c>output.Add(prod.Multiply(gk), output);</c> this adds current due to potassium
-        //     prod.SetSubVector(0, V.Count, NN.PointwisePower(4.0));
-        // Debug.Log("NN prod: " + prod);
-        //     prod.SetSubVector(0, V.Count, (V.Subtract(ek)).PointwiseMultiply(prod));
-        //     output.Add(prod.Multiply(gk), output);
-        //     /// <c>output.Add(prod.Multiply(gna), output);</c> this adds current due to sodium
-        //     prod.SetSubVector(0, V.Count, MM.PointwisePower(3.0));
-        //     prod.SetSubVector(0, V.Count, HH.PointwiseMultiply(prod));
-        //     prod.SetSubVector(0, V.Count, (V.Subtract(ena)).PointwiseMultiply(prod));
-        // Debug.Log("MM prod: " + prod);
-        // Debug.Log("HH prod: " + prod);
-        //     output.Add(prod.Multiply(gna), output);
-        //     /// <c>output.Add((V.Subtract(el)).Multiply(gl), output);</c> this adds leak current
-        //     output.Add((V.Subtract(el)).Multiply(gl), output);
-        //     /// Return the negative of the total 
-        //     output.Multiply(-1.0 / cap, output);
-
-        //     Debug.Log("output = " + output);
-        //     return output;
-        // }
 
         private static Vector reactF(List<IonChannel> activeIonChannels, Vector V, Dictionary<string, Vector> gatingStates, double cap)
         {
@@ -916,86 +751,6 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// <returns>f(V,N)</returns> the function returns the right hand side of the state N ODE.
         private static Vector fS(Vector S, Vector a, Vector b) { return a.PointwiseMultiply(1 - S) - b.PointwiseMultiply(S); }
        
-        /// <summary>
-        /// This is \f$\alpha_n\f$ rate function, the rate functions take the form of
-        /// \f[
-        /// \frac{a_p(V-B_p)}{\exp(\frac{V-B_p}{C_p})-D_p}
-        /// \f]
-        /// the constants \f$a_p,B_p,C_p,D_p\f$ are manually coded in for this version of the simulation\n
-        /// TODO: come up with an implementation where the user can enter in their own parameters (Yale Neuron has this capability)
-        /// </summary>
-        /// <param name="V"></param> this is the input voltage
-        /// <returns>an</returns> this function returns the rate at the given voltage
-        private static Vector an(Vector V)
-        {
-            Vector Vin = Vector.Build.DenseOfVector(V);
-            Vin.Multiply(1.0E3, Vin);
-            return (1.0E3) * (0.032) * (15.0 - Vin).PointwiseDivide(((15.0 - Vin) / 5.0).PointwiseExp() - 1.0);
-        }
-        /// <summary>
-        /// This is \f$\beta_n\f$ rate function, the rate functions take the form of
-        /// \f[
-        /// \frac{a_p(V-B_p)}{\exp(\frac{V-B_p}{C_p})-D_p}
-        /// \f]
-        /// the constants \f$a_p,B_p,C_p,D_p\f$ are manually coded in for this version of the simulation\n
-        /// TODO: come up with an implementation where the user can enter in their own parameters (Yale Neuron has this capability)
-        /// </summary>
-        /// <param name="V"></param> this is the input voltage
-        /// <returns>bn</returns> this function returns the rate at the given voltage
-        private static Vector bn(Vector V)
-        {
-            Vector Vin = Vector.Build.DenseOfVector(V);
-            Vin.Multiply(1.0E3, Vin);
-            return (1.0E3) * (0.5) * ((10.0 - Vin) / 40.0).PointwiseExp();
-        }
-        /// <summary>
-        /// This is \f$\alpha_m\f$ rate function, the rate functions take the form of
-        /// \f[
-        /// \frac{a_p(V-B_p)}{\exp(\frac{V-B_p}{C_p})-D_p}
-        /// \f]
-        /// the constants \f$a_p,B_p,C_p,D_p\f$ are manually coded in for this version of the simulation\n
-        /// TODO: come up with an implementation where the user can enter in their own parameters (Yale Neuron has this capability)
-        /// </summary>
-        /// <param name="V"></param> this is the input voltage
-        /// <returns>am</returns> this function returns the rate at the given voltage
-        private static Vector am(Vector V)
-        {
-            Vector Vin = Vector.Build.DenseOfVector(V);
-            Vin.Multiply(1.0E3, Vin);
-            return (1.0E3) * (0.32) * (13.0 - Vin).PointwiseDivide(((13.0 - Vin) / 4.0).PointwiseExp() - 1.0);
-        }
-        /// <summary>
-        /// This is \f$\beta_m\f$ rate function, the rate functions take the form of
-        /// \f[
-        /// \frac{a_p(V-B_p)}{\exp(\frac{V-B_p}{C_p})-D_p}
-        /// \f]
-        /// the constants \f$a_p,B_p,C_p,D_p\f$ are manually coded in for this version of the simulation\n
-        /// TODO: come up with an implementation where the user can enter in their own parameters (Yale Neuron has this capability)
-        /// </summary>
-        /// <param name="V"></param> this is the input voltage
-        /// <returns>bm</returns> this function returns the rate at the given voltage
-        private static Vector bm(Vector V)
-        {
-            Vector Vin = Vector.Build.DenseOfVector(V);
-            Vin.Multiply(1.0E3, Vin);
-            return (1.0E3) * (0.28) * (Vin - 40.0).PointwiseDivide(((Vin - 40.0) / 5.0).PointwiseExp() - 1.0);
-        }
-        /// <summary>
-        /// This is \f$\alpha_h\f$ rate function, the rate functions take the form of
-        /// \f[
-        /// \frac{a_p(V-B_p)}{\exp(\frac{V-B_p}{C_p})-D_p}
-        /// \f]
-        /// the constants \f$a_p,B_p,C_p,D_p\f$ are manually coded in for this version of the simulation\n
-        /// TODO: come up with an implementation where the user can enter in their own parameters (Yale Neuron has this capability)
-        /// </summary>
-        /// <param name="V"></param> this is the input voltage
-        /// <returns>ah</returns> this function returns the rate at the given voltage
-        private static Vector ah(Vector V)
-        {
-            Vector Vin = Vector.Build.DenseOfVector(V);
-            Vin.Multiply(1.0E3, Vin);
-            return (1.0E3) * (0.128) * ((17.0 - Vin) / 18.0).PointwiseExp();
-        }
 
         public void AddIonChannel(IonChannel channel)
         {
@@ -1034,46 +789,41 @@ namespace C2M2.NeuronalDynamics.Simulation
             }
         }
 
-        /// <summary>
-        /// This is \f$\beta_h\f$ rate function, the rate functions take the form of
-        /// \f[
-        /// \frac{a_p(V-B_p)}{\exp(\frac{V-B_p}{C_p})-D_p}
-        /// \f]
-        /// the constants \f$a_p,B_p,C_p,D_p\f$ are manually coded in for this version of the simulation\n
-        /// TODO: come up with an implementation where the user can enter in their own parameters (Yale Neuron has this capability)
-        /// </summary>
-        /// <param name="V"></param> this is the input voltage
-        /// <returns>bh</returns> this function returns the rate at the given voltage
-        private static Vector bh(Vector V)
-        {
-            Vector Vin = Vector.Build.DenseOfVector(V);
-            Vin.Multiply(1.0E3, Vin);
-            return (1.0E3) * 4.0 / (((40.0 - Vin) / 5.0).PointwiseExp() + 1.0);
+        // used by save/load functions in Menu.cs
+
+        // Returns a map from each gating-variable name to its current values [V.Count]
+        // returns kvp (key-value pair)
+        public Dictionary<string, double[]> getCurrentStates() { 
+            return currentStates.ToDictionary(
+                kvp => kvp.Key, kvp => kvp.Value.AsArray()
+            );
         }
 
-        // used by save/load functions in Menu.cs
-        public double[] getM() { return M.AsArray(); }
-        public double[] getN() { return N.AsArray(); }
-        public double[] getH() { return H.AsArray(); }
+        // Returns a map from each gating-variable name to its current values [V.Count]
+        // returns kvp (key-value pair)
+        public Dictionary<string, double[]> getPreviousStates() { 
+            return previousStates.ToDictionary(
+                kvp => kvp.Key, kvp => kvp.Value.AsArray()
+            );
+        }
 
         public double[] getUpre() { return Upre.AsArray(); }
-        public double[] getMpre() { return Mpre.AsArray(); }
-        public double[] getNpre() { return Npre.AsArray(); }
-        public double[] getHpre() { return Hpre.AsArray(); }
-        public void BuildVectors(double[] u, double[] m, double[] n, double[] h,
-                                    double[] upre, double[] mpre, double[] npre, double[] hpre)
+        public void BuildVectors(double[] u, double[] upre, 
+        Dictionary<string, double[]> currStates, Dictionary<string, double[]> prevStates)
         {
             lock (visualizationValuesLock) U = Vector.Build.DenseOfArray(u);
             lock (visualizationValuesLock) U_Active = U.Clone();
             Upre = Vector.Build.DenseOfArray(upre);
 
-            M = Vector.Build.DenseOfArray(m);
-            N = Vector.Build.DenseOfArray(n);
-            H = Vector.Build.DenseOfArray(h);
+            // convert every double[] -> Vector<double> 
 
-            Mpre = Vector.Build.DenseOfArray(mpre);
-            Npre = Vector.Build.DenseOfArray(npre);
-            Hpre = Vector.Build.DenseOfArray(hpre);
+            currentStates  = currStates.ToDictionary(
+                         kvp => kvp.Key,
+                         kvp => Vector.Build.DenseOfArray(kvp.Value));
+
+            previousStates = prevStates.ToDictionary(
+                         kvp => kvp.Key,
+                         kvp => Vector.Build.DenseOfArray(kvp.Value));
 
             Isyn = Vector.Build.Dense(Neuron.nodes.Count, 0.0); // will have to save/load
         }

@@ -4,18 +4,30 @@ using MathNet.Numerics.LinearAlgebra;
 
 namespace C2M2.NeuronalDynamics.Simulation
 {
-    public static class PremadeChannels
+    /// <summary>
+    /// This file consists of the channels for each Ion Channal. The equations follow the class architeture listed in IonChannels.cs. 
+    /// 
+    /// </summary>
+    public static class IonChannelModels
     {
         /// <summary>
-        /// Potassium channel matching the solver's definitions verbatim
+        /// Potassium channel equations
         /// gK = 5.0e1, eK = -90e-3
-        /// alpha_n, beta_n exactly as in SparseSolverTestv1
+        /// Equations derived from pospischil's paper
         /// </summary>
         public static IonChannel OriginalPotassiumChannel(int nodeCount)
         {
-            double gk = 5.0 * 1.0E1;     // => 100 S/m²
-            double ek = -90.0 * 1.0E-3;  // => -100 V
-            // double vT = -55.0;
+            /// <summary>
+            /// [S/m2] potassium conductance per unit area, this is the Potassium conductance per unit area, it is used in this term
+            /// \f[\bar{g}_{K}n^4(V-V_k)\f]
+            /// where \f$n\f$ is the state variable, and \f$V_k\f$ is the reversal potential.
+            /// </summary>
+            double gk = 5.0 * 1.0E1;
+            /// <summary>
+            /// [V] potassium reversal potential
+            /// </summary>
+            double ek = -90.0 * 1.0E-3;
+            // Voltage Threshold
             double vT = 0.0;
 
             IonChannel potassiumChannel = new IonChannel("Original Potassium Channel", gk, ek);
@@ -42,15 +54,21 @@ namespace C2M2.NeuronalDynamics.Simulation
         }
 
         /// <summary>
-        /// Sodium channel matching the solver's definitions verbatim
-        /// gNa = 60.0e1, eNa = 50.0e-3
-        /// alpha_m, beta_m, alpha_h, beta_h exactly as in SparseSolverTestv1
+        /// Sodium channel equations
         /// </summary>
         public static IonChannel OriginalSodiumChannel(int nodeCount)
         {
-            double gna = 50.0 * 1.0E1;    // S/m2
+            /// <summary>
+            /// [S/m2] sodium conductance per unit area, this is the Sodium conductance per unit area, it is used in this term
+            /// \f[\bar{g}_{Na}m^3h(V-V_{Na})\f]
+            /// where \f$m,h\f$ are the state variables, and \f$V_{Na}\f$ is the reversal potential for sodium.
+            /// </summary>
+            double gna = 50.0 * 1.0E1;
+            /// <summary>
+            /// [V] sodium reversal potential
+            /// </summary>
             double ena = 50.0 * 1.0E-3;
-            // double vT = -55.0;
+            // Voltage Threshold
             double vT = 0.0;
 
             IonChannel sodiumChannel = new IonChannel("Original Sodium Channel", gna, ena);
@@ -303,132 +321,6 @@ namespace C2M2.NeuronalDynamics.Simulation
             );
 
             return lowTCalciumChannel;
-        }
-
-
-
-
-        /// <summary>
-        /// Chloride channel matching the solver's definitions verbatim
-        /// user can pass gCl, eCl
-        /// alpha_cl, beta_cl as in SparseSolverTestv1
-        /// </summary>
-        // public static IonChannel ChlorideChannel(int nodeCount, double gcl, double ecl)
-        // {
-        //     IonChannel chlorideChannel = new IonChannel("Chloride Channel", gcl, ecl);
-
-        //     Func<Vector, Vector> alpha_cl = voltage =>
-        //     {
-        //         var Vin = voltage.Clone();
-        //         Vin.Multiply(1.0E3, Vin);
-        //         return (1.0E3 * 0.07)
-        //             * (Vin.Add(20.0))
-        //             .PointwiseDivide(
-        //                 (Vin.Add(20.0).Divide(10.0))
-        //                 .PointwiseExp()
-        //                 .Subtract(1.0)
-        //             );
-        //     };
-
-        //     Func<Vector, Vector> beta_cl = voltage =>
-        //     {
-        //         var Vin = voltage.Clone();
-        //         Vin.Multiply(1.0E3, Vin);
-        //         return (1.0E3 * 0.1)
-        //             * (-(Vin.Add(30.0)).Divide(10.0))
-        //             .PointwiseExp();
-        //     };
-
-        //     chlorideChannel.AddGatingVariable(
-        //         new GatingVariable("x", alpha_cl, beta_cl, 1, 0.5, nodeCount)
-        //     );
-
-        //     return chlorideChannel;
-        // }
-
-        /// <summary>
-        /// NEURON Sodium Channel with HH defaults.
-        /// </summary>
-        /// <summary>
-        /// NEURON Sodium Channel with HH defaults (Yale Neuron parameters):
-        /// gnabar = 0.12 S/cm^2, ena = 50 mV.
-        /// Gating: m^3 * h.
-        /// </summary>
-     
-        public static IonChannel NEURONPotassiumChannel(int nodeCount)
-        {
-            double gk = 360 * 1.0E1;          // S/cm^2
-            double ek = -77.0 * 1.0E-3;   // -77 mV converted to V
-            IonChannel potassiumChannel = new IonChannel("NEURON Potassium Channel", gk, ek);
-
-            Func<Vector, Vector> alpha_n = voltage =>
-            {
-                var Vin = voltage.Clone();
-                Vin.Multiply(1.0E3, Vin);
-                return (1.0E3) * (0.032) * (15.0 - Vin)
-                    .PointwiseDivide(((15.0 - Vin) / 5.0).PointwiseExp() - 1.0);
-            };
-
-            Func<Vector, Vector> beta_n = voltage =>
-            {
-                var Vin = voltage.Clone();
-                Vin.Multiply(1.0E3, Vin);
-                return (1.0E3) * (0.5) * ((10.0 - Vin) / 40.0).PointwiseExp();
-            };
-
-            potassiumChannel.AddGatingVariable(
-                new GatingVariable("n", alpha_n, beta_n, 4, 0.0376969, nodeCount)
-            );
-
-            return potassiumChannel;
-        }
-        public static IonChannel NEURONSodiumChannel(int nodeCount)
-        {
-            double gna = 120 * 1.0E1;          // S/cm^2
-            double ena = 50.0 * 1.0E-3;   // 50 mV converted to V
-            IonChannel sodiumChannel = new IonChannel("NEURON Sodium Channel", gna, ena);
-            // Use the HH kinetics (m^3 * h) with standard HH rate functions:
-            // [Define alpha_m, beta_m, alpha_h, beta_h based on the standard HH model; see the NEURON manual (Hodgkin & Huxley, 1952) or the NEURON documentation]
-            // For brevity, here is a simplified version:
-            Func<Vector, Vector> alpha_m = voltage =>
-            {
-                var Vin = voltage.Clone();
-                Vin.Multiply(1.0E3, Vin);
-                return (1.0E3) * (0.32) * (13.0 - Vin)
-                    .PointwiseDivide(((13.0 - Vin) / 4.0).PointwiseExp() - 1.0);
-            };
-
-            Func<Vector, Vector> beta_m = voltage =>
-            {
-                var Vin = voltage.Clone();
-                Vin.Multiply(1.0E3, Vin);
-                return (1.0E3) * (0.28) * (Vin - 40.0)
-                    .PointwiseDivide(((Vin - 40.0) / 5.0).PointwiseExp() - 1.0);
-            };
-
-            Func<Vector, Vector> alpha_h = voltage =>
-            {
-                var Vin = voltage.Clone();
-                Vin.Multiply(1.0E3, Vin);
-                return (1.0E3) * (0.128) * ((17.0 - Vin) / 18.0)
-                    .PointwiseExp();
-            };
-
-            Func<Vector, Vector> beta_h = voltage =>
-            {
-                var Vin = voltage.Clone();
-                Vin.Multiply(1.0E3, Vin);
-                return (1.0E3) * 4.0 / (((40.0 - Vin) / 5.0).PointwiseExp() + 1.0);
-            };
-
-            sodiumChannel.AddGatingVariable(
-                new GatingVariable("m", alpha_m, beta_m, 3, 0.0147567, nodeCount)
-            );
-            sodiumChannel.AddGatingVariable(
-                new GatingVariable("h", alpha_h, beta_h, 1, 0.9959410, nodeCount)
-            );
-
-            return sodiumChannel;
         }
     }
 }
