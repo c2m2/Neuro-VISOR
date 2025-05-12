@@ -5,7 +5,7 @@ using MathNet.Numerics.LinearAlgebra;
 namespace C2M2.NeuronalDynamics.Simulation
 {
     /// <summary>
-    /// This file consists of the channels for each Ion Channal. The equations follow the class architeture listed in IonChannels.cs. 
+    /// This file consists of the channels for each Ion Channel. The equations follow the class architecture listed in IonChannels.cs
     /// 
     /// </summary>
     public static class IonChannelModels
@@ -15,22 +15,24 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// gK = 5.0e1, eK = -90e-3
         /// Equations derived from pospischil's paper
         /// </summary>
-        public static IonChannel OriginalPotassiumChannel(int nodeCount)
+        public static IonChannel PotassiumChannel(int nodeCount)
         {
             /// <summary>
             /// [S/m2] potassium conductance per unit area, this is the Potassium conductance per unit area, it is used in this term
-            /// \f[\bar{g}_{K}n^4(V-V_k)\f]
-            /// where \f$n\f$ is the state variable, and \f$V_k\f$ is the reversal potential.
+            /// ḡKd n^4 (V − ek)
+            /// where n is the state variable, and ek is the reversal potential.
             /// </summary>
             double gk = 5.0 * 1.0E1;
             /// <summary>
             /// [V] potassium reversal potential
             /// </summary>
             double ek = -90.0 * 1.0E-3;
-            // Voltage Threshold
-            double vT = 0.0;
+            /// <summary>
+            /// [V] voltage threshold
+            /// </summary>
+            double vT = 0.0 * 1.0E-3;
 
-            IonChannel potassiumChannel = new IonChannel("Original Potassium Channel", gk, ek);
+            IonChannel potassiumChannel = new IonChannel("Potassium Channel", gk, ek);
 
             Func<Vector, Vector> alpha_n = voltage =>
             {
@@ -56,7 +58,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// <summary>
         /// Sodium channel equations
         /// </summary>
-        public static IonChannel OriginalSodiumChannel(int nodeCount)
+        public static IonChannel SodiumChannel(int nodeCount)
         {
             /// <summary>
             /// [S/m2] sodium conductance per unit area, this is the Sodium conductance per unit area, it is used in this term
@@ -68,10 +70,12 @@ namespace C2M2.NeuronalDynamics.Simulation
             /// [V] sodium reversal potential
             /// </summary>
             double ena = 50.0 * 1.0E-3;
-            // Voltage Threshold
-            double vT = 0.0;
+            /// <summary>
+            /// [V] voltage threshold
+            /// </summary>
+            double vT = 0.0 * 1.0E-3;
 
-            IonChannel sodiumChannel = new IonChannel("Original Sodium Channel", gna, ena);
+            IonChannel sodiumChannel = new IonChannel("Sodium Channel", gna, ena);
 
             // alpha_m(V)
             Func<Vector, Vector> alpha_m = voltage =>
@@ -113,14 +117,21 @@ namespace C2M2.NeuronalDynamics.Simulation
         }
 
         /// <summary>
-        /// Leakage channel matching the solver's gl=0.0, el=-70e-3
+        /// Leakage channel
         /// </summary>
         
-        public static IonChannel OriginalLeakageChannel(int nodeCount)
+        public static IonChannel LeakageChannel(int nodeCount)
         {
+            /// <summary>
+            /// [S/m2] leak conductance per unit area, this is the leak conductance per unit area, it is used in this term
+            /// \f[\bar{g}_{l}(V-V_l)\f]
+            /// </summary>
             double gl = 1.0E-4 * 1.0E4;  // S/m²
+            /// <summary>
+            /// [V] leak reversal potential
+            /// </summary>
             double el = -70.0 * 1.0E-3;   // mV
-            return new IonChannel("Original Leakage Channel", gl, el);
+            return new IonChannel("Leakage Channel", gl, el);
         }
             
 

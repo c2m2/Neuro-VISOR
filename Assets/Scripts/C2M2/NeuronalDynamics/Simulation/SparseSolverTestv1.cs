@@ -520,10 +520,10 @@ namespace C2M2.NeuronalDynamics.Simulation
 
             var channelSettings = new Dictionary<string,bool>()
             {
-                { "Original Potassium Channel",     true  },
-                { "Original Sodium Channel",        true  },  // true to activate chanenl in simulation
-                { "Calcium Channel",                false },  // false to deactive channel in simulation
-                { "Original Leakage Channel",       false },
+                { "Potassium Channel",     true  },
+                { "Sodium Channel",        true  },  // true to activate chanenl in simulation
+                { "Calcium Channel",       false },  // false to deactive channel in simulation
+                { "Leakage Channel",       false },
                 { "Low Threshold Calcium Channel",  false },
                 { "Slow Potassium Channel",         false },
             };
