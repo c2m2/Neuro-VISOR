@@ -16,6 +16,7 @@ using C2M2.NeuronalDynamics.Interaction.UI;
 using C2M2.Interaction.UI;
 using System.Linq;
 using C2M2.Utils;
+using C2M2.SomaPositionCalculation;
 
 namespace C2M2.NeuronalDynamics.Simulation {
 
@@ -27,7 +28,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
     /// </remarks>
     public abstract class NDSimulation : MeshSimulation {
         public int simID = -1; // simulation ID
-
+        public CharacteristicDistance characteristicDistance {get; set; } = null;
         public new NDSimulationManager Manager { get { return GameManager.instance.simulationManager; } }
         private double visualInflation = 1;
         public double VisualInflation
