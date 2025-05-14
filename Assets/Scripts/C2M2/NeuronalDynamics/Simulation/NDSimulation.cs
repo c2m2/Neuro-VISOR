@@ -206,80 +206,10 @@ namespace C2M2.NeuronalDynamics.Simulation {
             }
         }
 
-        private bool _somaClampSpawned = false;
-        private bool _spawnClampRequested = false;
-        private bool _csvActive = false;
-        private void Update() {
-            if (_spawnClampRequested) {
-            SpawnSomaClamp();
-            StartAutoCSVWriter();
-            _spawnClampRequested = false;
-            }
-        }
-
-        private void SpawnSomaClamp()
-        {
-            // figure out which 1D vertex is your soma;
-            // NDSimulation.Neuron.somaIDs is a List<int> of all soma verts
-            int somaVert = Neuron.somaIDs[0];  
-
-            GameObject ClampPrefab = clampManager.IdentifyBuildPrefab(this, somaVert);
-            if (ClampPrefab == null) return;
-
-            // instantiate the clamp object as a child of this simulation GameObject
-            GameObject go = Instantiate(ClampPrefab, transform);
-            var clamp = go.GetComponent<NeuronClamp>();
-
-            clamp.simulation = this;         // so clamp.Place can reference `simulation`
-
-            // tell it which vertex to clamp
-            clamp.FocusVert = somaVert;
-            if (_somaClampSpawned == false) {
-                clamp.Place(somaVert);
-                _somaClampSpawned = true;
-            }
-            // place it in the scene, scale & orient it
-
-            // turn clamp on
-            clamp.ToggleClamp();
-
-        }
-
-        private void StartAutoCSVWriter() {
-            if (!_csvActive)
-            {
-                _csvActive = true;
-                csv = gameObject.AddComponent<CSVWriter>();
-                csv.single = true;     // or false if you want multiple files
-            }
-
-            // 2) if we're in the window [15 … 250] ms, write each step
-
-            // 3) stop & convert at 250 ms
-            else 
-            {
-                _csvActive = false;
-                convert = true;
-                StopCSV();
-            }
-
-        }
-
         protected override void PostSolveStep(int t)
         {
             ApplyInteractionVals();
             SetOutputValues();
-            // double tms = GetSimulationTime() * 1000.0;
-
-            // if (!_somaClampSpawned && tms >= 15.0) {                
-            //     _spawnClampRequested = true;
-            // }
-
-            // if (_somaClampSpawned && tms >= 215.0) {
-            //     _spawnClampRequested = true;
-            // }
-            
-            // if (_csvActive) WriteCSV();
 
             void ApplyInteractionVals()
             {

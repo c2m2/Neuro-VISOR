@@ -361,7 +361,7 @@ namespace C2M2.NeuronalDynamics.Simulation
             tempState = Vector.Build.Dense(Neuron.nodes.Count, 0);
 
             /// this sets the target time step size
-            // timeStep = SetTargetTimeStep(cap, 2 * Neuron.MaxRadius, 2 * Neuron.MinRadius, Neuron.TargetEdgeLength, ionChannels, res, 1.0);
+            // timeStep = SetTargetTimeStep(cap, 2 * Neuron.MaxRadius, 2 * Neuron.MinRadius, Neuron.TargetEdgeLength, activeIonChannels, res, 1.0);
             timeStep = SetTargetTimeStep(cap, 2 * Neuron.MaxRadius,2*Neuron.MinRadius, Neuron.TargetEdgeLength, leakConductance, res, 1.0);
             // UnityEngine.Debug.Log("Target Time Step = " + timeStep);
 
@@ -456,35 +456,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// <param name="res"></param> this is the axial resistance
         /// <param name="Rmemscf"></param> this is membrane resistance scale factor, since this is only a fraction of theoretical maximum
         /// <returns></returns>
-        //     public static double SetTargetTimeStep(double cap, double maxDiameter, double minDiameter, double edgeLength , List<IonChannel> activeIonChannels, double res, double cfl)
-        // {
-        //     /// here we set the minimum time step size and maximum time step size
-        //     /// the dtmin is based on prior numerical experiments that revealed that for each refinement level the 
-        //     /// voltage profiles were visually accurate when compared to Yale Neuron for delta t at least 2 microseconds
-        //     /// we want to avoid using dtmin; therefore I compute the upper bound (and lower bound for reference)
-        //     //double dtmin = 2e-6;  
-        //     double dtmax = 50e-6;
-        //     double dt;
 
-        //     double scf = 1E-6; // to convert to micrometer of edgelengths and radii don't forget this!!!!
-        //     double effectiveConductance = 0.0;
-
-        //     foreach (IonChannel channel in activeIonChannels)
-        //     {
-        //         effectiveConductance += channel.Conductance;
-        //     }
-
-        //     if (effectiveConductance == 0.0) effectiveConductance = 1.0; // Avoid division by zero
-
-        //     double upper_bound = cap * edgeLength * scf * System.Math.Sqrt(res / (effectiveConductance * minDiameter * scf));
-        //     //double lower_bound = cap * edgeLength*scf * System.Math.Sqrt(res / (gna + gk + gl) * maxDiameter*scf);
-        //     //GameManager.instance.DebugLogSafe("upper_bound = " + upper_bound.ToString());
-
-        //     // some cells may have an upper bound that is too large for the solver, so choose the smaller of the two dtmax or upper_bound
-        //     dt = System.Math.Min(upper_bound,dtmax);
-        //     //GameManager.instance.DebugLogSafe("lower_bound = " + lower_bound.ToString());
-        //     return dt;       
-        // }
         public static double SetTargetTimeStep(double cap, double maxDiameter, double minDiameter, double edgeLength, double gl, double res, double cfl)
         {
             /// here we set the minimum time step size and maximum time step size
@@ -552,29 +524,13 @@ namespace C2M2.NeuronalDynamics.Simulation
         }
 
         /// <summary>
-        /// This function initializes the voltage vector <c>U</c> and the state vectors
-        /// <c>M</c>, <c>N</c>, and <c>H</c> \n
+        /// This function initializes the voltage vector <c>U</c> and the state vectors of gating variables
         /// The input <c>Neuron.vertCount</c> is the vertex count of the neuron geometry \n
         /// <c>U</c> is initialized to 0 [V] for the entire cell \n
-        /// <c>M</c> is initialized to \f$m_i\f$ which is set by <c>mi</c> \n
-        /// <c>N</c> is initialized to \f$n_i\f$ which is set by <c>ni</c> \n
-        /// <c>H</c> is initialized to \f$h_i\f$ which is set by <c>hi</c>
+        /// Gating variables are initialized to their initial probabilities
         /// </summary>
         private void InitializeNeuronCell()
         {
-
-            // double starting_voltage = -0.008;
-            
-            // foreach (var channel in activeIonChannels)
-            // {
-
-            //     // Apply leakage reversal potential as vstart if leakage exists
-            //     if (channel.Name.Contains("Leak")) {
-            //         starting_voltage = channel.ReversalPotential;
-            //         Debug.Log(channel.ReversalPotential);
-            //     }
-            // }
-
             lock (visualizationValuesLock)
             {
                 U = Vector.Build.Dense(Neuron.nodes.Count, 0.0); // Here is where initial voltage is set, i.e. -0.07 implies a start voltage of -70 mV for all vectors
@@ -694,9 +650,8 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// </summary>
         /// <param name="reactConst"></param> these are the conductances and reversal potentials defined by <c>List<double> reactConst = new List<double> { gk, gna, gl, ek, ena, el };</c>
         /// <param name="V"></param> this is the voltage vector
-        /// <param name="NN"></param> this is the state vector n
-        /// <param name="MM"></param> this is the state vector m
-        /// <param name="HH"></param> this is the state vector h
+        /// <param name="activeIonChannels"></param> this is the list of ion channels active in the simulation
+        /// <param name="gatingStates"></param> this is the list of state vectors for all gating variables
         /// <param name="cap"></param> this is the capacitance
         /// <returns></returns>
 
@@ -751,44 +706,6 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// <returns>f(V,N)</returns> the function returns the right hand side of the state N ODE.
         private static Vector fS(Vector S, Vector a, Vector b) { return a.PointwiseMultiply(1 - S) - b.PointwiseMultiply(S); }
        
-
-        public void AddIonChannel(IonChannel channel)
-        {
-            // ionChannels.Add(channel);
-
-            if (channel.IsActive)
-            {
-                activeIonChannels.Add(channel);
-            }
-        }
-
-
-        public void RemoveIonChannel(IonChannel channel)
-        {
-            ionChannels.Remove(channel);
-            activeIonChannels.Remove(channel);
-        }
-
-
-        public void ActivateIonChannel(IonChannel channel)
-        {
-            if (!channel.IsActive)
-            {
-                channel.IsActive = true;
-                activeIonChannels.Add(channel);
-            }
-        }
-
-
-        public void DeactivateIonChannel(IonChannel channel)
-        {
-            if (channel.IsActive)
-            {
-                channel.IsActive = false;
-                activeIonChannels.Remove(channel);
-            }
-        }
-
         // used by save/load functions in Menu.cs
 
         // Returns a map from each gating-variable name to its current values [V.Count]
