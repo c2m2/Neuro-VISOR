@@ -34,7 +34,7 @@ public class ModelAMPA : ISynapseModel
         double g = 1e-9;        //Calculated by using the graph in Rothman's Paper 
         double a1 = 0.9;        //Weight of first decay term of at
         double a2 = 0.1;        //Weight of second decay term of at
-        double anorm = 0.5;     //Used to normalize the decay terms of at such that their summed maximum is always one.
+        double anorm = 1;     //Used to normalize the decay terms of at such that their summed maximum is always one.
         // Since a1 + a2 = 1, anorm is technically not necessary in this case, and has been set to 1
         double taud1 = 0.0003;  //First decay constant of at    (sec)
         double taud2 = 0.002;   //Second decay constant of at   (sec)
