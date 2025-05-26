@@ -25,7 +25,6 @@ namespace C2M2.SomaPositionCalculation
 
         // Constants
         private const int NUM_POINTS = 150; // Number of points to sample on the unit sphere
-        private const string FILE_PATH = "Assets/Scripts/C2M2/SomaPositionCalculation/unitSphereEdgePoints.txt";
 
         // Class references
         private SpawnZone spawnZone;
@@ -38,8 +37,11 @@ namespace C2M2.SomaPositionCalculation
             this.spawnZone = new SpawnZone();
             this.somaPositionList = new SomaPositionList(spawnZone);
 
+            // Generates NUM_POINTS points on the unit sphere and saves them to a file. Uncomment to change saved points.
+            //SavePointsToFile(GenerateFixedSpherePoints(NUM_POINTS), "unitSphereEdgePoints.txt");
+
             // Reads pre-sampled unit sphere points into list
-            this.fixedSpherePoints = LoadPointsFromFile(FILE_PATH);
+            this.fixedSpherePoints = LoadPointsFromFile("unitSphereEdgePoints.txt");
         }
 
 
@@ -300,8 +302,13 @@ namespace C2M2.SomaPositionCalculation
         For the sampled unit sphere points. Not used during runtime, but should be kept for if we want to change the number of points 
         sampled. Reads to filePath.
         */
-        private static void SavePointsToFile(List<Vector3> points, string filePath)
+        private static void SavePointsToFile(List<Vector3> points, string fileName)
         {
+            string folderPath = Path.Combine(Application.dataPath, "UnitSpherePoints");
+            Directory.CreateDirectory(folderPath);
+
+            string filePath = Path.Combine(folderPath, fileName);
+
             using (StreamWriter writer = new StreamWriter(filePath))
             {
                 foreach (Vector3 point in points)
@@ -309,14 +316,31 @@ namespace C2M2.SomaPositionCalculation
                     writer.WriteLine($"{point.x} {point.y} {point.z}");
                 }
             }
+
+        #if UNITY_EDITOR
+            UnityEditor.AssetDatabase.Refresh();
+        #endif
+
+            Debug.Log($"Saved {points.Count} points to: {filePath}");
         }
+
 
         /*
         For the sampled unit sphere points. Assumes " " as delimiter
         */
-        private static List<Vector3> LoadPointsFromFile(string filePath)
+        private static List<Vector3> LoadPointsFromFile(string fileName)
         {
+            // Construct full path to the file in the "Assets/UnitSpherePoints" folder
+            string folderPath = Path.Combine(Application.dataPath, "UnitSpherePoints");
+            string filePath = Path.Combine(folderPath, fileName);
+
             List<Vector3> points = new List<Vector3>();
+
+            if (!File.Exists(filePath))
+            {
+                Debug.LogWarning($"File not found at path: {filePath}");
+                return points;
+            }
 
             foreach (string line in File.ReadLines(filePath))
             {
@@ -332,8 +356,10 @@ namespace C2M2.SomaPositionCalculation
                 }
             }
 
+            Debug.Log($"Loaded {points.Count} points from: {filePath}");
             return points;
         }
+
 
 
         /** TESTING ************************************************************************************/
