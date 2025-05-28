@@ -269,8 +269,10 @@ namespace C2M2.NeuronalDynamics.Simulation
 
             // If the user should use unrealistic biological parameters, this will check the current and set the current appropriately if the current goes beyond
             // biologically accurate currents
-            if (Double.IsNaN(Icurrs[0]) || Double.IsNaN(Icurrs[1]) || (Icurrs[0] > 0.5e-9) || (Icurrs[1]>0.5e-9))
-            {   
+            // The upper bound has been chosen to be an arbitrarily large value of 30 nano Siemens. Since this is larger than any of the max capacitance for each synapse,
+            // Current should not be greater than this under normal circumstances.
+            if (Double.IsNaN(Icurrs[0]) || Double.IsNaN(Icurrs[1]) || (Icurrs[0] > 30e-9) || (Icurrs[1] > 30e-9))
+            {
                 Debug.Log("CURRENT OUT OF RANGE");
                 Icurrs[0] = 1.0e-16; Icurrs[1] = 0.9e-16;
             }
@@ -316,7 +318,7 @@ namespace C2M2.NeuronalDynamics.Simulation
                 Debug.Log("Activation Time Updated");
                 newVal.Item1.ActivationTime = GetSimulationTime(); 
             }
-                                   
+
             // if the presynapse is below a threshold, then the synapse is INACTIVE
             if (presynVoltage <= voltageThreshold)
             {
@@ -326,12 +328,13 @@ namespace C2M2.NeuronalDynamics.Simulation
                     0.0     // zero current at postsynapse while INACTIVE
                 };
             }
-            
+
             else // if the presynaptic voltage is above threshold, then do not update activation time and compute the new current
             {
                 //If sufficient time (3.0e-4 sec = 0.3 ms) has passed since the action potential started and the presynaptic membrane potential has remained above the
                 //action potential threshold, then it updates activation to reset the decay of the synaptic current function
-                if (GetSimulationTime() > (newVal.Item1.ActivationTime + 3.0e-4)) {
+                if (GetSimulationTime() > (newVal.Item1.ActivationTime + 3.0e-4))
+                {
                     newVal.Item1.ActivationTime = GetSimulationTime();
                 }
 
@@ -339,8 +342,9 @@ namespace C2M2.NeuronalDynamics.Simulation
 
                 //Adds the synaptic currents for the current and previous timesteps
                 Icurrs.Add(model.getModelCurrent(presynVoltage, GetSimulationTime(), newVal.Item1.ActivationTime));
-                Icurrs.Add(model.getModelCurrent(presynVoltagePrev, GetSimulationTime()-timeStep, newVal.Item1.ActivationTime));
-                };
+                Icurrs.Add(model.getModelCurrent(presynVoltagePrev, GetSimulationTime() - timeStep, newVal.Item1.ActivationTime));
+                }
+            ;
 
             return Icurrs;
         }

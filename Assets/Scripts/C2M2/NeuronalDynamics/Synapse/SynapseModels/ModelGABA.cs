@@ -15,11 +15,12 @@ public class ModelGABA : ISynapseModel
     /// <returns></returns>
     public double getModelCurrent(double v, double t, double ts)
     {
-        double Erev = -0.065;              // reversal potential for synapse
-        double taud = 3.0e-4;               // decay constant from function
-        double g = 30e-12;              // borrowed from Rothman Paper this is conductance of GABA receptor
+        double Erev = -0.065;           // (Volts) Reversal potential of GABA synapses, stated on page 9 of Rothman's paper
+        double taud = 3.0e-4;           // (Seconds) decay constant from function, found in figure 2 of Rothman's Paper
+        double g = -1e-9;               // (Siemens) a chosen arbitrary value that produces a noticeable, but not too great, inhibitory response.
+                                        // Rothman's paper does not provide any examples for max capacitance of GABA synapses
 
-        return -g * System.Math.Exp(-1.0 * (t - ts) / taud) * (v - Erev);      
+        return g * System.Math.Exp(-(t - ts) / taud) * (v - Erev);      
     }
 
     //Returns the model name

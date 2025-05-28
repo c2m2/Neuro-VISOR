@@ -24,22 +24,25 @@ public class ModelAMPA : ISynapseModel
         Using equation 6 for a(t), ignoring 'extrasynaptic receptors'
         [1-exp(-(t-ts)/Tr)]^n * [a1* exp(-(t-ts)/taud) + (a2*exp(-(t-ts)/taud2))]/(anorm)
 
-        from figure 2;
-        n=2, taur = 0.2ms, a1=0.9, taud1=0.3ms, a2=0.1, taud2=2.0ms
+        The following values were pulled directly from figure 2;
+        n=2, taur=0.2ms, a1=0.9, taud1=0.3ms, a2=0.1, taud2=2.0ms
 
         Eampar is "typically 0 mv"
+
+        Although the value for g used by the Rothman paper is 1e-9, an arbitrary value has been chosen that demonstrates synaptic behavior well
         */
 
-        double Erev = 0;        //From Rothman's paper: EampaR is "usually 0"       (V)
-        double g = 1e-9;        //Calculated by using the graph in Rothman's Paper 
-        double a1 = 0.9;        //Weight of first decay term of at
-        double a2 = 0.1;        //Weight of second decay term of at
-        double anorm = 1;     //Used to normalize the decay terms of at such that their summed maximum is always one.
-        // Since a1 + a2 = 1, anorm is technically not necessary in this case, and has been set to 1
-        double taud1 = 0.0003;  //First decay constant of at    (sec)
-        double taud2 = 0.002;   //Second decay constant of at   (sec)
-        double taur = 0.0002;   //Decay weight constant (sec)
-        int n = 2;              //Decay weight power
+        double Erev = 0;        //(Volts) From Rothman's paper: EampaR is "usually 0" (page 6)
+        double g = 25e-9;       //(Siemens) An arbitrary value was chosen that clearly demonstrates AMPA's fast decay behavior, while
+                                // still producing a noticeable (but not too large) post synaptic response
+        double a1 = 0.9;        //(Unitless) Weight of first decay term of at
+        double a2 = 0.1;        //(Unitless) Weight of second decay term of at
+        double anorm = 1;       //(Unitless) Used to normalize the decay terms of at such that their summed maximum is always one.
+                                // Since a1 + a2 = 1, anorm is technically not necessary in this case, and has been set to 1
+        double taud1 = 0.0003;  //(Seconds) First decay constant of a(t)
+        double taud2 = 0.002;   //(Seconds) Second decay constant of a(t)
+        double taur = 0.0002;   //(Seconds) Decay weight constant
+        int n = 2;              //(Unitless) Decay weight power
 
 
         double at = System.Math.Pow(1 - System.Math.Exp(-(t-ts)/taur), n) * (a1*System.Math.Exp(-(t-ts)/taud1) + a2*System.Math.Exp(-(t-ts)/taud2))/anorm;
