@@ -5,6 +5,7 @@ using System.IO;
 using System.Collections.Generic;
 using C2M2.Interaction;
 using System.Linq;
+using C2M2.SomaPositionCalculation;
 
 namespace C2M2.NeuronalDynamics.Interaction
 {
@@ -22,6 +23,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         /// </remarks>
         [Tooltip("Script name of the solver script.")]
         public string solverName = "C2M2.NeuronalDynamics.Simulation.SparseSolverTestv1";
+        private SomaPositionCalculator calculator = null; // Placeholder default calculator
         public string vrnFileName { get; set; } = "null";
         public float globalMin = float.PositiveInfinity;
         public float globalMax = float.NegativeInfinity;
@@ -62,6 +64,11 @@ namespace C2M2.NeuronalDynamics.Interaction
 
         public Vector3 rulerInitPos = new Vector3(-0.5f, 0.443f, -0.322f);
         public Vector3 rulerInitRot = new Vector3(90, 0, 0);
+
+        private void Start()
+        {
+            calculator = new SomaPositionCalculator();
+        }
 
         // TODO: Allow SparseSolverTestv1 to be a variable script
         public GameObject Load(RaycastHit hit)
@@ -121,8 +128,16 @@ namespace C2M2.NeuronalDynamics.Interaction
                     pivotObj.GetComponent<GrabRescaler>().target = GameManager.instance.simulationSpace.transform;
                 }
             }
+            // Make characteristic distance from mesh size
+            Vector3 solverSize = solver.GetComponent<MeshRenderer>().bounds.size;
+            solver.characteristicDistance = new CharacteristicDistance(solverSize, solver.transform);
+
             solveObj.transform.parent = GameManager.instance.simulationSpace.transform;
             solver.transform.localScale = Vector3.one;
+            
+            // Using the characteristic distance, calculate the best next soma position in the room
+            solver.transform.position = (Vector3)calculator.CalculateNextSomaPosition(solver);
+            calculator.SetRandomYRotation(solver.transform); // Set a random Y rotation for the solver
 
             void TransferValues()
             {
