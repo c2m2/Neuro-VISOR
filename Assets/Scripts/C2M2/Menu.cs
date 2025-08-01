@@ -229,10 +229,10 @@ namespace C2M2
                     {
                         synD.syns[j * 2].synVert = synM.synapses[j].Item1.FocusVert;
                         synD.syns[j * 2].simID = synM.synapses[j].Item1.simulation.simID;
-                        synD.syns[j * 2].model = synM.synapses[j].Item1.currentModel;
+                        // synD.syns[j * 2].model = synM.synapses[j].Item1.currentModel;
                         synD.syns[(j * 2) + 1].synVert = synM.synapses[j].Item2.FocusVert;
                         synD.syns[(j * 2) + 1].simID = synM.synapses[j].Item2.simulation.simID;
-                        synD.syns[(j * 2) + 1].model = synM.synapses[j].Item2.currentModel;
+                        // synD.syns[(j * 2) + 1].model = synM.synapses[j].Item2.currentModel;
                     }
                 }
                 string jSon = JsonUtility.ToJson(synD);
@@ -432,7 +432,7 @@ namespace C2M2
                     }
                     syn = Instantiate(GameManager.instance.synapseManagerPrefab.GetComponent<SynapseManager>().synapsePrefab, ndsim.transform).GetComponentInChildren<Synapse>();
                     syn.AttachToSimulation(ndsim, synD.syns[j].synVert);
-                    syn.SwitchModel(synD.syns[j].model);
+                    // syn.SwitchModel(synD.syns[j].model);
                 }
 
                 finishedLoading = true; // this is for ChangeGradient
