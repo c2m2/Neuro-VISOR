@@ -12,7 +12,6 @@ namespace C2M2
         {
             public int synVert;
             public int simID;
-            public Synapse.Model model;
         }
 
         public SynData[] syns;
