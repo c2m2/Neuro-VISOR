@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.IO;
 using C2M2.NeuronalDynamics.Simulation;
 using System.Collections.Generic;
@@ -24,7 +24,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
         {
             foreach(NDGraph graph in graphs)
             {
-                graph.ndlinegraph.DestroyPlot();
+                graph.ndlinegraph.DestroyPlot(); 
             }
         }
 

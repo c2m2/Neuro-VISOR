@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -149,6 +149,7 @@ namespace C2M2.Visualization
             int ind = Mathf.RoundToInt((truePos.x / GraphWidth) * NumSamples);
             ind = Mathf.Clamp(ind, 0, lineGraph.positions.Count-1);
             Vector3 labelValue = lineGraph.positions[ind];
+            
 
             // Latch the cursor to a value on the graph
             Vector3 latchedPos = GetLatchedPosition(labelValue);

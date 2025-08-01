@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -12,7 +12,7 @@ namespace C2M2
         {
             public int synVert;
             public int simID;
-            public ISynapseModel model;
+            public Synapse.Model model;
         }
 
         public SynData[] syns;

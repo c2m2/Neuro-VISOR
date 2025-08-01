@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using C2M2.NeuronalDynamics.UGX;
@@ -16,7 +16,6 @@ using C2M2.NeuronalDynamics.Interaction.UI;
 using C2M2.Interaction.UI;
 using System.Linq;
 using C2M2.Utils;
-using C2M2.SomaPositionCalculation;
 
 namespace C2M2.NeuronalDynamics.Simulation {
 
@@ -28,9 +27,12 @@ namespace C2M2.NeuronalDynamics.Simulation {
     /// </remarks>
     public abstract class NDSimulation : MeshSimulation {
         public int simID = -1; // simulation ID
-        public CharacteristicDistance characteristicDistance {get; set; } = null;
+
         public new NDSimulationManager Manager { get { return GameManager.instance.simulationManager; } }
         private double visualInflation = 1;
+        public CSVWriter csv = null;
+        public SparseSolverTestv1 solver = null;
+        
         public double VisualInflation
         {
             get { return visualInflation; }
@@ -82,7 +84,8 @@ namespace C2M2.NeuronalDynamics.Simulation {
         public GameObject infoPanelPrefab = null;
 
         public GameObject controlPanel = null;
-
+        
+        
         // Need mesh options for each refinement, diameter level
         [Tooltip("Name of the vrn file within Assets/StreamingAssets/NeuronalDynamics/Geometries")]
         public string vrnFileName = "test.vrn";
@@ -207,6 +210,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
         {
             ApplyInteractionVals();
             SetOutputValues();
+
             void ApplyInteractionVals()
             {
                 /// Apply clamp values, if there are any clamps
@@ -226,24 +230,22 @@ namespace C2M2.NeuronalDynamics.Simulation {
                     }
                 }
 
-                //Checks if there are currently any synapses by using the list kept in synapseManager
+                /// Apply synapse values, if there are any synapses
                 if (Manager.synapseManager.synapses.Count > 0)
                 {
-                    //Creates a list of (Synapse, Synapse) pairs to keep track of corresponding pre- and post-synapses
-                    //Note: a Synapse refers to the prefab Synapse, a type of marker attached to a node when it is either the pre- or post- synaptic node
                     List<(Synapse, Synapse)> synapses = new List<(Synapse, Synapse)>(); //pre (Item1) and post (Item2) synapses
                     
-                    // Iterates through every (Synapse, Synapse) pair in the synapse list kept in the synapse manager
-                    // Checks if the neuron attached to this simulation class contains any post-synapse nodes
+                    // Gather a list of each synapse with their post on the current sim
                     foreach ((Synapse, Synapse) syn in Manager.synapseManager.synapses)
                     {
                         Synapse preSynapse = syn.Item1;
                         Synapse postSynapse = syn.Item2;
-
                         if (this == postSynapse.simulation)
                         {
-                            //After the foreach loop, the synapses list will contain a list of all the synapses with a post-synaptic side on the
-                            //current neuron, which this simulation is attached to
+                            // Set the synapse voltage to what the voltage is at the 1D vertex
+                            preSynapse.ActivationTime = 0.0;
+                            postSynapse.ActivationTime = 0.0;
+
                             synapses.Add((preSynapse, postSynapse));
                         }
                     }
@@ -258,6 +260,9 @@ namespace C2M2.NeuronalDynamics.Simulation {
                     Set1DValues(raycastHits);
                 }
             }
+            
+            
+            
         }
 
         internal abstract void SetOutputValues();
@@ -295,6 +300,9 @@ namespace C2M2.NeuronalDynamics.Simulation {
         /// Translate 1D vertex values to 3D values and pass them upwards for visualization
         /// </summary>
         /// <returns> One scalar value for each 3D vertex based on its 1D vert's scalar value </returns>
+        
+
+        
         public sealed override float[] GetValues () {
             double[] vals1D = Get1DValues();
             double[] scalars3D = new double[Mapping.Data.Count];
@@ -312,10 +320,16 @@ namespace C2M2.NeuronalDynamics.Simulation {
             foreach(NDGraph graph in graphManager.graphs)
             {
                 graph.ndlinegraph.AddValue(1000*GetSimulationTime(), (float)vals1D[graph.FocusVert] * unitScaler);
+                
+                
             }
+
+            
 
             return scalars3D.ToFloat();
         }
+        
+       
 
         /// <summary>
         /// Translate 3D vertex values to 1D values, and pass them downwards for interaction
@@ -359,6 +373,27 @@ namespace C2M2.NeuronalDynamics.Simulation {
         /// </summary>
         /// <returns></returns>
         public abstract double[] Get1DValues ();
+        protected override async void WriteCSV()
+        {   
+            
+            if (csv != null)
+            {
+                csv.WriteToCSV(1000 * GetSimulationTime(), Get1DValues());
+            }
+        }
+
+        public bool convert = false;
+
+        protected override async void StopCSV()
+        {
+            if (convert == true)
+            {   convert = false;
+                csv.ConvertToCSV();
+                csv = null;
+
+            }
+        }
+
         protected override void OnAwakePre()
         {
             UpdateGrid1D();
@@ -422,7 +457,11 @@ namespace C2M2.NeuronalDynamics.Simulation {
                     Destroy(controlPanel);
                     return;
                 }
+
+                
                 controller.MinimizeBoard(false);
+                
+                
             }
         }
 
@@ -508,6 +547,8 @@ namespace C2M2.NeuronalDynamics.Simulation {
             this.v2 = v2;
             this.lambda = lambda;
         }
+
+        
         public override string ToString()
         {
             return "v1: " + v1 + "\nv2: " + v2 + "\nlambda: " + lambda;

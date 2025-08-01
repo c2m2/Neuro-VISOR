@@ -3,6 +3,7 @@ using UnityEngine;
 using C2M2.NeuronalDynamics.Simulation;
 using TMPro;
 using UnityEngine.UI;
+using C2M2.Utils;
 
 namespace C2M2.NeuronalDynamics.Interaction.UI
 {
@@ -21,8 +22,11 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
         public GameObject defaultBackground;
         public GameObject minimizedBackground;
 
+        
+        public GameObject SaveButton;
+        public GameObject StopButton;
         private TextMeshProUGUI[] textElements = null;
-        CellPreviewerController controller;
+        private CSVWriter csv = null;
 
 
         private bool Minimized
@@ -38,6 +42,9 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
             textElements = GetComponentsInChildren<TextMeshProUGUI>(true);
 
             StartCoroutine(UpdateColRoutine(0.5f));
+            
+            StopButton = gameObject.transform.GetChild(6).gameObject;
+            StopButton.SetActive(false);
         }
 
         private void UpdateCols()
@@ -119,19 +126,14 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
                 {
                     // Reenable the cell previewer
                     GameManager.instance.cellPreviewer.SetActive(true);
-                    //Reenable the cell previewer controls
-                    CellPreviewerController.makePreviewerControlsVisible(true);
+
                     // Destroy this control panel
                     Destroy(transform.root.gameObject);
                 }
 
-                // Destroy ruler and pivot point objects if no cells are left
-                // TODO See NDSimulationLoader for note on supplementary object generation and removal improvement
-                if (GameManager.instance.activeSims.Count == 0)
-                {
-                    Destroy(GameObject.Find("Ruler"));
-                    Destroy(GameObject.Find("NeuronPivotPoint"));
-                }
+                // Destroy ruler if no cells are left
+                // TODO See NDSimulationLoader for note on ruler generation and removal improvement
+                if (GameManager.instance.activeSims.Count == 0) Destroy(GameObject.Find("Ruler"));
             }
         }
 
@@ -144,10 +146,26 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
             }
             defaultBackground.SetActive(!minimize);
             minimizedBackground.SetActive(minimize);
-            //make cell previewer controls nonvisible
-            CellPreviewerController.makePreviewerControlsVisible(false);
+
             // Ensure cell previewer is not present if board is expanded 
             if (!minimize) GameManager.instance.cellPreviewer.SetActive(false);
+        }
+
+        public void StartCSV(bool single)
+        {   //restrict user from saving multiple csv files, disable button after clicking
+            csv = GameManager.instance.activeSims[0].gameObject.AddComponent<CSVWriter>();
+            NDSimulation sim = (NDSimulation)GameManager.instance.activeSims[0];
+            sim.solver = (SparseSolverTestv1)GameManager.instance.activeSims[0];
+            sim.csv = csv;
+            csv.single = single;
+            
+        }
+        public void StopCSV()
+        {   
+            NDSimulation sim = (NDSimulation)GameManager.instance.activeSims[0];
+            sim.convert = true;
+            
+            
         }
 
         public void MinimizeToggle()

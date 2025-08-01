@@ -1,4 +1,4 @@
-﻿using Boo.Lang;
+using Boo.Lang;
 using C2M2;
 using C2M2.NeuronalDynamics.Simulation;
 using C2M2.NeuronalDynamics.UGX;

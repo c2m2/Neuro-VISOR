@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using UnityEngine;
 using C2M2.NeuronalDynamics.Simulation;
 using System.IO;

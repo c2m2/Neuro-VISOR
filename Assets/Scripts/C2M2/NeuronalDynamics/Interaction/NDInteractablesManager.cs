@@ -1,4 +1,4 @@
-﻿using C2M2;
+using C2M2;
 using C2M2.Interaction;
 using C2M2.NeuronalDynamics.Simulation;
 using System.Collections.Generic;

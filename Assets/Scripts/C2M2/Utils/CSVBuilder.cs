@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Text;
@@ -37,7 +37,7 @@ namespace C2M2
                 string newLine = "";
                 for (int i = 0; i < newData.Length; i++)
                 {
-                    newLine += newData[i].ToString() + ",";
+                    newLine += newData[i]+ ",";
                 }
                 // Remove last delimiter
                 newLine.Remove(newLine.Length - 1);

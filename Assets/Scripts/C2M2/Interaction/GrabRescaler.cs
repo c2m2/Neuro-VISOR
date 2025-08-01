@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using C2M2.Utils;
 using System.Security.Cryptography;
 using System.Collections.Specialized;

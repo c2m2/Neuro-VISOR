@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
@@ -20,6 +20,8 @@ namespace C2M2.Visualization
         public RectTransform infoPanel = null;
         public RectTransform infoPanelButton = null;
         private LineRenderer outline;
+        
+        
         public LineRenderer Outline
         {
             get
@@ -225,6 +227,8 @@ namespace C2M2.Visualization
             InitOutline();
             InitInfoPanelButton();
             MaxSamples = maxSamples;
+            
+            
 
             void InitInfoPanel()
             {
@@ -332,6 +336,8 @@ namespace C2M2.Visualization
             }
 
             positions.Add(new Vector3(x, y));
+            
+            
 
             // Update max and min
             XMin = positions[0].x;
