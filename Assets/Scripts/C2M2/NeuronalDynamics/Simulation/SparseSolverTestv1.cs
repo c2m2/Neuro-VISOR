@@ -265,7 +265,7 @@ namespace C2M2.NeuronalDynamics.Simulation
             area = 2 * System.Math.PI * Neuron.nodes[newVal.Item2.FocusVert].NodeRadius * Neuron.TargetEdgeLength * 1e-12;
 
             //Icurrs[0] is current synaptic state, and Icurrs[1] is previous synaptic state
-            Icurrs = SynapseCurrentFunction(newVal, newVal.Item1.currentModel);
+            Icurrs = SynapseCurrentFunction(newVal, newVal.Item1.currentModel.Value);
 
             // If the user should use unrealistic biological parameters, this will check the current and set the current appropriately if the current goes beyond
             // biologically accurate currents
