@@ -3,7 +3,17 @@ guid: cd3b813ee8b9b7747a6fd947babf78cf
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - simulation: {instanceID: 0}
+  - meshRenderer: {instanceID: 0}
+  - defaultMaterial: {instanceID: 0}
+  - previewMaterial: {instanceID: 0}
+  - destroyMaterial: {instanceID: 0}
+  - highlightObj: {instanceID: 0}
+  - inhibitoryMat: {fileID: 2100000, guid: 789ac42e6d85b3c4f9bd257768e6865a, type: 2}
+  - excitatoryMat: {fileID: 2100000, guid: c09e4ceba9cbc07479695a453f84be1f, type: 2}
+  - dopamineMat: {fileID: 2100000, guid: c1d49b49cccbde446bc707d2b31d82e8, type: 2}
+  - prePlaceMat: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

@@ -3,6 +3,9 @@ using UnityEngine;
 using C2M2;
 using C2M2.Simulation;
 using C2M2.NeuronalDynamics.Simulation;
+using UnityEngine.UI;
+using TMPro;
+using System;
 
 public class SynapseManager : NDInteractablesManager<Synapse>
 {
@@ -131,7 +134,7 @@ public class SynapseManager : NDInteractablesManager<Synapse>
         return false;
     }
 
-    public bool ChangeModel(Synapse syn, Synapse.Model model)
+    public bool ChangeModel(Synapse syn, ISynapseModel model)
     {
         if (FindSynapsePair(syn) != null)
         {
@@ -160,6 +163,7 @@ public class SynapseManager : NDInteractablesManager<Synapse>
         Synapse pre = synapses[synapses.Count - 1].Item1;
         Synapse post = synapses[synapses.Count - 1].Item2;
 
+
         // Create a new arrow in 3D space
         arrowHead = Instantiate(arrowPrefab, new Vector3(0, 0, 0), Quaternion.identity) as GameObject;
         /* Use Vector3 lerp so the position does not set it to the middle of the pre synapse but rather in the middle of both the pre-synapse and post-synapse*/
@@ -178,6 +182,10 @@ public class SynapseManager : NDInteractablesManager<Synapse>
         // Assign current synapses to fields of ArrowUpdate to ensure color changes with synapse model
         arrowHead.GetComponent<ArrowUpdate>().pre = pre;
         arrowHead.GetComponent<ArrowUpdate>().post = post;
+
+        //Handles changing the label of the synapse arrow
+        TextMeshPro textField = arrowHead.GetComponentInChildren<TextMeshPro>();
+        arrowHead.GetComponent<ArrowUpdate>().nameField = textField;
     }
 
     /// <summary>
