@@ -31,6 +31,8 @@ namespace C2M2.NeuronalDynamics.Simulation {
         public CharacteristicDistance characteristicDistance {get; set; } = null;
         public new NDSimulationManager Manager { get { return GameManager.instance.simulationManager; } }
         private double visualInflation = 1;
+        public CSVWriter csv = null;
+        public SparseSolverTestv1 solver = null;
         public double VisualInflation
         {
             get { return visualInflation; }
@@ -357,6 +359,26 @@ namespace C2M2.NeuronalDynamics.Simulation {
         /// </summary>
         /// <returns></returns>
         public abstract double[] Get1DValues ();
+         protected override async void WriteCSV()
+        {   
+            
+            if (csv != null)
+            {
+                csv.WriteToCSV(1000 * GetSimulationTime(), Get1DValues());
+            }
+        }
+
+        public bool convert = false;
+
+        protected override async void StopCSV()
+        {
+            if (convert == true)
+            {   convert = false;
+                csv.ConvertToCSV();
+                csv = null;
+
+            }
+        }
         protected override void OnAwakePre()
         {
             UpdateGrid1D();
