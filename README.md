@@ -217,7 +217,7 @@ The number of samples in the graph can be altered by opening the "more info" pan
 
 <img src="https://i.imgur.com/foTasYW.png" alt="synapse" width="400" align="right"/>
 
-With the addition of principled synapse models into a multi-neuron network, one is now able to build a network of neurons and connect them via synapses, simulating transmission of electrical signals from one neuron to another. The project is equipped with two functional types of chemical synapse models found within the mammalian cerebellum. The two implemented synapse models are the excitatory NMDA-receptor-based and the GABAergic inhibitory synapse. The mathematical equation describing the NMDA receptor-based model is I<sub>NMDAR</sub> = G<sub>NMDAR</sub> * a(t) * b(V<sub>postsyn</sub>) *(V<sub>postsyn</sub> – E<sub>NMDAR</sub>). G<sub>NMDAR</sub> is an experimental value for the conductance of the receptor. V<sub>postsyn</sub> is the membrane voltage at the postsynaptic site computed by Neuro-VISOR. E<sub>NMDAR</sub> is an experimental value for the reversal potential assigned to the synapse. The other terms in the equation, a(t) and b(V<sub>m</sub>), are probability functions. The a(t) term describes the time course of the conductance and takes two variables, time of the presynaptic action potential as well as the postsynaptic membrane voltage. The other term, b(V<sub>m</sub>) is a simple Boltzmann function that describes the fraction of NMDA receptors left unblocked. The term is used to simulate the magnesium ion block of the NMDA receptor which prevents excessive activation. When a given voltage threshold is reached on the presynaptic membrane the voltage of the postsynaptic membrane will be increased. The GABAergic synapse model is described by I<sub>GABAR</sub> = G<sub>GABAR</sub> * a(t) * (V<sub>postsyn</sub> – E<sub>GABAR</sub>). Like the NMDA Receptor model, the GABA current has many of the same terms, just with differing constants and conductance. The GABAergic synapse model doesn’t include the Boltzmann function. The chemical signal received when using the GABAergic model will activate the GABA receptor, which will polarize the postsynaptic cell and produce an inhibitory effect. In the simulation, when the user seeks to employ the GABAergic model, the voltage at the postsynaptic membrane will decrease until it reaches a designated voltage threshold.
+With the addition of principled synapse models into a multi-neuron network, one is now able to build a network of neurons and connect them via synapses, simulating transmission of electrical signals from one neuron to another. The project is equipped with two functional types of chemical synapse models found within the mammalian cerebellum. The implemented synapse models are the excitatory NMDA- and AMPA-receptor-based and the GABAergic inhibitory synapse. These are all modeled using the general form from  Rothman, Jason S. "Modeling Synapses." (2014): I<sub>SYN</sub> = G<sub>max</sub> * a(t) * b(V<sub>postsyn</sub>) *(V<sub>postsyn</sub> – E<sub>SYN</sub>). G<sub>max</sub> is an experimental value for the conductance of the receptor. V<sub>postsyn</sub> is the membrane voltage at the postsynaptic site computed by Neuro-VISOR. E<sub>SYN</sub> is an experimental value for the reversal potential assigned to the synapse. The other terms in the equation, a(t) and b(V<sub>m</sub>), are probability functions. The a(t) term describes the time course of the conductance and takes two variables, time of the presynaptic action potential as well as the postsynaptic membrane voltage. The other term, b(V<sub>m</sub>) is a simple Boltzmann function that describes the fraction of synaptic receptors left unblocked (GABAergic synapses do not include this term). In the simulation, when the user seeks to employ the GABAergic model, the voltage at the postsynaptic membrane will decrease until it reaches a designated voltage threshold.
 
 1. To interact with synapses in the simulation, select and place neurons to be worked
 with into the main scene.
@@ -228,14 +228,12 @@ presynaptic membrane.
 select a different vertex on the same cell to be the postsynaptic site, however the 
 action potential propagation is clearer when there are synapses connecting two 
 neurons).
-4. The same synapse mode allows a user to switch between two different types of 
-synapse models, namely excitatory or inhibitory.
-5. To switch between these two modes, select(long-press) at the postsynaptic site, the mode will change from either excitatory to inhibitory or vice versa.
+4. The same synapse mode allows a user to switch between different types of 
+synapse models, namely NMDA, AMPA, and GABA.
+5. To switch between these modes, select(long-press) at the postsynaptic site, the mode will cycle through the implemented synaptic models.
 6. The active synapse model is denoted by the synapse color displayed by the pre and postsynaptic sites as well 
 as the arrow that points in the direction from these two membranes.
-7. Note that the GABA receptor in our simulation is colored red as to distinguish 
-between the NMDA receptor which is colored green. The two types of synapse 
-models, combined with the neuron signaling, represent the key ingredients needed
+7. Note that the to distinguish between synaptic types, the GABA receptor in our simulation is colored red and the NMDA and AMPA receptors are colored green, each given a label above the arrow. The different synapse models, combined with the neuron signaling, represent the key ingredients needed
 to build micro-circuits with realistic signal processing capabilities.
 8. Multiple synaptic connections can be placed on any vertex
 9. Deleting one synapse connection triggers deletion of all other synapse connections associated with the vertex
@@ -257,6 +255,18 @@ Master: The latest stable version of the project
 Development: The active beta, contains the latest features but at a higher risk of bugs
 
 ## Changelog
+
+### 2.6.0
+Contributors: [Adam Marx](https://github.com/Kelvrim), [Aidan Ross](https://github.com/aidanross430), [Zachary Miksis](https://zacharymiksis.com)
+
+- Implemented a Soma Position Calculator class which is now used to determine the next "best" position to automatically place a new neuron
+- Neurons are now loaded in some distance away from existing neurons, favoring the center of the room.
+- Neurons are now also loaded with a random rotation along the vertical axis
+- Added AMPA receptors to the available types of synapses
+- Added a label to synapses, conveying to the user what model is being used
+- Added a discrete data structure for synapse receptor models
+- Updated synapse switching logic to allow more than two receptor types
+- Bug fixes to synapse activation time and synapse current decay behavior
 
 ### 2.5.0
 Contributors: [Malvin Prifti](https://github.com/ausii), [Brandon Hugger](https://github.com/B-Hugger), [Rujeko Chinomona](https://rujekoc.github.io/), [Zachary Miksis](https://zacharymiksis.com)
