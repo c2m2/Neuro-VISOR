@@ -145,7 +145,9 @@ are used analogously throughout the project, as are the terms 'Index Trigger' an
 | (H) | Hold button down |
 
 ### Selecting a Cell
-<img src="https://i.imgur.com/knL8vTZ.png" alt="cell previewer" width="500" align="right">
+<!-- <img src="https://i.imgur.com/knL8vTZ.png" alt="cell previewer" width="500" align="right"> -->
+<img src="https://i.imgur.com/9m9zhS8.png" alt="cell previewer" width="500" align="right">
+
 
 1. A cell previewer stands against the whiteboard near the window. It attempts to render the 1D mesh of any neuron `.vrn` cell file archives found in `StreamingAssets/NeuronalDynamics/Geometries`. Six example cells are included with this repo.
 2. Enable raycast mode. The hand with raycast mode enabled should be constantly pointing forward.
@@ -224,7 +226,8 @@ The number of samples in the graph can be altered by opening the "more info" pan
 
 ### Synapse interaction
 
-<img src="https://i.imgur.com/foTasYW.png" alt="synapse" width="400" align="right"/>
+<!-- <img src="https://i.imgur.com/foTasYW.png" alt="synapse" width="400" align="right"/> -->
+<img src="https://i.imgur.com/H2plH6p.png" alt="synapse" width="400" align="right"/>
 
 With the addition of principled synapse models into a multi-neuron network, one is now able to build a network of neurons and connect them via synapses, simulating transmission of electrical signals from one neuron to another. The project is equipped with three functional types of chemical synapse models found within the mammalian cerebellum. The implemented synapse models are the excitatory NMDA- and AMPA-receptor-based and the GABAergic inhibitory synapse. These are all modeled as outlined in J.S. Rothman, "Modeling Synapses" (2014).
 
