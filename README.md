@@ -4,17 +4,17 @@
 
 VISOR (Virtual Interactive Simulation Of Reality) is a research project developed by Temple University's [Center for Computational Mathematics and Modeling (C2M2)](https://c2m2.cst.temple.edu/), College of Science and Technology. The overarching long-term vision of VISOR is to produce novel concepts and software that enable efficient immersed virtual reality (VR) visualization and real-time interaction with simulations of real-world processes described via principled mathematical equations. Unlike traditional high performance computing (HPC) applications, the philosophy of VISOR is that (a) the simulation runs while it is visualized in a virtual environment, and (b) the user can affect and modify the system state or its conditions at runtime, and the simulation reacts instantaneously and seamlessly.
 
-<img src="https://i.imgur.com/EgFS41f.pngg" alt="room" width="50%" align="center">
+<img src="https://i.imgur.com/EgFS41f.pngg" alt="Virtual room" width="50%" align="left">
 
-The Neuro-VISOR project focuses on applications in computational neuroscience. Specifically, it provides a pipeline that (a) retrieves a wire-frame neuron geometry file from the public neuron database [NeuroMorpho](http://neuromorpho.org/), and (b) generates a surface mesh from it. This mesh is then (c) visualized in VR, while an efficient numerical method approximates the Hodgkin-Huxley model on the given wire-frame neuron geometry. Finally, while the running simulation is fed to the VR environment in real time, (d) the user can interact with the surface mesh and affect the simulation while it is running via several methods outlined under [controls](#controls).
+The Neuro-VISOR project focuses on applications in computational neuroscience. Selected neurons retrieved as wire-frame geometries from the public neuron database [NeuroMorpho](http://neuromorpho.org/) have been augmented by surface meshes for 3D visualization and user interaction. These neurons are available to be placed in the virtual room, in which an efficient and robust numerical method approximates governing partial differential equation models (such as the Hodgkin-Huxley model or related models) on the wire-frame neuron geometry. Moreover, while the running simulation is fed to the VR environment in real time, the user can interact with the surface mesh and affect the simulation while it is running, via several methods outlined under [controls](#controls). Analogously, different types of synapses can be placed, connecting two different neuron vertices, as well as clamps and evaluation/plotting windows. The overarching philosophy is that the virtual laboratory feels close to a real wet-lab, in the sense that neurons, synapses, clamps, etc. are places and manipulated via the user's hands, and the user can observe and experience the resulting biophysical activity in many ways.
 
-<img src="https://i.imgur.com/uZPZg7F.png" alt="Raycasting and grabbing" width="35%" align="right">
+<img src="https://i.imgur.com/uZPZg7F.png" alt="Raycasting and grabbing" width="25%" align="right">
 
-A key use case of this framework is that is can rapidly accelerate scientific discovery by providing an immediate and very intuitive feedback to the user about how changes to the simulated system affect the system's behavior. This insight, obtained from the simple and fast models used for VISOR, can then enable the computational scientist to devise significantly more targeted (non-interactive) simulations on large-scale HPC clusters of more complex models. In addition, in the context of neuroscience, the immersed 3D environment provides a more intuitive way to navigate and comprehend complex neuron geometries than traditional visualizations on computer screens.
+A key goal of this paradigm is that is can help accelerate scientific discovery by providing an immediate and intuitive feedback to the user about how changes to the simulated system affect the system's behavior. This insight, obtained from the simple and fast models used for VISOR, can then enable the computational scientist to devise significantly more targeted (non-interactive) simulations on large-scale HPC clusters of more complex models. In addition, in the context of neuroscience, the immersed 3D environment provides a more intuitive way to navigate and comprehend complex neuron geometries than traditional visualizations on computer screens, helping to overcome possible language gaps between computational and experimental science.
 
-The Neuro-VISOR software can be run in a VR version (currently for Oculus), as well as via a desktop version (without VR headset). While the desktop version does not provide the 3D visualization of the VR version, it does provide all of the same interactive real-time simulation capabilities.
+The Neuro-VISOR software is fully open source, and it can be run in VR mode (currently developed for Oculus VR hardware), as well as in desktop mode (without VR headset). While the desktop version does not provide the 3D visualization and intuitive controls via the user's hands of the VR version, it does provide all of the same interactive real-time simulation capabilities.
 
-Neuro-VISOR has been used at multiple venues, including teaching/education (undergraduate neuroscience course at Temple University), scientific conferences (Mid-Atlantic Numerical Analysis Day, Latest trends and insights into matrix theory, iterative methods, and preconditioning), research symposia, and public events.
+Neuro-VISOR has been used at multiple venues, including teaching/education (undergraduate neuroscience course at Temple University), scientific conferences (Mid-Atlantic Numerical Analysis Day, Latest trends and insights into matrix theory, iterative methods, and preconditioning, Mathematical Opportunities in Digital Twins), research symposia, and public events (Philadelphia Start Talking Science Festival).
 
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/ac2c4122b3174e4a8209ef2e791792b3)](https://www.codacy.com?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=c2m2/virtual-reality&amp;utm_campaign=Badge_Grade)
 
@@ -26,11 +26,11 @@ We use a modified version of the GNU LPGL v3. Our license can be found in LICENS
 
 This project is produced at the Center for Computational Mathematics and Modeling (C2M2) at Temple University.
 
-Project Leads: [Dr. Benjamin Seibold](https://math.temple.edu/~seibold/) [(Github)](https://github.com/benjaminseibold), [Dr. Gillian Queisser](https://math.temple.edu/~tug29557/about-gillian-queisser.html)
+Project Leads: [Dr. Benjamin Seibold](https://faculty.cst.temple.edu/~seibold/) [(Github)](https://github.com/benjaminseibold), [Dr. Gillian Queisser](https://sites.temple.edu/queisser/)
 
 Researchers and Developers: [Zachary Miksis](https://zacharymiksis.com/)
 
-Past Members: [Rujeko Chinomona](https://rujekoc.github.io/)
+Past Developers: [Rujeko Chinomona](https://rujekoc.github.io/)
 
 ## Code Documentation
 Our [code documentation](https://c2m2.github.io/doxyhtml/index.html) is generated using [Doxygen](https://www.doxygen.nl/index.html). The completeness of this documentation is dependent on code commenting, so there may be gaps and imperfections. If you notice issues with this documentation, please report it to <seibold@temple.edu>.
@@ -39,11 +39,11 @@ Our [code documentation](https://c2m2.github.io/doxyhtml/index.html) is generate
 [Stephan Grein](https://github.com/stephanmg/) [(in)](https://www.linkedin.com/in/stephan-grein-8520ba101/) maintains a [separate project for generating neuron grids](https://github.com/stephanmg/vr-grids), as well as [a project containing additional custom attributes](https://github.com/stephanmg/vr-utils) which proved useful during development of Neuro-VISOR.
 
 ## Connect with Us
-Our [blog](https://c2m2vr.wordpress.com/) goes into finer detail about some of our past and current code solutions. This blog contains interesting details about various areas of the project.
-
 Inquiries about the project can be made to <seibold@temple.edu>.
 
 Performance issues and code-related questions can be sent to <miksis@temple.edu>. We also encourage use of GitHub Issues.
+
+An old [blog](https://c2m2vr.wordpress.com/) goes into finer detail about some of our past and current code solutions. This blog contains interesting details about various areas of the project.
 
 # Use Guide
 
@@ -144,8 +144,7 @@ are used analogously throughout the project, as are the terms 'Index Trigger' an
 | (H) | Hold button down |
 
 ### Selecting a Cell
-<img src="https://i.imgur.com/LJcieiS.png" alt="cell previewer" width="500" align="right">
-
+<img src="https://i.imgur.com/LJcieiS.png" alt="cell previewer" width="55%" align="right">
 
 1. A cell previewer stands against the whiteboard near the window. It attempts to render the 1D mesh of any neuron `.vrn` cell file archives found in `StreamingAssets/NeuronalDynamics/Geometries`. Six example cells are included with this repo.
 2. Enable raycast mode. The hand with raycast mode enabled should be constantly pointing forward.
@@ -159,9 +158,9 @@ The cell can be grabbed by hovering your hand over the 3D geometry and pressing 
 #### Resizing
 While grabbing a cell, hold the thumbstick up or down on the hand that is being used to grab the cell to resize the cell in world space. Note: this does not affect the environment of the solver code: the cell can be scaled freely in world space without affecting the stored vertex positions of the 1D or 3D meshes.
 
-### Board Info and Controls
-<img src="https://i.imgur.com/tKyE0RO.png" alt="board controls" width="250" align="right">
+<img src="https://i.imgur.com/tKyE0RO.png" alt="board controls" width="30%" align="right">
 
+### Board Info and Controls
 A large user interface is spawned upon selecting a cell. This board contains useful static information about the cell.
 
 The board contains a color table that shows the current color gradient applied to the cell. The voltage value corresponding to different color values is diosplayed to the left of the color table. The user can change the value corresponding to the top or bottom of the color scale by hovering their finger cursor over either number and holding up/down on the joystick (or the up/down arrow key). The user can also change the color scheme by interacting with the arrows beneath the color table.
@@ -170,14 +169,14 @@ The board contains a subpanel for selecting the type of interaction. The user ca
 
 The board also contains a play/pause button. The user can use this to pause solver code at the current time step. Beneath is displayed the current simulation time.
 
-<img src="https://i.imgur.com/XEvBssG.png" alt="pivot point" width="175" align="right">
+<img src="https://i.imgur.com/XEvBssG.png" alt="pivot point" width="20%" align="right">
 
 ### Pivot point object
 A pivot point object is created when multiple neurons are present in the simulation. The pivot point object is represented as a white sphere, and is always located at the midpoint of all cell geometries. While grabbing the pivot point object, the cell geometries can be moved as a group.
 
 When not grabbing the pivot point object, users can utilize the Scale Objects controls in order to rescale the objects within the simulation.
 
-<img src="https://i.imgur.com/acM7ogE.png" alt="ruler" width="50" align="right">
+<img src="https://i.imgur.com/acM7ogE.png" alt="ruler" width="8%" align="right">
 
 ### Ruler controls
 A ruler is spawned with every cell geometry. The ruler can be used to understand the length scale of the cell in its local space. While grabbing the ruler, resize it by moving the thumbstick up or down on the hand that is being used to grab the ruler.
@@ -188,7 +187,7 @@ The measurements on the ruler will adapt to the world-space size of the geometry
 With raycast mode enabled, point at the surface of the geometry. A blue line should be drawn between your pointer finger and the surface of the geometry. Tap the geometry from up close, or press the Interact button from a distance to directly alter simulation value at the nearest 1D vertex to the point of interaction. The guide line should turn orange upon pressing, and the surface of the geometry should change color to reflect the affected potential at the nearest 1D vertex on the geometry.
 
 ### Clamp interaction
-<img src="https://i.imgur.com/QNpzkL1.png" alt="clamps" width="500" align="center">
+<img src="https://i.imgur.com/QNpzkL1.png" alt="clamps" width="50%" align="center">
 
 Clamps can be used to continuously alter the value of a single vertex on the 1D mesh. From the left to the right in the image above, there is a clamp that is off and then increasing in applied voltage.
 
@@ -214,7 +213,7 @@ In addition to each clamp being individually interactable, the "finger clamps" m
 The user can highlight all clamps with a red sphere to clarify their position to the user. This is particularly useful on complicated geometries with many clamps attached. While pointing at the finger clamp and holding the Interact button, hold down the hand trigger to highlight all existing spheres.
 
 ### Point-plotter interaction
-<img src="https://i.imgur.com/LG0Xa2P.png" alt="point plotter" width="400" align="right"/>
+<img src="https://i.imgur.com/LG0Xa2P.png" alt="point plotter" width="40%" align="right"/>
 The user is able to spawn line graphs that are attached to specific 1D vertices on the neuron cell. These graphs will show the voltage at that 1D point over time.
 
 To spawn a graph panel, the user simply needs to toggle "Plot" on the [board UI](#board-info-and-controls). At this point the user can raycast onto the surface of the mesh and press the index trigger (or click with the mouse) in order to spawn a graph attached to the nearest 1D vertex. Panels are grabbable and resizeable in the same way that the cell or the ruler is.
@@ -225,7 +224,7 @@ The number of samples in the graph can be altered by opening the "more info" pan
 
 ### Synapse interaction
 
-<img src="https://i.imgur.com/zbGuAFT.png" alt="synapse" width="400" align="right"/>
+<img src="https://i.imgur.com/zbGuAFT.png" alt="synapse" width="40%" align="right"/>
 
 With the addition of principled synapse models into a multi-neuron network, one is now able to build a network of neurons and connect them via synapses, simulating transmission of electrical signals from one neuron to another. The project is equipped with three functional types of chemical synapse models found within the mammalian cerebellum. The implemented synapse models are the excitatory NMDA- and AMPA-receptor-based and the GABAergic inhibitory synapse. These are all modeled as outlined in J.S. Rothman, "Modeling Synapses" (2014).
 
@@ -240,7 +239,7 @@ action potential propagation is clearer when there are synapses connecting two
 neurons).
 4. The same synapse mode allows a user to switch between different types of 
 synapse models, namely NMDA, AMPA, and GABA.
-5. To switch between these modes, select(long-press) at the postsynaptic site, the mode will cycle through the implemented synaptic models.
+5. To switch between these modes, select (long-press) at the postsynaptic site, the mode will cycle through the implemented synaptic models.
 6. The active synapse model is denoted by the synapse color displayed by the pre and postsynaptic sites as well 
 as the arrow that points in the direction from these two membranes.
 7. Note that the to distinguish between synaptic types, the GABA receptor in our simulation is colored red and the NMDA and AMPA receptors are colored green, each given a label above the arrow. The different synapse models, combined with the neuron signaling, represent the key ingredients needed
