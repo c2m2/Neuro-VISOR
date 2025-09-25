@@ -1,26 +1,27 @@
-﻿using C2M2;
+using Boo.Lang;
+using C2M2;
 using C2M2.NeuronalDynamics.Simulation;
 using C2M2.NeuronalDynamics.UGX;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using UnityEngine;
-
 public class Synapse : NDInteractables
 {
-    public Model currentModel = Model.NMDA;
+    //Defines a List to be used as the list of available synaptic models
+    static ISynapseModel[] modelArray = {new ModelNMDA(), new ModelGABA(), new ModelAMPA()};
+    static LinkedList<ISynapseModel> modelList = new LinkedList<ISynapseModel>(modelArray);
+    public LinkedListNode<ISynapseModel> currentModel = modelList.First;
 
+    //Defines the material for the model
     public Material inhibitoryMat;
     public Material excitatoryMat;
     public Material prePlaceMat;
-    
     public int Id;
 
-    public double ActivationTime { get; set; }
 
-    public enum Model
-    {
-        NMDA,
-        GABA
-    }
+    public double ActivationTime { get; set; }
 
     public Neuron.NodeData NodeData
     {
@@ -51,7 +52,6 @@ public class Synapse : NDInteractables
         other.Id = rnd.Next();
         return other;
     }
-
     public override void Place(int index)
     {
         transform.localPosition = FocusPos;
@@ -81,14 +81,21 @@ public class Synapse : NDInteractables
         // Change model 
         if (SynapseManager.HoldCount >= SynapseManager.ChangeCount && SynapseManager.HoldCount <= SynapseManager.DestroyCount)
         {
-            if (SynapseManager.FindSelectedSyn(this).currentModel == Model.GABA) SynapseManager.ChangeModel(SynapseManager.FindSelectedSyn(this), Model.NMDA);
-            else if (SynapseManager.FindSelectedSyn(this).currentModel == Model.NMDA) SynapseManager.ChangeModel(SynapseManager.FindSelectedSyn(this), Model.GABA);
+            //Implements the circularly linked list 
+            if (currentModel.Value.Equals(modelList.Last.Value)) {
+                SynapseManager.ChangeModel(SynapseManager.FindSelectedSyn(this), modelList.First.Value);
+                currentModel = modelList.First;     //Resets to the first model in the linked list
+            }
+            else {
+                SynapseManager.ChangeModel(SynapseManager.FindSelectedSyn(this), currentModel.Next.Value);
+                currentModel = currentModel.Next;   //Iterates through the linked list
+            }
+            Debug.Log("Current Model: " + currentModel.Value);
         }
         // Delete synapse
         else if (SynapseManager.HoldCount >= SynapseManager.DestroyCount)
         {
-            SynapseManager.DeleteSyn(SynapseManager.FindSelectedSyn(this));
-        }
+            SynapseManager.DeleteSyn(SynapseManager.FindSelectedSyn(this));        }
         // Place synapse 
         else if (GameManager.instance.simulationManager.FeatState == NDSimulationManager.FeatureState.Synapse)
         {
@@ -97,9 +104,9 @@ public class Synapse : NDInteractables
         SynapseManager.HoldCount = 0;
     }
 
-    public void SwitchModel(Model model)
+    public void SwitchModel(ISynapseModel model)
     {
-        currentModel = model;
+        currentModel = modelList.Find(model);
         SetToModeMaterial();
     }
 
@@ -110,7 +117,7 @@ public class Synapse : NDInteractables
 
     public void SetToModeMaterial()
     {
-        if (currentModel == Model.NMDA) SwitchMaterial(excitatoryMat);
-        else SwitchMaterial(inhibitoryMat);
+        if (currentModel.Value.isExcitatory()) { SwitchMaterial(excitatoryMat); }
+        else { SwitchMaterial(inhibitoryMat); }
     }
 }

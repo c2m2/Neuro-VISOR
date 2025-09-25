@@ -1,15 +1,19 @@
-﻿using UnityEngine;
+using System.IO;
+using UnityEngine;
 using C2M2.Visualization;
 using C2M2.NeuronalDynamics.Simulation;
+using C2M2.Utils;
 
 namespace C2M2.NeuronalDynamics.Interaction.UI
 {
     [RequireComponent(typeof(NDGraph))]
+    
+    
     public class NDLineGraph : LineGrapher
     {
 
         public NDGraph ndgraph;
-
+        
         public NDSimulation Sim
         {
             get
@@ -26,11 +30,14 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
         private void Awake()
         {
             ndgraph = GetComponent<NDGraph>();
+            
+            
         }
 
         // Start is called before the first frame update
         private void Start()
         {
+            
             SetLabels();
 
             transform.position = GetPanelPos();
@@ -43,7 +50,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
 
             UpdateSize();
             MaxSamples = 500;
-
+            
             void SetLabels()
             {
                 string title = "Voltage vs. Time (Vert " + ndgraph.FocusVert + ")";
@@ -86,7 +93,15 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
             YMax = Sim.ColorLUT.GlobalMax * Sim.unitScaler;
 
             // Add point to graph
+            //Debug.Log("Point added to the graph.");
             base.AddValue(x, y);
+            
+            
+            
+            
+                
+            
+            
         }
 
         private void Update()

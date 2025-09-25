@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Threading;
 using System;
 using C2M2.Interaction;
@@ -159,6 +159,15 @@ namespace C2M2.Simulation
         protected virtual void OnStart() { }
         protected virtual void OnUpdate() { }
 
+        protected virtual async void WriteCSV()
+        {
+            
+        }
+
+        protected virtual void StopCSV()
+        {
+        }
+
         protected void OnDestroy()
         {
             StopCoroutine("updateVisulizationStep");
@@ -169,6 +178,9 @@ namespace C2M2.Simulation
         public int curentTimeStep = -1;
         public double timeStep = 0.008 * 1e-3;
         public double endTime = 1.0;
+        
+        private float timeChange;
+        
         public int nT => (int)(endTime / timeStep);
 
         /// <summary>
@@ -204,11 +216,17 @@ namespace C2M2.Simulation
 
                     PostSolveStep(curentTimeStep);
                     
+                    WriteCSV();
+                    StopCSV();
+                    
+                    
+                    
+
                     curentTimeStep++;
                 }
                 
                 GameManager.instance.solveBarrier.SignalAndWait();
-                float timeChange = (float)(DateTime.Now - startStepTime).TotalSeconds;
+                timeChange = (float)(DateTime.Now - startStepTime).TotalSeconds;
                 resourceUsage = timeChange / minTimeStep;
                 if (resourceUsage < 1)
                 {

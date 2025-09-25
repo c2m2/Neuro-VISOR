@@ -1,4 +1,4 @@
-﻿#pragma warning disable 0618 // Ignore obsolete script warning
+#pragma warning disable 0618 // Ignore obsolete script warning
 
 using System.Collections.Generic;
 using UnityEngine;
@@ -23,14 +23,9 @@ namespace C2M2
 
         // vectors used in SparseSolve; for loading
         public double[] U;
-        public double[] M;
-        public double[] N;
-        public double[] H;
-
         public double[] Upre;
-        public double[] Mpre;
-        public double[] Npre;
-        public double[] Hpre;
+        public Dictionary<string, double[]> currentStates;
+        public Dictionary<string, double[]> previousStates;
 
         // for loading a file
         private bool loading = false;
@@ -58,6 +53,8 @@ namespace C2M2
         public GameObject synapseManagerPrefab = null;
 
         public GameObject graphManagerPrefab = null;
+        public GameObject writerManagerPrefab = null;
+        
 
         /// <summary>
         /// Allows solver threads to be synched
@@ -137,7 +134,6 @@ namespace C2M2
 
         private void Update()
         {
-
             if(logQ != null && logQ.Count > 0)
             { // print every queued statement
                 foreach (string s in logQ) { Debug.Log(s); }

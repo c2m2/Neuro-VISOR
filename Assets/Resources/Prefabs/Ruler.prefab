@@ -271,7 +271,7 @@ MonoBehaviour:
   onHover:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 9098607124181544640}
         m_MethodName: Rescale
         m_Mode: 1
         m_Arguments:
@@ -309,6 +309,7 @@ GameObject:
   - component: {fileID: 8385630151330308209}
   - component: {fileID: 2919815283430764373}
   - component: {fileID: 473024890890826751}
+  - component: {fileID: 9098607124181544640}
   - component: {fileID: 6528004498817801977}
   m_Layer: 12
   m_Name: Ruler
@@ -447,6 +448,30 @@ MonoBehaviour:
   - {fileID: 899021641628970695}
   topEndcap: {fileID: 4924299292279712794}
   bottomEndCap: {fileID: 8953187477037818776}
+--- !u!114 &9098607124181544640
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4174845952812593659}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1fd8b6f922b3f0147b59e7daa8f4ee0f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scaler: 50
+  minPercentage: 0.01
+  maxPercentage: 100
+  xScale: 1
+  yScale: 1
+  zScale: 1
+  vrThumbstick: 32768
+  vrThumbstickS: 8388608
+  incKey: 273
+  decKey: 274
+  resetKey: 114
+  target: {fileID: 0}
 --- !u!114 &6528004498817801977
 MonoBehaviour:
   m_ObjectHideFlags: 0
