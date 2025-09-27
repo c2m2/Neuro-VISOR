@@ -45,11 +45,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a88abe41ec92854cb921791a0e7ae0e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactables: []
   previewPrefab: {fileID: 8491212328184020626, guid: c4a980554d5c40045870deb578f06e8f,
     type: 3}
-  DestroyCount: 2.0
+  DestroyCount: 2
   ChangeCount: 0.75
+  PlaceDelay: 1
   interactOVR: 8192
   interactOVRS: 2097152
   powerIncreaseKey: 273
@@ -58,8 +58,10 @@ MonoBehaviour:
   highlightOVRS: 4194304
   synapsePrefab: {fileID: 688227186299511278, guid: 19572d8d06f0512458da9103e290bc40,
     type: 3}
-  arrowPrefab: {fileID: 5954688046854600746, guid: 4f3ad9ad58453a849a6b5c23e68e4860,
+  arrowPrefab: {fileID: 5954688046854600746, guid: d27468dc18cb13f4c8e9696ccee273c4,
     type: 3}
+  placementTimestamp: 0
+  synapseInProgress: {fileID: 0}
 --- !u!114 &-6155233359113782993
 MonoBehaviour:
   m_ObjectHideFlags: 0

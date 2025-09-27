@@ -276,6 +276,8 @@ namespace C2M2.NeuronalDynamics.Simulation
                 Debug.Log("CURRENT OUT OF RANGE");
                 Icurrs[0] = 1.0e-16; Icurrs[1] = 0.9e-16;
             }
+            
+            newVal.Item2.currentIsyn = Icurrs[0];
 
             // this is the SBDF calculation using the Icurr of the current state, and Icurr of the previous state
             return (2.0 / 3.0) * timeStep / (cap * area) * (2.0 * Icurrs[0] - Icurrs[1]);
