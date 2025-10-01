@@ -105,8 +105,14 @@ public class SynapseManager : NDInteractablesManager<Synapse>
             }
             return true;
         }
-        else Destroy(syn.gameObject);
-        return false;
+        else
+        {
+            if (syn != null)
+            {
+                Destroy(syn.gameObject);
+            }
+            return false;
+        } 
     }
 
     // Handles assignment of PrePlaceMaterial on Synapses that don't yet have an endpoint
