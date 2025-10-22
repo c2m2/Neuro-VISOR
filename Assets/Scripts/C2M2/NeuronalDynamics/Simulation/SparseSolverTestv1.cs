@@ -126,7 +126,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// This is for the synaptic current, it is not the current but the SBDF2 explicit component for the additional current term
         /// </summary>
         // private Vector Isyn;
-        private List Isyn;
+        private List<Vector> Isyn;
         /// <summary>
         /// this is for storing previous states
         /// </summary>
@@ -399,7 +399,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         protected override void SolveStep(int t)
         {
             R = U_Active.Clone();
-            explicitSBDF2(R, Upre, reactF(reactConst, U_Active, N, M, H, cap), reactF(reactConst, Upre, Npre, Mpre, Hpre, cap), timestep, 1);
+            explicitSBDF2(R, Upre, reactF(reactConst, U_Active, N, M, H, cap), reactF(reactConst, Upre, Npre, Mpre, Hpre, cap), timeStep, 1);
 
 
             // U_Active.Multiply(4.0 / 3.0, R);
@@ -411,7 +411,7 @@ namespace C2M2.NeuronalDynamics.Simulation
             // Isyn.Multiply(0.0, Isyn); // reset synaptic source this ensures that when you remove the synapse that Isyn becomes 0; therefore, current is not being sent to postsynapse once synapse is removed
 
             var Rsyn = Vector.Build.Dense(Neuron.nodes.Count, 0.0);
-            explicitSBDF2(Rsyn, Rsyn, Isyn[0], Isyn[1], Isyn[2]);
+            explicitSBDF2(Rsyn, Rsyn, Isyn[0], Isyn[1], timeStep, Isyn[2]);
             Isyn[0].Multiply(0.0, Isyn[0]);
             Isyn[1].Multiply(0.0, Isyn[1]);
             Isyn[2].Multiply(0.0, Isyn[2]);
@@ -521,7 +521,7 @@ namespace C2M2.NeuronalDynamics.Simulation
 
             // Isyn = Vector.Build.Dense(Neuron.nodes.Count, 0.0);
 
-            Isyn = new List();
+            Isyn = new List<Vector>();
             for (int i = 0; i < 3; i++)
             {
                 // Create a dense vector for each node
@@ -664,10 +664,10 @@ namespace C2M2.NeuronalDynamics.Simulation
 
         private void explicitSBDF2(Vector S, Vector Spre, Vector F, Vector Fpre, double dt, Vector scale)
         {
-            S.Add(F.Multiply(scale.Multiply(dt)), S);
+            S.Add(F.PointwiseMultiply(scale.Multiply(dt)), S);
             S.Multiply(4.0 / 3.0, S);
             S.Add(Spre.Multiply(-1.0 / 3.0), S);
-            S.Add(Fpre.Multiply(scale.Multiply(-2.0 * dt / 3.0)), S);
+            S.Add(Fpre.PointwiseMultiply(scale.Multiply(-2.0 * dt / 3.0)), S);
         }
         
         private void explicitSBDF2(Vector S, Vector Spre, Vector F, Vector Fpre, double dt, double scale)
@@ -811,7 +811,7 @@ namespace C2M2.NeuronalDynamics.Simulation
 
             // Isyn = Vector.Build.Dense(Neuron.nodes.Count, 0.0); // will have to save/load
 
-            Isyn = new List();
+            Isyn = new List<Vector>();
             for (int i = 0; i < 3; i++)
             {
                 // Create a dense vector for each node
