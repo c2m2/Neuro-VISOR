@@ -125,7 +125,8 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// <summary>
         /// This is for the synaptic current, it is not the current but the SBDF2 explicit component for the additional current term
         /// </summary>
-        private Vector Isyn;
+        // private Vector Isyn;
+        private List Isyn;
         /// <summary>
         /// this is for storing previous states
         /// </summary>
@@ -233,6 +234,8 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// <param name="newValues"></param>
         internal override void SetSynapseCurrent(List<(Synapse,Synapse)> newValues)
         {
+            List<double> tmp = new List<double>();
+
             // iterate through teach (pre,post) synapse pair
             foreach ((Synapse,Synapse) newVal in newValues)
             {
@@ -241,7 +244,12 @@ namespace C2M2.NeuronalDynamics.Simulation
                     if (newVal.Item1.FocusVert >= 0 && newVal.Item1.FocusVert < Neuron.nodes.Count && newVal.Item2.FocusVert >= 0 && newVal.Item2.FocusVert < Neuron.nodes.Count)
                     {
                         // compute the synaptic current at the postsynapse using an explicity SBDF update
-                        Isyn[newVal.Item2.FocusVert] += SynapseExplicitSBDF(newVal);
+                        // Isyn[newVal.Item2.FocusVert] += SynapseExplicitSBDF(newVal);
+
+                        tmp = SynapseCurrentFunction(newVal, newVal.Item1.currentModel.Value);
+                        Isyn[0][newVal.Item2.FocusVert] += tmp[0];
+                        Isyn[1][newVal.Item2.FocusVert] += tmp[1];
+                        Isyn[2][newVal.Item2.FocusVert] = 1 / (cap * 2 * System.Math.PI * Neuron.nodes[newVal.Item2.FocusVert].NodeRadius * Neuron.TargetEdgeLength * 1e-12);
                     }
                 }
             }
@@ -256,30 +264,30 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// </summary>
         /// <param name="newVal"></param>
         /// <returns></returns>
-        public double SynapseExplicitSBDF((Synapse, Synapse) newVal)
-        {
-            double area = new double();
-            List<double> Icurrs = new List<double>();
+        // public double SynapseExplicitSBDF((Synapse, Synapse) newVal)
+        // {
+        //     double area = new double();
+        //     List<double> Icurrs = new List<double>();
 
-            // compute surface area at postsynaptic location
-            area = 2 * System.Math.PI * Neuron.nodes[newVal.Item2.FocusVert].NodeRadius * Neuron.TargetEdgeLength * 1e-12;
+        //     // compute surface area at postsynaptic location
+        //     area = 2 * System.Math.PI * Neuron.nodes[newVal.Item2.FocusVert].NodeRadius * Neuron.TargetEdgeLength * 1e-12;
 
-            //Icurrs[0] is current synaptic state, and Icurrs[1] is previous synaptic state
-            Icurrs = SynapseCurrentFunction(newVal, newVal.Item1.currentModel.Value);
+        //     //Icurrs[0] is current synaptic state, and Icurrs[1] is previous synaptic state
+        //     Icurrs = SynapseCurrentFunction(newVal, newVal.Item1.currentModel.Value);
 
-            // If the user should use unrealistic biological parameters, this will check the current and set the current appropriately if the current goes beyond
-            // biologically accurate currents
-            // The upper bound has been chosen to be an arbitrarily large value of 30 nano Siemens. Since this is larger than any of the max capacitance for each synapse,
-            // Current should not be greater than this under normal circumstances.
-            if (Double.IsNaN(Icurrs[0]) || Double.IsNaN(Icurrs[1]) || (Icurrs[0] > 30e-9) || (Icurrs[1] > 30e-9))
-            {
-                Debug.Log("CURRENT OUT OF RANGE");
-                Icurrs[0] = 1.0e-16; Icurrs[1] = 0.9e-16;
-            }
+        //     // If the user should use unrealistic biological parameters, this will check the current and set the current appropriately if the current goes beyond
+        //     // biologically accurate currents
+        //     // The upper bound has been chosen to be an arbitrarily large value of 30 nano Siemens. Since this is larger than any of the max capacitance for each synapse,
+        //     // Current should not be greater than this under normal circumstances.
+        //     if (Double.IsNaN(Icurrs[0]) || Double.IsNaN(Icurrs[1]) || (Icurrs[0] > 30e-9) || (Icurrs[1] > 30e-9))
+        //     {
+        //         Debug.Log("CURRENT OUT OF RANGE");
+        //         Icurrs[0] = 1.0e-16; Icurrs[1] = 0.9e-16;
+        //     }
 
-            // this is the SBDF calculation using the Icurr of the current state, and Icurr of the previous state
-            return (2.0 / 3.0) * timeStep / (cap * area) * (2.0 * Icurrs[0] - Icurrs[1]);
-        }
+        //     // this is the SBDF calculation using the Icurr of the current state, and Icurr of the previous state
+        //     return (2.0 / 3.0) * timeStep / (cap * area) * (2.0 * Icurrs[0] - Icurrs[1]);
+        // }
 
         /// <summary>
         /// This is the synaptic current function
@@ -389,26 +397,39 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// is for the reaction terms and state variables
         /// </summary>     
         protected override void SolveStep(int t)
-        {            
-            U_Active.Multiply(4.0 / 3.0, R);
-            R.Add(reactF(reactConst, U_Active, N, M, H, cap).Multiply((4.0 / 3.0) * timeStep), R);
-            R.Add(Upre.Multiply(-1.0 / 3.0), R);
-            R.Add(reactF(reactConst, Upre, Npre, Mpre, Hpre, cap).Multiply((-2.0 / 3.0) * timeStep), R);
-            R.Add(Isyn, R);
-            Isyn.Multiply(0.0,Isyn); // reset synaptic source this ensures that when you remove the synapse that Isyn becomes 0; therefore, current is not being sent to postsynapse once synapse is removed
+        {
+            R = U_Active.Clone();
+            explicitSBDF2(R, Upre, reactF(reactConst, U_Active, N, M, H, cap), reactF(reactConst, Upre, Npre, Mpre, Hpre, cap), timestep, 1);
 
+
+            // U_Active.Multiply(4.0 / 3.0, R);
+            // R.Add(reactF(reactConst, U_Active, N, M, H, cap).Multiply((4.0 / 3.0) * timeStep), R);
+            // R.Add(Upre.Multiply(-1.0 / 3.0), R);
+            // R.Add(reactF(reactConst, Upre, Npre, Mpre, Hpre, cap).Multiply((-2.0 / 3.0) * timeStep), R);
+
+            // R.Add(Isyn, R);
+            // Isyn.Multiply(0.0, Isyn); // reset synaptic source this ensures that when you remove the synapse that Isyn becomes 0; therefore, current is not being sent to postsynapse once synapse is removed
+
+            var Rsyn = Vector.Build.Dense(Neuron.nodes.Count, 0.0);
+            explicitSBDF2(Rsyn, Rsyn, Isyn[0], Isyn[1], Isyn[2]);
+            Isyn[0].Multiply(0.0, Isyn[0]);
+            Isyn[1].Multiply(0.0, Isyn[1]);
+            Isyn[2].Multiply(0.0, Isyn[2]);
+
+            R.Add(Rsyn, R);
+            
             lu.Solve(R.ToArray(), b);
 
             tempState = N.Clone();
-            stateexplicitSBDF2(N, Npre, fS(N, an(U_Active), bn(U_Active)), fS(Npre, an(Upre), bn(Upre)), timeStep);
+            explicitSBDF2(N, Npre, fS(N, an(U_Active), bn(U_Active)), fS(Npre, an(Upre), bn(Upre)), timeStep, 1);
             Npre = tempState.Clone();
 
             tempState = M.Clone();
-            stateexplicitSBDF2(M, Mpre, fS(M, am(U_Active), bm(U_Active)), fS(Mpre, am(Upre), bm(Upre)), timeStep);
+            explicitSBDF2(M, Mpre, fS(M, am(U_Active), bm(U_Active)), fS(Mpre, am(Upre), bm(Upre)), timeStep, 1);
             Mpre = tempState.Clone();
 
             tempState = H.Clone();
-            stateexplicitSBDF2(H, Hpre, fS(H, ah(U_Active), bh(U_Active)), fS(Hpre, ah(Upre), bh(Upre)), timeStep);
+            explicitSBDF2(H, Hpre, fS(H, ah(U_Active), bh(U_Active)), fS(Hpre, ah(Upre), bh(Upre)), timeStep, 1);
             Hpre = tempState.Clone();
 
             Upre = U_Active.Clone();
@@ -497,7 +518,17 @@ namespace C2M2.NeuronalDynamics.Simulation
             M = Vector.Build.Dense(Neuron.nodes.Count, mi);
             N = Vector.Build.Dense(Neuron.nodes.Count, ni);
             H = Vector.Build.Dense(Neuron.nodes.Count, hi);
-            Isyn = Vector.Build.Dense(Neuron.nodes.Count, 0.0);
+
+            // Isyn = Vector.Build.Dense(Neuron.nodes.Count, 0.0);
+
+            Isyn = new List();
+            for (int i = 0; i < 3; i++)
+            {
+                // Create a dense vector for each node
+                var synVector = Vector.Build.Dense(Neuron.nodes.Count, 0.0);
+                Isyn.Add(synVector);
+            }
+
             Mpre = M.Clone(); Npre = N.Clone(); Hpre = H.Clone();
         }
         /// <summary>
@@ -631,10 +662,20 @@ namespace C2M2.NeuronalDynamics.Simulation
             return output;
         }
 
-        private void stateexplicitSBDF2(Vector S, Vector Spre, Vector F, Vector Fpre, double dt)
+        private void explicitSBDF2(Vector S, Vector Spre, Vector F, Vector Fpre, double dt, Vector scale)
         {
-            S.Add(F.Multiply(dt), S); S.Multiply(4.0 / 3.0, S);
-            S.Add(Spre.Multiply(-1.0 / 3.0), S); S.Add(Fpre.Multiply(-2.0 * dt / 3.0), S);
+            S.Add(F.Multiply(scale.Multiply(dt)), S);
+            S.Multiply(4.0 / 3.0, S);
+            S.Add(Spre.Multiply(-1.0 / 3.0), S);
+            S.Add(Fpre.Multiply(scale.Multiply(-2.0 * dt / 3.0)), S);
+        }
+        
+        private void explicitSBDF2(Vector S, Vector Spre, Vector F, Vector Fpre, double dt, double scale)
+        {
+            S.Add(F.Multiply(dt * scale), S); 
+            S.Multiply(4.0 / 3.0, S);
+            S.Add(Spre.Multiply(-1.0 / 3.0), S); 
+            S.Add(Fpre.Multiply(-2.0 * dt * scale / 3.0), S);
         }
 
         /// <summary>
@@ -768,7 +809,15 @@ namespace C2M2.NeuronalDynamics.Simulation
             Npre = Vector.Build.DenseOfArray(npre);
             Hpre = Vector.Build.DenseOfArray(hpre);
 
-            Isyn = Vector.Build.Dense(Neuron.nodes.Count, 0.0); // will have to save/load
+            // Isyn = Vector.Build.Dense(Neuron.nodes.Count, 0.0); // will have to save/load
+
+            Isyn = new List();
+            for (int i = 0; i < 3; i++)
+            {
+                // Create a dense vector for each node
+                var synVector = Vector.Build.Dense(Neuron.nodes.Count, 0.0);
+                Isyn.Add(synVector);
+            }
         }
     }
 }
