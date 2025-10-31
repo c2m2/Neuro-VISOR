@@ -123,10 +123,13 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// </summary>
         private Vector M, N, H;
         /// <summary>
-        /// This is for the synaptic current, it is not the current but the SBDF2 explicit component for the additional current term
+        /// This is for the synaptic current. It contains:
+        ///     [0]: The current at the active time step.
+        ///     [1]: The current at the previous time step.
+        ///     [2]: The spatial scaling at post-synaptic location for time stepping (1/(cap * area))
         /// </summary>
-        // private Vector Isyn;
         private List<Vector> Isyn;
+        private Vector surfaceArea;
         /// <summary>
         /// this is for storing previous states
         /// </summary>
@@ -243,51 +246,16 @@ namespace C2M2.NeuronalDynamics.Simulation
                 {
                     if (newVal.Item1.FocusVert >= 0 && newVal.Item1.FocusVert < Neuron.nodes.Count && newVal.Item2.FocusVert >= 0 && newVal.Item2.FocusVert < Neuron.nodes.Count)
                     {
-                        // compute the synaptic current at the postsynapse using an explicity SBDF update
-                        // Isyn[newVal.Item2.FocusVert] += SynapseExplicitSBDF(newVal);
-
+                        //tmp[0] is current synaptic state, and tmp[1] is previous synaptic state
                         tmp = SynapseCurrentFunction(newVal, newVal.Item1.currentModel.Value);
                         Isyn[0][newVal.Item2.FocusVert] += tmp[0];
                         Isyn[1][newVal.Item2.FocusVert] += tmp[1];
-                        Isyn[2][newVal.Item2.FocusVert] = 1 / (cap * 2 * System.Math.PI * Neuron.nodes[newVal.Item2.FocusVert].NodeRadius * Neuron.TargetEdgeLength * 1e-12);
+                        // compute surface area at postsynaptic location and scale for timestepping use
+                        surfaceArea[newVal.Item2.FocusVert] = 1 / (cap * 2 * System.Math.PI * Neuron.nodes[newVal.Item2.FocusVert].NodeRadius * Neuron.TargetEdgeLength * 1e-12);
                     }
                 }
             }
         }
-                
-        /// <summary>
-        /// This computes the explicit update for the Isynaptic current
-        /// the input is a tuple (presyn, postsyn) = (item1, item2) respectively
-        /// each synapse contains information
-        /// item1.nodeindex = index on the 1d geometry
-        /// item1.voltage = voltage at that node
-        /// </summary>
-        /// <param name="newVal"></param>
-        /// <returns></returns>
-        // public double SynapseExplicitSBDF((Synapse, Synapse) newVal)
-        // {
-        //     double area = new double();
-        //     List<double> Icurrs = new List<double>();
-
-        //     // compute surface area at postsynaptic location
-        //     area = 2 * System.Math.PI * Neuron.nodes[newVal.Item2.FocusVert].NodeRadius * Neuron.TargetEdgeLength * 1e-12;
-
-        //     //Icurrs[0] is current synaptic state, and Icurrs[1] is previous synaptic state
-        //     Icurrs = SynapseCurrentFunction(newVal, newVal.Item1.currentModel.Value);
-
-        //     // If the user should use unrealistic biological parameters, this will check the current and set the current appropriately if the current goes beyond
-        //     // biologically accurate currents
-        //     // The upper bound has been chosen to be an arbitrarily large value of 30 nano Siemens. Since this is larger than any of the max capacitance for each synapse,
-        //     // Current should not be greater than this under normal circumstances.
-        //     if (Double.IsNaN(Icurrs[0]) || Double.IsNaN(Icurrs[1]) || (Icurrs[0] > 30e-9) || (Icurrs[1] > 30e-9))
-        //     {
-        //         Debug.Log("CURRENT OUT OF RANGE");
-        //         Icurrs[0] = 1.0e-16; Icurrs[1] = 0.9e-16;
-        //     }
-
-        //     // this is the SBDF calculation using the Icurr of the current state, and Icurr of the previous state
-        //     return (2.0 / 3.0) * timeStep / (cap * area) * (2.0 * Icurrs[0] - Icurrs[1]);
-        // }
 
         /// <summary>
         /// This is the synaptic current function
@@ -315,44 +283,20 @@ namespace C2M2.NeuronalDynamics.Simulation
             // get the pre-synaptic voltage at current and previous timeStep
             double presynVoltage = newVal.Item1.simulation.Get1DValues()[newVal.Item1.FocusVert];
             double presynVoltagePrev = ((SparseSolverTestv1)newVal.Item1.simulation).getUpre()[newVal.Item1.FocusVert];
-            double voltageThreshold;
 
-            voltageThreshold = 0.038;   //Volts
-
-            //Used to update the activation time of the Synapse. This occurs on the timeStep in which the presynaptic membrane potential
-            //crosses the voltageThreshold
-            if ((presynVoltage >= voltageThreshold) && (presynVoltagePrev < voltageThreshold))
-            { 
-                Debug.Log("Activation Time Updated");
-                newVal.Item1.ActivationTime = GetSimulationTime(); 
+            if (model.isActive(presynVoltage, presynVoltagePrev, newVal.Item1.ActivationTime))
+            {
+                newVal.Item1.ActivationTime = GetSimulationTime();
             }
 
-            // if the presynapse is below a threshold, then the synapse is INACTIVE
-            if (presynVoltage <= voltageThreshold)
-            {
-                Icurrs = new List<double>
-                {
-                    0.0,    // zero current at postsynapse while INACTIVE
-                    0.0     // zero current at postsynapse while INACTIVE
-                };
-            }
-
-            else // if the presynaptic voltage is above threshold, then do not update activation time and compute the new current
-            {
-                //If sufficient time (3.0e-4 sec = 0.3 ms) has passed since the action potential started and the presynaptic membrane potential has remained above the
-                //action potential threshold, then it updates activation to reset the decay of the synaptic current function
-                if (GetSimulationTime() > (newVal.Item1.ActivationTime + 3.0e-4))
-                {
-                    newVal.Item1.ActivationTime = GetSimulationTime();
-                }
-
-                Icurrs = new List<double>();
-
+            Icurrs =
+            [
                 //Adds the synaptic currents for the current and previous timesteps
-                Icurrs.Add(model.getModelCurrent(presynVoltage, GetSimulationTime(), newVal.Item1.ActivationTime));
-                Icurrs.Add(model.getModelCurrent(presynVoltagePrev, GetSimulationTime() - timeStep, newVal.Item1.ActivationTime));
-                }
-            ;
+                Icurrs.Add(model.getModelCurrent(presynVoltage, GetSimulationTime(), newVal.Item1.ActivationTime)),
+                Icurrs.Add(model.getModelCurrent(presynVoltagePrev, GetSimulationTime() - timeStep, newVal.Item1.ActivationTime)),
+            ];
+            newVal.Item1.ts = newVal.Item1.ActivationTime;
+
 
             return Icurrs;
         }
@@ -399,37 +343,28 @@ namespace C2M2.NeuronalDynamics.Simulation
         protected override void SolveStep(int t)
         {
             R = U_Active.Clone();
-            explicitSBDF2(R, Upre, reactF(reactConst, U_Active, N, M, H, cap), reactF(reactConst, Upre, Npre, Mpre, Hpre, cap), timeStep, 1);
-
-
-            // U_Active.Multiply(4.0 / 3.0, R);
-            // R.Add(reactF(reactConst, U_Active, N, M, H, cap).Multiply((4.0 / 3.0) * timeStep), R);
-            // R.Add(Upre.Multiply(-1.0 / 3.0), R);
-            // R.Add(reactF(reactConst, Upre, Npre, Mpre, Hpre, cap).Multiply((-2.0 / 3.0) * timeStep), R);
-
-            // R.Add(Isyn, R);
-            // Isyn.Multiply(0.0, Isyn); // reset synaptic source this ensures that when you remove the synapse that Isyn becomes 0; therefore, current is not being sent to postsynapse once synapse is removed
+            explicitUpdate(R, Upre, reactF(reactConst, U_Active, N, M, H, cap), reactF(reactConst, Upre, Npre, Mpre, Hpre, cap), timeStep, 1);
 
             var Rsyn = Vector.Build.Dense(Neuron.nodes.Count, 0.0);
-            explicitSBDF2(Rsyn, Rsyn, Isyn[0], Isyn[1], timeStep, Isyn[2]);
+            explicitUpdate(Rsyn, Rsyn, Isyn[0], Isyn[1], timeStep, surfaceArea);
+            // reset synaptic source this ensures that when you remove the synapse that Isyn becomes 0; 
+            // therefore, current is not being sent to postsynapse once synapse is removed
             Isyn[0].Multiply(0.0, Isyn[0]);
             Isyn[1].Multiply(0.0, Isyn[1]);
-            Isyn[2].Multiply(0.0, Isyn[2]);
-
+            surfaceArea.Multiply(0.0, surfaceArea);
             R.Add(Rsyn, R);
-            
             lu.Solve(R.ToArray(), b);
 
             tempState = N.Clone();
-            explicitSBDF2(N, Npre, fS(N, an(U_Active), bn(U_Active)), fS(Npre, an(Upre), bn(Upre)), timeStep, 1);
+            explicitUpdate(N, Npre, fS(N, an(U_Active), bn(U_Active)), fS(Npre, an(Upre), bn(Upre)), timeStep, 1);
             Npre = tempState.Clone();
 
             tempState = M.Clone();
-            explicitSBDF2(M, Mpre, fS(M, am(U_Active), bm(U_Active)), fS(Mpre, am(Upre), bm(Upre)), timeStep, 1);
+            explicitUpdate(M, Mpre, fS(M, am(U_Active), bm(U_Active)), fS(Mpre, am(Upre), bm(Upre)), timeStep, 1);
             Mpre = tempState.Clone();
 
             tempState = H.Clone();
-            explicitSBDF2(H, Hpre, fS(H, ah(U_Active), bh(U_Active)), fS(Hpre, ah(Upre), bh(Upre)), timeStep, 1);
+            explicitUpdate(H, Hpre, fS(H, ah(U_Active), bh(U_Active)), fS(Hpre, ah(Upre), bh(Upre)), timeStep, 1);
             Hpre = tempState.Clone();
 
             Upre = U_Active.Clone();
@@ -519,15 +454,14 @@ namespace C2M2.NeuronalDynamics.Simulation
             N = Vector.Build.Dense(Neuron.nodes.Count, ni);
             H = Vector.Build.Dense(Neuron.nodes.Count, hi);
 
-            // Isyn = Vector.Build.Dense(Neuron.nodes.Count, 0.0);
-
             Isyn = new List<Vector>();
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 2; i++)
             {
                 // Create a dense vector for each node
                 var synVector = Vector.Build.Dense(Neuron.nodes.Count, 0.0);
                 Isyn.Add(synVector);
             }
+            surfaceArea = Vector.Build.Dense(Neuron.nodes.Count, 0.0);
 
             Mpre = M.Clone(); Npre = N.Clone(); Hpre = H.Clone();
         }
@@ -662,7 +596,7 @@ namespace C2M2.NeuronalDynamics.Simulation
             return output;
         }
 
-        private void explicitSBDF2(Vector S, Vector Spre, Vector F, Vector Fpre, double dt, Vector scale)
+        private void explicitUpdate(Vector S, Vector Spre, Vector F, Vector Fpre, double dt, Vector scale)
         {
             S.Add(F.PointwiseMultiply(scale.Multiply(dt)), S);
             S.Multiply(4.0 / 3.0, S);
@@ -670,7 +604,7 @@ namespace C2M2.NeuronalDynamics.Simulation
             S.Add(Fpre.PointwiseMultiply(scale.Multiply(-2.0 * dt / 3.0)), S);
         }
         
-        private void explicitSBDF2(Vector S, Vector Spre, Vector F, Vector Fpre, double dt, double scale)
+        private void explicitUpdate(Vector S, Vector Spre, Vector F, Vector Fpre, double dt, double scale)
         {
             S.Add(F.Multiply(dt * scale), S); 
             S.Multiply(4.0 / 3.0, S);
@@ -809,15 +743,14 @@ namespace C2M2.NeuronalDynamics.Simulation
             Npre = Vector.Build.DenseOfArray(npre);
             Hpre = Vector.Build.DenseOfArray(hpre);
 
-            // Isyn = Vector.Build.Dense(Neuron.nodes.Count, 0.0); // will have to save/load
-
             Isyn = new List<Vector>();
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 2; i++)
             {
                 // Create a dense vector for each node
                 var synVector = Vector.Build.Dense(Neuron.nodes.Count, 0.0);
                 Isyn.Add(synVector);
             }
+            surfaceArea = Vector.Build.Dense(Neuron.nodes.Count, 0.0);
         }
     }
 }

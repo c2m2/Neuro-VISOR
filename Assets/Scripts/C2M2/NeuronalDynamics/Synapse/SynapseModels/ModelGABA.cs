@@ -1,10 +1,22 @@
 using UnityEngine;
+using System;
 
 public class ModelGABA : ISynapseModel
 {
     private string modelName;
+    private double Erev;
+    private double taud;
+    private double g;
+    private double Imax;
     public ModelGABA() {
         modelName = "GABA";
+        Erev = -0.065;           // (Volts) Reversal potential of GABA synapses, stated on page 9 of Rothman's paper
+        taud = 15.0e-3;           // (Seconds) decay constant from function, found in figure 2 of Rothman's Paper
+        g = -10.0e-9;               // (Siemens) a chosen arbitrary value that produces a noticeable, but not too great, inhibitory response.
+                                        // Rothman's paper does not provide any examples for max capacitance of GABA synapses
+
+        double Vmax = 0.1;  // (Volts)
+        Imax = System.Math.Abs(g * (Vmax - Erev));
     }
 
     /// This is the GABA Synapse function borrowed from Rothman, Jason S. "Modeling Synapses." (2014).
@@ -15,11 +27,6 @@ public class ModelGABA : ISynapseModel
     /// <returns></returns>
     public double getModelCurrent(double v, double t, double ts)
     {
-        double Erev = -0.065;           // (Volts) Reversal potential of GABA synapses, stated on page 9 of Rothman's paper
-        double taud = 3.0e-4;           // (Seconds) decay constant from function, found in figure 2 of Rothman's Paper
-        double g = -1e-9;               // (Siemens) a chosen arbitrary value that produces a noticeable, but not too great, inhibitory response.
-                                        // Rothman's paper does not provide any examples for max capacitance of GABA synapses
-
         return g * System.Math.Exp(-(t - ts) / taud) * (v - Erev);      
     }
 
@@ -29,8 +36,31 @@ public class ModelGABA : ISynapseModel
         return modelName;
     }
 
+    public double getImax()
+    {
+        return Imax;
+    }
+
     //Boolean for synapse behavior, used for material of synapse
-    public bool isExcitatory() {
+    public bool isExcitatory()
+    {
         return false;
+    }
+    
+    public bool isActive(double presynVoltage, double presynVoltagePrev, double ActivationTime)
+    {
+        double voltageThreshold = -0.05;   //Volts
+        double refireRate = 3.0; // arbitrarily chosen
+        double minRefireTime = 1.0e-2; // ms
+        bool updateActivation = false;
+
+        if ((presynVoltage >= voltageThreshold) && ((presynVoltagePrev < voltageThreshold) || (GetSimulationTime() - ActivationTime > refireRate*taud)) && (GetSimulationTime() - ActivationTime > minRefireTime))
+        {
+            Debug.Log("Activation Time Updated");
+            updateActivation = true;
+        }
+
+        return updateActivation;
+
     }
 }

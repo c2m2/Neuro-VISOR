@@ -1,10 +1,29 @@
 ﻿using UnityEngine;
+using System;
 
 public class ModelNMDA : ISynapseModel
 {
     private string modelName;
+    private double Erev;
+    private double taud;
+    private double g;
+    private double v05;           // (Volts) V0.5, first voltage constant used in Boltzmann function for Magnesium block, value found in figure 3 of Rothman paper
+    private double k;
+    private double Imax; 
     public ModelNMDA() {
         modelName = "NMDA";
+        Erev = 0;                // (Volts) reversal potential for synapse, Stated explicitly in Rothman's paper to usually be 0 Volts (page 7)
+        taud = 60.0e-3;           // (Seconds) decay constant from function, Stated explicitly in Rothman's paper (figure 2)
+        g = 17e-9;               // (Siemens) 17 nano Siemens was chosen because it produces a noticeable post synaptic response across
+                                        // a single synapse, while still requiring multiple synapses to produce a post-synaptic action potential
+                                        // from a single pre-synaptic action potential  
+                                        // Each synapse has ~20 receptors of 50 pS each, each arrow is a cluster of 17 synapses
+
+        v05 = -0.0128;           // (Volts) V0.5, first voltage constant used in Boltzmann function for Magnesium block, value found in figure 3 of Rothman paper
+        k = 0.0224;              // (Volts) second voltage constant used in Boltzmann function, value found in figure 3 of rothman paper
+
+        double Vmax = 0.1;  // (Volts)
+        Imax = System.Math.Abs(g * (1.0 / (1.0 + System.Math.Exp(-(Vmax-v05) / k))) * (Vmax - Erev));
     }
 
     //Returns the Synaptic Current. Used in SparseSolver.
@@ -34,26 +53,40 @@ public class ModelNMDA : ISynapseModel
         Although the value for g used by the Rothman paper is 1e-9, an arbitrary value has been chosen that demonstrates synaptic behavior well
         */
 
-        double Erev = 0;                // (Volts) reversal potential for synapse, Stated explicitly in Rothman's paper to usually be 0 Volts (page 7)
-        double taud = 3.0e-4;           // (Seconds) decay constant from function, Stated explicitly in Rothman's paper (figure 2)
-        double g = 17e-9;               // (Siemens) 17 nano Siemens was chosen because it produces a noticeable post synaptic response across
-                                        // a single synapse, while still requiring multiple synapses to produce a post-synaptic action potential
-                                        // from a single pre-synaptic action potential  
-
-        double v05 = -0.0128;           // (Volts) V0.5, first voltage constant used in Boltzmann function for Magnesium block, value found in figure 3 of Rothman paper
-        double k = 0.0224;              // (Volts) second voltage constant used in Boltzmann function, value found in figure 3 of rothman paper
-
         return g * (1.0 / (1.0 + System.Math.Exp(-(v-v05) / k))) * System.Math.Exp(-(t - ts) / taud) * (v - Erev);          
     }
-    
+
     //Returns the model name
     public string getModelName()
     {
         return modelName;
     }
+    
+    public double getImax()
+    {
+        return Imax;
+    }
 
     //Boolean for synapse behavior, used for material of synapse
-    public bool isExcitatory() {
+    public bool isExcitatory()
+    {
         return true;
+    }
+    
+    public bool isActive(double presynVoltage, double presynVoltagePrev, double ActivationTime)
+    {
+        double voltageThreshold = 0.038;   //Volts
+        double refireRate = 3.0; // arbitrarily chosen
+        double minRefireTime = 1.0e-2; // ms
+        bool updateActivation = false;
+
+        if ((presynVoltage >= voltageThreshold) && ((presynVoltagePrev < voltageThreshold) || (GetSimulationTime() - ActivationTime > refireRate*taud)) && (GetSimulationTime() - ActivationTime > minRefireTime))
+        {
+            Debug.Log("Activation Time Updated");
+            updateActivation = true;
+        }
+
+        return updateActivation;
+
     }
 }

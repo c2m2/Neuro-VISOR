@@ -1,10 +1,39 @@
 using UnityEngine;
+using System;
 public class ModelAMPA : ISynapseModel
 {
     private string modelName;
+    private double Erev;        //(Volts) From Rothman's paper: EampaR is "usually 0" (page 6)
+    private double g;       //(Siemens) An arbitrary value was chosen that clearly demonstrates AMPA's fast decay behavior, while
+                            // still producing a noticeable (but not too large) post synaptic response
+                            // 10 pS per receptor, ~40 receptors per synapse, choose # of synapses
+    private double a1;        //(Unitless) Weight of first decay term of at
+    private double a2;        //(Unitless) Weight of second decay term of at
+    private double anorm;       //(Unitless) Used to normalize the decay terms of at such that their summed maximum is always one.
+                            // Since a1 + a2 = 1, anorm is technically not necessary in this case, and has been set to 1
+    private double taud1;  //(Seconds) First decay constant of a(t)
+    private double taud2;   //(Seconds) Second decay constant of a(t)
+    private double taur;   //(Seconds) Decay weight constant
+    private int n;              //(Unitless) Decay weight power
+    private double Imax;
     public ModelAMPA() {
         //Provides the Name and Material for the model
         modelName = "AMPA";
+        Erev = 0;        //(Volts) From Rothman's paper: EampaR is "usually 0" (page 6)
+        g = 25e-9;       //(Siemens) An arbitrary value was chosen that clearly demonstrates AMPA's fast decay behavior, while
+                                // still producing a noticeable (but not too large) post synaptic response
+                                // 10 pS per receptor, ~40 receptors per synapse, choose # of synapses
+        a1 = 0.9;        //(Unitless) Weight of first decay term of at
+        a2 = 0.1;        //(Unitless) Weight of second decay term of at
+        anorm = 1;       //(Unitless) Used to normalize the decay terms of at such that their summed maximum is always one.
+                                // Since a1 + a2 = 1, anorm is technically not necessary in this case, and has been set to 1
+        taud1 = 0.0003;  //(Seconds) First decay constant of a(t)
+        taud2 = 0.002;   //(Seconds) Second decay constant of a(t)
+        taur = 0.0002;   //(Seconds) Decay weight constant
+        n = 2;              //(Unitless) Decay weight power
+
+        double Vmax = 0.1;  // (Volts)
+        Imax = System.Math.Abs(g * (Vmax - Erev));
     }
 
     //Returns the Synaptic Current. Used in SparseSolver.
@@ -32,19 +61,6 @@ public class ModelAMPA : ISynapseModel
         Although the value for g used by the Rothman paper is 1e-9, an arbitrary value has been chosen that demonstrates synaptic behavior well
         */
 
-        double Erev = 0;        //(Volts) From Rothman's paper: EampaR is "usually 0" (page 6)
-        double g = 25e-9;       //(Siemens) An arbitrary value was chosen that clearly demonstrates AMPA's fast decay behavior, while
-                                // still producing a noticeable (but not too large) post synaptic response
-        double a1 = 0.9;        //(Unitless) Weight of first decay term of at
-        double a2 = 0.1;        //(Unitless) Weight of second decay term of at
-        double anorm = 1;       //(Unitless) Used to normalize the decay terms of at such that their summed maximum is always one.
-                                // Since a1 + a2 = 1, anorm is technically not necessary in this case, and has been set to 1
-        double taud1 = 0.0003;  //(Seconds) First decay constant of a(t)
-        double taud2 = 0.002;   //(Seconds) Second decay constant of a(t)
-        double taur = 0.0002;   //(Seconds) Decay weight constant
-        int n = 2;              //(Unitless) Decay weight power
-
-
         double at = System.Math.Pow(1 - System.Math.Exp(-(t-ts)/taur), n) * (a1*System.Math.Exp(-(t-ts)/taud1) + a2*System.Math.Exp(-(t-ts)/taud2))/anorm;
 
         return g*at*(v-Erev);
@@ -57,8 +73,31 @@ public class ModelAMPA : ISynapseModel
         return modelName;
     }
 
+    public double getImax()
+    {
+        return Imax;
+    }
+
     //Boolean for synapse behavior, used for material of synapse
-    public bool isExcitatory() {
+    public bool isExcitatory()
+    {
         return true;
+    }
+    
+    public bool isActive(double presynVoltage, double presynVoltagePrev, double ActivationTime)
+    {
+        double voltageThreshold = 0.038;   //Volts
+        double refireRate = 3.0; // arbitrarily chosen
+        double minRefireTime = 1.0e-2; // ms
+        bool updateActivation = false;
+
+        if ((presynVoltage >= voltageThreshold) && ((presynVoltagePrev < voltageThreshold) || (GetSimulationTime() - ActivationTime > refireRate*taud)) && (GetSimulationTime() - ActivationTime > minRefireTime))
+        {
+            Debug.Log("Activation Time Updated");
+            updateActivation = true;
+        }
+
+        return updateActivation;
+
     }
 }
