@@ -16,6 +16,9 @@ public class ModelAMPA : ISynapseModel
     private double taur;   //(Seconds) Decay weight constant
     private int n;              //(Unitless) Decay weight power
     private double Imax;
+    private double voltageThreshold;   //Volts
+    private double refireRate; // arbitrarily chosen
+    private double minRefireTime; // ms
     public ModelAMPA() {
         //Provides the Name and Material for the model
         modelName = "AMPA";
@@ -34,6 +37,10 @@ public class ModelAMPA : ISynapseModel
 
         double Vmax = 0.1;  // (Volts)
         Imax = System.Math.Abs(g * (Vmax - Erev));
+
+        voltageThreshold = 0.038;   //Volts
+        refireRate = 3.0; // arbitrarily chosen
+        minRefireTime = 1.0e-2; // ms
     }
 
     //Returns the Synaptic Current. Used in SparseSolver.

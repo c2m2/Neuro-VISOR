@@ -10,6 +10,9 @@ public class ModelNMDA : ISynapseModel
     private double v05;           // (Volts) V0.5, first voltage constant used in Boltzmann function for Magnesium block, value found in figure 3 of Rothman paper
     private double k;
     private double Imax; 
+    private double voltageThreshold;   //Volts
+    private double refireRate; // arbitrarily chosen
+    private double minRefireTime; // ms
     public ModelNMDA() {
         modelName = "NMDA";
         Erev = 0;                // (Volts) reversal potential for synapse, Stated explicitly in Rothman's paper to usually be 0 Volts (page 7)
@@ -23,7 +26,11 @@ public class ModelNMDA : ISynapseModel
         k = 0.0224;              // (Volts) second voltage constant used in Boltzmann function, value found in figure 3 of rothman paper
 
         double Vmax = 0.1;  // (Volts)
-        Imax = System.Math.Abs(g * (1.0 / (1.0 + System.Math.Exp(-(Vmax-v05) / k))) * (Vmax - Erev));
+        Imax = System.Math.Abs(g * (1.0 / (1.0 + System.Math.Exp(-(Vmax - v05) / k))) * (Vmax - Erev));
+        
+        voltageThreshold = 0.038;   //Volts
+        refireRate = 3.0; // arbitrarily chosen
+        minRefireTime = 1.0e-2; // ms
     }
 
     //Returns the Synaptic Current. Used in SparseSolver.
@@ -75,9 +82,6 @@ public class ModelNMDA : ISynapseModel
     
     public bool isActive(double presynVoltage, double presynVoltagePrev, double ActivationTime)
     {
-        double voltageThreshold = 0.038;   //Volts
-        double refireRate = 3.0; // arbitrarily chosen
-        double minRefireTime = 1.0e-2; // ms
         bool updateActivation = false;
 
         if ((presynVoltage >= voltageThreshold) && ((presynVoltagePrev < voltageThreshold) || (GetSimulationTime() - ActivationTime > refireRate*taud)) && (GetSimulationTime() - ActivationTime > minRefireTime))

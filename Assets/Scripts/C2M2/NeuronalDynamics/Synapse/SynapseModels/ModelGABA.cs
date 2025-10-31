@@ -8,6 +8,9 @@ public class ModelGABA : ISynapseModel
     private double taud;
     private double g;
     private double Imax;
+    private double voltageThreshold;   //Volts
+    private double refireRate; // arbitrarily chosen
+    private double minRefireTime; // ms
     public ModelGABA() {
         modelName = "GABA";
         Erev = -0.065;           // (Volts) Reversal potential of GABA synapses, stated on page 9 of Rothman's paper
@@ -17,6 +20,10 @@ public class ModelGABA : ISynapseModel
 
         double Vmax = 0.1;  // (Volts)
         Imax = System.Math.Abs(g * (Vmax - Erev));
+
+        voltageThreshold = -0.05;   //Volts
+        refireRate = 3.0; // arbitrarily chosen
+        minRefireTime = 1.0e-2; // ms
     }
 
     /// This is the GABA Synapse function borrowed from Rothman, Jason S. "Modeling Synapses." (2014).
@@ -49,9 +56,6 @@ public class ModelGABA : ISynapseModel
     
     public bool isActive(double presynVoltage, double presynVoltagePrev, double ActivationTime)
     {
-        double voltageThreshold = -0.05;   //Volts
-        double refireRate = 3.0; // arbitrarily chosen
-        double minRefireTime = 1.0e-2; // ms
         bool updateActivation = false;
 
         if ((presynVoltage >= voltageThreshold) && ((presynVoltagePrev < voltageThreshold) || (GetSimulationTime() - ActivationTime > refireRate*taud)) && (GetSimulationTime() - ActivationTime > minRefireTime))
