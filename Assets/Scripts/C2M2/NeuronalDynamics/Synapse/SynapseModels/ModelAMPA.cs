@@ -91,14 +91,14 @@ public class ModelAMPA : ISynapseModel
         return true;
     }
     
-    public bool isActive(double presynVoltage, double presynVoltagePrev, double ActivationTime)
+    public bool isActive(double presynVoltage, double presynVoltagePrev, double ActivationTime, double simulationTime)
     {
         double voltageThreshold = 0.038;   //Volts
         double refireRate = 3.0; // arbitrarily chosen
         double minRefireTime = 1.0e-2; // ms
         bool updateActivation = false;
 
-        if ((presynVoltage >= voltageThreshold) && ((presynVoltagePrev < voltageThreshold) || (GetSimulationTime() - ActivationTime > refireRate*taud)) && (GetSimulationTime() - ActivationTime > minRefireTime))
+        if ((presynVoltage >= voltageThreshold) && ((presynVoltagePrev < voltageThreshold) || (simulationTime - ActivationTime > refireRate*taud1)) && (simulationTime - ActivationTime > minRefireTime))
         {
             Debug.Log("Activation Time Updated");
             updateActivation = true;

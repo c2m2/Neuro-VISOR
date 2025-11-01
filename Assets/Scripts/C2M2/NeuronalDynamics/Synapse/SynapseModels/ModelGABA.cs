@@ -54,11 +54,11 @@ public class ModelGABA : ISynapseModel
         return false;
     }
     
-    public bool isActive(double presynVoltage, double presynVoltagePrev, double ActivationTime)
+    public bool isActive(double presynVoltage, double presynVoltagePrev, double ActivationTime, double simulationTime)
     {
         bool updateActivation = false;
 
-        if ((presynVoltage >= voltageThreshold) && ((presynVoltagePrev < voltageThreshold) || (GetSimulationTime() - ActivationTime > refireRate*taud)) && (GetSimulationTime() - ActivationTime > minRefireTime))
+        if ((presynVoltage >= voltageThreshold) && ((presynVoltagePrev < voltageThreshold) || (simulationTime - ActivationTime > refireRate*taud)) && (simulationTime - ActivationTime > minRefireTime))
         {
             Debug.Log("Activation Time Updated");
             updateActivation = true;
