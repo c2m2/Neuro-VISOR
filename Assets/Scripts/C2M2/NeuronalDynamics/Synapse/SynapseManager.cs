@@ -159,33 +159,20 @@ public class SynapseManager : NDInteractablesManager<Synapse>
         GameObject arrowHead;
         Transform preSynapse = synapses[synapses.Count - 1].Item1.transform;
         Transform postSynapse = synapses[synapses.Count - 1].Item2.transform;
-        
+
         Synapse pre = synapses[synapses.Count - 1].Item1;
         Synapse post = synapses[synapses.Count - 1].Item2;
 
-
         // Create a new arrow in 3D space
         arrowHead = Instantiate(arrowPrefab, new Vector3(0, 0, 0), Quaternion.identity) as GameObject;
-        /* Use Vector3 lerp so the position does not set it to the middle of the pre synapse but rather in the middle of both the pre-synapse and post-synapse*/
-        arrowHead.transform.position = Vector3.Lerp(preSynapse.position, postSynapse.position, 0.5f);
-        arrowHead.transform.LookAt(postSynapse.position);
-        // Adjust the z scale of the arrow so we can point correctly to the post-synapse
-        // We can calculate this by the distance of the two synapses
-        arrowHead.transform.localScale = new Vector3(preSynapse.lossyScale.x / 4, preSynapse.lossyScale.x / 4, Vector3.Distance(preSynapse.position, postSynapse.position));
-        arrowHead.transform.SetParent(preSynapse);
 
+        ArrowUpdate arrowUpdate = arrowHead.GetComponent<ArrowUpdate>();
         // Add the method to update arrows when user moves the neurons
-        arrowHead.AddComponent<ArrowUpdate>();
-        arrowHead.GetComponent<ArrowUpdate>().preSynapse = preSynapse;
-        arrowHead.GetComponent<ArrowUpdate>().postSynapse = postSynapse;
-        
+        arrowUpdate.preSynapse = preSynapse;
+        arrowUpdate.postSynapse = postSynapse;
         // Assign current synapses to fields of ArrowUpdate to ensure color changes with synapse model
-        arrowHead.GetComponent<ArrowUpdate>().pre = pre;
-        arrowHead.GetComponent<ArrowUpdate>().post = post;
-
-        //Handles changing the label of the synapse arrow
-        TextMeshPro textField = arrowHead.GetComponentInChildren<TextMeshPro>();
-        arrowHead.GetComponent<ArrowUpdate>().nameField = textField;
+        arrowUpdate.pre = pre;
+        arrowUpdate.post = post;
     }
 
     /// <summary>

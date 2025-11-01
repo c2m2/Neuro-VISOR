@@ -250,6 +250,7 @@ namespace C2M2.NeuronalDynamics.Simulation
                         tmp = SynapseCurrentFunction(newVal, newVal.Item1.currentModel.Value);
                         Isyn[0][newVal.Item2.FocusVert] += tmp[0];
                         Isyn[1][newVal.Item2.FocusVert] += tmp[1];
+                        newVal.Item2.currentIsyn = Isyn[0][newVal.Item2.FocusVert];
                         // compute surface area at postsynaptic location and scale for timestepping use
                         surfaceArea[newVal.Item2.FocusVert] = 1 / (cap * 2 * System.Math.PI * Neuron.nodes[newVal.Item2.FocusVert].NodeRadius * Neuron.TargetEdgeLength * 1e-12);
                     }
