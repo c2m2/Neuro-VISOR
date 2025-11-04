@@ -294,6 +294,7 @@ namespace C2M2.NeuronalDynamics.Simulation
             //Adds the synaptic currents for the current and previous timesteps
             Icurrs.Add(model.getModelCurrent(presynVoltage, GetSimulationTime(), newVal.Item1.ActivationTime));
             Icurrs.Add(model.getModelCurrent(presynVoltagePrev, GetSimulationTime() - timeStep, newVal.Item1.ActivationTime));
+            newVal.Item1.ts = newVal.Item1.ActivationTime;
             return Icurrs;
         }
 
