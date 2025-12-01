@@ -90,6 +90,10 @@ public class ModelAMPA : ISynapseModel
     {
         return true;
     }
+    public double getTaud()
+    {
+        return taud1;
+    }
     
     public bool isActive(double presynVoltage, double presynVoltagePrev, double ActivationTime, double simulationTime)
     {

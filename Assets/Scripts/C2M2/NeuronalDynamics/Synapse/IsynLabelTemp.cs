@@ -34,10 +34,10 @@ public class IsynLabelTemp : MonoBehaviour
             }
         }
         float iSyn = (float)post.currentIsyn;
-        float iMax = 1.144e-9f;
-        float iSynDivided = iSyn / 1e-10f;
+        float iMax = (float)post.currentModel.Value.getImax();
+        float iSynDivided = iSyn / iMax;
 
-        double taud = 3.0e-4;
+        double taud = (float)post.currentModel.Value.getTaud();
 
 
         label.text = "ISyn: " + iSynDivided.ToString("F3") + "\n (t - ts) / taud: " + ((self.simulation.GetSimulationTime() - pre.ts) / taud).ToString("F3");

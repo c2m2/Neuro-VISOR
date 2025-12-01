@@ -68,11 +68,17 @@ public class ModelNMDA : ISynapseModel
     {
         return modelName;
     }
-    
+
     public double getImax()
     {
         return Imax;
     }
+    
+    public double getTaud()
+    {
+        return taud;
+    }
+    
 
     //Boolean for synapse behavior, used for material of synapse
     public bool isExcitatory()

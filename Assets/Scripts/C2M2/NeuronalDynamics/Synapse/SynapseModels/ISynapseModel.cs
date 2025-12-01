@@ -8,4 +8,5 @@ public interface ISynapseModel
     bool isExcitatory();
     bool isActive(double presynVoltage, double presynVoltagePrev, double ActivationTime, double simulationTime);
     double getImax();
+    double getTaud();
 }

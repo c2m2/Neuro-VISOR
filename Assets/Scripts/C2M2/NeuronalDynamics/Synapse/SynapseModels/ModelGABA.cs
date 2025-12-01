@@ -47,7 +47,11 @@ public class ModelGABA : ISynapseModel
     {
         return Imax;
     }
-
+    public double getTaud()
+    {
+        return taud;
+    }
+    
     //Boolean for synapse behavior, used for material of synapse
     public bool isExcitatory()
     {

@@ -195,6 +195,7 @@ public class ArrowUpdate : MonoBehaviour
 
         var shape = particleSystem.shape;
         shape.radius = disk.localScale.x * 0.3f;
+        Debug.Log(shape.radius);
 
         var main = particleSystem.main;
         particleSize = radius * 0.5f;
@@ -240,25 +241,39 @@ public class ArrowUpdate : MonoBehaviour
         var emissionModule = particleSystem.emission;
         var main = particleSystem.main;
 
-            float iSyn = (float)post.currentIsyn;
-            float iMax = 1.144e-9f;
-            float vMax = 1f;
-            float V = Mathf.Clamp(iSyn / iMax, 0.0001f, 1f) * vMax;
+        float iSyn = (float)post.currentIsyn;
+        float iMax = (float)post.currentModel.Value.getImax();
+        Debug.Log(iMax);
+        float vMax = 1f;
 
-            float speed = Mathf.Max(0.1f, V);
+        float V = Mathf.Clamp(Mathf.Abs(iSyn) / iMax, 0.0001f, 1f) * vMax;
+        float emissionRate = Mathf.Max(0.01f, V);
+        float speed = 0.75f * vMax;
 
-            if (iSyn > 0f)
-            {
-                emissionModule.enabled = true;
-                emissionModule.rateOverTime = speed * 20f;
-                main.startSpeed = speed;
-            }
-            else
-            {
-                emissionModule.enabled = false;
-            }
+        if (Mathf.Abs(iSyn) > 0f)
+        {
+            emissionModule.enabled = true;
+            emissionModule.rateOverTime = emissionRate * 80f;
+            main.startSpeed = speed;
+        }
+        else
+        {
+            emissionModule.enabled = false;
+        }
+
+       
+        Color32 liveColor;
+        if (iSyn >= 0f)
+        {
+            liveColor = Color.red;
+        }
 
 
+        else
+        {
+            liveColor = Color.cyan;  
+        }
+    
         //Particle buffer is allocated
         if (m_Particles == null || m_Particles.Length < particleSystem.main.maxParticles)
         {
@@ -274,13 +289,46 @@ public class ArrowUpdate : MonoBehaviour
         // Change only the particles that are alive
         for (int i = 0; i < numParticlesAlive; i++)
         {
-            float yOffset = Random.Range(-jitterStrength, jitterStrength);
+            //float xOffset = Random.Range(-jitterStrength, jitterStrength);
+            //float yOffset = Random.Range(-jitterStrength, jitterStrength);
+
+            // Sample offset uniformly from disk of radius jitterStrength
+            //float jitter_r2 = Random.Range(0, Mathf.Pow(jitterStrength,2));
+            //float jitter_phi = Random.Range(-1, 1) * Mathf.PI;
+            //float xOffset = Mathf.Sqrt(jitter_r2) * Mathf.Cos(jitter_phi);
+            //float yOffset = Mathf.Sqrt(jitter_r2) * Mathf.Sin(jitter_phi);
+
+            // non uniform in disk
+            float jitter_r = Random.Range(0, jitterStrength);
+            float jitter_phi = Random.Range(-1, 1) * Mathf.PI;
+            float xOffset = jitter_r * Mathf.Cos(jitter_phi);
+            float yOffset = jitter_r * Mathf.Sin(jitter_phi);
+
+
+            //yOffset = jitterStrength; // this is for testing
+
+            Vector3 position = m_Particles[i].position;
+            position.x += xOffset;
+            position.y += yOffset;
+
+            //position.y = MathF.Min(position.y,shape.radius)
+            //position.y = Mathf.Min(position.y, 0.088f); // this works in y direction only
+
+
+            float target_radius = 0.12f; // should be replaced by correct radius of target
+            float dist_from_center_line = Mathf.Sqrt(Mathf.Pow(position.x, 2) + Mathf.Pow(position.y, 2))+1.0e-12f;
+            float dist_factor = Mathf.Min(target_radius / dist_from_center_line, 1);
+            position.x = position.x * dist_factor;
+            position.y = position.y * dist_factor;
+
+
 
             Vector3 direction = m_Particles[i].velocity.normalized;
-            direction += new Vector3(0f, yOffset, 0f);
 
             m_Particles[i].velocity = direction * speed;
+            m_Particles[i].position = position;
             m_Particles[i].startSize = particleSize;
+            m_Particles[i].startColor = liveColor;
         }
 
         //Apply the changes
