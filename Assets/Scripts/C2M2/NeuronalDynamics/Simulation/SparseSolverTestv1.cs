@@ -126,9 +126,11 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// This is for the synaptic current. It contains:
         ///     [0]: The current at the active time step.
         ///     [1]: The current at the previous time step.
-        ///     [2]: The spatial scaling at post-synaptic location for time stepping (1/(cap * area))
         /// </summary>
         private List<Vector> Isyn;
+        /// <summary>
+        /// The spatial scaling at post-synaptic location for time stepping (1/(cap * area))
+        /// </summary>
         private Vector surfaceArea;
         /// <summary>
         /// this is for storing previous states
@@ -151,7 +153,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         List<CoordinateStorage<double>> sparse_stencils;
         CompressedColumnStorage<double> r_csc;              //This is for the rhs sparse matrix
         CompressedColumnStorage<double> l_csc;              //This is for the lhs sparse matrix
-        private SparseLU lu;                                //Initialize the LU factorizaation
+        private SparseLU SBDF_implicit_decomp;                                //Initialize the LU factorizaation
 
         /// <summary>
         /// Send simulation 1D values, this send the current voltage after the solve runs 1 iteration
@@ -222,8 +224,8 @@ namespace C2M2.NeuronalDynamics.Simulation
             rj = Vector.Build.DenseOfArray(bj);
             rj.At(newVal.Item1, rj[newVal.Item1] - 1);
 
-            lu.Solve(ej.ToArray(), z);
-            lu.Solve(R.ToArray(), y);
+            SBDF_implicit_decomp.Solve(ej.ToArray(), z);
+            SBDF_implicit_decomp.Solve(R.ToArray(), y);
             
             ZZ = Vector.Build.DenseOfArray(z);
             YY = Vector.Build.DenseOfArray(y);
@@ -332,7 +334,7 @@ namespace C2M2.NeuronalDynamics.Simulation
             ///<c>double [] b</c> we define storage for the diffusion solve part
             b = new double[Neuron.nodes.Count];
             ///<c>var lu = SparseLU.Create(l_csc, ColumnOrdering.MinimumDegreeAtA, 0.1);</c> this creates the LU decomposition of the HINES matrix which is defined by <c>l_csc</c>
-            lu = SparseLU.Create(l_csc, ColumnOrdering.MinimumDegreeAtA, 0.1);
+            SBDF_implicit_decomp = SparseLU.Create(l_csc, ColumnOrdering.MinimumDegreeAtA, 0.1);
         }
 
         /// <summary>
@@ -353,7 +355,7 @@ namespace C2M2.NeuronalDynamics.Simulation
             Isyn[1].Multiply(0.0, Isyn[1]);
             surfaceArea.Multiply(0.0, surfaceArea);
             R.Add(Rsyn, R);
-            lu.Solve(R.ToArray(), b);
+            SBDF_implicit_decomp.Solve(R.ToArray(), b);
 
             tempState = N.Clone();
             explicitUpdate(N, Npre, fS(N, an(U_Active), bn(U_Active)), fS(Npre, an(Upre), bn(Upre)), timeStep, 1);

@@ -1,6 +1,14 @@
 using UnityEngine;
 using System;
 
+/*
+Reference:
+
+Rothman, J.S. (2014). Modeling Synapses. In: Jaeger, D., Jung, R. (eds) 
+Encyclopedia of Computational Neuroscience. Springer, New York, NY. 
+https://doi.org/10.1007/978-1-4614-7320-6_240-1
+*/
+
 public class ModelGABA : ISynapseModel
 {
     private string modelName;
@@ -9,7 +17,7 @@ public class ModelGABA : ISynapseModel
     private double g;
     private double Imax;
     private double voltageThreshold;   //Volts
-    private double refireRate; // arbitrarily chosen
+    private double refireRate; // refire at 5%
     private double minRefireTime; // ms
     public ModelGABA() {
         modelName = "GABA";
@@ -22,11 +30,11 @@ public class ModelGABA : ISynapseModel
         Imax = System.Math.Abs(g * (Vmax - Erev));
 
         voltageThreshold = -0.05;   //Volts
-        refireRate = 3.0; // arbitrarily chosen
+        refireRate = 3.0; // refire at 5%
         minRefireTime = 1.0e-2; // ms
     }
 
-    /// This is the GABA Synapse function borrowed from Rothman, Jason S. "Modeling Synapses." (2014).
+    /// This is the GABA Synapse function borrowed from Rothman.
     /// </summary>
     /// <param name="v"></param> this is the postsynaptic voltage
     /// <param name="t"></param> this is the current simulation time

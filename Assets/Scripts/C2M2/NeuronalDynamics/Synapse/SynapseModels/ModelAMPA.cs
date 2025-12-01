@@ -1,5 +1,14 @@
 using UnityEngine;
 using System;
+
+/*
+Reference:
+
+Rothman, J.S. (2014). Modeling Synapses. In: Jaeger, D., Jung, R. (eds) 
+Encyclopedia of Computational Neuroscience. Springer, New York, NY. 
+https://doi.org/10.1007/978-1-4614-7320-6_240-1
+*/
+
 public class ModelAMPA : ISynapseModel
 {
     private string modelName;
@@ -14,10 +23,10 @@ public class ModelAMPA : ISynapseModel
     private double taud1;  //(Seconds) First decay constant of a(t)
     private double taud2;   //(Seconds) Second decay constant of a(t)
     private double taur;   //(Seconds) Decay weight constant
-    private int n;              //(Unitless) Decay weight power
+    private int n;              //(Unitless) Decay weight exponent
     private double Imax;
     private double voltageThreshold;   //Volts
-    private double refireRate; // arbitrarily chosen
+    private double refireRate; // refire at 5%
     private double minRefireTime; // ms
     public ModelAMPA() {
         //Provides the Name and Material for the model
@@ -31,7 +40,7 @@ public class ModelAMPA : ISynapseModel
         anorm = 1;       //(Unitless) Used to normalize the decay terms of at such that their summed maximum is always one.
                                 // Since a1 + a2 = 1, anorm is technically not necessary in this case, and has been set to 1
         taud1 = 0.0003;  //(Seconds) First decay constant of a(t)
-        taud2 = 0.002;   //(Seconds) Second decay constant of a(t)
+        taud2 = 0.004;   //(Seconds) Second decay constant of a(t)
         taur = 0.0002;   //(Seconds) Decay weight constant
         n = 2;              //(Unitless) Decay weight power
 
@@ -39,13 +48,13 @@ public class ModelAMPA : ISynapseModel
         Imax = System.Math.Abs(g * (Vmax - Erev));
 
         voltageThreshold = 0.038;   //Volts
-        refireRate = 3.0; // arbitrarily chosen
+        refireRate = 3.0; // refire at 5%
         minRefireTime = 1.0e-2; // ms
     }
 
     //Returns the Synaptic Current. Used in SparseSolver.
     /// <summary>
-    /// This is the AMPA Synapse function borrowed from Rothman, Jason S. "Modeling Synapses." (2014).
+    /// This is the AMPA Synapse function borrowed from Rothman.
     /// </summary>
     /// <param name="v"></param> this is the postsynaptic voltage
     /// <param name="t"></param> this is the current simulation time
@@ -65,7 +74,7 @@ public class ModelAMPA : ISynapseModel
 
         Eampar is "typically 0 mv"
 
-        Although the value for g used by the Rothman paper is 1e-9, an arbitrary value has been chosen that demonstrates synaptic behavior well
+        Although the value for g used by the Rothman is 1e-9, an arbitrary value has been chosen that demonstrates synaptic behavior well
         */
 
         double at = System.Math.Pow(1 - System.Math.Exp(-(t-ts)/taur), n) * (a1*System.Math.Exp(-(t-ts)/taud1) + a2*System.Math.Exp(-(t-ts)/taud2))/anorm;
@@ -93,9 +102,6 @@ public class ModelAMPA : ISynapseModel
     
     public bool isActive(double presynVoltage, double presynVoltagePrev, double ActivationTime)
     {
-        double voltageThreshold = 0.038;   //Volts
-        double refireRate = 3.0; // arbitrarily chosen
-        double minRefireTime = 1.0e-2; // ms
         bool updateActivation = false;
 
         if ((presynVoltage >= voltageThreshold) && ((presynVoltagePrev < voltageThreshold) || (GetSimulationTime() - ActivationTime > refireRate*taud)) && (GetSimulationTime() - ActivationTime > minRefireTime))

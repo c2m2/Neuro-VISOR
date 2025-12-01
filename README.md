@@ -265,6 +265,12 @@ Development: The active beta, contains the latest features but at a higher risk 
 
 ## Changelog
 
+### 2.6.1
+Contributors: [Adam Marx](https://github.com/Kelvrim), [Aidan Ross](https://github.com/aidanross430), [Zachary Miksis](https://zacharymiksis.com)
+
+- Correction of performance issues in v2.6.0.
+- Reorganization of numerical time stepping implementation.
+
 ### 2.6.0
 Contributors: [Adam Marx](https://github.com/Kelvrim), [Aidan Ross](https://github.com/aidanross430), [Zachary Miksis](https://zacharymiksis.com)
 
