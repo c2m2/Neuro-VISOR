@@ -119,6 +119,9 @@ MonoBehaviour:
   inhibitoryMat: {fileID: 2100000, guid: 789ac42e6d85b3c4f9bd257768e6865a, type: 2}
   excitatoryMat: {fileID: 2100000, guid: c09e4ceba9cbc07479695a453f84be1f, type: 2}
   prePlaceMat: {fileID: 2100000, guid: 8c22a2946d07df74893ab7f5496eaf31, type: 2}
+  NMDAMat: {fileID: 2100000, guid: d0e3e6749b99ac04aac54bd2652f59cb, type: 2}
+  AMPAMat: {fileID: 2100000, guid: 1939a203f017d9244b78fc87b47ad501, type: 2}
+  GABAMat: {fileID: 2100000, guid: 5fd754953aa448b4983fc8c136557b9b, type: 2}
   Id: 0
 --- !u!114 &-172088395829924350
 MonoBehaviour:

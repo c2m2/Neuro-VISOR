@@ -116,27 +116,50 @@ public class ArrowUpdate : MonoBehaviour
 
     void UpdateMaterial()
     {
-        Material newMaterial = null;
+        var model = pre.currentModel.Value;
 
-        if (pre.currentModel.Value.isExcitatory())
+        // This material applies to the disks/arrowhead of the synapse. Either inhibitory or excitatory
+        Material typeMaterial;
+        if (model.isExcitatory())
+            typeMaterial = pre.excitatoryMat;
+        else
+            typeMaterial = pre.inhibitoryMat;
+
+        // This is a model specific override for the length(s) of the synapse
+        Material textMaterial;
+
+        if (model is ModelNMDA)
+            textMaterial = pre.NMDAMat;
+
+        else if(model is ModelGABA)
         {
-            newMaterial = pre.excitatoryMat;
+            textMaterial = pre.GABAMat;
+        }
+        
+        else if(model is ModelAMPA)
+        {
+            textMaterial = pre.AMPAMat;
         }
         else
+            textMaterial = typeMaterial; 
+
+
+        if (mode == VisualMode.Arrow)
         {
-            newMaterial = pre.inhibitoryMat;
+            arrowBody.GetComponent<MeshRenderer>().material = textMaterial;
+            arrowHead.GetComponent<MeshRenderer>().material = typeMaterial;
+        }
+        else // Disk mode
+        {
+            body1.GetComponent<MeshRenderer>().material = textMaterial;
+            body2.GetComponent<MeshRenderer>().material = textMaterial;
+
+            disk1.GetComponent<MeshRenderer>().material = typeMaterial;
+            disk2.GetComponent<MeshRenderer>().material = typeMaterial;
         }
 
-        foreach (MeshRenderer mr in GetComponentsInChildren<MeshRenderer>())
-        {
-            // inhibitory/excitatory materials do not apply to text objects
-            // alternatively could make mat changes only to arrow/disk components
-            if (mr.GetComponent<TMP_Text>() != null)
-                continue;
-
-            mr.material = newMaterial;
-        }
     }
+
     void UpdateLabel(Vector3 p1, Vector3 p2, float r1, float r2)
     {
         Vector3 midpoint = (p1 + p2) * 0.5f;

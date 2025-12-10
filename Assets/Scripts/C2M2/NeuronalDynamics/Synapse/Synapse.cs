@@ -18,6 +18,9 @@ public class Synapse : NDInteractables
     public Material inhibitoryMat;
     public Material excitatoryMat;
     public Material prePlaceMat;
+    public Material NMDAMat;
+    public Material AMPAMat;
+    public Material GABAMat;
     public int Id;
 
 
