@@ -242,18 +242,16 @@ public class ArrowUpdate : MonoBehaviour
     }
 
 
-    float GetVisualRadius(Transform syn)
+    float GetVisualRadius(Transform mesh)
     {
-        var rend = syn.GetComponentInChildren<Renderer>();
-        if (rend != null)
+        var mf = mesh.GetComponent<MeshFilter>();
+        if (mf != null && mf.sharedMesh != null)
         {
             //defines the cylinder radius at the pre/post-synaptic vertices in terms of the respective radii of the two spheres
-            return rend.bounds.size.x * 0.5f; 
+            return mf.sharedMesh.bounds.extents.x * mesh.lossyScale.x;
         }
         return 0.1f;
     }
-
-
 
 
     void UpdateParticleSystem()
@@ -307,7 +305,10 @@ public class ArrowUpdate : MonoBehaviour
         int numParticlesAlive = particleSystem.GetParticles(m_Particles);
 
         //Particles move uniformly on the x-axis, but have an element of randomness to their movement on the y-axis
-        float jitterStrength = 0.02f;
+        //float jitterStrength = 0.02f;
+
+        float target_radius = GetVisualRadius(disk2); // should be replaced by correct radius of target
+        float jitterStrength = 1.11f * target_radius;
 
         // Change only the particles that are alive
         for (int i = 0; i < numParticlesAlive; i++)
@@ -326,7 +327,7 @@ public class ArrowUpdate : MonoBehaviour
             float jitter_phi = Random.Range(0.0f,2.0f) * Mathf.PI;
             float xOffset = jitter_r * Mathf.Cos(jitter_phi);
             float yOffset = jitter_r * Mathf.Sin(jitter_phi);
-            Debug.Log("cos: " + Mathf.Cos(jitter_phi) + "sin: "+  Mathf.Sin(jitter_phi));
+            //Debug.Log("cos: " + Mathf.Cos(jitter_phi) + "sin: "+  Mathf.Sin(jitter_phi));
             //Debug.Log("dx: " + Mathf.Cos(jitter_phi) + "dy: "+  Mathf.Sin(jitter_phi));
 
 
@@ -340,7 +341,7 @@ public class ArrowUpdate : MonoBehaviour
             //position.y = Mathf.Min(position.y, 0.088f); // this works in y direction only
 
 
-            float target_radius = 0.18f; // should be replaced by correct radius of target
+            //float target_radius = 0.18f; // should be replaced by correct radius of target
             float dist_from_center_line = Mathf.Sqrt(Mathf.Pow(position.x, 2) + Mathf.Pow(position.y, 2))+1.0e-12f;
             float dist_factor = Mathf.Min(target_radius / dist_from_center_line, 1);
             position.x = position.x * dist_factor;
