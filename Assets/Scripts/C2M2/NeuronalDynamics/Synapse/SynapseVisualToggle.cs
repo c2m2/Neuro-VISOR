@@ -12,7 +12,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
             if (toggled)
             {
                 ArrowUpdate.SetGlobalMode(ArrowUpdate.VisualMode.Disk);
-                buttonLabel.text = "Disk";
+                buttonLabel.text = "Terminal";
             }
             else
             {

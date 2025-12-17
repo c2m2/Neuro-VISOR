@@ -36,6 +36,7 @@ public class ArrowUpdate : MonoBehaviour
     private static VisualMode globalMode = VisualMode.Arrow;
     private VisualMode mode;
 
+    //TODO: several hard-coded vars (most notably 0.8). Refactor all instances to reference arrowBodyEnd
 
     void Start()
     {
@@ -197,6 +198,22 @@ public class ArrowUpdate : MonoBehaviour
         body.position = segmentMidpoint;
         body.up = direction;
         body.localScale = new Vector3(1f, segmentLength * 0.5f, 1f);
+
+
+        // This controls the albedos on the assigned textures, meant to maintain the aspect ratio of the synapse models' uvs in particular. 
+        Vector2[] uvs = mesh.uv;
+
+        float tileSize = 0.5f;
+
+        for (int i = 0; i < uvs.Length; i++)
+        {
+            uvs[i].y = originalVertices[i].y / tileSize;
+        }
+
+        mesh.uv = uvs;
+
+
+
     }
 
 
@@ -224,13 +241,14 @@ public class ArrowUpdate : MonoBehaviour
         particleSize = radius * 0.5f;
         main.startSize = particleSize;
     }
-
     void UpdateArrowhead(Vector3 p1, Vector3 direction, float fullLength)
     {
         float arrowBodyLength = fullLength * 0.8f;
         float coneLength = fullLength - arrowBodyLength;
 
-        float rEnd = GetVisualRadius(postSynapse);
+        float r1 = GetVisualRadius(preSynapse);
+        float r2 = GetVisualRadius(postSynapse);
+        float rShaft = Mathf.Lerp(r1, r2, 0.8f); //the width of the arrowhead is three times the width of the length's shaft
         float coneWidth = 3f;
 
         Vector3 arrowBodyEnd = p1 + direction * arrowBodyLength;
@@ -238,7 +256,7 @@ public class ArrowUpdate : MonoBehaviour
 
         arrowHead.position = coneMidpoint;
         arrowHead.up = direction;
-        arrowHead.localScale = new Vector3(rEnd * coneWidth, coneLength * 0.5f, rEnd * coneWidth);
+        arrowHead.localScale = new Vector3(rShaft * coneWidth, coneLength * 0.5f, rShaft * coneWidth);
     }
 
 
@@ -307,8 +325,8 @@ public class ArrowUpdate : MonoBehaviour
         //Particles move uniformly on the x-axis, but have an element of randomness to their movement on the y-axis
         //float jitterStrength = 0.02f;
 
-        float target_radius = GetVisualRadius(disk2); // should be replaced by correct radius of target
-        float jitterStrength = 1.11f * target_radius;
+        float target_radius = GetVisualRadius(disk2) * 0.9f; // make bounding cylinder slightly smaller than receiving terminal
+        float jitterStrength = 0.5f * target_radius;
 
         // Change only the particles that are alive
         for (int i = 0; i < numParticlesAlive; i++)
