@@ -88,11 +88,11 @@ public class ModelNMDA : ISynapseModel
         return true;
     }
     
-    public bool isActive(double presynVoltage, double presynVoltagePrev, double ActivationTime)
+    public bool isActive(double presynVoltage, double presynVoltagePrev, double SimulationTime, double ActivationTime)
     {
         bool updateActivation = false;
 
-        if ((presynVoltage >= voltageThreshold) && ((presynVoltagePrev < voltageThreshold) || (GetSimulationTime() - ActivationTime > refireRate*taud)) && (GetSimulationTime() - ActivationTime > minRefireTime))
+        if ((presynVoltage >= voltageThreshold) && ((presynVoltagePrev < voltageThreshold) || (SimulationTime - ActivationTime > refireRate*taud)) && (SimulationTime - ActivationTime > minRefireTime))
         {
             Debug.Log("Activation Time Updated");
             updateActivation = true;

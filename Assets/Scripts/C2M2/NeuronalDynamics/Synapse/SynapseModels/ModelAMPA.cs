@@ -75,7 +75,6 @@ public class ModelAMPA : ISynapseModel
         Although the value for g used by the Rothman is 1e-9, an arbitrary value has been chosen that demonstrates synaptic behavior well
         */
 
-        // double at = System.Math.Pow(1 - System.Math.Exp(-(t-ts)/taur), n) * (a1*System.Math.Exp(-(t-ts)/taud1) + a2*System.Math.Exp(-(t-ts)/taud2))/anorm;
         double at = System.Math.Pow(1 - System.Math.Exp(-t/taur), n) * System.Math.Exp(-t/taud) / anorm;
 
         return g*at*(v-Erev);
@@ -99,11 +98,11 @@ public class ModelAMPA : ISynapseModel
         return true;
     }
     
-    public bool isActive(double presynVoltage, double presynVoltagePrev, double ActivationTime)
+    public bool isActive(double presynVoltage, double presynVoltagePrev, double SimulationTime, double ActivationTime)
     {
         bool updateActivation = false;
 
-        if ((presynVoltage >= voltageThreshold) && ((presynVoltagePrev < voltageThreshold) || (GetSimulationTime() - ActivationTime > refireRate*taud)) && (GetSimulationTime() - ActivationTime > minRefireTime))
+        if ((presynVoltage >= voltageThreshold) && ((presynVoltagePrev < voltageThreshold) || (SimulationTime - ActivationTime > refireRate*taud)) && (SimulationTime - ActivationTime > minRefireTime))
         {
             Debug.Log("Activation Time Updated");
             updateActivation = true;

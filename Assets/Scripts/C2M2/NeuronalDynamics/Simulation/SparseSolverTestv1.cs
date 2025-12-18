@@ -286,18 +286,14 @@ namespace C2M2.NeuronalDynamics.Simulation
             double presynVoltage = newVal.Item1.simulation.Get1DValues()[newVal.Item1.FocusVert];
             double presynVoltagePrev = ((SparseSolverTestv1)newVal.Item1.simulation).getUpre()[newVal.Item1.FocusVert];
 
-            if (model.isActive(presynVoltage, presynVoltagePrev, newVal.Item1.ActivationTime))
+            if (model.isActive(presynVoltage, presynVoltagePrev, GetSimulationTime(), newVal.Item1.ActivationTime))
             {
                 newVal.Item1.ActivationTime = GetSimulationTime();
             }
 
-            Icurrs =
-            [
-                //Adds the synaptic currents for the current and previous timesteps
-                Icurrs.Add(model.getModelCurrent(presynVoltage, GetSimulationTime(), newVal.Item1.ActivationTime)),
-                Icurrs.Add(model.getModelCurrent(presynVoltagePrev, GetSimulationTime() - timeStep, newVal.Item1.ActivationTime)),
-            ];
-            newVal.Item1.ts = newVal.Item1.ActivationTime;
+            //Adds the synaptic currents for the current and previous timesteps
+            Icurrs.Add(model.getModelCurrent(presynVoltage, GetSimulationTime(), newVal.Item1.ActivationTime));
+            Icurrs.Add(model.getModelCurrent(presynVoltagePrev, GetSimulationTime() - timeStep, newVal.Item1.ActivationTime));
 
 
             return Icurrs;
