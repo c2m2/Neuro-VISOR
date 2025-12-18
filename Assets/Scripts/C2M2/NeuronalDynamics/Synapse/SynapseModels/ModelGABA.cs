@@ -25,6 +25,8 @@ public class ModelGABA : ISynapseModel
         taud = 15.0e-3;           // (Seconds) decay constant from function, found in figure 2 of Rothman's Paper
         g = -10.0e-9;               // (Siemens) a chosen arbitrary value that produces a noticeable, but not too great, inhibitory response.
                                         // Rothman's paper does not provide any examples for max capacitance of GABA synapses
+                                        // TBD: Choose conductance of single receptor, number of receptors per synapse, and number of synapses 
+                                        // per cluster to justify this value.
 
         double Vmax = 0.1;  // (Volts)
         Imax = System.Math.Abs(g * (Vmax - Erev));

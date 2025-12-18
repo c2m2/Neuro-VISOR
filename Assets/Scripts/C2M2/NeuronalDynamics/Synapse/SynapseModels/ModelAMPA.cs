@@ -16,12 +16,10 @@ public class ModelAMPA : ISynapseModel
     private double g;       //(Siemens) An arbitrary value was chosen that clearly demonstrates AMPA's fast decay behavior, while
                             // still producing a noticeable (but not too large) post synaptic response
                             // 10 pS per receptor, ~40 receptors per synapse, choose # of synapses
-    private double a1;        //(Unitless) Weight of first decay term of at
-    private double a2;        //(Unitless) Weight of second decay term of at
-    private double anorm;       //(Unitless) Used to normalize the decay terms of at such that their summed maximum is always one.
-                            // Since a1 + a2 = 1, anorm is technically not necessary in this case, and has been set to 1
-    private double taud1;  //(Seconds) First decay constant of a(t)
-    private double taud2;   //(Seconds) Second decay constant of a(t)
+    private double anorm;       // (Unitless) Used to normalize the decay terms of at such that their summed maximum is always one.
+    private double sigma;    // (Unitless) Used to scale the noise added to the synaptic current
+    private double taud;  // (Seconds) First decay constant of a(t)
+    private double beta;    // (Unitless) Proportion of taur to taud
     private double taur;   //(Seconds) Decay weight constant
     private int n;              //(Unitless) Decay weight exponent
     private double Imax;
@@ -35,14 +33,14 @@ public class ModelAMPA : ISynapseModel
         g = 25e-9;       //(Siemens) An arbitrary value was chosen that clearly demonstrates AMPA's fast decay behavior, while
                                 // still producing a noticeable (but not too large) post synaptic response
                                 // 10 pS per receptor, ~40 receptors per synapse, choose # of synapses
-        a1 = 0.9;        //(Unitless) Weight of first decay term of at
-        a2 = 0.1;        //(Unitless) Weight of second decay term of at
-        anorm = 1;       //(Unitless) Used to normalize the decay terms of at such that their summed maximum is always one.
-                                // Since a1 + a2 = 1, anorm is technically not necessary in this case, and has been set to 1
-        taud1 = 0.0003;  //(Seconds) First decay constant of a(t)
-        taud2 = 0.004;   //(Seconds) Second decay constant of a(t)
-        taur = 0.0002;   //(Seconds) Decay weight constant
+
+        taud = 4.0e-3;  //(Seconds) Decay constant of a(t)
+        beta = 0.05;    // (Unitless) Proportion of taur to taud
+        taur = beta * taud;   //(Seconds) Decay weight constant
         n = 2;              //(Unitless) Decay weight power
+
+        sigma = 1 / (n * (taud / taur) + 1); // (Unitless) Used to scale the noise added to the synaptic current
+        anorm = System.Math.Pow(1 - sigma, n) * System.Math.Pow(sigma, taur/taud);       //(Unitless) Used to normalize the decay terms of at such that their summed maximum is always one.
 
         double Vmax = 0.1;  // (Volts)
         Imax = System.Math.Abs(g * (Vmax - Erev));
@@ -77,7 +75,8 @@ public class ModelAMPA : ISynapseModel
         Although the value for g used by the Rothman is 1e-9, an arbitrary value has been chosen that demonstrates synaptic behavior well
         */
 
-        double at = System.Math.Pow(1 - System.Math.Exp(-(t-ts)/taur), n) * (a1*System.Math.Exp(-(t-ts)/taud1) + a2*System.Math.Exp(-(t-ts)/taud2))/anorm;
+        // double at = System.Math.Pow(1 - System.Math.Exp(-(t-ts)/taur), n) * (a1*System.Math.Exp(-(t-ts)/taud1) + a2*System.Math.Exp(-(t-ts)/taud2))/anorm;
+        double at = System.Math.Pow(1 - System.Math.Exp(-t/taur), n) * System.Math.Exp(-t/taud) / anorm;
 
         return g*at*(v-Erev);
 
