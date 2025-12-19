@@ -64,18 +64,15 @@ public class ModelAMPA : ISynapseModel
         Base Equation:
         Iampar = GampaR * a(t) * (V(m) - Eampar)
 
-        Using equation 6 for a(t), ignoring 'extrasynaptic receptors'
-        [1-exp(-(t-ts)/Tr)]^n * [a1* exp(-(t-ts)/taud) + (a2*exp(-(t-ts)/taud2))]/(anorm)
-
         The following values were pulled directly from figure 2;
-        n=2, taur=0.2ms, a1=0.9, taud1=0.3ms, a2=0.1, taud2=2.0ms
+        n=2
 
         Eampar is "typically 0 mv"
 
         Although the value for g used by the Rothman is 1e-9, an arbitrary value has been chosen that demonstrates synaptic behavior well
         */
 
-        double at = System.Math.Pow(1 - System.Math.Exp(-t/taur), n) * System.Math.Exp(-t/taud) / anorm;
+        double at = System.Math.Pow(1 - System.Math.Exp(-(t-ts)/taur), n) * System.Math.Exp(-(t-ts)/taud) / anorm;
 
         return g*at*(v-Erev);
 
