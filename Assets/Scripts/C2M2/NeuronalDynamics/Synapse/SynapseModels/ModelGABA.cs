@@ -44,7 +44,9 @@ public class ModelGABA : ISynapseModel
     /// <returns></returns>
     public double getModelCurrent(double v, double t, double ts)
     {
-        return g * System.Math.Exp(-(t - ts) / taud) * (v - Erev);      
+        double current = g * System.Math.Exp(-(t - ts) / taud) * (v - Erev);
+        
+        return current;      
     }
 
     //Returns the model name

@@ -73,8 +73,9 @@ public class ModelAMPA : ISynapseModel
         */
 
         double at = System.Math.Pow(1 - System.Math.Exp(-(t-ts)/taur), n) * System.Math.Exp(-(t-ts)/taud) / anorm;
+        double current = g*at*(v-Erev);
 
-        return g*at*(v-Erev);
+        return current;
 
     }
 

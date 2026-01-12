@@ -68,7 +68,9 @@ public class ModelNMDA : ISynapseModel
         Although the value for g used by the Rothman is 1e-9, an arbitrary value has been chosen that demonstrates synaptic behavior well
         */
 
-        return g * (1.0 / (1.0 + System.Math.Exp(-(v-v05) / k))) * System.Math.Exp(-(t - ts) / taud) * (v - Erev);          
+        double current = g * (1.0 / (1.0 + System.Math.Exp(-(v-v05) / k))) * System.Math.Exp(-(t - ts) / taud) * (v - Erev);
+
+        return current;          
     }
 
     //Returns the model name
