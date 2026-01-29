@@ -29,6 +29,16 @@ public class Synapse : NDInteractables
     {
         get
         {
+            if (simulation == null || simulation.Neuron == null || simulation.Neuron.nodes == null)
+            {
+                Debug.LogWarning("Synapse.NodeData: simulation, Neuron, or nodes is null");
+                return null;
+            }
+            if (FocusVert < 0 || FocusVert >= simulation.Neuron.nodes.Count)
+            {
+                Debug.LogWarning("Synapse.NodeData: FocusVert " + FocusVert + " out of bounds (0.." + (simulation.Neuron.nodes.Count - 1) + ")");
+                return null;
+            }
             return simulation.Neuron.nodes[FocusVert];
         }
     }
@@ -37,6 +47,8 @@ public class Synapse : NDInteractables
     {
         get
         {
+            if (GameManager.instance == null || GameManager.instance.simulationManager == null)
+                return null;
             return GameManager.instance.simulationManager.synapseManager;
         }
     }
@@ -45,7 +57,9 @@ public class Synapse : NDInteractables
     {
         if (isBeingDestroyed) return;
         isBeingDestroyed = true;
-        SynapseManager.DeleteSyn(SynapseManager.FindSelectedSyn(this));
+        var manager = SynapseManager;
+        if (manager == null) return;
+        manager.DeleteSyn(manager.FindSelectedSyn(this));
     }
     
     // Creates a unique synapse instance

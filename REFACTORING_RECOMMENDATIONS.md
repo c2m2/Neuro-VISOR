@@ -373,6 +373,8 @@ Key components:
   fragile initialization ordering.
 - **Fix**: Use a proper initialization state machine or builder pattern.
 
+<span style="color:red">**CORRECTED (7.1):** Added `InitState` enum (`Uninitialized`, `PreInitializing`, `BuildingVisualization`, `BuildingInteraction`, `PostInitializing`, `Initialized`) and `CurrentInitState` property to `Simulation.cs`. The `Initialize()` method now transitions through each state at the appropriate phase, replacing the self-deprecating comment. `StartSimulation()` now guards against being called during an invalid initialization state.</span>
+
 ### 7.2 Magic number in mesh rescaling
 - **File**: `NDSimulation.cs:389`
 - **Issue**: `VisualMesh.Rescale(transform, new Vector3(4, 4, 4)); //TODO why 4?` —
@@ -392,11 +394,15 @@ Key components:
   surprise — callers expect non-destructive extension methods.
 - **Fix**: Return a new array/list, or rename to `AbsInPlace`.
 
+<span style="color:red">**CORRECTED (7.4):** Renamed all six `Abs()` overloads (for `int[]`, `float[]`, `double[]`, `List<int>`, `List<float>`, `List<double>`) to `AbsInPlace()` in `Utils/Extensions/Math.cs`. The in-place mutation behavior is preserved for performance, but the name now explicitly communicates the side effect. No callers exist in the current codebase, so no call sites required updating.</span>
+
 ### 7.5 `Synapse.OnDestroy` may cause recursive deletion
 - **File**: `Synapse.cs:44`
 - **Issue**: `DeleteSyn` calls `Destroy()` on GameObjects, triggering `OnDestroy` on other
   synapses, potentially causing recursive deletion or list modification during iteration.
 - **Fix**: Use a deferred deletion queue or flag to prevent re-entry.
+
+<span style="color:red">**CORRECTED (7.5):** Already fixed as part of Category 9.6. An `isBeingDestroyed` re-entrancy guard flag was added to `Synapse.OnDestroy()` to prevent recursive deletion when `DeleteSyn` triggers `Destroy()` on related GameObjects.</span>
 
 ### 7.6 Missing null checks throughout
 - **Files**: Multiple
@@ -404,6 +410,15 @@ Key components:
   `GameManager.instance.simulationManager.synapseManager`,
   `simulation.Neuron.nodes[FocusVert]`, `simulation.Verts1D[vert]` — no bounds checking.
 - **Fix**: Add null guards and bounds validation at boundary entry points.
+
+<span style="color:red">**CORRECTED (7.6):** Added null guards and bounds validation at all identified boundary entry points:
+- `NDInteractables.FocusPos`: guards `simulation`, `simulation.Verts1D`, and bounds-checks `FocusVert` against `Verts1D.Length`.
+- `Synapse.NodeData`: guards `simulation`, `simulation.Neuron`, `simulation.Neuron.nodes`, and bounds-checks `FocusVert` against `nodes.Count`.
+- `NeuronClamp.NodeData`: same guards as `Synapse.NodeData`.
+- `Synapse.SynapseManager`: guards `GameManager.instance` and `simulationManager` null chain; returns `null` if unavailable.
+- `Synapse.OnDestroy`: now caches `SynapseManager` result and exits early if `null`.
+- `NDBoardController.CloseAllSimulations`: caches `synapseManager` via null-guarded chain before iterating synapses.
+All guards log a `Debug.LogWarning` with the specific property and invalid state for diagnostics.</span>
 
 ---
 

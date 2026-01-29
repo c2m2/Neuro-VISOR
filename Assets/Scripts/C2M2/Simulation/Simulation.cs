@@ -9,6 +9,18 @@ using C2M2.NeuronalDynamics.Simulation;
 
 namespace C2M2.Simulation
 {
+    /// <summary>
+    /// Tracks the initialization phase of a Simulation to enforce correct ordering
+    /// </summary>
+    public enum InitState
+    {
+        Uninitialized,
+        PreInitializing,
+        BuildingVisualization,
+        BuildingInteraction,
+        PostInitializing,
+        Initialized
+    }
 
     /// <summary>
     /// Provides an base interface for simulations using a general data type T
@@ -19,6 +31,10 @@ namespace C2M2.Simulation
     /// <typeparam name="GrabType"></typeparam>
     public abstract class Simulation<ValueType, VizType, RaycastType, GrabType> : Interactable
     {
+        /// <summary>
+        /// Current initialization state of this simulation
+        /// </summary>
+        public InitState CurrentInitState { get; private set; } = InitState.Uninitialized;
         [Tooltip("Run simulation code without visualization or interaction features")]
         /// <summary>
         /// Run solve code without visualization or interaction
@@ -103,17 +119,22 @@ namespace C2M2.Simulation
         #region Unity Methods
         public void Initialize()
         {
-            // We should move away from using OnAwakePre, OnAwakePost
-            OnAwakePre(); //this is a mess!! :(
+            CurrentInitState = InitState.PreInitializing;
+            OnAwakePre();
 
             if (!dryRun)
             {
+                CurrentInitState = InitState.BuildingVisualization;
                 Viz = BuildVisualization();
+
+                CurrentInitState = InitState.BuildingInteraction;
                 BuildInteraction();
             }
 
-            // Run child awake methods first
+            CurrentInitState = InitState.PostInitializing;
             OnAwakePost(Viz);
+
+            CurrentInitState = InitState.Initialized;
             StartCoroutine("UpdateVisualizationStep");
             return;
 
@@ -185,8 +206,14 @@ namespace C2M2.Simulation
         /// </summary>
         public void StartSimulation()
         {
+            if (CurrentInitState != InitState.Initialized && CurrentInitState != InitState.BuildingInteraction)
+            {
+                Debug.LogError("StartSimulation called during invalid init state: " + CurrentInitState);
+                return;
+            }
+
             solveStepSampler = CustomSampler.Create("SolveStep");
-            
+
             solveThread = new Thread(Solve) { IsBackground = true };
             solveThread.Start();
             Debug.Log("Solve() launched on thread " + solveThread.ManagedThreadId);

@@ -377,7 +377,7 @@ namespace C2M2
             }
             #endregion
             #region Abs
-            public static int[] Abs(this int[] array)
+            public static int[] AbsInPlace(this int[] array)
             {
                 for (int i = 0; i < array.Length; i++)
                 {
@@ -385,7 +385,7 @@ namespace C2M2
                 }
                 return array;
             }
-            public static float[] Abs(this float[] array)
+            public static float[] AbsInPlace(this float[] array)
             {
                 for (int i = 0; i < array.Length; i++)
                 {
@@ -393,12 +393,12 @@ namespace C2M2
                 }
                 return array;
             }
-            public static double[] Abs(this double[] array)
+            public static double[] AbsInPlace(this double[] array)
             {
                 for (int i = 0; i < array.Length; i++) array[i] = array[i] > 0 ? array[i] : -array[i];
                 return array;
             }
-            public static List<int> Abs(this List<int> list)
+            public static List<int> AbsInPlace(this List<int> list)
             {
                 for (int i = 0; i < list.Count; i++)
                 {
@@ -406,7 +406,7 @@ namespace C2M2
                 }
                 return list;
             }
-            public static List<float> Abs(this List<float> list)
+            public static List<float> AbsInPlace(this List<float> list)
             {
                 for (int i = 0; i < list.Count; i++)
                 {
@@ -414,7 +414,7 @@ namespace C2M2
                 }
                 return list;
             }
-            public static List<double> Abs(this List<double> list)
+            public static List<double> AbsInPlace(this List<double> list)
             {
                 for (int i = 0; i < list.Count; i++) list[i] = list[i] > 0 ? list[i] : -list[i];
                 return list;
@@ -469,7 +469,7 @@ namespace C2M2
             public static void CompareToLinq(int numTrials = 1000, int arraySize = 1000, 
                 bool testMin = true, bool testMax = true, bool testClamp = true, 
                 bool testArrMax = true, bool testArrMin = true, bool testArrAvg = true,
-                bool testArrStdDev = true, bool testArrSum = true, bool testArrAbs = true,
+                bool testArrStdDev = true, bool testArrSum = true, bool testArrAbsInPlace = true,
                 float maxTimeSeconds = 30f)
             {
                 // Individual min
@@ -488,7 +488,7 @@ namespace C2M2
 
                 // Array sum
 
-                // Array abs
+                // Array absInPlace
             }
         }
     }
