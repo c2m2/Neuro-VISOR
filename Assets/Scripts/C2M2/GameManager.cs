@@ -52,6 +52,7 @@ namespace C2M2
         /// </summary>
         public Gradient defaultGradient;
         public List<Interactable> activeSims = new List<Interactable>();
+        public readonly object activeSimsLock = new object();
         public GameObject clampManagerPrefab = null;
         public GameObject clampManagerL = null;
         public GameObject clampManagerR = null;

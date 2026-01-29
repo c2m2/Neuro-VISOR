@@ -20,6 +20,7 @@ public class Synapse : NDInteractables
     public Material prePlaceMat;
     private static int nextId = 0;
     public int Id;
+    private bool isBeingDestroyed = false;
 
 
     public double ActivationTime { get; set; }
@@ -42,6 +43,8 @@ public class Synapse : NDInteractables
 
     private void OnDestroy()
     {
+        if (isBeingDestroyed) return;
+        isBeingDestroyed = true;
         SynapseManager.DeleteSyn(SynapseManager.FindSelectedSyn(this));
     }
     

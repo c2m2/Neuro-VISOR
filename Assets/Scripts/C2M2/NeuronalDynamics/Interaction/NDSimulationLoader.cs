@@ -91,9 +91,6 @@ namespace C2M2.NeuronalDynamics.Interaction
 
             NDSimulation solver = (NDSimulation)solveObj.AddComponent(solverType);
 
-            // Store the new active simulation
-            GameManager.instance.activeSims.Add(solver);
-
             TransferValues();
 
             // make Save button visible
@@ -101,6 +98,12 @@ namespace C2M2.NeuronalDynamics.Interaction
             m.SaveButtonVisible(true);
 
             solver.Initialize();
+
+            // Store the new active simulation after initialization completes
+            lock (GameManager.instance.activeSimsLock)
+            {
+                GameManager.instance.activeSims.Add(solver);
+            }
 
             solver.Manager.FeatState = solver.Manager.FeatState;
 

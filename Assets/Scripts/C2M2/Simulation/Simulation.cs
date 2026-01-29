@@ -163,6 +163,15 @@ namespace C2M2.Simulation
         {
             StopCoroutine("UpdateVisualizationStep");
             StopSimulation();
+
+            // Remove this simulation from the active simulations list
+            if (GameManager.instance != null)
+            {
+                lock (GameManager.instance.activeSimsLock)
+                {
+                    GameManager.instance.activeSims.Remove(this);
+                }
+            }
         }
         #endregion
 

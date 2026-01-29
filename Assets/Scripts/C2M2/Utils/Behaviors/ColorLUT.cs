@@ -181,12 +181,20 @@ namespace C2M2.Visualization
             return gradientLUT;
         }
 
+        private float[] rescaleBuffer = null;
         private float[] RescaleArray(float[] scalars, ExtremaMethod extremaMethod)
         {
-            // Rescale based on extrema
-            (float, float) minMax = GetMinMax(scalars, extremaMethod);
-            scalars.RescaleArray(0f, lutRes - 1, minMax.Item1, minMax.Item2);
-            return scalars;
+            // Copy input to buffer to avoid mutating the source array
+            if (rescaleBuffer == null || rescaleBuffer.Length != scalars.Length)
+            {
+                rescaleBuffer = new float[scalars.Length];
+            }
+            Array.Copy(scalars, rescaleBuffer, scalars.Length);
+
+            // Rescale the buffer based on extrema (computed from original values in the copy)
+            (float, float) minMax = GetMinMax(rescaleBuffer, extremaMethod);
+            rescaleBuffer.RescaleArray(0f, lutRes - 1, minMax.Item1, minMax.Item2);
+            return rescaleBuffer;
         }
 
         public (float, float) GetMinMax(float[] scalars, ExtremaMethod extremaMethod)

@@ -569,6 +569,7 @@ removed, or when the simulation is running.
 - **Fix**: Fix the string to match the method name. Better yet, store the coroutine
   reference (`Coroutine vizCoroutine = StartCoroutine(...)`) and stop it by reference,
   which avoids string-matching entirely and is more robust.
+- <span style="color:red">**CORRECTED**: Already fixed by Category 1, item 1.3. The coroutine name was corrected to `UpdateVisualizationStep` in all three locations (method name, StartCoroutine, StopCoroutine).</span>
 
 ### 9.2 Barrier deadlock when a neuron is removed or throws an exception
 - **File**: `Simulation.cs:192,210,221`
@@ -600,6 +601,7 @@ removed, or when the simulation is running.
      ```
   3. Consider whether the barrier is necessary at all. Each neuron's solver is independent
      except for synaptic coupling, which could use a lock-free message queue instead.
+- <span style="color:red">**CORRECTED**: Already fixed by Category 2, items 2.2+2.3. The solve loop is wrapped in `try/catch/finally`. The `finally` block guarantees `RemoveParticipant()` is called even on exceptions. The `catch` block logs the exception via `DebugLogErrorSafe`.</span>
 
 ### 9.3 `activeSims` list is mutated without synchronization during add/remove
 - **File**: `GameManager.cs:53`, `NDSimulationLoader.cs:95`,
@@ -617,6 +619,7 @@ removed, or when the simulation is running.
 - **Fix**: Use a `ConcurrentBag<Interactable>`, or synchronize access to `activeSims`
   with a dedicated lock. Alternatively, replace `ActiveSimulations` with a cached snapshot
   that is rebuilt only when `activeSims` changes.
+- <span style="color:red">**CORRECTED**: Applied. Added `activeSimsLock` to `GameManager`. Protected `activeSims.Add()` in `NDSimulationLoader.Load` and `activeSims.Remove()` in `Simulation.OnDestroy` with the lock. `NDSimulationManager.ActiveSimulations` now iterates under lock to produce a snapshot.</span>
 
 ### 9.4 Synapse iteration on solver thread races with main-thread synapse add/remove
 - **File**: `NDSimulation.cs:230-253` (PostSolveStep, runs on solver thread),
@@ -641,6 +644,7 @@ removed, or when the simulation is running.
   ```
   Or use `ConcurrentBag`/`ConcurrentDictionary`. The lock should be the same object used
   by `SynapticPlacement` and `DeleteSyn`.
+- <span style="color:red">**CORRECTED**: Already fixed by Category 2, item 2.5. Added `synapseLock` and `GetSynapsesSnapshot()` to `SynapseManager`. `PostSolveStep` now iterates a snapshot copy instead of the live list.</span>
 
 ### 9.5 `DeleteSyn` calls `FindSynapsePair` twice, enabling race window
 - **File**: `SynapseManager.cs:96-116`
@@ -653,6 +657,7 @@ removed, or when the simulation is running.
   - Removing the wrong pair from the list
 - **Fix**: Call `FindSynapsePair` once and cache the result. All operations on that result
   should be performed atomically under a lock.
+- <span style="color:red">**CORRECTED**: Already fixed by Category 1, item 1.9. `FindSynapsePair` result is now cached in both `DeleteSyn` and `PrePlaceCheck`.</span>
 
 ### 9.6 `Synapse.OnDestroy` triggers recursive `DeleteSyn` calls
 - **File**: `Synapse.cs:42-45`, `SynapseManager.cs:96-116`
@@ -684,6 +689,7 @@ removed, or when the simulation is running.
   ```
   Additionally, `DeleteSyn` should destroy arrow GameObjects explicitly (they are children
   of the pre-synapse transform but are not tracked anywhere).
+- <span style="color:red">**CORRECTED**: Applied. Added `isBeingDestroyed` re-entrancy guard to `Synapse`. `OnDestroy` now checks and sets this flag before calling `DeleteSyn`, preventing the recursive destruction chain.</span>
 
 ### 9.7 `RescaleArray` mutates the `float[]` returned by `GetValues`, corrupting data
 - **File**: `ColorLUT.cs:184-189`, `NDSimulation.cs:298-317`
@@ -700,6 +706,7 @@ removed, or when the simulation is running.
   evaluation in the same frame, producing wrong extrema bounds.
 - **Fix**: `RescaleArray` should operate on a dedicated work buffer, not the input array.
   Pre-allocate a `float[] rescaleBuffer` in `ColorLUT` and copy into it before rescaling.
+- <span style="color:red">**CORRECTED**: Applied. Added pre-allocated `rescaleBuffer` field to `ColorLUT`. `RescaleArray` now copies the input array into the buffer via `Array.Copy` before rescaling. The original input array is never modified. Buffer is allocated/resized lazily.</span>
 
 ### 9.8 Visualization coroutine continues during pause, but solver doesn't advance
 - **File**: `Simulation.cs:141-154`
@@ -713,6 +720,7 @@ removed, or when the simulation is running.
   visualization coroutine should check this flag and display a visual indicator (e.g., gray
   out the mesh or show "Solver Stopped") if the solver has not advanced for several
   visualization frames.
+- <span style="color:red">**NOT CORRECTED**: Skipped per instruction — this is the desired behavior of the pause button (pause the solver, not the visualization).</span>
 
 ### 9.9 `NDSimulationLoader.Load` adds simulation to `activeSims` before initialization
 - **File**: `NDSimulationLoader.cs:95-103`
@@ -729,6 +737,7 @@ removed, or when the simulation is running.
   the main thread. But if any `Awake()`/`Start()` callback or event handler on a newly
   created component triggers an `ActiveSimulations` iteration, it will crash.
 - **Fix**: Move `activeSims.Add(solver)` to after `Initialize()` completes.
+- <span style="color:red">**CORRECTED**: Applied. Moved `activeSims.Add(solver)` to after `solver.Initialize()` completes. The Add is also protected with `activeSimsLock` (see 9.3 fix).</span>
 
 ### 9.10 No cleanup of child objects when a neuron is removed
 - **Files**: `NDSimulation.cs`, `NeuronClamp.cs:79-81`, `Synapse.cs:42-45`
@@ -753,6 +762,7 @@ removed, or when the simulation is running.
   4. Destroys graphs, clamps, control panels, info panels
   5. Then destroys the GameObject
   This method should be used instead of directly calling `Destroy()` on the neuron.
+- <span style="color:red">**CORRECTED**: Partially applied. Added `activeSims.Remove(this)` under `activeSimsLock` in `Simulation.OnDestroy`, addressing point #1 (removing from activeSims). Point #2 (solver thread) is mitigated by existing `StopSimulation()` + Category 2 fixes (2.2/2.3 ensure barrier cleanup). Points #3 and #4 (arrow and UI cleanup) are partially addressed by Unity's child destruction cascade.</span>
 
 ### 9.11 `async void` solver swallows exceptions, leaving simulation silently dead
 - **File**: `Simulation.cs:186`
@@ -785,6 +795,7 @@ removed, or when the simulation is running.
   ```
   Also consider changing `async void` to either a plain `void` method on a dedicated
   thread, or `async Task` with error propagation.
+- <span style="color:red">**CORRECTED**: Already fixed by Category 2, item 2.2. The solve loop is wrapped in `try/catch`. Exceptions are caught and logged via `DebugLogErrorSafe` (now functional after fixes 1.2 + 2.1). The solver no longer dies silently.</span>
 
 ---
 
