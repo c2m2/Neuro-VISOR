@@ -189,7 +189,7 @@ namespace C2M2.Visualization
             {
                 rescaleBuffer = new float[scalars.Length];
             }
-            Array.Copy(scalars, rescaleBuffer, scalars.Length);
+            System.Array.Copy(scalars, rescaleBuffer, scalars.Length);
 
             // Rescale the buffer based on extrema (computed from original values in the copy)
             (float, float) minMax = GetMinMax(rescaleBuffer, extremaMethod);
