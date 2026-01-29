@@ -107,7 +107,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
         /// <summary>
         /// Includes info like cell species, strain, and archive
         /// </summary>
-        public VrnReader.MetaInfo MetaInfo { get { return (VrnReader.MetaInfo)vrnReader.GetMetaInfo(); } }
+        public VrnReader.MetaInfo MetaInfo { get { return (VrnReader.MetaInfo)VrnReader.GetMetaInfo(); } }
 
         private Grid grid1D = null;
         public Grid Grid1D
@@ -178,10 +178,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
                     mapping = (MappingInfo)MapUtils.BuildMap(Grid1D, Grid2D);
                 }
                 return mapping;
-            }
-            set
-            {
-                mapping = (MappingInfo)MapUtils.BuildMap(Grid1D, Grid2D);
             }
         }
 

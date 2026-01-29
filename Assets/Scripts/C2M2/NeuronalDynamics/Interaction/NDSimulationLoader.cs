@@ -56,7 +56,7 @@ namespace C2M2.NeuronalDynamics.Interaction
                 List<NDSimulation> sims = new List<NDSimulation>(GameManager.instance.activeSims.Count);
                 for(int i = 0; i < GameManager.instance.activeSims.Count; i++)
                 {
-                    sims[i] = (NDSimulation)GameManager.instance.activeSims[i];
+                    sims.Add((NDSimulation)GameManager.instance.activeSims[i]);
                 }
                 return sims;
             }

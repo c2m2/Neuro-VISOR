@@ -95,9 +95,10 @@ public class SynapseManager : NDInteractablesManager<Synapse>
 
     public bool DeleteSyn(Synapse syn)
     {
-        if (FindSynapsePair(syn) != null)
+        var pairs = FindSynapsePair(syn);
+        if (pairs != null)
         {
-            foreach ((Synapse, Synapse) pair in FindSynapsePair(syn))
+            foreach ((Synapse, Synapse) pair in pairs)
             {
                 Destroy(pair.Item1.gameObject);
                 Destroy(pair.Item2.gameObject);
@@ -112,20 +113,21 @@ public class SynapseManager : NDInteractablesManager<Synapse>
                 Destroy(syn.gameObject);
             }
             return false;
-        } 
+        }
     }
 
     // Handles assignment of PrePlaceMaterial on Synapses that don't yet have an endpoint
     public bool PrePlaceCheck(Synapse syn)
     {
-        if (FindSynapsePair(syn) == null)
+        var pairs = FindSynapsePair(syn);
+        if (pairs == null)
         {
             syn.SetPrePlace();
             return true;
         }
-        else if (FindSynapsePair(syn) != null)
+        else
         {
-            foreach ((Synapse, Synapse) pair in FindSynapsePair(syn))
+            foreach ((Synapse, Synapse) pair in pairs)
             {
                 pair.Item1.SetToModeMaterial();
                 pair.Item2.SetToModeMaterial();

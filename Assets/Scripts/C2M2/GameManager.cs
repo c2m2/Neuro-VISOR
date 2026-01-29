@@ -102,7 +102,7 @@ namespace C2M2
 
             if(roomOptions != null && roomOptions.Length > 0)
             {
-                Mathf.Clamp(roomSelected, 0, roomOptions.Length - 1);
+                roomSelected = Mathf.Clamp(roomSelected, 0, roomOptions.Length - 1);
                 // Only enable selected room, disable all others
                 for(int i = 0; i < roomOptions.Length; i++)
                 {
@@ -133,6 +133,8 @@ namespace C2M2
             {
                 Debug.LogError("No cell previewer prefab given!");
             }
+
+            isRunning = true;
         }
 
         private void Update()

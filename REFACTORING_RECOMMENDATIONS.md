@@ -23,6 +23,7 @@ Key components:
   is never assigned. `roomSelected` is never actually clamped, so an out-of-range value
   will cause an `IndexOutOfRangeException` on line 109.
 - **Fix**: Assign the result: `roomSelected = Mathf.Clamp(roomSelected, 0, roomOptions.Length - 1);`
+- <span style="color:red">**CORRECTED**: Applied. Added `roomSelected =` before `Mathf.Clamp(...)` call at line 105.</span>
 
 ### 1.2 `isRunning` is never set to `true`
 - **File**: `GameManager.cs:92`
@@ -30,6 +31,7 @@ Key components:
   and toggled in `OnApplicationPause`, but never set to `true` on startup. This means
   `DebugLogSafe()` and `DebugLogErrorSafe()` silently discard all messages.
 - **Fix**: Add `isRunning = true;` at the end of `Awake()`.
+- <span style="color:red">**CORRECTED**: Applied. Added `isRunning = true;` at end of `Awake()` method (after cellPreviewer instantiation).</span>
 
 ### 1.3 Coroutine name typo causes silent failure
 - **File**: `Simulation.cs:117, 164`
@@ -38,17 +40,20 @@ Key components:
   does **not** match the method name, so `StopCoroutine` silently fails and the coroutine
   continues running after `OnDestroy`.
 - **Fix**: Rename the method to `UpdateVisualizationStep` and update both string references.
+- <span style="color:red">**CORRECTED**: Applied. Renamed method to `UpdateVisualizationStep()` and updated both `StartCoroutine` (line 117) and `StopCoroutine` (line 164) string references to match.</span>
 
 ### 1.4 `curentTimeStep` typo
 - **File**: `Simulation.cs:169`
 - **Issue**: Missing 't' in `curentTimeStep`. Used throughout the class.
 - **Fix**: Rename to `currentTimeStep`.
+- <span style="color:red">**CORRECTED**: Applied. Renamed `curentTimeStep` → `currentTimeStep` in all occurrences across `Simulation.cs`, `Menu.cs` (lines 124, 331), and `SparseSolverTestv1.cs` (line 168).</span>
 
 ### 1.5 List indexing throws `ArgumentOutOfRangeException`
 - **File**: `NDSimulationLoader.cs:57-59`
 - **Issue**: `new List<NDSimulation>(count)` sets **capacity**, not **count**. The list
   has zero elements, so `sims[i] = ...` throws `ArgumentOutOfRangeException`.
 - **Fix**: Use `sims.Add((NDSimulation)GameManager.instance.activeSims[i]);`
+- <span style="color:red">**CORRECTED**: Applied. Changed `sims[i] = (NDSimulation)...` to `sims.Add((NDSimulation)...)` at line 59.</span>
 
 ### 1.6 Unnecessary `using Boo.Lang` import
 - **File**: `Synapse.cs:1`
@@ -56,6 +61,7 @@ Key components:
   `System.Collections.Generic.List<T>`, causing subtle type resolution bugs. Boo is
   deprecated in Unity.
 - **Fix**: Remove `using Boo.Lang;`
+- <span style="color:red">**CORRECTED**: Applied. Removed `using Boo.Lang;` import from `Synapse.cs`.</span>
 
 ### 1.7 `vrnReader` bypasses lazy initialization
 - **File**: `NDSimulation.cs:110`
@@ -63,18 +69,21 @@ Key components:
   directly, bypassing the `VrnReader` property (uppercase) which performs lazy
   initialization. Will throw `NullReferenceException` if accessed before `VrnReader`.
 - **Fix**: Change to `VrnReader.GetMetaInfo()`.
+- <span style="color:red">**CORRECTED**: Applied. Changed `vrnReader.GetMetaInfo()` to `VrnReader.GetMetaInfo()` to use the lazy-initialized property.</span>
 
 ### 1.8 Mapping setter ignores assigned value
 - **File**: `NDSimulation.cs:184-186`
 - **Issue**: The setter always calls `MapUtils.BuildMap(Grid1D, Grid2D)` regardless of
   the `value` parameter, making assignment semantically incorrect.
 - **Fix**: Either remove the setter or use the `value` parameter.
+- <span style="color:red">**CORRECTED**: Applied. Removed the unused setter entirely; `Mapping` is now a get-only property.</span>
 
 ### 1.9 Redundant null checks in `PrePlaceCheck`
 - **File**: `SynapseManager.cs:119-135`
 - **Issue**: `if (X == null) { ... } else if (X != null) { ... }` — the `else if` is
   always true. Also calls `FindSynapsePair` three times for the same synapse.
 - **Fix**: Call once, cache result, use simple `else`.
+- <span style="color:red">**CORRECTED**: Applied. Cached `FindSynapsePair(syn)` result in both `DeleteSyn` and `PrePlaceCheck`; replaced redundant `else if (X != null)` with simple `else`.</span>
 
 ### 1.10 Synaptic current driving force uses presynaptic voltage instead of postsynaptic
 - **File**: `SparseSolverTestv1.cs:286-295`
@@ -95,6 +104,7 @@ Key components:
 - **Fix**: Read the postsynaptic voltage separately and pass it to `getModelCurrent`
   for the driving force and Boltzmann terms. The presynaptic voltage should continue to be
   used only for the `isActive` activation check.
+- <span style="color:red">**NOT CORRECTED**: Skipped per instruction — no changes to the biological model.</span>
 
 ### 1.11 `FindSelectedSyn` may return wrong synapse from pair
 - **File**: `SynapseManager.cs:39-53`
@@ -102,12 +112,14 @@ Key components:
   (Item1 or Item2), not necessarily the exact input `syn`. This can return a pre-synapse
   when the caller expects the post-synapse they passed in.
 - **Fix**: Return the matching synapse or the pair, not Item1/Item2 unconditionally.
+- <span style="color:red">**REASSESSED**: Upon detailed code review, the existing logic is functionally correct. `FindSelectedSyn` returns the stored synapse that matches by `FocusVert` and `Neuron` identity — this is the intended lookup behavior. All callers use it to locate the matching pair entry, which is correctly returned. No code change needed.</span>
 
 ### 1.12 `Clone()` uses shallow copy with non-deterministic ID
 - **File**: `Synapse.cs:50-53`
 - **Issue**: `MemberwiseClone()` shares the `currentModel` `LinkedListNode` reference.
   `new System.Random()` seeded from system clock can produce duplicate IDs on rapid calls.
 - **Fix**: Use a static atomic counter for IDs. Deep-copy or re-initialize mutable fields.
+- <span style="color:red">**CORRECTED**: Applied. Added `private static int nextId = 0` field. Replaced `System.Random` with `Interlocked.Increment(ref nextId)` for deterministic unique IDs. Added `modelList.Find(currentModel.Value)` to re-resolve `currentModel` on the clone, avoiding shared `LinkedListNode` reference.</span>
 
 ---
 

@@ -165,7 +165,7 @@ namespace C2M2.NeuronalDynamics.Simulation
             /// this initialize the curVals which will be sent back to the VR simulation
             double[] curVals = null;
             /// check if this beginning of the simulation
-            if (curentTimeStep > -1)
+            if (currentTimeStep > -1)
             {
                 Vector curTimeSlice;
                 lock (visualizationValuesLock)

@@ -114,7 +114,7 @@ namespace C2M2.Simulation
 
             // Run child awake methods first
             OnAwakePost(Viz);
-            StartCoroutine("UpdateVisulizationStep");
+            StartCoroutine("UpdateVisualizationStep");
             return;
 
             void BuildInteraction()
@@ -138,7 +138,7 @@ namespace C2M2.Simulation
             }
         }
 
-        IEnumerator UpdateVisulizationStep()
+        IEnumerator UpdateVisualizationStep()
         {
             while (!dryRun)
             {
@@ -161,12 +161,12 @@ namespace C2M2.Simulation
 
         protected void OnDestroy()
         {
-            StopCoroutine("updateVisulizationStep");
+            StopCoroutine("UpdateVisualizationStep");
             StopSimulation();
         }
         #endregion
 
-        public int curentTimeStep = -1;
+        public int currentTimeStep = -1;
         public double timeStep = 0.008 * 1e-3;
         public double endTime = 1.0;
         public int nT => (int)(endTime / timeStep);
@@ -191,20 +191,20 @@ namespace C2M2.Simulation
 
             GameManager.instance.solveBarrier.AddParticipant();
             DateTime startStepTime = DateTime.Now;
-            curentTimeStep = 0;
-            while (curentTimeStep < nT)
+            currentTimeStep = 0;
+            while (currentTimeStep < nT)
             {
                 if (!GameManager.instance.simulationManager.Paused && !GameManager.instance.Loading)
                 {
-                    PreSolveStep(curentTimeStep);
+                    PreSolveStep(currentTimeStep);
 
                     solveStepSampler.Begin();
-                    SolveStep(curentTimeStep);
+                    SolveStep(currentTimeStep);
                     solveStepSampler.End();
 
-                    PostSolveStep(curentTimeStep);
+                    PostSolveStep(currentTimeStep);
                     
-                    curentTimeStep++;
+                    currentTimeStep++;
                 }
                 
                 GameManager.instance.solveBarrier.SignalAndWait();
@@ -228,7 +228,7 @@ namespace C2M2.Simulation
             solveThread = null;
         }
 
-        public sealed override float GetSimulationTime() => curentTimeStep * (float)timeStep;
+        public sealed override float GetSimulationTime() => currentTimeStep * (float)timeStep;
 
         /// <summary>
         /// Called on the solve thread before the simulation for loop is launched

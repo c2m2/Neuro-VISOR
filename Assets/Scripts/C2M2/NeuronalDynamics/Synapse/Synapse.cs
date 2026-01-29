@@ -1,11 +1,11 @@
-﻿using Boo.Lang;
-using C2M2;
+﻿using C2M2;
 using C2M2.NeuronalDynamics.Simulation;
 using C2M2.NeuronalDynamics.UGX;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using UnityEngine;
 public class Synapse : NDInteractables
 {
@@ -18,6 +18,7 @@ public class Synapse : NDInteractables
     public Material inhibitoryMat;
     public Material excitatoryMat;
     public Material prePlaceMat;
+    private static int nextId = 0;
     public int Id;
 
 
@@ -44,12 +45,13 @@ public class Synapse : NDInteractables
         SynapseManager.DeleteSyn(SynapseManager.FindSelectedSyn(this));
     }
     
-    // Creates a unique synapse instance 
+    // Creates a unique synapse instance
     public Synapse Clone()
     {
-        System.Random rnd = new System.Random();
         Synapse other = (Synapse) this.MemberwiseClone();
-        other.Id = rnd.Next();
+        other.Id = Interlocked.Increment(ref nextId);
+        // Re-resolve currentModel to avoid sharing the LinkedListNode reference
+        other.currentModel = modelList.Find(currentModel.Value);
         return other;
     }
     public override void Place(int index)
