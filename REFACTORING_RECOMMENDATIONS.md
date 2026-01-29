@@ -76,12 +76,25 @@ Key components:
   always true. Also calls `FindSynapsePair` three times for the same synapse.
 - **Fix**: Call once, cache result, use simple `else`.
 
-### 1.10 Synaptic current uses wrong voltage (physics error)
+### 1.10 Synaptic current driving force uses presynaptic voltage instead of postsynaptic
 - **File**: `SparseSolverTestv1.cs:286-295`
-- **Issue**: `getModelCurrent` interface documents its first parameter as *post*synaptic
-  voltage (`v`, used for driving force `(v - Erev)` and NMDA Boltzmann block). But it is
-  called with *pre*synaptic voltage. This produces physically incorrect synaptic currents.
-- **Fix**: Pass the postsynaptic membrane potential to `getModelCurrent`.
+- **Issue**: `SynapseCurrentFunction` correctly reads the presynaptic voltage to determine
+  **activation** (whether the presynaptic neuron fired — the `isActive` check at line 289).
+  However, it then passes that same presynaptic voltage as the `v` parameter to
+  `getModelCurrent`, where it is used in the **driving force** term `g * a(t) * (v - Erev)`
+  and, for NMDA, the voltage-dependent Mg2+ block `1/(1 + exp(-(v - v05)/k))`.
+  Physically, `a(t)` captures the presynaptic signal (neurotransmitter gating triggered at
+  activation time `ts`). The driving force `(v - Erev)` determines the magnitude and
+  direction of ionic current through channels on the *postsynaptic* membrane, so `v` should
+  be the postsynaptic membrane potential. The NMDA Boltzmann block is also a postsynaptic
+  phenomenon (Mg2+ blocks the channel from the postsynaptic side depending on postsynaptic
+  voltage). Using presynaptic voltage in these terms conflates two distinct physical
+  quantities. The postsynaptic voltage is available from `this` solver (since
+  `SetSynapseCurrent` runs on the postsynaptic neuron), e.g.,
+  `Get1DValues()[newVal.Item2.FocusVert]`.
+- **Fix**: Read the postsynaptic voltage separately and pass it to `getModelCurrent`
+  for the driving force and Boltzmann terms. The presynaptic voltage should continue to be
+  used only for the `isActive` activation check.
 
 ### 1.11 `FindSelectedSyn` may return wrong synapse from pair
 - **File**: `SynapseManager.cs:39-53`
