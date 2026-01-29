@@ -72,6 +72,11 @@ namespace C2M2.NeuronalDynamics.Interaction
                     cellsPath = "NeuronalDynamics" + Path.AltDirectorySeparatorChar + "Geometries";
                 }
                 string fullPath = Application.streamingAssetsPath + Path.DirectorySeparatorChar + cellsPath;
+                if (!Directory.Exists(fullPath))
+                {
+                    Debug.LogWarning("CellPreviewer: Directory not found, creating: " + fullPath);
+                    Directory.CreateDirectory(fullPath);
+                }
                 watcher.Path = fullPath;
                 watcher.Filter = "*.VRN";
                 List<string> geoms = GetGeometryNames(fullPath);
@@ -286,6 +291,11 @@ namespace C2M2.NeuronalDynamics.Interaction
 
             private void ConfigureFileSystemWatcher(string path)
             {
+                if (!Directory.Exists(path))
+                {
+                    Debug.LogWarning("CellPreviewer: Directory not found, creating: " + path);
+                    Directory.CreateDirectory(path);
+                }
                 watcher.Path = path;
                 watcher.Filter = "*.vrn";
                 watcher.EnableRaisingEvents = true;
