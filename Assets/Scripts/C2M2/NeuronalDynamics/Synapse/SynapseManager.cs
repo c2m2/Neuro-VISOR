@@ -14,6 +14,18 @@ public class SynapseManager : NDInteractablesManager<Synapse>
     public float placementTimestamp;
     public Synapse synapseInProgress = null; //Contains presynapse when a presynapse has been placed but no post synapse
     public List<(Synapse, Synapse)> synapses = new List<(Synapse, Synapse)>(); //pre (Item1) and post (Item2) synapses
+    public readonly object synapseLock = new object();
+
+    /// <summary>
+    /// Returns a thread-safe snapshot of the synapses list for iteration on the solver thread
+    /// </summary>
+    public List<(Synapse, Synapse)> GetSynapsesSnapshot()
+    {
+        lock (synapseLock)
+        {
+            return new List<(Synapse, Synapse)>(synapses);
+        }
+    }
 
     public override GameObject IdentifyBuildPrefab(NDSimulation sim, int index)
     {
@@ -27,12 +39,15 @@ public class SynapseManager : NDInteractablesManager<Synapse>
 
     private void OnDestroy()
     {
-        foreach ((Synapse, Synapse) synapsePair in synapses)
+        lock (synapseLock)
         {
-            Destroy(synapsePair.Item1);
-            Destroy(synapsePair.Item2);
+            foreach ((Synapse, Synapse) synapsePair in synapses)
+            {
+                Destroy(synapsePair.Item1);
+                Destroy(synapsePair.Item2);
+            }
+            synapses.Clear();
         }
-        synapses.Clear();
     }
     
     // Returns the synapse object corresponding to the currently selected synapse 
@@ -68,7 +83,10 @@ public class SynapseManager : NDInteractablesManager<Synapse>
         else //Post Synapse
         {
             Synapse postPlaced = placedSynapse.Clone();
-            synapses.Add((synapseInProgress, postPlaced));
+            lock (synapseLock)
+            {
+                synapses.Add((synapseInProgress, postPlaced));
+            }
             PrePlaceCheck(synapseInProgress);
             synapseInProgress = null;
 
@@ -102,7 +120,10 @@ public class SynapseManager : NDInteractablesManager<Synapse>
             {
                 Destroy(pair.Item1.gameObject);
                 Destroy(pair.Item2.gameObject);
-                synapses.Remove(pair);
+                lock (synapseLock)
+                {
+                    synapses.Remove(pair);
+                }
             }
             return true;
         }

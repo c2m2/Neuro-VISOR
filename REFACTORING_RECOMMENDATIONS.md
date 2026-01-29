@@ -131,6 +131,7 @@ Key components:
   `DebugLogSafe`) and read/cleared from main thread (in `Update`). Can cause
   `InvalidOperationException` during `foreach`.
 - **Fix**: Replace with `ConcurrentQueue<string>` or add locks.
+- <span style="color:red">**CORRECTED**: Applied. Replaced `List<string>` with `ConcurrentQueue<string>` for both `logQ` and `eLogQ`. `Update()` now uses `TryDequeue` loop instead of `foreach`/`Clear()`. `DebugLogSafe`/`DebugLogErrorSafe` now use `Enqueue`. Removed `Debug.LogWarning` from cap-exceeded path (itself unsafe from non-main threads).</span>
 
 ### 2.2 `async void Solve()` will crash on exceptions
 - **File**: `Simulation.cs:186`
@@ -138,6 +139,7 @@ Key components:
   solve loop will crash the application.
 - **Fix**: Use `async Task` with top-level try/catch, or remove async and use
   `Thread.Sleep`.
+- <span style="color:red">**CORRECTED**: Applied. Wrapped the solve loop in `try/catch`. The `catch` block logs the exception via `DebugLogErrorSafe` (now functional after fix 1.2 + 2.1). The `async void` signature is retained since the method is a thread entry point, but exceptions are now caught and reported instead of crashing.</span>
 
 ### 2.3 Barrier participant leak on exception
 - **File**: `Simulation.cs:192,221`
@@ -145,6 +147,7 @@ Key components:
   called, causing all other simulation threads to deadlock permanently at
   `SignalAndWait()`.
 - **Fix**: Wrap `AddParticipant()` through `RemoveParticipant()` in `try/finally`.
+- <span style="color:red">**CORRECTED**: Applied. Added `try/finally` around the solve loop. `RemoveParticipant()` and `cts.Dispose()` are now in the `finally` block, guaranteeing cleanup even on exceptions. Combined with fix 2.2 in the same `try/catch/finally` structure.</span>
 
 ### 2.4 `U_Active` lacks synchronization
 - **File**: `SparseSolverTestv1.cs`
@@ -152,6 +155,7 @@ Key components:
   `SolveStep()` (solve thread). The `visualizationValuesLock` only protects `U`, not
   `U_Active`.
 - **Fix**: Extend lock scope to cover `U_Active`, or use a lock-free double-buffer pattern.
+- <span style="color:red">**CORRECTED**: Applied. Extended `visualizationValuesLock` to cover the `U_Active` assignment in `Set1DValues`. The `DircheletRank1UpdateSolve` computation is performed outside the lock to minimize contention; only the reference assignment is synchronized.</span>
 
 ### 2.5 `synapses` list concurrent modification
 - **File**: `SynapseManager.cs`
@@ -159,6 +163,7 @@ Key components:
   and modified in `SynapticPlacement`/`DeleteSyn` (main thread). Can cause
   `InvalidOperationException` during enumeration.
 - **Fix**: Use a concurrent collection or snapshot-copy pattern for iteration.
+- <span style="color:red">**CORRECTED**: Applied. Added `synapseLock` object to `SynapseManager`. Protected `synapses.Add()` in `SynapticPlacement`, `synapses.Remove()` in `DeleteSyn`, and the iterate+clear in `OnDestroy` with the lock. Added `GetSynapsesSnapshot()` method that returns a copy under lock. Updated `NDSimulation.PostSolveStep` to use `GetSynapsesSnapshot()` for safe iteration on the solver thread.</span>
 
 ---
 

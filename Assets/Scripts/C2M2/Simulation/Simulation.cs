@@ -190,36 +190,46 @@ namespace C2M2.Simulation
             PreSolve();
 
             GameManager.instance.solveBarrier.AddParticipant();
-            DateTime startStepTime = DateTime.Now;
-            currentTimeStep = 0;
-            while (currentTimeStep < nT)
+            try
             {
-                if (!GameManager.instance.simulationManager.Paused && !GameManager.instance.Loading)
+                DateTime startStepTime = DateTime.Now;
+                currentTimeStep = 0;
+                while (currentTimeStep < nT)
                 {
-                    PreSolveStep(currentTimeStep);
+                    if (!GameManager.instance.simulationManager.Paused && !GameManager.instance.Loading)
+                    {
+                        PreSolveStep(currentTimeStep);
 
-                    solveStepSampler.Begin();
-                    SolveStep(currentTimeStep);
-                    solveStepSampler.End();
+                        solveStepSampler.Begin();
+                        SolveStep(currentTimeStep);
+                        solveStepSampler.End();
 
-                    PostSolveStep(currentTimeStep);
-                    
-                    currentTimeStep++;
+                        PostSolveStep(currentTimeStep);
+
+                        currentTimeStep++;
+                    }
+
+                    GameManager.instance.solveBarrier.SignalAndWait();
+                    float timeChange = (float)(DateTime.Now - startStepTime).TotalSeconds;
+                    resourceUsage = timeChange / minTimeStep;
+                    if (resourceUsage < 1)
+                    {
+                        int millisecondsToWait = (int)(1000 * (minTimeStep-timeChange));
+                        await Task.Delay(millisecondsToWait);
+                    }
+                    if (cts.Token.IsCancellationRequested) break;
+                    startStepTime = DateTime.Now;
                 }
-                
-                GameManager.instance.solveBarrier.SignalAndWait();
-                float timeChange = (float)(DateTime.Now - startStepTime).TotalSeconds;
-                resourceUsage = timeChange / minTimeStep;
-                if (resourceUsage < 1)
-                {
-                    int millisecondsToWait = (int)(1000 * (minTimeStep-timeChange));
-                    await Task.Delay(millisecondsToWait);
-                }
-                if (cts.Token.IsCancellationRequested) break;
-                startStepTime = DateTime.Now;
             }
-            GameManager.instance.solveBarrier.RemoveParticipant();
-            cts.Dispose();
+            catch (Exception ex)
+            {
+                GameManager.instance.DebugLogErrorSafe("Solver thread crashed: " + ex.ToString());
+            }
+            finally
+            {
+                GameManager.instance.solveBarrier.RemoveParticipant();
+                cts.Dispose();
+            }
 
             PostSolve();
 

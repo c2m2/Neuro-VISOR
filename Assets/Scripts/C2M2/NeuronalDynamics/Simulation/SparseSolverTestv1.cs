@@ -196,7 +196,11 @@ namespace C2M2.NeuronalDynamics.Simulation
                     // perform a rank1 update solve to properly update with added dirichelet boundary conditions
                     // from a raycast, or voltage clamp. This is done because with a voltage clamp you are imposing
                     // a dirichelet B.C. which requires solving an updated diffusion problem with identity rows.
-                    U_Active = Vector.Build.DenseOfVector(DircheletRank1UpdateSolve(newVal));
+                    Vector result = DircheletRank1UpdateSolve(newVal);
+                    lock (visualizationValuesLock)
+                    {
+                        U_Active = Vector.Build.DenseOfVector(result);
+                    }
                 }
             }
         }
