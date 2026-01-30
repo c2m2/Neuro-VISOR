@@ -18,6 +18,8 @@ namespace C2M2.NeuronalDynamics.Interaction
 
         private void OnDestroy()
         {
+            if (GameManager.isQuitting) return;
+
             foreach (NeuronClamp clamp in clamps)
             {
                 Destroy(clamp);

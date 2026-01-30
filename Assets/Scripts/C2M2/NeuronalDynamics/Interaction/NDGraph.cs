@@ -26,6 +26,7 @@ public class NDGraph : NDInteractables
 
     private void OnDestroy()
     {
+        if (GameManager.isQuitting) return;
         GraphManager.graphs.Remove(this);
     }
 

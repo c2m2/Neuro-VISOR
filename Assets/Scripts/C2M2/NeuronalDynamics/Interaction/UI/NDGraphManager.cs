@@ -22,6 +22,8 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
 
         private void OnDestroy()
         {
+            if (GameManager.isQuitting) return;
+
             foreach(NDGraph graph in graphs)
             {
                 graph.ndlinegraph.DestroyPlot();

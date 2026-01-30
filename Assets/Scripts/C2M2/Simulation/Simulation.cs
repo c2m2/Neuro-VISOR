@@ -182,6 +182,8 @@ namespace C2M2.Simulation
 
         protected void OnDestroy()
         {
+            if (GameManager.isQuitting) return;
+
             StopCoroutine("UpdateVisualizationStep");
             StopSimulation();
 
