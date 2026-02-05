@@ -17,7 +17,7 @@ public class ArrowUpdate : MonoBehaviour
     [SerializeField] private Transform arrowBody;
     [SerializeField] private Transform arrowHead;
 
-    [Header("Disk mode")]
+    [Header("Terminal mode")]
     [SerializeField] private GameObject diskComponents;
     [SerializeField] private Transform body1;
     [SerializeField] private Transform body2;
@@ -37,7 +37,7 @@ public class ArrowUpdate : MonoBehaviour
     private VisualMode mode;
 
 
-    Vector3 _p1;
+    Vector3 _p_pre;
     Vector3 _direction;
     float _fullLength;
     float _r_pre;
@@ -71,15 +71,15 @@ public class ArrowUpdate : MonoBehaviour
 
         nameField.text = pre.currentModel.Value.getModelName();
 
-        Vector3 p1 = preSynapse.position;
-        Vector3 p2 = postSynapse.position;
-        Vector3 direction = (p2 - p1).normalized;
-        float fullLength = Vector3.Distance(p1, p2);
+        Vector3 p_pre = preSynapse.position;
+        Vector3 p_post = postSynapse.position;
+        Vector3 direction = (p_post - p_pre).normalized;
+        float fullLength = Vector3.Distance(p_pre, p_post);
 
         float r_pre = GetVisualRadius(preSynapse);
         float r_post = GetVisualRadius(postSynapse);
 
-        _p1 = p1;
+        _p_pre = p_pre;
         _direction = direction;
         _fullLength = fullLength;
         _r_pre = r_pre;
@@ -92,23 +92,25 @@ public class ArrowUpdate : MonoBehaviour
             float arrowBodyStart = 0f;
             float arrowBodyEnd = 0.8f;
             UpdateBodySegment(arrowBody, arrowBodyStart, arrowBodyEnd);
-            UpdateArrowhead(p1, direction, fullLength);
+            UpdateArrowhead(p_pre, direction, fullLength);
         }
 
 
         if (mode == VisualMode.Disk)
         {
-            float cleftPosition1 = 0.6f;
-            float cleftPosition2 = 0.8f;
+            float cleftPosition1Start = 0f;
+            float cleftPosition1End = 0.6f;
+            float cleftPosition2Start = 0.8f;
+            float cleftPosition2End = 1f;
 
-            float radius = r_pre + (r_post - r_pre) * (cleftPosition1 + cleftPosition2) * 0.5f;
+            float radius = r_pre + (r_post - r_pre) * (cleftPosition1Start + cleftPosition2End) * 0.5f;
 
-            UpdateBodySegment(body1, 0f, cleftPosition1);
-            UpdateBodySegment(body2, cleftPosition2, 1f);
+            UpdateBodySegment(body1, cleftPosition1Start, cleftPosition1End);
+            UpdateBodySegment(body2, cleftPosition2Start, cleftPosition2End);
 
 
-            Vector3 pos1 = PositionAlongArrow(p1, p2, cleftPosition1);
-            Vector3 pos2 = PositionAlongArrow(p1, p2, cleftPosition2);
+            Vector3 pos1 = PositionAlongArrow(p_pre, p_post, cleftPosition1End);
+            Vector3 pos2 = PositionAlongArrow(p_pre, p_post, cleftPosition2Start);
 
 
             UpdateDisk(disk1, pos1, direction, radius, fullLength);
@@ -119,7 +121,7 @@ public class ArrowUpdate : MonoBehaviour
         }
 
         UpdateMaterial();
-        UpdateLabel(p1, p2, r_pre, r_post);
+        UpdateLabel(p_pre, p_post, r_pre, r_post);
     }
 
     public void SetMode(VisualMode newMode)
@@ -173,7 +175,7 @@ public class ArrowUpdate : MonoBehaviour
             arrowBody.GetComponent<MeshRenderer>().material = textMaterial;
             arrowHead.GetComponent<MeshRenderer>().material = typeMaterial;
         }
-        else // Disk mode
+        else // Terminal mode
         {
             body1.GetComponent<MeshRenderer>().material = textMaterial;
             body2.GetComponent<MeshRenderer>().material = textMaterial;
@@ -184,20 +186,24 @@ public class ArrowUpdate : MonoBehaviour
 
     }
 
-    void UpdateLabel(Vector3 p1, Vector3 p2, float r_pre, float r_post)
+    void UpdateLabel(Vector3 p_pre, Vector3 p_post, float r_pre, float r_post)
     {
-        Vector3 midpoint = (p1 + p2) * 0.5f;
+        Vector3 midpoint = (p_pre + p_post) * 0.5f;
         midpoint.y += r_pre + r_post * 0.6f;
         nameField.fontSize = r_pre + r_post * 15f;
         nameField.transform.position = midpoint;
     }
 
+    // This is a linear interpolation between two given radii. The mesh's original vertices are stored and a copy is created to avoid applying the interpolation to each instance,
+    // keeping it on a per-instance basis. Each of its vertices are looped through, and its x and y coordinates are are adjusted to fit the linear interpolation.
+
+    // UV tiling is also in here... this needs to be hashed out. Maintain aspect ratio. It should just be moved to a new method. 
     void UpdateBodySegment(Transform body, float startLocation, float endLocation)
     {
         float segmentLength = (endLocation - startLocation) * _fullLength;
 
         float relativeMidpoint = (startLocation + endLocation) * 0.5f;
-        Vector3 segmentMidpoint = _p1 + _direction * (relativeMidpoint * _fullLength);
+        Vector3 segmentMidpoint = _p_pre + _direction * (relativeMidpoint * _fullLength);
 
         MeshFilter mf = body.GetComponent<MeshFilter>();
         Mesh mesh = mf.mesh;
@@ -261,13 +267,13 @@ public class ArrowUpdate : MonoBehaviour
         main.startSize = particleSize;
     }
 
-    Vector3 PositionAlongArrow(Vector3 p1, Vector3 p2, float t)
+    Vector3 PositionAlongArrow(Vector3 p_pre, Vector3 p_post, float s)
     {
-        return Vector3.Lerp(p1, p2, t);
+        return Vector3.Lerp(p_pre, p_post, s);
     }
 
 
-    void UpdateArrowhead(Vector3 p1, Vector3 direction, float fullLength)
+    void UpdateArrowhead(Vector3 p_pre, Vector3 direction, float fullLength)
     {
         float arrowBodyLength = fullLength * 0.8f;
         float coneLength = fullLength - arrowBodyLength;
@@ -277,7 +283,7 @@ public class ArrowUpdate : MonoBehaviour
         float rShaft = Mathf.Lerp(r_pre, r_post, 0.8f); //the width of the arrowhead is rShaft * coneWidth
         float coneWidth = 3f;
 
-        Vector3 arrowBodyEnd = p1 + direction * arrowBodyLength;
+        Vector3 arrowBodyEnd = p_pre + direction * arrowBodyLength;
         Vector3 coneMidpoint = arrowBodyEnd + direction * (coneLength * 0.5f);
 
         arrowHead.position = coneMidpoint;
