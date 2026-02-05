@@ -36,7 +36,6 @@ public class ArrowUpdate : MonoBehaviour
     private static VisualMode globalMode = VisualMode.Arrow;
     private VisualMode mode;
 
-
     Vector3 _p_pre;
     Vector3 _direction;
     float _fullLength;
@@ -45,8 +44,7 @@ public class ArrowUpdate : MonoBehaviour
 
 
 
-    //TODO: rename r_pre/r_post to r_pre and r_post
-    //TODO: direction vs length 
+    //TODO: rename body to shaft?
     void Start()
     {
         // In UpdateBodySegment(), the vertices of the cylinder mesh are deformed to interpolate the mesh's y-axis between the radii of the the pre and post synapses
@@ -56,7 +54,6 @@ public class ArrowUpdate : MonoBehaviour
         originalMesh = Instantiate(meshFilter.sharedMesh);
         meshFilter.mesh = originalMesh;
 
-        //mode = globalMode;
         SetGlobalMode(globalMode);
     }
 
@@ -79,6 +76,7 @@ public class ArrowUpdate : MonoBehaviour
         float r_pre = GetVisualRadius(preSynapse);
         float r_post = GetVisualRadius(postSynapse);
 
+        // These are all to cache local variables and invoke in other methods. 
         _p_pre = p_pre;
         _direction = direction;
         _fullLength = fullLength;
@@ -88,11 +86,13 @@ public class ArrowUpdate : MonoBehaviour
 
         if (mode == VisualMode.Arrow)
         {
-            // a single continuous body from 0.0 to 0.8
+            // The arrow contains a single continuous body that goes from 0 to 0.8. 
             float arrowBodyStart = 0f;
             float arrowBodyEnd = 0.8f;
             UpdateBodySegment(arrowBody, arrowBodyStart, arrowBodyEnd);
-            UpdateArrowhead(p_pre, direction, fullLength);
+
+            // The arrowhead starts where the arrow body ends and ends at 1. 
+            UpdateArrowhead(arrowBodyEnd, 1f);
         }
 
 
@@ -273,22 +273,17 @@ public class ArrowUpdate : MonoBehaviour
     }
 
 
-    void UpdateArrowhead(Vector3 p_pre, Vector3 direction, float fullLength)
+    void UpdateArrowhead(float startS, float endS)
     {
-        float arrowBodyLength = fullLength * 0.8f;
-        float coneLength = fullLength - arrowBodyLength;
+        float arrowHeadLength = (endS - startS) * _fullLength;
+        float rShaft = Mathf.Lerp(_r_pre, _r_post, startS);
+        float coneWidthMultiplier = 3f;
+        float arrowHeadCenter = 0.5f * (startS + endS);
+        Vector3 arrowHeadMidpoint = _p_pre + _direction * (arrowHeadCenter * _fullLength);
 
-        float r_pre = GetVisualRadius(preSynapse);
-        float r_post = GetVisualRadius(postSynapse);
-        float rShaft = Mathf.Lerp(r_pre, r_post, 0.8f); //the width of the arrowhead is rShaft * coneWidth
-        float coneWidth = 3f;
-
-        Vector3 arrowBodyEnd = p_pre + direction * arrowBodyLength;
-        Vector3 coneMidpoint = arrowBodyEnd + direction * (coneLength * 0.5f);
-
-        arrowHead.position = coneMidpoint;
-        arrowHead.up = direction;
-        arrowHead.localScale = new Vector3(rShaft * coneWidth, coneLength * 0.5f, rShaft * coneWidth);
+        arrowHead.position = arrowHeadMidpoint;
+        arrowHead.up = _direction;
+        arrowHead.localScale = new Vector3(rShaft * coneWidthMultiplier, arrowHeadLength * 0.5f, rShaft * coneWidthMultiplier);
     }
 
 
