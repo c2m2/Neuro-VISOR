@@ -148,7 +148,7 @@ namespace C2M2
             /// <summary> Rescale each member of an array from (oldMin, oldMax) to (newMin, newMax) </summary>
             public static void RescaleArray(this float[] array, float newMin, float newMax, float oldMin, float oldMax)
             {              
-                if (oldMin == 0 && oldMax == 0)
+                if (oldMin == oldMax)
                 { // We cant divide by 0
                     return;
                 }
