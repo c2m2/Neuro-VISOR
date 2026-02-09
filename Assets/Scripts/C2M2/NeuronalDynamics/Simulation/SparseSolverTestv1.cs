@@ -650,16 +650,16 @@ namespace C2M2.NeuronalDynamics.Simulation
             {
                 double da = d_alpha[i];
 
-                if (Math.Abs(da) < 1e-6)
+                if (System.Math.Abs(da) < 1e-6)
                 {
                     // limit form
                     alpha[i] = 1e3 * -0.032 /
-                            ((-1.0 / 5.0) * Math.Exp(-da / 5.0));
+                            ((-1.0 / 5.0) * System.Math.Exp(-da / 5.0));
                 }
                 else
                 {
                     alpha[i] = 1e3 * -0.032 * da /
-                            (Math.Exp(-da / 5.0) - 1.0);
+                            (System.Math.Exp(-da / 5.0) - 1.0);
                 }
             }
 
@@ -704,16 +704,16 @@ namespace C2M2.NeuronalDynamics.Simulation
             {
                 double da = d_alpha[i];
 
-                if (Math.Abs(da) < 1e-6)
+                if (System.Math.Abs(da) < 1e-6)
                 {
                     // limit form
                     alpha[i] = -1e3 * 0.32 /
-                            ((-1.0 / 4.0) * Math.Exp(-da / 4.0));
+                            ((-1.0 / 4.0) * System.Math.Exp(-da / 4.0));
                 }
                 else
                 {
                     alpha[i] = -1e3 * 0.32 * da /
-                            (Math.Exp(-da / 4.0) - 1.0);
+                            (System.Math.Exp(-da / 4.0) - 1.0);
                 }
             }
 
@@ -742,16 +742,16 @@ namespace C2M2.NeuronalDynamics.Simulation
             {
                 double db = d_beta[i];
 
-                if (Math.Abs(db) < 1e-6)
+                if (System.Math.Abs(db) < 1e-6)
                 {
                     // limit form
                     beta[i] = 1e3 * 0.28 /
-                            ((1.0 / 5.0) * Math.Exp(db / 5.0));
+                            ((1.0 / 5.0) * System.Math.Exp(db / 5.0));
                 }
                 else
                 {
                     beta[i] = 1e3 * 0.28 * db /
-                            (Math.Exp(db / 5.0) - 1.0);
+                            (System.Math.Exp(db / 5.0) - 1.0);
                 }
             }
 
