@@ -99,7 +99,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// <summary>
         /// [V] threshold voltage
         /// </summary>
-        private double Vt = -50.0 * 1.0E-3;
+        private static double Vt = -50.0 * 1.0E-3;
         /// <summary>
         /// [] potassium channel state probability, unitless
         /// </summary>
