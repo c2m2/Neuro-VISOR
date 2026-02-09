@@ -53,6 +53,7 @@ namespace C2M2
         public Gradient defaultGradient;
         public List<Interactable> activeSims = new List<Interactable>();
         public readonly object activeSimsLock = new object();
+        public static bool isQuitting { get; private set; } = false;
         public GameObject clampManagerPrefab = null;
         public GameObject clampManagerL = null;
         public GameObject clampManagerR = null;
@@ -192,6 +193,7 @@ namespace C2M2
 
         private void OnApplicationQuit()
         {
+            isQuitting = true;
             isRunning = false;
         }
         private void OnApplicationPause(bool pause)

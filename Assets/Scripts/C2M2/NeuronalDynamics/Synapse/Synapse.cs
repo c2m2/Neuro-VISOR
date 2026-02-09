@@ -55,6 +55,7 @@ public class Synapse : NDInteractables
 
     private void OnDestroy()
     {
+        if (GameManager.isQuitting) return;
         if (isBeingDestroyed) return;
         isBeingDestroyed = true;
         var manager = SynapseManager;

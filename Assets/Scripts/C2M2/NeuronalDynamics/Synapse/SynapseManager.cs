@@ -39,6 +39,8 @@ public class SynapseManager : NDInteractablesManager<Synapse>
 
     private void OnDestroy()
     {
+        if (GameManager.isQuitting) return;
+
         lock (synapseLock)
         {
             foreach ((Synapse, Synapse) synapsePair in synapses)

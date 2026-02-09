@@ -87,6 +87,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         }
         private void OnDestroy()
         {
+            if (GameManager.isQuitting) return;
             lock (simulation.clampLock) ClampManager.clamps.Remove(this);
         }
         #endregion

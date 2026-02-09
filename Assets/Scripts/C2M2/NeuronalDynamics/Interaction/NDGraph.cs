@@ -1,4 +1,5 @@
-﻿using C2M2.Interaction;
+﻿using C2M2;
+using C2M2.Interaction;
 using C2M2.NeuronalDynamics.Interaction.UI;
 using UnityEngine;
 
@@ -26,6 +27,7 @@ public class NDGraph : NDInteractables
 
     private void OnDestroy()
     {
+        if (GameManager.isQuitting) return;
         GraphManager.graphs.Remove(this);
     }
 
