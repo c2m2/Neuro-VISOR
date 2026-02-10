@@ -281,7 +281,7 @@ public static class OVRNodeStateProperties
 			return currentDisplaySubsystem.running;				//In 2019.3, this should be changed to currentDisplaySubsystem.isConnected, but this is a fine placeholder for now.
 		return false;
 #else
-		return Device.isPresent;
+		return false;
 #endif
 	}
 
