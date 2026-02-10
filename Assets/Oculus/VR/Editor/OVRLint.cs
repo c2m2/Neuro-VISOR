@@ -361,7 +361,7 @@ public class OVRLint : EditorWindow
 		}
 #endif
 
-#if UNITY_2017_3_OR_NEWER && !UNITY_ANDROID
+#if UNITY_2017_3_OR_NEWER && !UNITY_ANDROID && !UNITY_2020_1_OR_NEWER
 		if (!PlayerSettings.VROculus.dashSupport)
 		{
 			AddFix("Enable Dash Integration", "We recommend to enable Dash Integration for better user experience.", delegate (UnityEngine.Object obj, bool last, int selected)
