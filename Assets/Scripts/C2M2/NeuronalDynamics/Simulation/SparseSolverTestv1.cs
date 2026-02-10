@@ -373,6 +373,10 @@ namespace C2M2.NeuronalDynamics.Simulation
             explicitUpdate(H, Hpre, fS(H, ah(U_Active), bh(U_Active)), fS(Hpre, ah(Upre), bh(Upre)), timeStep, 1);
             Hpre = tempState.Clone();
 
+            N.Map(x => System.Math.Clamp(x, 0.0, 1.0), N);
+            M.Map(x => System.Math.Clamp(x, 0.0, 1.0), M);
+            H.Map(x => System.Math.Clamp(x, 0.0, 1.0), H);
+
             Upre = U_Active.Clone();
             U_Active.SetSubVector(0, Neuron.nodes.Count, Vector.Build.DenseOfArray(b));
         }
