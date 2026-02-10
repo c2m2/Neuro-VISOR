@@ -25,7 +25,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         public string solverName = "C2M2.NeuronalDynamics.Simulation.SparseSolverTestv1";
         private SomaPositionCalculator calculator = null; // Placeholder default calculator
         public string vrnFileName { get; set; } = "null";
-        public float globalMin = float.PositiveInfinity;
+        public float globalMin = -0.1f;
         public float globalMax = float.NegativeInfinity;
         public string lengthScale = "μm";
         public int refinementLevel = 0;
