@@ -51,9 +51,8 @@ namespace C2M2.NeuronalDynamics.Visualization
             //if vrnFileName is not in dictionary then do the rest
             //if (!(Placed.neuron.Contains(vrnFileName))) ;
 
-            char sl = Path.DirectorySeparatorChar;
             if (!vrnFileName.EndsWith(".vrn")) vrnFileName = vrnFileName + ".vrn";
-            vrnReader = new VrnReader(Application.streamingAssetsPath + sl + "NeuronalDynamics" + sl + "Geometries" + sl + vrnFileName);
+            vrnReader = new VrnReader(Path.Combine(Application.streamingAssetsPath, "NeuronalDynamics", "Geometries", vrnFileName));
 
             refinements = vrnReader.ListRefinements();
 

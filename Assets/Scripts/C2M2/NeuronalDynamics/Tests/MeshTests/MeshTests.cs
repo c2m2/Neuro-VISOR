@@ -191,8 +191,7 @@ namespace C2M2.NeuronalDynamics.Tests
 	    private string[] GetCellFiles ( in string hhCellFolder, in string activeCellFolder ) {
 		string[] cells = new string[3];
 
-		char slash = Path.DirectorySeparatorChar;
-		string cellPath = Application.streamingAssetsPath + slash + hhCellFolder + slash + activeCellFolder + slash;
+		string cellPath = Path.Combine(Application.streamingAssetsPath, hhCellFolder, activeCellFolder) + "/";
 		// Only take the first cell found
 		cellPath = Directory.GetDirectories ( cellPath ) [0];
 

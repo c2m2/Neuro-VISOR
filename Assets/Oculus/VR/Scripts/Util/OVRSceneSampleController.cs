@@ -145,7 +145,7 @@ public class OVRSceneSampleController : MonoBehaviour
 #if UNITY_2017_2_OR_NEWER
 			UnityEngine.XR.XRSettings.showDeviceView = !UnityEngine.XR.XRSettings.showDeviceView;
 #else
-			UnityEngine.VR.VRSettings.showDeviceView = !UnityEngine.VR.VRSettings.showDeviceView;
+			UnityEngine.XR.XRSettings.showDeviceView = !UnityEngine.XR.XRSettings.showDeviceView;
 #endif
 
 #if !UNITY_ANDROID || UNITY_EDITOR

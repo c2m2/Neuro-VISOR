@@ -66,8 +66,7 @@ namespace C2M2
                 string timerInfo = ToStringPlus();
          
                 CSVBuilder csv = new CSVBuilder();
-                char separator = System.IO.Path.DirectorySeparatorChar;
-                string filePath = Application.dataPath + separator + "TimerResults" + separator + newFileName;
+                string filePath = System.IO.Path.Combine(Application.dataPath, "TimerResults", newFileName);
                 csv.ExportCSV(timerInfo, filePath, overwrite: true);
             }
 

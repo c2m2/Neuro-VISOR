@@ -26,13 +26,13 @@ using Node = UnityEngine.XR.XRNode;
 using NodeState = UnityEngine.XR.XRNodeState;
 using Settings = UnityEngine.XR.XRSettings;
 #elif UNITY_2017_1_OR_NEWER
-using InputTracking = UnityEngine.VR.InputTracking;
-using Node = UnityEngine.VR.VRNode;
-using NodeState = UnityEngine.VR.VRNodeState;
-using Settings = UnityEngine.VR.VRSettings;
+using InputTracking = UnityEngine.XR.InputTracking;
+using Node = UnityEngine.XR.XRNode;
+using NodeState = UnityEngine.XR.XRNodeState;
+using Settings = UnityEngine.XR.XRSettings;
 #else
-using Node = UnityEngine.VR.VRNode;
-using Settings = UnityEngine.VR.VRSettings;
+using Node = UnityEngine.XR.XRNode;
+using Settings = UnityEngine.XR.XRSettings;
 #endif
 
 /// <summary>
@@ -163,11 +163,11 @@ public class OVRDisplay
 #if UNITY_2017_2_OR_NEWER
         UnityEngine.XR.InputTracking.Recenter();
 #else
-		UnityEngine.VR.InputTracking.Recenter();
+		UnityEngine.XR.InputTracking.Recenter();
 #endif
 
 		// The current poses are cached for the current frame and won't be updated immediately
-		// after UnityEngine.VR.InputTracking.Recenter(). So we need to wait until next frame
+		// after UnityEngine.XR.InputTracking.Recenter(). So we need to wait until next frame
 		// to trigger the RecenteredPose delegate. The application could expect the correct pose
 		// when the RecenteredPose delegate get called.
 		recenterRequested = true;
@@ -251,7 +251,7 @@ public class OVRDisplay
 #if UNITY_2017_2_OR_NEWER
     public EyeRenderDesc GetEyeRenderDesc(UnityEngine.XR.XRNode eye)
 #else
-	public EyeRenderDesc GetEyeRenderDesc(UnityEngine.VR.VRNode eye)
+	public EyeRenderDesc GetEyeRenderDesc(UnityEngine.XR.XRNode eye)
 #endif
 	{
 		return eyeDescs[(int)eye];
@@ -343,15 +343,15 @@ public class OVRDisplay
 		ConfigureEyeDesc(UnityEngine.XR.XRNode.LeftEye);
         ConfigureEyeDesc(UnityEngine.XR.XRNode.RightEye);
 #else
-		ConfigureEyeDesc(UnityEngine.VR.VRNode.LeftEye);
-		ConfigureEyeDesc(UnityEngine.VR.VRNode.RightEye);
+		ConfigureEyeDesc(UnityEngine.XR.XRNode.LeftEye);
+		ConfigureEyeDesc(UnityEngine.XR.XRNode.RightEye);
 #endif
 	}
 
 #if UNITY_2017_2_OR_NEWER
     private void ConfigureEyeDesc(UnityEngine.XR.XRNode eye)
 #else
-	private void ConfigureEyeDesc(UnityEngine.VR.VRNode eye)
+	private void ConfigureEyeDesc(UnityEngine.XR.XRNode eye)
 #endif
 	{
 		if (!OVRManager.isHmdPresent)

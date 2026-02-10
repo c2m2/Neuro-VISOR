@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.XR;
+using System.Collections.Generic;
 
 namespace C2M2.Interaction.VR
 {
@@ -46,18 +47,26 @@ namespace C2M2.Interaction.VR
 
         private void CheckForVRDevice()
         {
-            // Get VR device (or lack of one)
-            // Note: in Unity 2019.4 XRDevice.model is obsolete but still works.
-            InputDevice inputDevice = new InputDevice();
-            Debug.Log("VR Device Name: " + inputDevice.name);
-            VRDevice = XRDevice.model;
+            // Get VR device (or lack of one) via InputDevices API
+            var headDevices = new List<InputDevice>();
+            InputDevices.GetDevicesAtXRNode(XRNode.Head, headDevices);
+            if (headDevices.Count > 0)
+            {
+                VRDevice = headDevices[0].name;
+                Debug.Log("VR Device Name: " + VRDevice);
+            }
+            else
+            {
+                VRDevice = string.Empty;
+                Debug.Log("No VR device found.");
+            }
         }
 
         private void SwitchState(bool vrActive)
         {
             VRActive = vrActive;
 
-            XRSettings.enabled = vrActive;
+            // XRSettings.enabled is removed in Unity 6; XR is managed by XR Plugin Management
 
             vrController.SetActive(vrActive);
             desktopController.SetActive(!vrActive);

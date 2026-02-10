@@ -22,7 +22,7 @@ using System.Runtime.InteropServices;
 #if UNITY_2017_2_OR_NEWER
 using Settings = UnityEngine.XR.XRSettings;
 #else
-using Settings = UnityEngine.VR.VRSettings;
+using Settings = UnityEngine.XR.XRSettings;
 #endif
 
 /// <summary>
@@ -184,13 +184,13 @@ public class OVROverlay : MonoBehaviour
 #if UNITY_2017_2_OR_NEWER
 	public void OverrideOverlayTextureInfo(Texture srcTexture, IntPtr nativePtr, UnityEngine.XR.XRNode node)
 #else
-	public void OverrideOverlayTextureInfo(Texture srcTexture, IntPtr nativePtr, UnityEngine.VR.VRNode node)
+	public void OverrideOverlayTextureInfo(Texture srcTexture, IntPtr nativePtr, UnityEngine.XR.XRNode node)
 #endif
 	{
 #if UNITY_2017_2_OR_NEWER
 		int index = (node == UnityEngine.XR.XRNode.RightEye) ? 1 : 0;
 #else
-		int index = (node == UnityEngine.VR.VRNode.RightEye) ? 1 : 0;
+		int index = (node == UnityEngine.XR.XRNode.RightEye) ? 1 : 0;
 #endif
 
 		if (textures.Length <= index)

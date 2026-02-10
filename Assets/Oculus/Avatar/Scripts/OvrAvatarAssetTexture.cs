@@ -36,12 +36,12 @@ public class OvrAvatarAssetTexture : OvrAvatarAsset
                 format = TextureFormat.DXT5;
                 break;
             case ovrAvatarTextureFormat.ASTC_RGB_6x6:
-                format = TextureFormat.ASTC_RGB_6x6;
+                format = TextureFormat.ASTC_6x6;
                 textureData = new IntPtr(textureData.ToInt64() + ASTCHeaderSize);
                 textureDataSize -= ASTCHeaderSize;
                 break;
             case ovrAvatarTextureFormat.ASTC_RGB_6x6_MIPMAPS:
-                format = TextureFormat.ASTC_RGB_6x6;
+                format = TextureFormat.ASTC_6x6;
                 break;
             default:
                 throw new NotImplementedException(

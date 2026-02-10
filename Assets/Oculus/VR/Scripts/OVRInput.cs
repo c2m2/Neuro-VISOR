@@ -25,9 +25,9 @@ using InputTracking = UnityEngine.XR.InputTracking;
 using Node = UnityEngine.XR.XRNode;
 using Settings = UnityEngine.XR.XRSettings;
 #else
-using InputTracking = UnityEngine.VR.InputTracking;
-using Node = UnityEngine.VR.VRNode;
-using Settings = UnityEngine.VR.VRSettings;
+using InputTracking = UnityEngine.XR.InputTracking;
+using Node = UnityEngine.XR.XRNode;
+using Settings = UnityEngine.XR.XRSettings;
 #endif
 
 /// <summary>
@@ -310,7 +310,7 @@ public static class OVRInput
 			new OVRControllerLHand(),
 			new OVRControllerRHand(),
 #elif UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX
-			new OVRControllerGamepadMac(),
+			// OVRControllerGamepadMac requires a native plugin without arm64 support; skip it
 #else
 			new OVRControllerGamepadPC(),
 			new OVRControllerTouch(),

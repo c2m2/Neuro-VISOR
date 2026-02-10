@@ -348,7 +348,7 @@ namespace C2M2
                     if (data.graphs.Length > 0)
                     {
                         graphM = sim.graphManager;
-                        GameObject graphPrefab = Resources.Load("Prefabs" + Path.DirectorySeparatorChar + "NeuronalDynamics" + Path.DirectorySeparatorChar + "NDLineGraph") as GameObject;
+                        GameObject graphPrefab = Resources.Load("Prefabs/NeuronalDynamics/NDLineGraph") as GameObject;
                         for (int j = 0; j < data.graphs.Length; j++)
                         {
                             var graphObj = Instantiate(graphPrefab);

@@ -39,7 +39,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
 
         private string basePath = Application.streamingAssetsPath;
         public string extension = ".txt";
-        public string subPath = Path.DirectorySeparatorChar + "Gradients";
+        public string subPath = "/Gradients";
 
         public void NextGrad()
         {
@@ -125,17 +125,8 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
 
         private void ReadGradients()
         {
-            if(Application.platform == RuntimePlatform.OSXPlayer || Application.platform == RuntimePlatform.OSXEditor)
-            {
-                subPath = Path.AltDirectorySeparatorChar + "Gradients";
-
-            }
             // Find gradient files in gradient directory
-            DirectoryInfo d = new DirectoryInfo(basePath + subPath + Path.DirectorySeparatorChar);
-            if (Application.platform == RuntimePlatform.OSXPlayer || Application.platform == RuntimePlatform.OSXEditor)
-            {
-                d = new DirectoryInfo(basePath + subPath + Path.AltDirectorySeparatorChar);
-            }
+            DirectoryInfo d = new DirectoryInfo(Path.Combine(basePath, "Gradients"));
             FileInfo[] files = d.GetFiles("*" + extension);
 
             if (files.Length > 0)
@@ -153,14 +144,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
                 // Read requested gradietns
                 for(int i = 0; i < readNames.Length; i++)
                 {
-                    if (Application.platform == RuntimePlatform.OSXPlayer || Application.platform == RuntimePlatform.OSXEditor)
-                    {
-                        readGrads[i] = ReadGradient.Read(basePath + subPath + Path.AltDirectorySeparatorChar + readNames[i] + extension);
-                    }
-                    else
-                    {
-                        readGrads[i] = ReadGradient.Read(basePath + subPath + Path.DirectorySeparatorChar + readNames[i] + extension);
-                    }
+                    readGrads[i] = ReadGradient.Read(Path.Combine(basePath, "Gradients", readNames[i] + extension));
                 }
 
                 // Merge read gradients and manually given gradients

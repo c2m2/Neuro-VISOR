@@ -37,8 +37,8 @@ namespace C2M2.Interaction.VR
             Rigidbody rb = raycastTargetObject.AddComponent<Rigidbody>();
             rb.useGravity = false;
             rb.isKinematic = true;
-            rb.angularDrag = Mathf.Infinity;
-            rb.drag = Mathf.Infinity;
+            rb.angularDamping = Mathf.Infinity;
+            rb.linearDamping = Mathf.Infinity;
             return rb;
         }
 

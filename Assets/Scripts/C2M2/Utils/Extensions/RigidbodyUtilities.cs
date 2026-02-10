@@ -9,8 +9,8 @@ namespace C2M2
         {
             public static void SetDefaultState(this Rigidbody rb)
             {
-                rb.drag = Mathf.Infinity;
-                rb.angularDrag = Mathf.Infinity;
+                rb.linearDamping = Mathf.Infinity;
+                rb.angularDamping = Mathf.Infinity;
                 rb.isKinematic = true;
                 rb.useGravity = false;
             }

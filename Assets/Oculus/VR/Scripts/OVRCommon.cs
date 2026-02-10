@@ -34,14 +34,14 @@ using Node = UnityEngine.XR.XRNode;
 using NodeState = UnityEngine.XR.XRNodeState;
 using Device = UnityEngine.XR.XRDevice;
 #elif UNITY_2017_1_OR_NEWER
-using InputTracking = UnityEngine.VR.InputTracking;
-using Node = UnityEngine.VR.VRNode;
-using NodeState = UnityEngine.VR.VRNodeState;
-using Device = UnityEngine.VR.VRDevice;
+using InputTracking = UnityEngine.XR.InputTracking;
+using Node = UnityEngine.XR.XRNode;
+using NodeState = UnityEngine.XR.XRNodeState;
+using Device = UnityEngine.XR.XRDevice;
 #else
-using InputTracking = UnityEngine.VR.InputTracking;
-using Node = UnityEngine.VR.VRNode;
-using Device = UnityEngine.VR.VRDevice;
+using InputTracking = UnityEngine.XR.InputTracking;
+using Node = UnityEngine.XR.XRNode;
+using Device = UnityEngine.XR.XRDevice;
 #endif
 
 /// <summary>
@@ -281,7 +281,7 @@ public static class OVRNodeStateProperties
 			return currentDisplaySubsystem.running;				//In 2019.3, this should be changed to currentDisplaySubsystem.isConnected, but this is a fine placeholder for now.
 		return false;
 #else
-		return Device.isPresent;
+		return false;
 #endif
 	}
 
