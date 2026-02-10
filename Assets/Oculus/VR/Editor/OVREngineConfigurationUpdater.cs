@@ -184,7 +184,7 @@ class OVREngineConfigurationUpdater
 #if UNITY_2017_2_OR_NEWER
 				foreach (var device in UnityEngine.XR.XRSettings.supportedDevices)
 #else
-				foreach (var device in UnityEngine.VR.VRSettings.supportedDevices)
+				foreach (var device in UnityEngine.XR.XRSettings.supportedDevices)
 #endif
 					oculusFound |= (device == "Oculus");
 

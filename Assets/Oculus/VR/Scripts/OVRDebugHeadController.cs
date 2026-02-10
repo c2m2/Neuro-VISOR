@@ -87,7 +87,7 @@ public class OVRDebugHeadController : MonoBehaviour
 #if UNITY_2017_2_OR_NEWER
 		if ( !UnityEngine.XR.XRDevice.isPresent && ( AllowYawLook || AllowPitchLook ) )
 #else
-		if ( !UnityEngine.VR.VRDevice.isPresent && ( AllowYawLook || AllowPitchLook ) )
+		if ( !UnityEngine.XR.XRDevice.isPresent && ( AllowYawLook || AllowPitchLook ) )
 #endif
 		{
 			Quaternion r = transform.rotation;

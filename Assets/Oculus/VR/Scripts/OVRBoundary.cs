@@ -18,7 +18,7 @@ permissions and limitations under the License.
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using VR = UnityEngine.VR;
+using VR = UnityEngine.XR;
 using System.Runtime.InteropServices;
 #if UNITY_2017_2_OR_NEWER
 using Boundary = UnityEngine.Experimental.XR.Boundary;
