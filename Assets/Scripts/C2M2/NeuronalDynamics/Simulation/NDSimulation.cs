@@ -96,9 +96,8 @@ namespace C2M2.NeuronalDynamics.Simulation {
             {
                 if (vrnReader == null)
                 {
-                    char sl = Path.DirectorySeparatorChar;
                     if (!vrnFileName.EndsWith(".vrn")) vrnFileName = vrnFileName + ".vrn";
-                    vrnReader = new VrnReader(Application.streamingAssetsPath + sl + "NeuronalDynamics" + sl + "Geometries" + sl + vrnFileName);
+                    vrnReader = new VrnReader(Path.Combine(Application.streamingAssetsPath, "NeuronalDynamics", "Geometries", vrnFileName));
                 }
                 return vrnReader;
             }
@@ -269,7 +268,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
         protected override void OnAwakePost(Mesh viz)
         {
             base.OnAwakePost(viz);
-            infoPanelPrefab = (GameObject)Resources.Load("Prefabs" + Path.DirectorySeparatorChar + "NeuronalDynamics" + Path.DirectorySeparatorChar + "PointInfo");
+            infoPanelPrefab = (GameObject)Resources.Load("Prefabs/NeuronalDynamics/PointInfo");
 
             defaultRaycastEvent.OnHover.AddListener((hit) =>
             {

@@ -28,7 +28,7 @@ public class VrnReaderBehaviour : MonoBehaviour
             /// Example 1: List grids and/or retrieve mesh file name from 
             ///            archive based on refinement or inflation
             ////////////////////////////////////////////////////////////////
-            string fullFileName = Application.dataPath + Path.DirectorySeparatorChar + fileName;
+            string fullFileName = Path.Combine(Application.dataPath, fileName);
             /// Instantiate the VRN reader with the desired file name (.vrn archive) to load from Assets
             VrnReader reader = new VrnReader(fullFileName);
             /// List all 1D and 2D geometries contained in given .vrn archive

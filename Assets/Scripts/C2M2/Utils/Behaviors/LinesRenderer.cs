@@ -35,8 +35,7 @@ namespace C2M2.Utils.DebugUtils
                 Destroy(renderersGo);
             }
 
-            char slash = Path.DirectorySeparatorChar;
-            renderersGo = Instantiate(Resources.Load("Prefabs" + slash + "LineRenderer"), transform) as GameObject;
+            renderersGo = Instantiate(Resources.Load("Prefabs/LineRenderer"), transform) as GameObject;
             LineRenderer lr = renderersGo.GetComponent<LineRenderer>();
             lr.startColor = color;
             lr.endColor = color;
@@ -100,8 +99,7 @@ namespace C2M2.Utils.DebugUtils
             lineRenderers = new LineRenderer[edges.Count]; // Two points per line
 
             
-            char slash = Path.DirectorySeparatorChar;
-            GameObject lrPrefab = Resources.Load("Prefabs" + slash + "LineRenderer") as GameObject;
+            GameObject lrPrefab = Resources.Load("Prefabs/LineRenderer") as GameObject;
 
             for (int i = 0; i < edges.Count; i++)
             {
