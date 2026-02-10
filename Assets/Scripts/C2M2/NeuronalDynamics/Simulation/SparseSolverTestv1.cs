@@ -474,10 +474,6 @@ namespace C2M2.NeuronalDynamics.Simulation
             surfaceArea = Vector.Build.Dense(Neuron.nodes.Count, 0.0);
 
             Mpre = M.Clone(); Npre = N.Clone(); Hpre = H.Clone();
-
-            // Set color bar range directly on ColorLUT to bypass serialized field defaults
-            ColorLUT.GlobalMin = -0.1f;   // -100 mV
-            ColorLUT.GlobalMax = 0.05f;   //   50 mV
         }
         /// <summary>
         /// This is for constructing the lhs and rhs of system matrix \n
