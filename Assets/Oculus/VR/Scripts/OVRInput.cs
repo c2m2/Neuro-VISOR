@@ -310,7 +310,7 @@ public static class OVRInput
 			new OVRControllerLHand(),
 			new OVRControllerRHand(),
 #elif UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX
-			new OVRControllerGamepadMac(),
+			// OVRControllerGamepadMac requires a native plugin without arm64 support; skip it
 #else
 			new OVRControllerGamepadPC(),
 			new OVRControllerTouch(),
