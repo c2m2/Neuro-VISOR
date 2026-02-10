@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using TMPro;
-
 public class ArrowUpdate : MonoBehaviour
 {
     public Transform preSynapse;
@@ -232,7 +231,7 @@ public class ArrowUpdate : MonoBehaviour
         body.localScale = new Vector3(1f, segmentLength * 0.5f, 1f);
 
         Vector2[] uvs = mesh.uv;
-        const float tileSize = 0.5f;
+        const float tileSize = 0.25f;
 
         for (int i = 0; i < uvs.Length; i++)
             uvs[i].y = originalVertices[i].y / tileSize;
@@ -263,7 +262,7 @@ public class ArrowUpdate : MonoBehaviour
         //Debug.Log(shape.radius);
 
         var main = particleSystem.main;
-        particleSize = radius * 0.5f;
+        particleSize = radius * 0.25f;
         main.startSize = particleSize;
     }
 
@@ -310,15 +309,15 @@ public class ArrowUpdate : MonoBehaviour
         float iSyn = (float)post.currentIsyn;
         float iMax = (float)post.currentModel.Value.getImax();
         //This routine calculates the emissions rate as a function of the Isyn
-        float EmMax = 1f; 
-        float Em = Mathf.Clamp(Mathf.Abs(iSyn) / iMax, 0.0001f, 1f) * EmMax;
-        float emissionRate = Mathf.Max(0.01f, Em);
-        float speed = 0.75f * EmMax;
+        float EmMax = 2000f; // Constant for emissions rate
+        float EmissionRate = Mathf.Clamp(Mathf.Abs(iSyn) / iMax, 0.01f, 1f);
+        Debug.Log("Isyn over Imax: " + Mathf.Abs(iSyn) / iMax);
+        float speed = 0.75f;
 
         if (Mathf.Abs(iSyn) > 0f)
         {
             emissionModule.enabled = true;
-            emissionModule.rateOverTime = emissionRate * 80f;
+            emissionModule.rateOverTime = EmissionRate * EmMax;
             main.startSpeed = speed;
         }
         else
