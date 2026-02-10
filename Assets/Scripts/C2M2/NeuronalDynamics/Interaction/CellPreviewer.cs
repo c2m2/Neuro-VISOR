@@ -19,7 +19,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             /// <summary>
             /// Cell path relative to StreamingAssets
             /// </summary>
-            public string cellsPath = "NeuronalDynamics" + Path.DirectorySeparatorChar + "Geometries";
+            public string cellsPath = "NeuronalDynamics/Geometries";
             public GameObject previewWindowPrefab = null;
             public NDSimulationLoader loader = null;
             public bool renderWalls = true;
@@ -67,11 +67,7 @@ namespace C2M2.NeuronalDynamics.Interaction
                 FindSimulationLoader();
 
                 // Get possible geometries from given direcrory
-                if (Application.platform == RuntimePlatform.OSXPlayer || Application.platform == RuntimePlatform.OSXEditor)
-                {
-                    cellsPath = "NeuronalDynamics" + Path.AltDirectorySeparatorChar + "Geometries";
-                }
-                string fullPath = Application.streamingAssetsPath + Path.DirectorySeparatorChar + cellsPath;
+                string fullPath = Path.Combine(Application.streamingAssetsPath, cellsPath);
                 if (!Directory.Exists(fullPath))
                 {
                     Debug.LogWarning("CellPreviewer: Directory not found, creating: " + fullPath);
@@ -359,7 +355,7 @@ namespace C2M2.NeuronalDynamics.Interaction
 
         private void Start()
             {
-                string fullPath = Application.streamingAssetsPath + Path.DirectorySeparatorChar + cellsPath;
+                string fullPath = Path.Combine(Application.streamingAssetsPath, cellsPath);
                 ConfigureFileSystemWatcher(fullPath);
                 GameObject cellobj = GameObject.Find("Arrows");
                 controller = cellobj.GetComponent<CellPreviewerController>();
