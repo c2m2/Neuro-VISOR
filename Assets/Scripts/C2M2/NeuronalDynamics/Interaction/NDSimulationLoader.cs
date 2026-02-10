@@ -26,7 +26,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         private SomaPositionCalculator calculator = null; // Placeholder default calculator
         public string vrnFileName { get; set; } = "null";
         public float globalMin = -0.1f;
-        public float globalMax = float.NegativeInfinity;
+        public float globalMax = 0.1f;
         public string lengthScale = "μm";
         public int refinementLevel = 0;
         public double timestepSize = 0.002 * 1e-3;
