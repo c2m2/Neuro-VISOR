@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using KdTree;
 using KdTree.Math;
-using UnityEditor;
 using UnityEngine;
 #endregion
 

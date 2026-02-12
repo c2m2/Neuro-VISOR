@@ -9,7 +9,6 @@ using System.Xml.Linq;
 using System.Xml.Schema;
 using C2M2.NeuronalDynamics.Visualization.VRN;
 using C2M2.NeuronalDynamics.Visualization;
-using UnityEditor;
 using UnityEngine;
 #endregion
 
