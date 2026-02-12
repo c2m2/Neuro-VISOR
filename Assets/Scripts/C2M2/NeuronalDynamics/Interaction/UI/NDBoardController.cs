@@ -80,6 +80,8 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
 
             // Reactivate cell previewer
             GameManager.instance.cellPreviewer.SetActive(true);
+            // Reactivate cell previewer pagination controls (arrows, page counter, refresh)
+            CellPreviewerController.makePreviewerControlsVisible(true);
         }
 
         public void CloseAllSimulations()
