@@ -154,7 +154,7 @@ public class ArrowUpdate : MonoBehaviour
         Material textMaterial;
 
         if (model is ModelNMDA)
-            textMaterial = pre.excitatoryMat;
+            textMaterial = pre.NMDAMat;
 
         else if(model is ModelGABA)
         {
@@ -230,13 +230,21 @@ public class ArrowUpdate : MonoBehaviour
         body.up = _direction;
         body.localScale = new Vector3(1f, segmentLength * 0.5f, 1f);
 
-        Vector2[] uvs = mesh.uv;
-        const float tileSize = 0.25f;
 
+        Vector2[] uvs = mesh.uv;
+
+        //world units per repeat (tiling property on the material)
+        const float tileSize = 0.5f;
+        float tilingY = segmentLength / tileSize;                  //longer segment, bigger UV span, more repeats
+        float offsetY = startLocation * _fullLength / tileSize;  //keeps body1/body2 aligned
         for (int i = 0; i < uvs.Length; i++)
-            uvs[i].y = originalVertices[i].y / tileSize;
+        {
+            uvs[i].y = originalVertices[i].y * tilingY + offsetY;
+        }
 
         mesh.uv = uvs;
+
+
     }
 
 
