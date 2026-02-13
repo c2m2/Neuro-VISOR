@@ -262,7 +262,7 @@ public class ArrowUpdate : MonoBehaviour
         //Debug.Log(shape.radius);
 
         var main = particleSystem.main;
-        particleSize = radius * 0.25f;
+        particleSize = radius * 0.5f;
         main.startSize = particleSize;
     }
 
@@ -309,9 +309,9 @@ public class ArrowUpdate : MonoBehaviour
         float iSyn = (float)post.currentIsyn;
         float iMax = (float)post.currentModel.Value.getImax();
         //This routine calculates the emissions rate as a function of the Isyn
-        float EmMax = 2000f; // Constant for emissions rate
-        float EmissionRate = Mathf.Clamp(Mathf.Abs(iSyn) / iMax, 0.01f, 1f);
-        Debug.Log("Isyn over Imax: " + Mathf.Abs(iSyn) / iMax);
+        float EmMax = 200f; // Constant for emissions rate
+        float EmissionRate = Mathf.Clamp(Mathf.Abs(iSyn) / iMax, 0f, 1f);
+        //Debug.Log("Isyn over Imax: " + Mathf.Abs(iSyn) / iMax);
         float speed = 0.75f;
 
         if (Mathf.Abs(iSyn) > 0f)
@@ -329,13 +329,13 @@ public class ArrowUpdate : MonoBehaviour
         Color32 liveColor;
         if (iSyn >= 0f)
         {
-            liveColor = Color.red;
+            main.startColor = Color.red;
         }
 
 
         else
         {
-            liveColor = Color.cyan;  
+            main.startColor = Color.cyan;  
         }
     
         //Particle buffer is allocated
@@ -380,7 +380,7 @@ public class ArrowUpdate : MonoBehaviour
             m_Particles[i].velocity = direction * speed;
             m_Particles[i].position = position;
             m_Particles[i].startSize = particleSize;
-            m_Particles[i].startColor = liveColor;
+            //m_Particles[i].startColor = liveColor;
         }
 
         //Apply the changes
