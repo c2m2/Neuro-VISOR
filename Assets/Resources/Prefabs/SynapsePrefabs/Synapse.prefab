@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: -3632711304237603747}
   - component: {fileID: -172088395829924350}
   - component: {fileID: 5168362966301897455}
+  - component: {fileID: 7772155885504482851}
   m_Layer: 8
   m_Name: Synapse
   m_TagString: Untagged
@@ -163,6 +164,20 @@ MonoBehaviour:
   onEndPress:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &7772155885504482851
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 688227186299511278}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc8cd1af9cbfe3947b43a910be07e1c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  self: {fileID: -3632711304237603747}
+  label: {fileID: 8911174062001964152}
 --- !u!1 &5159379668881964433
 GameObject:
   m_ObjectHideFlags: 0

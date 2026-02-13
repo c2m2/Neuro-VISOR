@@ -233,10 +233,10 @@ public class ArrowUpdate : MonoBehaviour
 
         Vector2[] uvs = mesh.uv;
 
-        //world units per repeat (tiling property on the material)
-        const float tileSize = 0.5f;
-        float tilingY = segmentLength / tileSize;                  //longer segment, bigger UV span, more repeats
-        float offsetY = startLocation * _fullLength / tileSize;  //keeps body1/body2 aligned
+        float referenceRadius = (_r_pre + _r_post) * 0.5f;
+        const float tileSize = 10f;
+        float tilingY = (segmentLength / referenceRadius) / tileSize;               //longer segment, bigger UV span, more repeats
+        float offsetY = (startLocation * _fullLength / referenceRadius) / tileSize;  //keeps body1/body2 aligned
         for (int i = 0; i < uvs.Length; i++)
         {
             uvs[i].y = originalVertices[i].y * tilingY + offsetY;
@@ -317,8 +317,8 @@ public class ArrowUpdate : MonoBehaviour
         float iSyn = (float)post.currentIsyn;
         float iMax = (float)post.currentModel.Value.getImax();
         //This routine calculates the emissions rate as a function of the Isyn
-        float EmMax = 200f; // Constant for emissions rate
-        float EmissionRate = Mathf.Clamp(Mathf.Abs(iSyn) / iMax, 0f, 1f);
+        float EmMax = 300f; // Constant for emissions rate
+        float EmissionRate = Mathf.Clamp(Mathf.Abs(iSyn) / iMax, 0.0001f, 1f);
         //Debug.Log("Isyn over Imax: " + Mathf.Abs(iSyn) / iMax);
         float speed = 0.75f;
 
