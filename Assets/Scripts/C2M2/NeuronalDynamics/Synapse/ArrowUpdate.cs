@@ -270,7 +270,7 @@ public class ArrowUpdate : MonoBehaviour
         //Debug.Log(shape.radius);
 
         var main = particleSystem.main;
-        particleSize = radius * 0.5f;
+        particleSize = radius * 0.4f;
         main.startSize = particleSize;
     }
 
@@ -320,7 +320,7 @@ public class ArrowUpdate : MonoBehaviour
         float EmMax = 300f; // Constant for emissions rate
         float EmissionRate = Mathf.Clamp(Mathf.Abs(iSyn) / iMax, 0.0001f, 1f);
         //Debug.Log("Isyn over Imax: " + Mathf.Abs(iSyn) / iMax);
-        float speed = 0.75f;
+        float speed = 0.5f;
 
         if (Mathf.Abs(iSyn) > 0f)
         {
@@ -358,7 +358,7 @@ public class ArrowUpdate : MonoBehaviour
         //Particles move uniformly on the x-axis, but have an element of randomness to their movement on the y-axis
 
         float target_radius = GetVisualRadius(disk2) * 0.9f; // make bounding cylinder slightly smaller than receiving terminal
-        float jitterStrength = 0.5f * target_radius;
+        float jitterStrength = 0.05f * target_radius;
 
         // Change only the particles that are alive
         for (int i = 0; i < numParticlesAlive; i++)
@@ -383,9 +383,9 @@ public class ArrowUpdate : MonoBehaviour
 
 
 
-            Vector3 direction = m_Particles[i].velocity.normalized;
+            //Vector3 direction = m_Particles[i].velocity.normalized;
 
-            m_Particles[i].velocity = direction * speed;
+            //m_Particles[i].velocity = direction * speed;
             m_Particles[i].position = position;
             m_Particles[i].startSize = particleSize;
             //m_Particles[i].startColor = liveColor;
