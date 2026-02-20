@@ -44,6 +44,7 @@ public class ArrowUpdate : MonoBehaviour
 
 
     //TODO: rename body to shaft?
+    //TODO: cache the arrays of mesh vertices to bring the GC allocation closer to 0 
     void Start()
     {
         // In UpdateBodySegment(), the vertices of the cylinder mesh are deformed to interpolate the mesh's y-axis between the radii of the the pre and post synapses
@@ -97,24 +98,35 @@ public class ArrowUpdate : MonoBehaviour
 
         if (mode == VisualMode.Disk)
         {
+            // average radius used as a reference length
+            float referenceRadius = (r_pre + r_post) * 0.5f;
+
+            // the gap defaults to 20% of the total synapse length, but is capped at a multiple of the
+            // reference radius to place a bound on its growth for longer synapses 
+            float gap = Mathf.Min(0.2f * fullLength, referenceRadius * 3f);
+
+            // positions are normalized [0,1] along the synapse from pre to post
+            // the gap is centered at 0.7 (midpoint of 0.6 and 0.8)
+            // and spread symmetrical by half the gap on either side
+            // the first body goes from 0 to 0.6 of the length, the second goes from 0.8 to 1 until it's bounded
             float cleftPosition1Start = 0f;
-            float cleftPosition1End = 0.6f;
-            float cleftPosition2Start = 0.8f;
+            float cleftPosition1End = 0.7f - gap / fullLength * 0.5f;
+            float cleftPosition2Start = 0.7f + gap / fullLength * 0.5f;
             float cleftPosition2End = 1f;
 
-            float radius = r_pre + (r_post - r_pre) * (cleftPosition1Start + cleftPosition2End) * 0.5f;
+            Debug.Log("cleftPosition1End: " + cleftPosition1End + "cleftPosition2Start" + cleftPosition2Start);
+
+            //this is the radius at the midpoint of the synapse interpolated between pre/post
+            float radius = Mathf.Lerp(r_pre, r_post, 0.5f);
 
             UpdateBodySegment(body1, cleftPosition1Start, cleftPosition1End);
             UpdateBodySegment(body2, cleftPosition2Start, cleftPosition2End);
 
+            Vector3 preSynPos = PositionAlongArrow(p_pre, p_post, cleftPosition1End);
+            Vector3 postSynPos = PositionAlongArrow(p_pre, p_post, cleftPosition2Start);
 
-            Vector3 pos1 = PositionAlongArrow(p_pre, p_post, cleftPosition1End);
-            Vector3 pos2 = PositionAlongArrow(p_pre, p_post, cleftPosition2Start);
-
-
-            UpdateDisk(disk1, pos1, direction, radius, fullLength);
-            UpdateDisk(disk2, pos2, -direction, radius, fullLength);
-
+            UpdateDisk(disk1, preSynPos, direction, radius, fullLength);
+            UpdateDisk(disk2, postSynPos, -direction, radius, fullLength);
 
             UpdateParticleSystem();
         }
@@ -259,7 +271,7 @@ public class ArrowUpdate : MonoBehaviour
 
         //first and last arguments are the x and z coordinates, which are the transversal directions; the y coordinate is the longitudal direction 
         float diskRadius = radius * 3f; //x and z coordinates
-        float diskThickness = length * 0.05f; //y coordinate direction
+        float diskThickness = radius * 1f; //y coordinate direction
 
         //comment
         disk.localScale = new Vector3(diskRadius, diskThickness, diskRadius);
