@@ -60,6 +60,9 @@ public class ArrowUpdate : MonoBehaviour
 
     void Update()
     {
+        //Debug.Log(1f/0f);
+
+        //Debug.Log("exp^5000" + 0.0/0.0);
         if (preSynapse == null || postSynapse == null)
         {
             Destroy(gameObject);
@@ -98,24 +101,24 @@ public class ArrowUpdate : MonoBehaviour
 
         if (mode == VisualMode.Disk)
         {
-            // average radius used as a reference length
             float referenceRadius = (r_pre + r_post) * 0.5f;
 
-            // the gap defaults to 20% of the total synapse length, but is capped at a multiple of the
-            // reference radius to place a bound on its growth for longer synapses 
-            float gap = Mathf.Min(0.2f * fullLength, referenceRadius * 3f);
-
+            // the gap defaults to 20% of the total synapse length, clamped between a minimum
+            // and maximum multiple of the reference radius
+            float minimumGap = referenceRadius * 2f;
+            float maximumGap = referenceRadius * 3f;
+            float gap = Mathf.Clamp(0.2f * fullLength, minimumGap, maximumGap);
+            float center = 0.7f;
             // positions are normalized [0,1] along the synapse from pre to post
             // the gap is centered at 0.7 (midpoint of 0.6 and 0.8)
             // and spread symmetrical by half the gap on either side
             // the first body goes from 0 to 0.6 of the length, the second goes from 0.8 to 1 until it's bounded
             float cleftPosition1Start = 0f;
-            float cleftPosition1End = 0.7f - gap / fullLength * 0.5f;
-            float cleftPosition2Start = 0.7f + gap / fullLength * 0.5f;
+            float cleftPosition1End = Mathf.Max(center - gap / fullLength * 0.5f, 0.2f);
+            float cleftPosition2Start = Mathf.Min(center + gap / fullLength * 0.5f, 0.8f);
             float cleftPosition2End = 1f;
 
             Debug.Log("cleftPosition1End: " + cleftPosition1End + "cleftPosition2Start" + cleftPosition2Start);
-
             //this is the radius at the midpoint of the synapse interpolated between pre/post
             float radius = Mathf.Lerp(r_pre, r_post, 0.5f);
 
