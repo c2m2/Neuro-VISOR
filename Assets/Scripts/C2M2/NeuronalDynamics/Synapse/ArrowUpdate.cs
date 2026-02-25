@@ -101,32 +101,27 @@ public class ArrowUpdate : MonoBehaviour
 
         if (mode == VisualMode.Disk)
         {
-            float referenceRadius = (r_pre + r_post) * 0.5f;
+            float referenceRadius = (r_pre + r_post) * 0.5f; // use average of synaptic vertex radii as reference length scale
+            float cleftMinimumLength = referenceRadius * 2f; // minimum length of synaptic cleft (when synapse long enough)
+            float cleftMaximumLength = referenceRadius * 3f; // maximum length of synaptic cleft
 
-            // the gap defaults to 20% of the total synapse length, clamped between a minimum
-            // and maximum multiple of the reference radius
-            float minimumGap = referenceRadius * 2f;
-            float maximumGap = referenceRadius * 3f;
-            float gap = Mathf.Clamp(0.2f * fullLength, minimumGap, maximumGap);
-            float center = 0.7f;
-            // positions are normalized [0,1] along the synapse from pre to post
-            // the gap is centered at 0.7 (midpoint of 0.6 and 0.8)
-            // and spread symmetrical by half the gap on either side
-            // the first body goes from 0 to 0.6 of the length, the second goes from 0.8 to 1 until it's bounded
-            float cleftPosition1Start = 0f;
-            float cleftPosition1End = Mathf.Max(center - gap / fullLength * 0.5f, 0.2f);
-            float cleftPosition2Start = Mathf.Min(center + gap / fullLength * 0.5f, 0.8f);
-            float cleftPosition2End = 1f;
+            float cleftLength = Mathf.Clamp(0.2f * fullLength, cleftMinimumLength, cleftMaximumLength); // if within above bounds, make cleft 0.2 of synapse length
+            float cleftCenterPosition = 0.7f; // center point of synaptic cleft (when synapse long enough)
 
-            Debug.Log("cleftPosition1End: " + cleftPosition1End + "cleftPosition2Start" + cleftPosition2Start);
+            float synapsePositionPresynVertex = 0f;
+            float synapsePositionPresynCleft = Mathf.Max(cleftCenterPosition - cleftLength / fullLength * 0.5f, 0.2f); // relative presynaptic terminal position
+            float synapsePositionPostsynCleft = Mathf.Min(cleftCenterPosition + cleftLength / fullLength * 0.5f, 0.8f); // relative postsynaptic terminal position
+            float synapsePositionPostsynVertex = 1f;
+
+            Debug.Log("synapsePositionPresynCleft: " + synapsePositionPresynCleft + "synapsePositionPostsynCleft" + synapsePositionPostsynCleft);
             //this is the radius at the midpoint of the synapse interpolated between pre/post
             float radius = Mathf.Lerp(r_pre, r_post, 0.5f);
 
-            UpdateBodySegment(body1, cleftPosition1Start, cleftPosition1End);
-            UpdateBodySegment(body2, cleftPosition2Start, cleftPosition2End);
+            UpdateBodySegment(body1, synapsePositionPresynVertex, synapsePositionPresynCleft);
+            UpdateBodySegment(body2, synapsePositionPostsynCleft, synapsePositionPostsynVertex);
 
-            Vector3 preSynPos = PositionAlongArrow(p_pre, p_post, cleftPosition1End);
-            Vector3 postSynPos = PositionAlongArrow(p_pre, p_post, cleftPosition2Start);
+            Vector3 preSynPos = PositionAlongArrow(p_pre, p_post, synapsePositionPresynCleft);
+            Vector3 postSynPos = PositionAlongArrow(p_pre, p_post, synapsePositionPostsynCleft);
 
             UpdateDisk(disk1, preSynPos, direction, radius, fullLength);
             UpdateDisk(disk2, postSynPos, -direction, radius, fullLength);
