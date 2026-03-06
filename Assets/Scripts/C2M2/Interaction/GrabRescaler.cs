@@ -42,6 +42,20 @@ namespace C2M2.Interaction
         private GameObject[] pivotPoints;
         public GameObject pivot;
 
+        // Desktop grab state for moving all neurons without VR
+        private bool isDesktopGrabbed = false;
+        private Vector3 desktopGrabOffset;
+        private float desktopGrabScreenZ;
+        public int desktopGrabMouseButton = 1; // right mouse button
+
+        /// <summary>
+        /// True when the pivot is grabbed in VR or being dragged on desktop
+        /// </summary>
+        private bool IsGrabbed
+        {
+            get { return grabbable.isGrabbed || isDesktopGrabbed; }
+        }
+
         private float ChangeScaler
         {
             get
@@ -140,19 +154,44 @@ namespace C2M2.Interaction
             // Check if the user is toggling the visibility of the pivotpoint object
             VisibilityCheck();
 
+            // Desktop grab detection: right-click drag on the pivot ball to move all neurons
+            if (!GameManager.instance.vrDeviceManager.VRActive)
+            {
+                if (Input.GetMouseButtonDown(desktopGrabMouseButton) && pivotcollider.enabled)
+                {
+                    Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                    RaycastHit hit;
+                    if (Physics.Raycast(ray, out hit) && hit.collider == pivotcollider)
+                    {
+                        isDesktopGrabbed = true;
+                        desktopGrabScreenZ = Camera.main.WorldToScreenPoint(pivot.transform.position).z;
+                        desktopGrabOffset = pivot.transform.position - Camera.main.ScreenToWorldPoint(
+                            new Vector3(Input.mousePosition.x, Input.mousePosition.y, desktopGrabScreenZ));
+                    }
+                }
+                if (Input.GetMouseButtonUp(desktopGrabMouseButton))
+                {
+                    isDesktopGrabbed = false;
+                }
+                if (isDesktopGrabbed)
+                {
+                    Vector3 mouseScreenPos = new Vector3(Input.mousePosition.x, Input.mousePosition.y, desktopGrabScreenZ);
+                    pivot.transform.position = Camera.main.ScreenToWorldPoint(mouseScreenPos) + desktopGrabOffset;
+                }
+            }
+
             // Calculate the average point between each simulated Neuron
             GeometricMedian(target);
 
-            // If the pivotpoint object is not grabbed but the rescaling keys are pressed, rescale the neurons accordingly
-            if (!grabbable.isGrabbed && median != null)
+            // If the pivotpoint object is not grabbed, snap it to the median and rescale if requested
+            if (!IsGrabbed)
             {
                 SetNeuronParents(target);
                 pivot.transform.position = median;
                 if (ChangeScaler != 0) Rescale();
             }
-            // But if the pivotpoint object is grabbed, disable rescaling and allow movement of all neurons as a group
-            // TODO: Implement the ability to move all neurons as a group by moving the pivotpoint object on Desktop version; need a workaround because there's no "grabbing" on Desktop
-            if (grabbable.isGrabbed)
+            // If the pivotpoint object is grabbed (VR or desktop), reparent neurons for group movement
+            if (IsGrabbed)
             {
                 SetNeuronParents(pivot.transform);
             }
@@ -196,6 +235,7 @@ namespace C2M2.Interaction
 
         private void SetNeuronParents(Transform transform)
         {
+            if (neuronList.Length == 0) return;
             if (neuronList[0].transform.parent != transform)
             {
                 for (int i = 0; i < neuronList.Count(); i++)
@@ -211,6 +251,12 @@ namespace C2M2.Interaction
             // Update the list of neurons to include all objects tagged "SimulatedNeuronCell"
             // TODO: Create and track this in NDSimulationLoader by adding neurons to a list as they're generated
             int activeNeurons = neuronList.Count();
+
+            // If there are no neurons, return the current median
+            if (activeNeurons == 0)
+            {
+                return median;
+            }
 
             // If there is only one neuron, geometric median is its position
             if (activeNeurons == 1)
