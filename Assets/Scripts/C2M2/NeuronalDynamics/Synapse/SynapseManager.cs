@@ -13,7 +13,6 @@ public class SynapseManager : NDInteractablesManager<Synapse>
     public GameObject arrowPrefab;
     public float placementTimestamp;
     public Synapse synapseInProgress = null; //Contains presynapse when a presynapse has been placed but no post synapse
-    public bool deleteMode = false;
     public List<(Synapse, Synapse)> synapses = new List<(Synapse, Synapse)>(); //pre (Item1) and post (Item2) synapses
 
     public override GameObject IdentifyBuildPrefab(NDSimulation sim, int index)

@@ -76,46 +76,39 @@ public class Synapse : NDInteractables
         HitEvent.OnEndPress.AddListener((hit) => CheckInput());
     }
 
-    private bool actionFired = false;
     public void MonitorInput()
     {
         SynapseManager.HoldCount += Time.deltaTime;
         // If we've held the button long enough to destroy, color caps red until user releases button
-        if (!actionFired && SynapseManager.HoldCount > SynapseManager.DestroyCount)
-        {
-            actionFired = true;
-            if (SynapseManager.deleteMode)
-            {
-                SynapseManager.DeleteSyn(SynapseManager.FindSelectedSyn(this));
-                actionFired = false;
-            }
-            else // Change model 
-            {
-                //Implements the circularly linked list 
-                if (currentModel.Value.Equals(modelList.Last.Value)) {
-                    SynapseManager.ChangeModel(SynapseManager.FindSelectedSyn(this), modelList.First.Value);
-                    currentModel = modelList.First;     //Resets to the first model in the linked list
-                }
-                else {
-                    SynapseManager.ChangeModel(SynapseManager.FindSelectedSyn(this), currentModel.Next.Value);
-                    currentModel = currentModel.Next;   //Iterates through the linked list
-                }
-                Debug.Log("Current Model: " + currentModel.Value);
-            }
-        }
-        
+        if (SynapseManager.HoldCount > SynapseManager.DestroyCount) SwitchMaterial(destroyMaterial);
     }
     
     private void CheckInput()
     {
+        // Change model 
+        if (SynapseManager.HoldCount >= SynapseManager.ChangeCount && SynapseManager.HoldCount <= SynapseManager.DestroyCount)
+        {
+            //Implements the circularly linked list 
+            if (currentModel.Value.Equals(modelList.Last.Value)) {
+                SynapseManager.ChangeModel(SynapseManager.FindSelectedSyn(this), modelList.First.Value);
+                currentModel = modelList.First;     //Resets to the first model in the linked list
+            }
+            else {
+                SynapseManager.ChangeModel(SynapseManager.FindSelectedSyn(this), currentModel.Next.Value);
+                currentModel = currentModel.Next;   //Iterates through the linked list
+            }
+            Debug.Log("Current Model: " + currentModel.Value);
+        }
+        // Delete synapse
+        else if (SynapseManager.HoldCount >= SynapseManager.DestroyCount)
+        {
+            SynapseManager.DeleteSyn(SynapseManager.FindSelectedSyn(this));        }
         // Place synapse 
-        if (!actionFired && GameManager.instance.simulationManager.FeatState == NDSimulationManager.FeatureState.Synapse
-            && SynapseManager.FindSelectedSyn(this) == null)
+        else if (GameManager.instance.simulationManager.FeatState == NDSimulationManager.FeatureState.Synapse)
         {
             SynapseManager.SynapticPlacement(this);
         }
         SynapseManager.HoldCount = 0;
-        actionFired = false;
     }
 
     public void SwitchModel(ISynapseModel model)
