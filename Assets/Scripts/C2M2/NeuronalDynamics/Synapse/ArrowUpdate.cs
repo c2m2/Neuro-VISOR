@@ -30,6 +30,7 @@ public class ArrowUpdate : MonoBehaviour
 
     private float particleSize;
 
+    private float previousCleftLength = 1f;
 
     public enum VisualMode { Arrow, Disk }
     private static VisualMode globalMode = VisualMode.Arrow;
@@ -117,6 +118,10 @@ public class ArrowUpdate : MonoBehaviour
             //this is the radius at the midpoint of the synapse interpolated between pre/post
             float radius = Mathf.Lerp(r_pre, r_post, 0.5f);
 
+            //float particleSpeed = (synapsePositionPostsynCleft - synapsePositionPresynCleft) * fullLength * 0.1f;
+            float cleftWorldLength = (synapsePositionPostsynCleft - synapsePositionPresynCleft) * fullLength;
+
+
             UpdateBodySegment(body1, synapsePositionPresynVertex, synapsePositionPresynCleft);
             UpdateBodySegment(body2, synapsePositionPostsynCleft, synapsePositionPostsynVertex);
 
@@ -125,8 +130,8 @@ public class ArrowUpdate : MonoBehaviour
 
             UpdateDisk(disk1, preSynPos, direction, radius, fullLength);
             UpdateDisk(disk2, postSynPos, -direction, radius, fullLength);
-
-            UpdateParticleSystem();
+            UpdateParticleSystem(cleftWorldLength);
+        
         }
 
         UpdateMaterial();
@@ -316,7 +321,7 @@ public class ArrowUpdate : MonoBehaviour
     }
 
 
-    void UpdateParticleSystem()
+    void UpdateParticleSystem(float cleftLength)
     {
 
         if (particleSystem == null || post == null) return;
@@ -330,13 +335,17 @@ public class ArrowUpdate : MonoBehaviour
         float EmMax = 300f; // Constant for emissions rate
         float EmissionRate = Mathf.Clamp(Mathf.Abs(iSyn) / iMax, 0.0001f, 1f);
         //Debug.Log("Isyn over Imax: " + Mathf.Abs(iSyn) / iMax);
-        float speed = 0.5f;
 
+
+
+        float traversalTime = 0.5f;
+        float currentSpeed = cleftLength/traversalTime;
         if (Mathf.Abs(iSyn) > 0f)
         {
             emissionModule.enabled = true;
             emissionModule.rateOverTime = EmissionRate * EmMax;
-            main.startSpeed = speed;
+            main.startLifetime = traversalTime;
+            main.startSpeed = currentSpeed;
         }
         else
         {
@@ -366,7 +375,6 @@ public class ArrowUpdate : MonoBehaviour
         int numParticlesAlive = particleSystem.GetParticles(m_Particles);
 
         //Particles move uniformly on the x-axis, but have an element of randomness to their movement on the y-axis
-
         float target_radius = GetVisualRadius(disk2) * 0.9f; // make bounding cylinder slightly smaller than receiving terminal
         float jitterStrength = 0.05f * target_radius;
 
@@ -391,19 +399,17 @@ public class ArrowUpdate : MonoBehaviour
             position.x = position.x * dist_factor;
             position.y = position.y * dist_factor;
 
+            m_Particles[i].velocity = m_Particles[i].velocity.normalized * currentSpeed;
 
+            m_Particles[i].remainingLifetime *= cleftLength / previousCleftLength;
 
-            //Vector3 direction = m_Particles[i].velocity.normalized;
-
-            //m_Particles[i].velocity = direction * speed;
             m_Particles[i].position = position;
             m_Particles[i].startSize = particleSize;
-            //m_Particles[i].startColor = liveColor;
         }
 
         //Apply the changes
         particleSystem.SetParticles(m_Particles, numParticlesAlive);
-
+        previousCleftLength = cleftLength;
     }
 
 }
