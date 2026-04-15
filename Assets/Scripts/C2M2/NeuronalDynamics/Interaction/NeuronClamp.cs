@@ -81,7 +81,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             // only assign ClampPower if it's not loading; otherwise it will overwrite the loaded value
             if (!GameManager.instance.Loading)
             {
-                ClampPower = 0.05f; // default clamp power is 50 mV
+                ClampPower = 0.05f; // default clamp voltage is 50 mV (called "power" here)
                 UpdateColor();
             }
         }

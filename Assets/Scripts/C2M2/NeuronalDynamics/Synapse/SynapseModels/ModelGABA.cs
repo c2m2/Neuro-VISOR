@@ -23,15 +23,15 @@ public class ModelGABA : ISynapseModel
         modelName = "GABA";
         Erev = -0.065;           // (Volts) Reversal potential of GABA synapses, stated on page 9 of Rothman's paper
         taud = 15.0e-3;           // (Seconds) decay constant from function, found in figure 2 of Rothman's Paper
-        g = -10.0e-9;               // (Siemens) a chosen arbitrary value that produces a noticeable, but not too great, inhibitory response.
-                                        // Rothman's paper does not provide any examples for max capacitance of GABA synapses
-                                        // TBD: Choose conductance of single receptor, number of receptors per synapse, and number of synapses 
-                                        // per cluster to justify this value.
+        g = -25.0e-9;               // (Siemens) -25 nano Siemens was chosen because it produces a noticeable post synaptic supressive response
+                                        // when coupled with the NMDA synapse, while still requiring multiple synapses to produce a 
+                                        // post-synaptic action potential
+                                        // Each synapse has ~50 receptors of -20 pS each, each arrow is a cluster of 25 synapses
 
         double Vmax = 0.1;  // (Volts)
         Imax = System.Math.Abs(g * (Vmax - Erev));
 
-        voltageThreshold = -0.05;   //Volts
+        voltageThreshold = 0.038;   //Volts
         refireRate = 3.0; // refire at 5%
         minRefireTime = 1.0e-2; // ms
     }

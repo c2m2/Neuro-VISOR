@@ -46,7 +46,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   solverName: C2M2.NeuronalDynamics.Simulation.SparseSolverTestv1
-  globalMin: -0.1
+  globalMin: -0.07
   globalMax: 0.05
   lengthScale: "\u03BCm"
   refinementLevel: 1
