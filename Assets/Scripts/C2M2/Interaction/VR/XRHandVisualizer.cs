@@ -48,8 +48,27 @@ namespace C2M2.Interaction.VR
             if (_leftModel == null || _rightModel == null)
                 Debug.LogWarning("[XRHandVisualizer] Hand models not found – falling back to primitives.");
 
+            // The LocalAvatar hierarchy (OvrAvatar SDK, broken without App ID) contains its own
+            // hand_left / hand_right GameObjects that are still active.  OculusEventSignaler
+            // searches for these by name via Find() to toggle them when raycasting mode switches.
+            // Disable the LocalAvatar hands now so Find() returns our new anchored hands instead.
+            DisableStaleHands("hand_left");
+            DisableStaleHands("hand_right");
+
             StartCoroutine(BuildHandObject(rig.leftHandAnchor,  "hand_left",  _leftModel,  isLeft: true));
             StartCoroutine(BuildHandObject(rig.rightHandAnchor, "hand_right", _rightModel, isLeft: false));
+        }
+
+        private static void DisableStaleHands(string handName)
+        {
+            // FindObjectsByType is allocation-heavy; use the legacy Find which returns the first
+            // active match — enough because there is at most one stale hand per name.
+            var stale = GameObject.Find(handName);
+            if (stale != null)
+            {
+                stale.SetActive(false);
+                Debug.Log($"[XRHandVisualizer] Disabled stale '{handName}' under '{stale.transform.parent?.name}'.");
+            }
         }
 
         private IEnumerator BuildHandObject(Transform anchor, string handName, GameObject model, bool isLeft)
