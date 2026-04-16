@@ -48,11 +48,11 @@ namespace C2M2.Interaction.VR
             if (_leftModel == null || _rightModel == null)
                 Debug.LogWarning("[XRHandVisualizer] Hand models not found – falling back to primitives.");
 
-            StartCoroutine(BuildHandObject(rig.leftHandAnchor,  "hand_left",  _leftModel));
-            StartCoroutine(BuildHandObject(rig.rightHandAnchor, "hand_right", _rightModel));
+            StartCoroutine(BuildHandObject(rig.leftHandAnchor,  "hand_left",  _leftModel,  isLeft: true));
+            StartCoroutine(BuildHandObject(rig.rightHandAnchor, "hand_right", _rightModel, isLeft: false));
         }
 
-        private IEnumerator BuildHandObject(Transform anchor, string handName, GameObject model)
+        private IEnumerator BuildHandObject(Transform anchor, string handName, GameObject model, bool isLeft)
         {
             if (anchor == null) yield break;
             if (anchor.Find(handName) != null) yield break;
@@ -68,7 +68,9 @@ namespace C2M2.Interaction.VR
                 var instance = Instantiate(model, hand.transform, false);
                 instance.name = "HandModel";
                 instance.transform.localPosition = Vector3.zero;
-                instance.transform.localRotation = Quaternion.identity;
+                // Match the rotation used by the original CustomHandLeft/Right prefab roots:
+                // +90° Z for left hand, -90° Z for right hand.
+                instance.transform.localRotation = Quaternion.Euler(0f, 0f, isLeft ? 90f : -90f);
                 instance.transform.localScale    = Vector3.one;
 
                 if (_handMaterial != null)
