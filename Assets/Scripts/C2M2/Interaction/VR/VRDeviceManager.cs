@@ -121,9 +121,11 @@ namespace C2M2.Interaction.VR
             {
                 var viz = vrController.AddComponent<XRHandVisualizer>();
 #if UNITY_EDITOR
-                var prefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(
-                    "Assets/Oculus/VR/Prefabs/OVRHandPrefab.prefab");
-                viz.SetHandPrefab(prefab);
+                const string modelBase = "Assets/Oculus/SampleFramework/Core/CustomHands/Models/";
+                var leftModel  = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(modelBase + "l_hand_skeletal_lowres.fbx");
+                var rightModel = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(modelBase + "r_hand_skeletal_lowres.fbx");
+                var handMat    = UnityEditor.AssetDatabase.LoadAssetAtPath<Material>  (modelBase + "HandMaterial.mat");
+                viz.SetHandAssets(leftModel, rightModel, handMat);
 #endif
             }
         }

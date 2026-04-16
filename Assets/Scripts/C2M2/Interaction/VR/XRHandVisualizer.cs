@@ -1,22 +1,30 @@
 using System.Collections;
-using System.Reflection;
 using UnityEngine;
 
 namespace C2M2.Interaction.VR
 {
     /// <summary>
-    /// Creates phantom-hand GameObjects named "hand_left" and "hand_right"
-    /// as children of OVRCameraRig's hand anchors using OVRHandPrefab.
+    /// Spawns skeletal hand-mesh GameObjects ("hand_left" / "hand_right") under
+    /// OVRCameraRig's hand anchors.  Visual assets are injected by VRDeviceManager
+    /// via SetHandAssets(); falls back to simple primitives when assets are absent.
     ///
-    /// VRDeviceManager injects the prefab reference via SetHandPrefab() before
-    /// Start() runs. Falls back to simple primitives when no prefab is available.
+    /// Using raw FBX model GameObjects (l_hand_skeletal_lowres / r_hand_skeletal_lowres)
+    /// with HandMaterial gives the standard phantom-white-hand appearance without any
+    /// dependency on OVRInput or OVRPlugin hand-tracking state.
     /// </summary>
     public class XRHandVisualizer : MonoBehaviour
     {
-        private GameObject _handPrefab;
+        private GameObject _leftModel;
+        private GameObject _rightModel;
+        private Material   _handMaterial;
 
         /// <summary>Called by VRDeviceManager immediately after AddComponent.</summary>
-        public void SetHandPrefab(GameObject prefab) => _handPrefab = prefab;
+        public void SetHandAssets(GameObject leftModel, GameObject rightModel, Material handMaterial)
+        {
+            _leftModel    = leftModel;
+            _rightModel   = rightModel;
+            _handMaterial = handMaterial;
+        }
 
         private void Start()
         {
@@ -29,17 +37,22 @@ namespace C2M2.Interaction.VR
                 return;
             }
 
-            if (_handPrefab == null)
-                _handPrefab = Resources.Load<GameObject>("Prefabs/OVRHandPrefab");
+            // Resources fallback paths (require files to be copied into Assets/Resources/).
+            if (_leftModel == null)
+                _leftModel = Resources.Load<GameObject>("Models/l_hand_skeletal_lowres");
+            if (_rightModel == null)
+                _rightModel = Resources.Load<GameObject>("Models/r_hand_skeletal_lowres");
+            if (_handMaterial == null)
+                _handMaterial = Resources.Load<Material>("Materials/HandMaterial");
 
-            if (_handPrefab == null)
-                Debug.LogWarning("[XRHandVisualizer] OVRHandPrefab not found – falling back to primitives.");
+            if (_leftModel == null || _rightModel == null)
+                Debug.LogWarning("[XRHandVisualizer] Hand models not found – falling back to primitives.");
 
-            StartCoroutine(BuildHandObject(rig.leftHandAnchor,  "hand_left",  isLeft: true));
-            StartCoroutine(BuildHandObject(rig.rightHandAnchor, "hand_right", isLeft: false));
+            StartCoroutine(BuildHandObject(rig.leftHandAnchor,  "hand_left",  _leftModel));
+            StartCoroutine(BuildHandObject(rig.rightHandAnchor, "hand_right", _rightModel));
         }
 
-        private IEnumerator BuildHandObject(Transform anchor, string handName, bool isLeft)
+        private IEnumerator BuildHandObject(Transform anchor, string handName, GameObject model)
         {
             if (anchor == null) yield break;
             if (anchor.Find(handName) != null) yield break;
@@ -50,45 +63,31 @@ namespace C2M2.Interaction.VR
             hand.transform.localRotation = Quaternion.identity;
             hand.transform.localScale    = Vector3.one;
 
-            if (_handPrefab != null)
+            if (model != null)
             {
-                var instance = Instantiate(_handPrefab, hand.transform, false);
-                instance.name = "OVRHand";
+                var instance = Instantiate(model, hand.transform, false);
+                instance.name = "HandModel";
                 instance.transform.localPosition = Vector3.zero;
                 instance.transform.localRotation = Quaternion.identity;
                 instance.transform.localScale    = Vector3.one;
 
-                // Set HandType via reflection — the field is private on OVRHand but
-                // OVRSkeleton/OVRMesh read it through the IOVRSkeletonDataProvider /
-                // IOVRMeshDataProvider interfaces that OVRHand implements, so one
-                // reflection call is sufficient.
-                var ovrHand = instance.GetComponent<OVRHand>();
-                if (ovrHand != null)
+                if (_handMaterial != null)
                 {
-                    var field = typeof(OVRHand).GetField("HandType",
-                        BindingFlags.NonPublic | BindingFlags.Instance);
-                    if (field != null)
+                    foreach (var smr in instance.GetComponentsInChildren<SkinnedMeshRenderer>(true))
                     {
-                        OVRHand.Hand handType = isLeft ? OVRHand.Hand.HandLeft : OVRHand.Hand.HandRight;
-                        field.SetValue(ovrHand, handType);
-                        Debug.Log($"[XRHandVisualizer] Set HandType={handType} on {handName}.");
+                        var mats = new Material[smr.sharedMaterials.Length];
+                        for (int i = 0; i < mats.Length; i++)
+                            mats[i] = _handMaterial;
+                        smr.sharedMaterials = mats;
                     }
-                    else
-                    {
-                        Debug.LogWarning("[XRHandVisualizer] Could not find HandType field on OVRHand via reflection.");
-                    }
-                }
-                else
-                {
-                    Debug.LogWarning("[XRHandVisualizer] OVRHand component not found on instantiated prefab.");
                 }
 
-                // Wait one frame for OVRHand.Start() to initialize with the new HandType.
-                yield return null;
+                Debug.Log($"[XRHandVisualizer] Built '{handName}' from model '{model.name}'.");
             }
             else
             {
                 BuildPrimitive(hand.transform);
+                Debug.Log($"[XRHandVisualizer] Built '{handName}' as primitive fallback.");
             }
         }
 
