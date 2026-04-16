@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.XR;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace C2M2.Interaction.VR
@@ -28,12 +29,16 @@ namespace C2M2.Interaction.VR
         {
             vrController = transform.GetChild(0).gameObject;
             desktopController = transform.GetChild(1).gameObject;
-
             vrCameras = vrController.GetComponentsInChildren<Camera>();
             desktopCamera = desktopController.GetComponent<Camera>();
+            StartCoroutine(DelayedVRCheck());
+        }
 
+        private IEnumerator DelayedVRCheck()
+        {
+            // Wait for OpenXR to fully initialize
+            yield return new WaitForSeconds(2f);
             CheckForVRDevice();
-
             SwitchState(VRDevicePresent);
         }
 

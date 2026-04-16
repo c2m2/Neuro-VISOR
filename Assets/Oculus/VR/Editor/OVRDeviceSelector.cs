@@ -23,24 +23,49 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+#if PRIORITIZE_OCULUS_XR_SETTINGS
+using Unity.XR.Oculus;
+#endif
 
 public class OVRDeviceSelector
 {
-	public static bool isTargetDeviceGearVrOrGo
+	public static bool isTargetDeviceQuestFamily
 	{
 		get
 		{
-			OVRProjectConfig projectConfig = OVRProjectConfig.GetProjectConfig();
-			return projectConfig.targetDeviceTypes.Contains(OVRProjectConfig.DeviceType.GearVrOrGo);
+			return isTargetDeviceQuest || isTargetDeviceQuest2;
 		}
 	}
-
 	public static bool isTargetDeviceQuest
 	{
 		get
 		{
+// #if PRIORITIZE_OCULUS_XR_SETTINGS
+// 			OculusSettings settings;
+// 			UnityEditor.EditorBuildSettings.TryGetConfigObject<OculusSettings>("Unity.XR.Oculus.Settings", out settings);
+// 			return settings.TargetQuest;
+// #else
+// 			OVRProjectConfig projectConfig = OVRProjectConfig.GetProjectConfig();
+// 			return projectConfig.targetDeviceTypes.Contains(OVRProjectConfig.DeviceType.Quest);
+// #endif
+OVRProjectConfig projectConfig = OVRProjectConfig.GetProjectConfig();
+return projectConfig.targetDeviceTypes.Contains(OVRProjectConfig.DeviceType.Quest);
+
+		}
+	}
+
+	public static bool isTargetDeviceQuest2
+	{
+		get
+		{
+#if PRIORITIZE_OCULUS_XR_SETTINGS
+			OculusSettings settings;
+			UnityEditor.EditorBuildSettings.TryGetConfigObject<OculusSettings>("Unity.XR.Oculus.Settings", out settings);
+			return settings.TargetQuest2;
+#else
 			OVRProjectConfig projectConfig = OVRProjectConfig.GetProjectConfig();
-			return projectConfig.targetDeviceTypes.Contains(OVRProjectConfig.DeviceType.Quest);
+			return projectConfig.targetDeviceTypes.Contains(OVRProjectConfig.DeviceType.Quest2);
+#endif
 		}
 	}
 }

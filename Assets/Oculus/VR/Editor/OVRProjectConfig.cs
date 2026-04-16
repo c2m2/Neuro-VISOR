@@ -27,12 +27,16 @@ using System.IO;
 using System;
 
 [System.Serializable]
+#if UNITY_EDITOR
+[UnityEditor.InitializeOnLoad]
+#endif
 public class OVRProjectConfig : ScriptableObject
 {
 	public enum DeviceType
 	{
-		GearVrOrGo = 0,
-		Quest = 1
+		//GearVrOrGo = 0, // DEPRECATED
+		Quest = 1,
+		Quest2 = 2
 	}
 
 	public enum HandTrackingSupport
@@ -42,25 +46,56 @@ public class OVRProjectConfig : ScriptableObject
 		HandsOnly = 2
 	}
 
-	public enum ColorGamut
+	public enum HandTrackingFrequency
 	{
-		Default = 0,
-		Rec709 = 1,
-		DciP3 = 2,
-		Adobe = 3,
-		Rec2020 = 4
+		LOW = 0,
+		HIGH = 1,
+		MAX = 2
 	}
 
-	public List<DeviceType> targetDeviceTypes;
-	public HandTrackingSupport handTrackingSupport;
-	public ColorGamut colorGamut;
+	public enum SpatialAnchorsSupport
+	{
+		Disabled = 0,
+		Enabled = 1,
+	}
 
-	public bool disableBackups;
-	public bool enableNSCConfig;
 
-	public bool focusAware;
+	public List<DeviceType> targetDeviceTypes = new List<DeviceType> {DeviceType.Quest, DeviceType.Quest2};
+	public bool allowOptional3DofHeadTracking = false;
+	public HandTrackingSupport handTrackingSupport = HandTrackingSupport.ControllersOnly;
+	public HandTrackingFrequency handTrackingFrequency = HandTrackingFrequency.LOW;
+	public SpatialAnchorsSupport spatialAnchorsSupport = SpatialAnchorsSupport.Disabled;
+
+	public bool disableBackups = true;
+	public bool enableNSCConfig = true;
+	public string securityXmlPath;
+
+	public bool skipUnneededShaders = false;
+
+	[System.Obsolete("Focus awareness is now required. The option will be deprecated.", false)]
+	public bool focusAware = true;
+
+	public bool requiresSystemKeyboard = false;
+	public bool experimentalFeaturesEnabled = false;
+	public bool insightPassthroughEnabled = false;
+	public Texture2D systemSplashScreen;
 
 	//public const string OculusProjectConfigAssetPath = "Assets/Oculus/OculusProjectConfig.asset";
+
+	static OVRProjectConfig()
+	{
+		// BuildPipeline.isBuildingPlayer cannot be called in a static constructor
+		// Run Update once to call GetProjectConfig then remove delegate
+		EditorApplication.update += Update;
+	}
+
+	static void Update()
+	{
+		// Initialize the asset if it doesn't exist
+		GetProjectConfig();
+		// Stop running Update
+		EditorApplication.update -= Update;
+	}
 
 	private static string GetOculusProjectConfigAssetPath()
 	{
@@ -70,6 +105,16 @@ public class OVRProjectConfig : ScriptableObject
 		string editorDir = Directory.GetParent(assetPath).FullName;
 		string ovrDir = Directory.GetParent(editorDir).FullName;
 		string oculusDir = Directory.GetParent(ovrDir).FullName;
+
+		if (OVRPluginUpdaterStub.IsInsidePackageDistribution())
+		{
+			oculusDir = Path.GetFullPath(Path.Combine(Application.dataPath, "Oculus"));
+			if (!Directory.Exists(oculusDir))
+			{
+				Directory.CreateDirectory(oculusDir);
+			}
+		}
+
 		string configAssetPath = Path.GetFullPath(Path.Combine(oculusDir, "OculusProjectConfig.asset"));
 		Uri configUri = new Uri(configAssetPath);
 		Uri projectUri = new Uri(Application.dataPath);
@@ -90,16 +135,37 @@ public class OVRProjectConfig : ScriptableObject
 		{
 			Debug.LogWarningFormat("Unable to load ProjectConfig from {0}, error {1}", oculusProjectConfigAssetPath, e.Message);
 		}
-		if (projectConfig == null)
+		// Initialize the asset only if a build is not currently running.
+		if (projectConfig == null && !BuildPipeline.isBuildingPlayer)
 		{
 			projectConfig = ScriptableObject.CreateInstance<OVRProjectConfig>();
 			projectConfig.targetDeviceTypes = new List<DeviceType>();
 			projectConfig.targetDeviceTypes.Add(DeviceType.Quest);
+			projectConfig.targetDeviceTypes.Add(DeviceType.Quest2);
+			projectConfig.allowOptional3DofHeadTracking = false;
 			projectConfig.handTrackingSupport = HandTrackingSupport.ControllersOnly;
+			projectConfig.handTrackingFrequency = HandTrackingFrequency.LOW;
+			projectConfig.spatialAnchorsSupport = SpatialAnchorsSupport.Disabled;
 			projectConfig.disableBackups = true;
 			projectConfig.enableNSCConfig = true;
-			projectConfig.focusAware = false;
+			projectConfig.skipUnneededShaders = false;
+			projectConfig.requiresSystemKeyboard = false;
+			projectConfig.experimentalFeaturesEnabled = false;
+			projectConfig.insightPassthroughEnabled = false;
 			AssetDatabase.CreateAsset(projectConfig, oculusProjectConfigAssetPath);
+		}
+		// Force migration to Quest device if still on legacy GearVR/Go device type
+		if (projectConfig.targetDeviceTypes.Contains((DeviceType)0)) // deprecated GearVR/Go device
+		{
+			projectConfig.targetDeviceTypes.Remove((DeviceType)0); // deprecated GearVR/Go device
+			if (!projectConfig.targetDeviceTypes.Contains(DeviceType.Quest))
+			{
+				projectConfig.targetDeviceTypes.Add(DeviceType.Quest);
+			}
+			if (!projectConfig.targetDeviceTypes.Contains(DeviceType.Quest2))
+			{
+				projectConfig.targetDeviceTypes.Add(DeviceType.Quest2);
+			}
 		}
 		return projectConfig;
 	}
@@ -112,17 +178,5 @@ public class OVRProjectConfig : ScriptableObject
 			Debug.LogWarningFormat("The asset path of ProjectConfig is wrong. Expect {0}, get {1}", oculusProjectConfigAssetPath, AssetDatabase.GetAssetPath(projectConfig));
 		}
 		EditorUtility.SetDirty(projectConfig);
-	}
-
-	public static string ColorGamutToString(ColorGamut colorGamut)
-	{
-		switch(colorGamut)
-		{
-			case ColorGamut.Rec709: return "Rec. 709";
-			case ColorGamut.DciP3: return "DCI-P3";
-			case ColorGamut.Adobe: return "Adobe";
-			case ColorGamut.Rec2020: return "Rec. 2020";
-			default: return "<none>";
-		}
 	}
 }
