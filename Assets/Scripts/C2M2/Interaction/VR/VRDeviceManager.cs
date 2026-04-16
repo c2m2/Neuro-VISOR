@@ -122,8 +122,8 @@ namespace C2M2.Interaction.VR
                 var viz = vrController.AddComponent<XRHandVisualizer>();
 #if UNITY_EDITOR
                 var prefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(
-                    "Assets/Oculus/VR/Prefabs/OVRControllerPrefab.prefab");
-                viz.SetControllerPrefab(prefab);
+                    "Assets/Oculus/VR/Prefabs/OVRHandPrefab.prefab");
+                viz.SetHandPrefab(prefab);
 #endif
             }
         }

@@ -5,8 +5,9 @@ namespace C2M2.Interaction.VR
 {
     /// <summary>
     /// Singleton bridge from the legacy OVRInput API to the Unity Input System.
-    /// Provides equivalent functionality for the controller buttons and axes used
-    /// throughout this project. Lazily self-creates when first accessed during play.
+    /// Each action carries multiple bindings covering both the generic XRController
+    /// paths and the Oculus-specific paths so at least one will match the active
+    /// OpenXR interaction profile (Meta Quest Link, built PC app, etc.).
     /// </summary>
     public class XRInputBridge : MonoBehaviour
     {
@@ -55,18 +56,56 @@ namespace C2M2.Interaction.VR
             }
             _instance = this;
 
-            rightTrigger    = MakeButton("RightTrigger",    "{RightHand}/trigger");
-            leftTrigger     = MakeButton("LeftTrigger",     "{LeftHand}/trigger");
-            rightGrip       = MakeButton("RightGrip",       "{RightHand}/grip");
-            leftGrip        = MakeButton("LeftGrip",        "{LeftHand}/grip");
-            rightPrimary    = MakeButton("RightPrimary",    "{RightHand}/primaryButton");
-            leftPrimary     = MakeButton("LeftPrimary",     "{LeftHand}/primaryButton");
-            rightSecondary  = MakeButton("RightSecondary",  "{RightHand}/secondaryButton");
-            leftSecondary   = MakeButton("LeftSecondary",   "{LeftHand}/secondaryButton");
-            menuButton      = MakeButton("Menu",            "{LeftHand}/menuButton");
+            // Each critical action gets both the generic XRController float-axis path
+            // and the Oculus-specific boolean-button path as fallbacks.  Unity Input
+            // System will bind whichever path matches the active device layout.
 
-            rightThumbstick = MakeAxis("RightThumbstick",   "{RightHand}/thumbstick");
-            leftThumbstick  = MakeAxis("LeftThumbstick",    "{LeftHand}/thumbstick");
+            rightTrigger   = MakeMultiButton("RightTrigger",
+                "<XRController>{RightHand}/trigger",
+                "<XRController>{RightHand}/triggerButton",
+                "<OculusTouchController>{RightHand}/trigger",
+                "<OculusTouchController>{RightHand}/triggerPressed");
+
+            leftTrigger    = MakeMultiButton("LeftTrigger",
+                "<XRController>{LeftHand}/trigger",
+                "<XRController>{LeftHand}/triggerButton",
+                "<OculusTouchController>{LeftHand}/trigger",
+                "<OculusTouchController>{LeftHand}/triggerPressed");
+
+            rightGrip      = MakeMultiButton("RightGrip",
+                "<XRController>{RightHand}/grip",
+                "<XRController>{RightHand}/gripButton",
+                "<OculusTouchController>{RightHand}/grip",
+                "<OculusTouchController>{RightHand}/gripPressed");
+
+            leftGrip       = MakeMultiButton("LeftGrip",
+                "<XRController>{LeftHand}/grip",
+                "<XRController>{LeftHand}/gripButton",
+                "<OculusTouchController>{LeftHand}/grip",
+                "<OculusTouchController>{LeftHand}/gripPressed");
+
+            rightPrimary   = MakeMultiButton("RightPrimary",
+                "<XRController>{RightHand}/primaryButton",
+                "<OculusTouchController>{RightHand}/primaryButton");
+
+            leftPrimary    = MakeMultiButton("LeftPrimary",
+                "<XRController>{LeftHand}/primaryButton",
+                "<OculusTouchController>{LeftHand}/primaryButton");
+
+            rightSecondary = MakeMultiButton("RightSecondary",
+                "<XRController>{RightHand}/secondaryButton",
+                "<OculusTouchController>{RightHand}/secondaryButton");
+
+            leftSecondary  = MakeMultiButton("LeftSecondary",
+                "<XRController>{LeftHand}/secondaryButton",
+                "<OculusTouchController>{LeftHand}/secondaryButton");
+
+            menuButton     = MakeMultiButton("Menu",
+                "<XRController>{LeftHand}/menuButton",
+                "<OculusTouchController>{LeftHand}/menuButton");
+
+            rightThumbstick = MakeAxis("RightThumbstick", "<XRController>{RightHand}/thumbstick");
+            leftThumbstick  = MakeAxis("LeftThumbstick",  "<XRController>{LeftHand}/thumbstick");
 
             EnableAll();
         }
@@ -84,19 +123,19 @@ namespace C2M2.Interaction.VR
 
         // ── Factory helpers ────────────────────────────────────────────────────
 
-        private static InputAction MakeButton(string name, string hand)
+        private static InputAction MakeMultiButton(string name, params string[] bindings)
         {
-            var a = new InputAction(name, InputActionType.Button,
-                binding: "<XRController>" + hand);
+            var a = new InputAction(name, InputActionType.Button);
+            foreach (var b in bindings)
+                a.AddBinding(b);
             return a;
         }
 
-        private static InputAction MakeAxis(string name, string hand)
+        private static InputAction MakeAxis(string name, string binding)
         {
-            var a = new InputAction(name, InputActionType.Value,
-                binding: "<XRController>" + hand,
+            return new InputAction(name, InputActionType.Value,
+                binding: binding,
                 expectedControlType: "Vector2");
-            return a;
         }
 
         private void EnableAll()

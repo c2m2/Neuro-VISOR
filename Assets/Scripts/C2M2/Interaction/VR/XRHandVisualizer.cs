@@ -1,22 +1,22 @@
 using System.Collections;
+using System.Reflection;
 using UnityEngine;
 
 namespace C2M2.Interaction.VR
 {
     /// <summary>
-    /// Creates controller-visual GameObjects named "hand_left" and "hand_right"
-    /// as children of OVRCameraRig's hand anchors, using OVRControllerPrefab.
+    /// Creates phantom-hand GameObjects named "hand_left" and "hand_right"
+    /// as children of OVRCameraRig's hand anchors using OVRHandPrefab.
     ///
-    /// VRDeviceManager injects the controller prefab reference via
-    /// SetControllerPrefab() before Start() runs. Falls back to simple primitives
-    /// when no prefab is available.
+    /// VRDeviceManager injects the prefab reference via SetHandPrefab() before
+    /// Start() runs. Falls back to simple primitives when no prefab is available.
     /// </summary>
     public class XRHandVisualizer : MonoBehaviour
     {
-        private GameObject _controllerPrefab;
+        private GameObject _handPrefab;
 
         /// <summary>Called by VRDeviceManager immediately after AddComponent.</summary>
-        public void SetControllerPrefab(GameObject prefab) => _controllerPrefab = prefab;
+        public void SetHandPrefab(GameObject prefab) => _handPrefab = prefab;
 
         private void Start()
         {
@@ -29,11 +29,11 @@ namespace C2M2.Interaction.VR
                 return;
             }
 
-            if (_controllerPrefab == null)
-                _controllerPrefab = Resources.Load<GameObject>("Prefabs/OVRControllerPrefab");
+            if (_handPrefab == null)
+                _handPrefab = Resources.Load<GameObject>("Prefabs/OVRHandPrefab");
 
-            if (_controllerPrefab == null)
-                Debug.LogWarning("[XRHandVisualizer] OVRControllerPrefab not found – falling back to primitives.");
+            if (_handPrefab == null)
+                Debug.LogWarning("[XRHandVisualizer] OVRHandPrefab not found – falling back to primitives.");
 
             StartCoroutine(BuildHandObject(rig.leftHandAnchor,  "hand_left",  isLeft: true));
             StartCoroutine(BuildHandObject(rig.rightHandAnchor, "hand_right", isLeft: false));
@@ -42,7 +42,7 @@ namespace C2M2.Interaction.VR
         private IEnumerator BuildHandObject(Transform anchor, string handName, bool isLeft)
         {
             if (anchor == null) yield break;
-            if (anchor.Find(handName) != null) yield break; // already exists
+            if (anchor.Find(handName) != null) yield break;
 
             var hand = new GameObject(handName);
             hand.transform.SetParent(anchor, false);
@@ -50,70 +50,45 @@ namespace C2M2.Interaction.VR
             hand.transform.localRotation = Quaternion.identity;
             hand.transform.localScale    = Vector3.one;
 
-            if (_controllerPrefab != null)
+            if (_handPrefab != null)
             {
-                var ctrl = Instantiate(_controllerPrefab, hand.transform, false);
-                ctrl.name = "ControllerModel";
-                ctrl.transform.localPosition = Vector3.zero;
-                ctrl.transform.localRotation = Quaternion.identity;
-                ctrl.transform.localScale    = Vector3.one;
+                var instance = Instantiate(_handPrefab, hand.transform, false);
+                instance.name = "OVRHand";
+                instance.transform.localPosition = Vector3.zero;
+                instance.transform.localRotation = Quaternion.identity;
+                instance.transform.localScale    = Vector3.one;
 
-                // Wait two frames: frame 1 for OVRControllerHelper.Awake(),
-                // frame 2 for OVRControllerHelper.Start() which hides all sub-models.
-                yield return null;
-                yield return null;
-
-                var helper = ctrl.GetComponent<OVRControllerHelper>();
-                if (helper != null)
+                // Set HandType via reflection — the field is private on OVRHand but
+                // OVRSkeleton/OVRMesh read it through the IOVRSkeletonDataProvider /
+                // IOVRMeshDataProvider interfaces that OVRHand implements, so one
+                // reflection call is sufficient.
+                var ovrHand = instance.GetComponent<OVRHand>();
+                if (ovrHand != null)
                 {
-                    helper.enabled = false; // stop Update() from overriding visibility
-                    ForceControllerModelActive(helper, isLeft);
+                    var field = typeof(OVRHand).GetField("HandType",
+                        BindingFlags.NonPublic | BindingFlags.Instance);
+                    if (field != null)
+                    {
+                        OVRHand.Hand handType = isLeft ? OVRHand.Hand.HandLeft : OVRHand.Hand.HandRight;
+                        field.SetValue(ovrHand, handType);
+                        Debug.Log($"[XRHandVisualizer] Set HandType={handType} on {handName}.");
+                    }
+                    else
+                    {
+                        Debug.LogWarning("[XRHandVisualizer] Could not find HandType field on OVRHand via reflection.");
+                    }
                 }
                 else
                 {
-                    Debug.LogWarning("[XRHandVisualizer] OVRControllerHelper not found on instantiated prefab.");
+                    Debug.LogWarning("[XRHandVisualizer] OVRHand component not found on instantiated prefab.");
                 }
+
+                // Wait one frame for OVRHand.Start() to initialize with the new HandType.
+                yield return null;
             }
             else
             {
                 BuildPrimitive(hand.transform);
-            }
-        }
-
-        /// <summary>
-        /// Mirrors OVRControllerHelper's headset-detection switch so the correct
-        /// physical controller model is shown for whatever headset is connected.
-        /// </summary>
-        private static void ForceControllerModelActive(OVRControllerHelper helper, bool isLeft)
-        {
-            OVRPlugin.SystemHeadset headset = OVRPlugin.GetSystemHeadsetType();
-            Debug.Log($"[XRHandVisualizer] Headset type: {headset}, isLeft: {isLeft}");
-
-            GameObject model;
-            switch (headset)
-            {
-                case OVRPlugin.SystemHeadset.Rift_CV1:
-                    model = isLeft ? helper.m_modelOculusTouchRiftLeftController
-                                   : helper.m_modelOculusTouchRiftRightController;
-                    break;
-                case OVRPlugin.SystemHeadset.Oculus_Quest_2:
-                    model = isLeft ? helper.m_modelOculusTouchQuest2LeftController
-                                   : helper.m_modelOculusTouchQuest2RightController;
-                    break;
-                default:
-                    model = isLeft ? helper.m_modelOculusTouchQuestAndRiftSLeftController
-                                   : helper.m_modelOculusTouchQuestAndRiftSRightController;
-                    break;
-            }
-
-            if (model != null)
-            {
-                model.SetActive(true);
-                Debug.Log($"[XRHandVisualizer] Activated controller model '{model.name}' for {(isLeft ? "left" : "right")} hand.");
-            }
-            else
-            {
-                Debug.LogWarning($"[XRHandVisualizer] No matching controller sub-model found (headset={headset}, isLeft={isLeft}).");
             }
         }
 
