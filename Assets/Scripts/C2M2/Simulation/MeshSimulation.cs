@@ -162,9 +162,9 @@ namespace C2M2.Simulation
             {
                 if (GameManager.instance.vrDeviceManager.VRActive)
                 {
-                    // Uses the value of both joysticks added together
-                    float scaler = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick).y + OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick).y;
-
+                    // Uses the combined Y axis of both thumbsticks
+                    XRInputBridge xri = XRInputBridge.Instance;
+                    float scaler = xri != null ? xri.GetBothThumbsticksY() : 0f;
                     return ThumbstickScaler * scaler;
                 }
                 else

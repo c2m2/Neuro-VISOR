@@ -89,7 +89,7 @@ namespace C2M2.Interaction.VR
                 instance.transform.localPosition = Vector3.zero;
                 // Match the rotation used by the original CustomHandLeft/Right prefab roots:
                 // +90° Z for left hand, -90° Z for right hand.
-                instance.transform.localRotation = Quaternion.Euler(0f, 0f, isLeft ? 90f : -90f);
+                instance.transform.localRotation = Quaternion.Euler(0f, 0f, isLeft ? 70f : -70f);
                 instance.transform.localScale    = Vector3.one;
 
                 if (_handMaterial != null)

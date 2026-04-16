@@ -29,10 +29,13 @@ namespace C2M2.Interaction.VR
             // Build raycast target object
             raycastTargetObj = BuildChildObject(transform);
 
-            // Build the Rigidbody
-            //BuildRigidBody(raycastTargetObj);
+            // Kinematic Rigidbody ensures the physics engine re-syncs this collider's position
+            // every FixedUpdate when Physics.autoSyncTransforms is disabled (project default).
+            // Without it the MeshCollider stays at world-origin after the neuron is repositioned,
+            // making Physics.Raycast miss the neuron entirely.
+            BuildRigidBody(raycastTargetObj);
 
-            // Check if there is a mesh, then send it to mesh collider   
+            // Check if there is a mesh, then send it to mesh collider
             MeshFilter mf = gameObject.GetComponent<MeshFilter>();
             Mesh mesh = gameObject.GetComponent<MeshFilter>().mesh;
             if (mesh == null) throw new MeshNotFoundException();

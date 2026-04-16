@@ -84,6 +84,18 @@ namespace C2M2.Interaction.VR
             if (vrControlScheme != null) vrControlScheme.SetActive(vrActive);
             if (desktopControlScheme != null) desktopControlScheme.SetActive(!vrActive);
 
+            // Disable LocalAvatar's stale hand_left / hand_right BEFORE enabling OculusEventSignalers.
+            // OculusEventSignaler.SearchForHand() calls GameObject.Find(handName) in its Start() coroutine.
+            // If the LocalAvatar hands are still active when Start() runs, Find() returns them instead of
+            // the anchored hands created by XRHandVisualizer, causing a duplicate/wrong hand reference.
+            if (vrActive)
+            {
+                var staleLeft  = GameObject.Find("hand_left");
+                if (staleLeft  != null) staleLeft.SetActive(false);
+                var staleRight = GameObject.Find("hand_right");
+                if (staleRight != null) staleRight.SetActive(false);
+            }
+
             // Enable controllers
             OculusEventSignaler[] oculusSignalers = GetComponentsInChildren<OculusEventSignaler>();
             foreach (OculusEventSignaler o in oculusSignalers)
