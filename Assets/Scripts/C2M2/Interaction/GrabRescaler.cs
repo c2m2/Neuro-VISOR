@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using C2M2.Utils;
-using System.Security.Cryptography;
-using System.Collections.Specialized;
+using C2M2.Interaction.VR;
 using System;
 using C2M2.NeuronalDynamics.Interaction;
 using System.Collections.Generic;
@@ -29,7 +28,6 @@ namespace C2M2.Interaction
         public bool xScale = true;
         public bool yScale = true;
         public bool zScale = true;
-        public OVRInput.RawButton LeftX = OVRInput.RawButton.X;
         public KeyCode incKey = KeyCode.UpArrow;
         public KeyCode decKey = KeyCode.DownArrow;
         public KeyCode visibilityToggleKey = KeyCode.R;
@@ -60,11 +58,14 @@ namespace C2M2.Interaction
         {
             get
             {
-                ///<returns>A float between -1 and 1, where -1 means the thumbstick y axis is completely down and 1 implies it is all the way up</returns>
-                if (GameManager.instance.vrDeviceManager.VRActive) return (OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick).y + OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick).y);
-                else if (Input.GetKey(incKey) && !Input.GetKey(decKey)) return 1f;
-                else if (Input.GetKey(decKey) && !Input.GetKey(incKey)) return -1f;
-                return 0;
+                if (GameManager.instance.vrDeviceManager.VRActive)
+                {
+                    XRInputBridge xri = XRInputBridge.Instance;
+                    return xri != null ? xri.GetBothThumbsticksY() : 0f;
+                }
+                if (Input.GetKey(incKey) && !Input.GetKey(decKey)) return  1f;
+                if (Input.GetKey(decKey) && !Input.GetKey(incKey)) return -1f;
+                return 0f;
             }
         }
 
@@ -73,7 +74,9 @@ namespace C2M2.Interaction
         {
             if (GameManager.instance.vrDeviceManager.VRActive)
             {
-                if (OVRInput.GetDown(LeftX) && !OVRInput.Get(OVRInput.RawButton.Y))
+                XRInputBridge xri = XRInputBridge.Instance;
+                // X button (left primary) pressed while Y button (left secondary) is NOT held
+                if (xri != null && xri.GetPrimaryButtonDown(true) && !xri.GetSecondaryButton(true))
                 {
                     meshrender.enabled = !meshrender.enabled;
                     pivotcollider.enabled = !pivotcollider.enabled;

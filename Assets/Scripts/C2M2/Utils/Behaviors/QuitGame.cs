@@ -1,24 +1,27 @@
-﻿using UnityEngine;
+using UnityEngine;
+using C2M2.Interaction.VR;
 
 namespace C2M2.Utils
 {
     public class QuitGame : MonoBehaviour
     {
         public KeyCode quitKey = KeyCode.Escape;
-        public OVRInput.Button quitButton = OVRInput.Button.Start;
+
         private bool OculusRequested
         {
             get
             {
-                return OVRInput.Get(quitButton, OVRInput.Controller.LTouch) || OVRInput.Get(quitButton, OVRInput.Controller.RTouch);
+                XRInputBridge xri = XRInputBridge.Instance;
+                return xri != null && xri.GetMenuButton();
             }
         }
+
         private bool QuitRequested
         {
             get
             {
-                return GameManager.instance.vrDeviceManager.VRActive ?
-                    (OculusRequested || Input.GetKey(quitKey))
+                return GameManager.instance.vrDeviceManager.VRActive
+                    ? (OculusRequested || Input.GetKey(quitKey))
                     : Input.GetKey(quitKey);
             }
         }
@@ -28,14 +31,10 @@ namespace C2M2.Utils
         [Tooltip("Number of frames to quit after.")]
         public int xFrames = 300;
 
-        // Update is called once per frame
         void Update()
         {
-            // Quit if the user requests or when the user requests
             if ((QuitAfterX && Time.frameCount >= xFrames) || QuitRequested)
-            {
                 Quit();
-            }
         }
 
         private void Quit()

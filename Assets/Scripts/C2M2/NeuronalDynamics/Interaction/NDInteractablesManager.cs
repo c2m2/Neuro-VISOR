@@ -1,5 +1,6 @@
 ﻿using C2M2;
 using C2M2.Interaction;
+using C2M2.Interaction.VR;
 using C2M2.NeuronalDynamics.Simulation;
 using System.Collections.Generic;
 using UnityEngine;
@@ -35,52 +36,50 @@ public abstract class NDInteractablesManager<T> : MonoBehaviour
 
     #region InputButtons
 
-    /// <summary>
-    /// Pressing these buttons allows interaction with the interactable
-    /// </summary>
-    public OVRInput.Button interactOVR = OVRInput.Button.PrimaryIndexTrigger;
-    public OVRInput.Button interactOVRS = OVRInput.Button.SecondaryIndexTrigger;
+    /// <summary>True while either index trigger is held (or always in desktop mode).</summary>
     public bool InteractHold
     {
         get
         {
             if (GameManager.instance.vrDeviceManager.VRActive)
-                return OVRInput.Get(interactOVR) || OVRInput.Get(interactOVRS);
-            else return true;
+            {
+                XRInputBridge xri = XRInputBridge.Instance;
+                return xri != null && xri.GetEitherTrigger();
+            }
+            return true;
         }
     }
 
     public KeyCode powerIncreaseKey = KeyCode.UpArrow;
     public KeyCode powerDecreaseKey = KeyCode.DownArrow;
+
+    /// <summary>Combined Y-axis of both thumbsticks, or keyboard fallback in desktop mode.</summary>
     public float PowerModifier
     {
         get
         {
             if (GameManager.instance.vrDeviceManager.VRActive)
             {
-                // Uses the value of both joysticks added together
-                float scaler = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick).y + OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick).y;
-
-                return scaler;
+                XRInputBridge xri = XRInputBridge.Instance;
+                return xri != null ? xri.GetBothThumbsticksY() : 0f;
             }
-            else
-            {
-                if (Input.GetKey(powerIncreaseKey)) return .4f;
-                if (Input.GetKey(powerDecreaseKey)) return -.4f;
-                else return 0;
-            }
+            if (Input.GetKey(powerIncreaseKey)) return  0.4f;
+            if (Input.GetKey(powerDecreaseKey)) return -0.4f;
+            return 0f;
         }
     }
 
-    public OVRInput.Button highlightOVR = OVRInput.Button.PrimaryHandTrigger;
-    public OVRInput.Button highlightOVRS = OVRInput.Button.SecondaryHandTrigger;
+    /// <summary>True while either grip trigger is held.</summary>
     public bool HighLightHold
     {
         get
         {
             if (GameManager.instance.vrDeviceManager.VRActive)
-                return OVRInput.Get(highlightOVR) || OVRInput.Get(highlightOVRS);
-            else return false; // We cannot highlight through the emulator
+            {
+                XRInputBridge xri = XRInputBridge.Instance;
+                return xri != null && xri.GetEitherGrip();
+            }
+            return false;
         }
     }
 

@@ -6,7 +6,9 @@ using System.Collections.Generic;
 namespace C2M2.Interaction.VR
 {
     /// <summary>
-    /// Handles switching between VR and emulator modes
+    /// Handles switching between VR and emulator modes.
+    /// When VR is activated it also bootstraps XRInputBridge (controller input)
+    /// and XRHandVisualizer (hand-mesh creation).
     /// </summary>
     public class VRDeviceManager : MonoBehaviour
     {
@@ -24,6 +26,8 @@ namespace C2M2.Interaction.VR
         public bool VRActive { get; set; } = false;
         public bool VRDevicePresent { get { return !VRDevice.Equals(string.Empty); } }
         public string VRDevice { get; private set; }
+
+        private bool xrSystemsInitialized = false;
 
         private void Awake()
         {
@@ -93,6 +97,29 @@ namespace C2M2.Interaction.VR
                 cam.enabled = vrActive;
             }
             desktopCamera.enabled = !vrActive;
+
+            if (vrActive) EnsureXRSystemsInitialized();
+        }
+
+        /// <summary>
+        /// One-time setup of XRInputBridge and XRHandVisualizer when VR mode first activates.
+        /// </summary>
+        private void EnsureXRSystemsInitialized()
+        {
+            if (xrSystemsInitialized) return;
+            xrSystemsInitialized = true;
+
+            // Ensure the input bridge singleton exists.
+            // XRInputBridge.Instance auto-creates itself, but touching it here guarantees
+            // it's alive before any other component queries it this frame.
+            _ = XRInputBridge.Instance;
+
+            // Create hand visuals (hand_left / hand_right) under the OVR anchors.
+            // XRHandVisualizer.Start() locates OVRCameraRig and spawns the objects.
+            if (vrController.GetComponentInChildren<XRHandVisualizer>() == null)
+            {
+                vrController.AddComponent<XRHandVisualizer>();
+            }
         }
     }
 }

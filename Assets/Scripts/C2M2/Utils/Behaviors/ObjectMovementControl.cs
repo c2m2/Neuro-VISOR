@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using C2M2.Interaction.VR;
 
 namespace C2M2.Utils
 {
@@ -8,7 +9,6 @@ namespace C2M2.Utils
     {
         private OVRGrabbable grabbable = null;
 
-        public OVRInput.Button resetButton = OVRInput.Button.Start;
         public KeyCode resetKey = KeyCode.X;
         public Vector3 resetPosition = Vector3.zero;
         public Vector3 resetRotation = Vector3.zero;
@@ -43,12 +43,10 @@ namespace C2M2.Utils
             {
                 if (GameManager.instance.vrDeviceManager.VRActive)
                 {
-                    return OVRInput.Get(resetButton) && grabbable.isGrabbed;
+                    XRInputBridge xri = XRInputBridge.Instance;
+                    return xri != null && xri.GetMenuButton() && grabbable.isGrabbed;
                 }
-                else
-                {
-                    return Input.GetKey(resetKey) && IsClickedObjectThisObject(out RaycastHit hitInfo);
-                }
+                return Input.GetKey(resetKey) && IsClickedObjectThisObject(out _);
             }
         }
 

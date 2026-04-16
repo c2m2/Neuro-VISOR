@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using C2M2.Utils;
+using C2M2.Interaction.VR;
 using TMPro;
 using UnityEngine.UI;
 namespace C2M2.NeuronalDynamics.Interaction.UI
@@ -97,19 +98,22 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
             }
         }
 
-        public OVRInput.Axis2D thumbstickP = OVRInput.Axis2D.PrimaryThumbstick;
-        public OVRInput.Axis2D thumbstickS = OVRInput.Axis2D.SecondaryThumbstick;
         public KeyCode incKey = KeyCode.UpArrow;
         public KeyCode decKey = KeyCode.DownArrow;
+
+        /// <summary>Combined Y-axis of both thumbsticks, or keyboard fallback in desktop mode.</summary>
         public float PowerModifier
         {
             get
             {
-                // Uses the value of both joysticks added together
-                if (GameManager.instance.vrDeviceManager.VRActive) return OVRInput.Get(thumbstickP).y + OVRInput.Get(thumbstickS).y;
-                else if (Input.GetKey(incKey)) return 1;
-                else if (Input.GetKey(decKey)) return -1;
-                else return 0f;
+                if (GameManager.instance.vrDeviceManager.VRActive)
+                {
+                    XRInputBridge xri = XRInputBridge.Instance;
+                    return xri != null ? xri.GetBothThumbsticksY() : 0f;
+                }
+                if (Input.GetKey(incKey)) return  1f;
+                if (Input.GetKey(decKey)) return -1f;
+                return 0f;
             }
         }
 
