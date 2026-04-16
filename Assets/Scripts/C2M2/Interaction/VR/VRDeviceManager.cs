@@ -115,10 +115,16 @@ namespace C2M2.Interaction.VR
             _ = XRInputBridge.Instance;
 
             // Create hand visuals (hand_left / hand_right) under the OVR anchors.
-            // XRHandVisualizer.Start() locates OVRCameraRig and spawns the objects.
+            // Inject the controller prefab reference directly so the visualizer never
+            // depends on Resources.Load succeeding (which requires proper import).
             if (vrController.GetComponentInChildren<XRHandVisualizer>() == null)
             {
-                vrController.AddComponent<XRHandVisualizer>();
+                var viz = vrController.AddComponent<XRHandVisualizer>();
+#if UNITY_EDITOR
+                var prefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(
+                    "Assets/Oculus/VR/Prefabs/OVRControllerPrefab.prefab");
+                viz.SetControllerPrefab(prefab);
+#endif
             }
         }
     }

@@ -5,19 +5,19 @@ namespace C2M2.Interaction.VR
 {
     /// <summary>
     /// Creates controller-visual GameObjects named "hand_left" and "hand_right"
-    /// as children of OVRCameraRig's hand anchors.
+    /// as children of OVRCameraRig's hand anchors, using OVRControllerPrefab.
     ///
-    /// Serves two purposes:
-    ///   1. Provide a visual controller indicator while the Avatar SDK is absent.
-    ///   2. Satisfy OculusEventSignaler.SearchForHand() so the static-hand toggle works.
-    ///
-    /// Loads OVRControllerPrefab from Resources, instantiates it under each anchor,
-    /// and force-activates the correct controller sub-model using the same headset
-    /// detection as OVRControllerHelper (Rift / Quest+RiftS / Quest 2).
-    /// Falls back to simple primitives if the prefab cannot be loaded.
+    /// VRDeviceManager injects the controller prefab reference via
+    /// SetControllerPrefab() before Start() runs. Falls back to simple primitives
+    /// when no prefab is available.
     /// </summary>
     public class XRHandVisualizer : MonoBehaviour
     {
+        private GameObject _controllerPrefab;
+
+        /// <summary>Called by VRDeviceManager immediately after AddComponent.</summary>
+        public void SetControllerPrefab(GameObject prefab) => _controllerPrefab = prefab;
+
         private void Start()
         {
             OVRCameraRig rig = GetComponentInChildren<OVRCameraRig>();
@@ -28,6 +28,12 @@ namespace C2M2.Interaction.VR
                 Debug.LogError("[XRHandVisualizer] No OVRCameraRig found in scene.");
                 return;
             }
+
+            if (_controllerPrefab == null)
+                _controllerPrefab = Resources.Load<GameObject>("Prefabs/OVRControllerPrefab");
+
+            if (_controllerPrefab == null)
+                Debug.LogWarning("[XRHandVisualizer] OVRControllerPrefab not found – falling back to primitives.");
 
             StartCoroutine(BuildHandObject(rig.leftHandAnchor,  "hand_left",  isLeft: true));
             StartCoroutine(BuildHandObject(rig.rightHandAnchor, "hand_right", isLeft: false));
@@ -44,23 +50,28 @@ namespace C2M2.Interaction.VR
             hand.transform.localRotation = Quaternion.identity;
             hand.transform.localScale    = Vector3.one;
 
-            var prefab = Resources.Load<GameObject>("Prefabs/OVRControllerPrefab");
-            if (prefab != null)
+            if (_controllerPrefab != null)
             {
-                var ctrl = Instantiate(prefab, hand.transform, false);
+                var ctrl = Instantiate(_controllerPrefab, hand.transform, false);
                 ctrl.name = "ControllerModel";
                 ctrl.transform.localPosition = Vector3.zero;
                 ctrl.transform.localRotation = Quaternion.identity;
                 ctrl.transform.localScale    = Vector3.one;
 
-                // Wait one frame so OVRControllerHelper.Start() runs and hides all sub-models
+                // Wait two frames: frame 1 for OVRControllerHelper.Awake(),
+                // frame 2 for OVRControllerHelper.Start() which hides all sub-models.
+                yield return null;
                 yield return null;
 
                 var helper = ctrl.GetComponent<OVRControllerHelper>();
                 if (helper != null)
                 {
-                    helper.enabled = false; // stop Update() from toggling visibility via OVRInput
+                    helper.enabled = false; // stop Update() from overriding visibility
                     ForceControllerModelActive(helper, isLeft);
+                }
+                else
+                {
+                    Debug.LogWarning("[XRHandVisualizer] OVRControllerHelper not found on instantiated prefab.");
                 }
             }
             else
@@ -70,12 +81,13 @@ namespace C2M2.Interaction.VR
         }
 
         /// <summary>
-        /// Mirrors OVRControllerHelper's headset-detection logic so the correct
+        /// Mirrors OVRControllerHelper's headset-detection switch so the correct
         /// physical controller model is shown for whatever headset is connected.
         /// </summary>
         private static void ForceControllerModelActive(OVRControllerHelper helper, bool isLeft)
         {
             OVRPlugin.SystemHeadset headset = OVRPlugin.GetSystemHeadsetType();
+            Debug.Log($"[XRHandVisualizer] Headset type: {headset}, isLeft: {isLeft}");
 
             GameObject model;
             switch (headset)
@@ -88,16 +100,21 @@ namespace C2M2.Interaction.VR
                     model = isLeft ? helper.m_modelOculusTouchQuest2LeftController
                                    : helper.m_modelOculusTouchQuest2RightController;
                     break;
-                default: // Quest, Quest Pro, Quest 3, RiftS, and all PC-Link variants
+                default:
                     model = isLeft ? helper.m_modelOculusTouchQuestAndRiftSLeftController
                                    : helper.m_modelOculusTouchQuestAndRiftSRightController;
                     break;
             }
 
             if (model != null)
+            {
                 model.SetActive(true);
+                Debug.Log($"[XRHandVisualizer] Activated controller model '{model.name}' for {(isLeft ? "left" : "right")} hand.");
+            }
             else
-                Debug.LogWarning("[XRHandVisualizer] No matching controller sub-model found in OVRControllerPrefab.");
+            {
+                Debug.LogWarning($"[XRHandVisualizer] No matching controller sub-model found (headset={headset}, isLeft={isLeft}).");
+            }
         }
 
         private static void BuildPrimitive(Transform parent)
