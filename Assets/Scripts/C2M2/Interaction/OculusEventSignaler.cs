@@ -35,7 +35,7 @@ namespace C2M2.Interaction
             get
             {
                 // If the raycasting button was pressed for the first time this frame, enable/disable raycasting
-                if (OVRInput.GetDown(beginRaycastingButton, controller))
+                if (XRInputFallback.GetButtonDown(beginRaycastingButton, controller))
                 {
                     toggled = !toggled;
                 }
@@ -64,7 +64,7 @@ namespace C2M2.Interaction
         {
             // If we are in toggle mode, is raycasting mode toggled on?
             // Otherwise, is the Begin Raycasting Button currently being pressed down?
-            bool rURaycasting = toggleMode ? Toggled : OVRInput.Get(beginRaycastingButton, controller);
+            bool rURaycasting = toggleMode ? Toggled : XRInputFallback.GetButton(beginRaycastingButton, controller);
 
             // If an object is being actively grabbed, don't raycast
             if (grabber != null && grabber.grabbedObject != null)
@@ -77,7 +77,7 @@ namespace C2M2.Interaction
         }
         private bool distancePressed = false;
         /// <returns> True if the specified controller button is pressed OR if we are near enough to the raycast target </returns>
-        protected override bool PressCondition() => (OVRInput.Get(triggerEventsButton, controller) || distancePressed);
+        protected override bool PressCondition() => (XRInputFallback.GetButton(triggerEventsButton, controller) || distancePressed);
 
         // At the start of a click change the line renderer color to pressed color
         protected override void OnPressBegin()

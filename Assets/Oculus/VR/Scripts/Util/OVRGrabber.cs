@@ -12,6 +12,7 @@ permissions and limitations under the License.
 
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.XR;
 
 /// <summary>
 /// Allows grabbing and throwing of objects with the OVRGrabbable component on them.
@@ -162,8 +163,9 @@ public class OVRGrabber : MonoBehaviour
         m_lastRot = transform.rotation;
 
 		float prevFlex = m_prevFlex;
-		// Update values from inputs
-		m_prevFlex = OVRInput.Get(OVRInput.Axis1D.PrimaryHandTrigger, m_controller);
+		// Update values from inputs. Prefer Unity's XR InputDevices so this works under
+		// OpenXR (where OVRPlugin.dll may not load). Falls back to OVRInput for legacy rigs.
+		m_prevFlex = XRInputFallback.GetGrip(m_controller);
 
 		CheckForGrabOrRelease(prevFlex);
     }
@@ -344,13 +346,13 @@ public class OVRGrabber : MonoBehaviour
     {
         if (m_grabbedObj != null)
         {
-			OVRPose localPose = new OVRPose { position = OVRInput.GetLocalControllerPosition(m_controller), orientation = OVRInput.GetLocalControllerRotation(m_controller) };
+			OVRPose localPose = new OVRPose { position = XRInputFallback.GetLocalPosition(m_controller), orientation = XRInputFallback.GetLocalRotation(m_controller) };
             OVRPose offsetPose = new OVRPose { position = m_anchorOffsetPosition, orientation = m_anchorOffsetRotation };
             localPose = localPose * offsetPose;
 
 			OVRPose trackingSpace = transform.ToOVRPose() * localPose.Inverse();
-			Vector3 linearVelocity = trackingSpace.orientation * OVRInput.GetLocalControllerVelocity(m_controller);
-			Vector3 angularVelocity = trackingSpace.orientation * OVRInput.GetLocalControllerAngularVelocity(m_controller);
+			Vector3 linearVelocity = trackingSpace.orientation * XRInputFallback.GetLocalVelocity(m_controller);
+			Vector3 angularVelocity = trackingSpace.orientation * XRInputFallback.GetLocalAngularVelocity(m_controller);
 
             GrabbableRelease(linearVelocity, angularVelocity);
         }

@@ -508,6 +508,7 @@ GameObject:
   - component: {fileID: 806130742265277101}
   - component: {fileID: 806130742265277103}
   - component: {fileID: 806130742265277100}
+  - component: {fileID: 1111222233334444551}
   m_Layer: 9
   m_Name: LeftHandAnchor
   m_TagString: Untagged
@@ -1260,6 +1261,7 @@ GameObject:
   - component: {fileID: 806130742610489090}
   - component: {fileID: 806130742610489092}
   - component: {fileID: 806130742610489089}
+  - component: {fileID: 1111222233334444552}
   m_Layer: 9
   m_Name: RightHandAnchor
   m_TagString: Untagged
@@ -2698,3 +2700,29 @@ MonoBehaviour:
   rightModelPositionOffset: {x: 0, y: 0, z: 0}
   rightModelRotationOffset: {x: 0, y: 0, z: 0}
   hideWhenUntracked: 1
+--- !u!114 &1111222233334444551
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 806130742265277099}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3d4e5f6a7b89012c3d4e5f6a7b89012, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  hand: 0
+--- !u!114 &1111222233334444552
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 806130742610489088}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3d4e5f6a7b89012c3d4e5f6a7b89012, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  hand: 1
