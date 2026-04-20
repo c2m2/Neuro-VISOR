@@ -2713,8 +2713,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b8c4d3e5f6a79012b8c4d3e5f6a79012, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  leftHandModelPrefab: {fileID: 0}
-  rightHandModelPrefab: {fileID: 0}
+  leftHandModelPrefab: {fileID: 100100000, guid: 442d5b4503ed83c4897ef44659446587, type: 3}
+  rightHandModelPrefab: {fileID: 100100000, guid: 88e2e1bfe11ec6c438b0ade27eaeded1, type: 3}
   leftModelPositionOffset: {x: 0, y: 0, z: 0}
   leftModelRotationOffset: {x: 0, y: 0, z: 0}
   rightModelPositionOffset: {x: 0, y: 0, z: 0}

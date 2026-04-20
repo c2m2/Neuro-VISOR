@@ -22,6 +22,9 @@ namespace C2M2.Interaction.VR
         [Tooltip("Which XR node to sample the pose from.")]
         public Hand hand = Hand.Right;
 
+        [Tooltip("Euler rotation applied after the controller rotation. Used to convert the OpenXR grip pose (Z along grip direction) to whatever pointing convention the existing hand/pointer models expect. A Meta Touch controller typically needs about (-45, 0, 0) to make 'forward' match the held-controller pointer direction.")]
+        public Vector3 rotationOffset = new Vector3(-45f, 0f, 0f);
+
         private XRNode Node => hand == Hand.Left ? XRNode.LeftHand : XRNode.RightHand;
         private readonly List<InputDevice> deviceBuffer = new List<InputDevice>();
 
@@ -34,7 +37,7 @@ namespace C2M2.Interaction.VR
             if (device.TryGetFeatureValue(CommonUsages.devicePosition, out Vector3 pos))
                 transform.localPosition = pos;
             if (device.TryGetFeatureValue(CommonUsages.deviceRotation, out Quaternion rot))
-                transform.localRotation = rot;
+                transform.localRotation = rot * Quaternion.Euler(rotationOffset);
         }
     }
 }
