@@ -657,7 +657,7 @@ GameObject:
   - component: {fileID: 806130742850113871}
   - component: {fileID: 806130742410350238}
   - component: {fileID: 806130742850113856}
-  - component: {fileID: 9998887776665554443}
+  - component: {fileID: 7776665554443332222}
   m_Layer: 9
   m_Name: LocalAvatar
   m_TagString: Untagged
@@ -2681,7 +2681,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   RenderParts: []
   isLeftHand: 1
---- !u!114 &9998887776665554443
+--- !u!114 &7776665554443332222
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
