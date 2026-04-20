@@ -32,8 +32,8 @@ namespace C2M2.Interaction.VR
         public Vector3 rightModelPositionOffset = Vector3.zero;
         public Vector3 rightModelRotationOffset = Vector3.zero;
 
-        [Tooltip("If true, hides the hand visuals until a tracking pose is received.")]
-        public bool hideWhenUntracked = true;
+        [Tooltip("If true, hides the hand visuals until a tracking pose is received. Default false so the hand stays visible even if tracking briefly drops (OculusEventSignaler toggles this GameObject active/inactive when switching raycast modes, which can leave a hidden hand after reactivation).")]
+        public bool hideWhenUntracked = false;
 
         private void Awake()
         {

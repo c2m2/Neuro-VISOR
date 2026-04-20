@@ -2719,7 +2719,7 @@ MonoBehaviour:
   leftModelRotationOffset: {x: 0, y: 0, z: 0}
   rightModelPositionOffset: {x: 0, y: 0, z: 0}
   rightModelRotationOffset: {x: 0, y: 0, z: 0}
-  hideWhenUntracked: 1
+  hideWhenUntracked: 0
 --- !u!114 &1111222233334444561
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2733,6 +2733,7 @@ MonoBehaviour:
   m_Name:
   m_EditorClassIdentifier:
   hand: 0
+  rotationOffset: {x: 45, y: 0, z: 0}
 --- !u!114 &1111222233334444562
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2746,3 +2747,4 @@ MonoBehaviour:
   m_Name:
   m_EditorClassIdentifier:
   hand: 1
+  rotationOffset: {x: 45, y: 0, z: 0}

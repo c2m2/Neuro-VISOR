@@ -30,8 +30,8 @@ namespace C2M2.Interaction.VR
         [Tooltip("Local rotation offset (Euler, degrees) applied to the instantiated hand model.")]
         public Vector3 modelRotationOffset = Vector3.zero;
 
-        [Tooltip("If true, the GameObject is hidden until a valid tracking pose is received. Prevents the hand flashing at origin on start.")]
-        public bool hideWhenUntracked = true;
+        [Tooltip("If true, the hand's renderers are disabled until a valid tracking pose is received. Prevents the hand flashing at origin on start. Default is false so the hand stays visible regardless of transient tracking gaps (Meta Quest Link sometimes drops the pose for a frame).")]
+        public bool hideWhenUntracked = false;
 
         private XRNode HandNode => isLeftHand ? XRNode.LeftHand : XRNode.RightHand;
         private string HandName => isLeftHand ? "hand_left" : "hand_right";
@@ -54,6 +54,9 @@ namespace C2M2.Interaction.VR
                 spawnedModel = Instantiate(handModelPrefab, transform);
                 spawnedModel.transform.localPosition = modelPositionOffset;
                 spawnedModel.transform.localEulerAngles = modelRotationOffset;
+                // Match the parent hand GameObject's layer so the camera doesn't cull the model.
+                // hand_left / hand_right are placed on the "Player" layer in the Controller prefab.
+                ApplyLayerRecursively(spawnedModel, gameObject.layer);
                 modelRenderers = spawnedModel.GetComponentsInChildren<Renderer>(true);
             }
             else
@@ -61,7 +64,32 @@ namespace C2M2.Interaction.VR
                 modelRenderers = GetComponentsInChildren<Renderer>(true);
             }
 
+            // SkinnedMeshRenderer bounds go stale when the parent GameObject is toggled
+            // inactive/active (as OculusEventSignaler does when entering/leaving raycast mode),
+            // which can leave the hand culled after reactivation. updateWhenOffscreen forces
+            // per-frame bounds recomputation from the current pose so it renders correctly.
+            for (int i = 0; i < modelRenderers.Length; i++)
+            {
+                if (modelRenderers[i] is SkinnedMeshRenderer smr) smr.updateWhenOffscreen = true;
+            }
+
             if (hideWhenUntracked) SetVisible(false);
+            else SetVisible(true);
+        }
+
+        private static void ApplyLayerRecursively(GameObject go, int layer)
+        {
+            go.layer = layer;
+            foreach (Transform child in go.transform) ApplyLayerRecursively(child.gameObject, layer);
+        }
+
+        private void OnEnable()
+        {
+            // Re-assert visibility on every activation. OculusEventSignaler.StaticHandSetActive
+            // toggles this GameObject active/inactive each time raycast mode is entered or
+            // exited; without this, a stale hasPose flag (or hideWhenUntracked=true) can leave
+            // the hand invisible until the next tracking update.
+            if (!hideWhenUntracked) SetVisible(true);
         }
 
         private void Update()

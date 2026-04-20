@@ -23,9 +23,13 @@ namespace C2M2.Interaction.VR
         {
             GameObject childObject = new GameObject(name);
             childObject.layer = LayerMask.NameToLayer(layer);
-            childObject.transform.parent = parent;
-            childObject.transform.position = Vector3.zero;
-            childObject.transform.eulerAngles = Vector3.zero;
+            // Parent with worldPositionStays=false so the child inherits the parent's
+            // transform exactly. Using SetParent(false) + local identity keeps the child
+            // glued to the parent regardless of where the parent currently sits in world
+            // space, and regardless of any later transforms applied to the parent.
+            childObject.transform.SetParent(parent, worldPositionStays: false);
+            childObject.transform.localPosition = Vector3.zero;
+            childObject.transform.localRotation = Quaternion.identity;
             childObject.transform.localScale = Vector3.one;
 
             return childObject;
