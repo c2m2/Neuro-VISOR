@@ -22,6 +22,10 @@ namespace C2M2
         public double timeStep;
         public double endTime;
 
+        public GatingVariableData[] gates;
+        // Ion‐channel data
+        public ChannelData[] channels;
+
         // Clamp data
         [System.Serializable]
         public struct ClampData
@@ -35,15 +39,24 @@ namespace C2M2
 
         // Simulation state
         public double[] U;
-        public double[] M;
-        public double[] N;
-        public double[] H;
 
         public double[] Upre;
-        public double[] Mpre;
-        public double[] Npre;
-        public double[] Hpre;
 
+        // Gating Variables
+        [System.Serializable]
+        public class GatingVariableData {
+            public string name;
+            public double[] current;
+            public double[] previous;
+        }
+
+        // Ion Channels
+        [System.Serializable]
+        public class ChannelData {
+            public string name;
+            public bool isActive;
+        }
+        
         // Graph data
         [System.Serializable]
         public struct Graph

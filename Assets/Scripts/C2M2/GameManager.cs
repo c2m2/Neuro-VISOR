@@ -24,15 +24,11 @@ namespace C2M2
 
         // vectors used in SparseSolve; for loading
         public double[] U;
-        public double[] M;
-        public double[] N;
-        public double[] H;
-
+        
         public double[] Upre;
-        public double[] Mpre;
-        public double[] Npre;
-        public double[] Hpre;
-
+        
+        public Dictionary<string, double[]> currentStates;
+        public Dictionary<string, double[]> previousStates;
         // for loading a file
         private bool loading = false;
         public bool Loading
@@ -61,6 +57,7 @@ namespace C2M2
         public GameObject synapseManagerPrefab = null;
 
         public GameObject graphManagerPrefab = null;
+        public GameObject writerManagerPrefab = null;
 
         /// <summary>
         /// Allows solver threads to be synched
