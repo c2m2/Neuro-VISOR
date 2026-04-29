@@ -477,7 +477,7 @@ namespace C2M2.NeuronalDynamics.Simulation
             Mpre = M.Clone(); Npre = N.Clone(); Hpre = H.Clone();
 
             // Set color bar range directly on ColorLUT to bypass serialized field defaults
-            ColorLUT.GlobalMin = -0.1f;   // -100 mV
+            ColorLUT.GlobalMin = -0.07f;   // -100 mV
             ColorLUT.GlobalMax = 0.05f;   //   50 mV
         }
         /// <summary>
