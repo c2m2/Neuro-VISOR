@@ -362,20 +362,20 @@ namespace C2M2.NeuronalDynamics.Simulation
             SBDF_implicit_decomp.Solve(R.ToArray(), b);
 
             tempState = N.Clone();
-            explicitUpdate(N, Npre, fS(N, an(U_Active), bn(U_Active)), fS(Npre, an(Upre), bn(Upre)), timeStep, 1);
+            explicitUpdate(N, Npre, fS(N, an(U_Active), bn(U_Active), timeStep), fS(Npre, an(Upre), bn(Upre), timeStep), timeStep, 1);
             Npre = tempState.Clone();
 
             tempState = M.Clone();
-            explicitUpdate(M, Mpre, fS(M, am(U_Active), bm(U_Active)), fS(Mpre, am(Upre), bm(Upre)), timeStep, 1);
+            explicitUpdate(M, Mpre, fS(M, am(U_Active), bm(U_Active), timeStep), fS(Mpre, am(Upre), bm(Upre), timeStep), timeStep, 1);
             Mpre = tempState.Clone();
 
             tempState = H.Clone();
-            explicitUpdate(H, Hpre, fS(H, ah(U_Active), bh(U_Active)), fS(Hpre, ah(Upre), bh(Upre)), timeStep, 1);
+            explicitUpdate(H, Hpre, fS(H, ah(U_Active), bh(U_Active), timeStep), fS(Hpre, ah(Upre), bh(Upre), timeStep), timeStep, 1);
             Hpre = tempState.Clone();
 
-            N.Map(x => System.Math.Max(0.0, System.Math.Min(1.0, x)), N);
-            M.Map(x => System.Math.Max(0.0, System.Math.Min(1.0, x)), M);
-            H.Map(x => System.Math.Max(0.0, System.Math.Min(1.0, x)), H);
+            N = N.Map(x => System.Math.Clamp(x, 0.0, 1.0));
+            M = M.Map(x => System.Math.Clamp(x, 0.0, 1.0));
+            H = H.Map(x => System.Math.Clamp(x, 0.0, 1.0));
 
             Upre = U_Active.Clone();
             U_Active.SetSubVector(0, Neuron.nodes.Count, Vector.Build.DenseOfArray(b));
@@ -634,7 +634,20 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// <param name="b"></param> this is the rate vector
         /// <param name="S"></param> this is the current vector of state S for the geometry
         /// <returns>f(V,N)</returns> the function returns the right hand side of the state N ODE.
-        private static Vector fS(Vector S, Vector a, Vector b) { return a.PointwiseMultiply(1 - S) - b.PointwiseMultiply(S); }
+        private static Vector fS(Vector S, Vector a, Vector b, double dt) 
+        {
+            var fac = (a + b).Map(v => ScalingFactor(v, dt));
+
+            var aScaled = a.PointwiseMultiply(fac);
+            var bScaled = b.PointwiseMultiply(fac);
+            return aScaled.PointwiseMultiply(1 - S) - bScaled.PointwiseMultiply(S);
+        }
+        private static double ScalingFactor(double v, double dt)
+        {
+            if (System.Math.Abs(v) < 1.0E-10)
+                return 1.0;
+            return System.Math.Max(dt / v, 1.0);
+        }
        
         /// <summary>
         /// This is \f$\alpha_n\f$ rate function, the rate functions take the form of
@@ -659,6 +672,8 @@ namespace C2M2.NeuronalDynamics.Simulation
             {
                 double da = d_alpha[i];
 
+                /// L'hospital's rule for limit form when da is close to 0, 
+                /// this is to avoid numerical instability and NaN values
                 if (System.Math.Abs(da) < 1.0E-6)
                 {
                     // limit form
@@ -714,6 +729,8 @@ namespace C2M2.NeuronalDynamics.Simulation
             {
                 double da = d_alpha[i];
 
+                /// L'hospital's rule for limit form when da is close to 0, 
+                /// this is to avoid numerical instability and NaN values
                 if (System.Math.Abs(da) < 1.0E-6)
                 {
                     // limit form
@@ -753,6 +770,8 @@ namespace C2M2.NeuronalDynamics.Simulation
             {
                 double db = d_beta[i];
 
+                /// L'hospital's rule for limit form when da is close to 0, 
+                /// this is to avoid numerical instability and NaN values
                 if (System.Math.Abs(db) < 1.0E-6)
                 {
                     // limit form
