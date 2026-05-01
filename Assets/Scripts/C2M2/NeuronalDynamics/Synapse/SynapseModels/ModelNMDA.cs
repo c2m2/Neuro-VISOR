@@ -34,7 +34,7 @@ public class ModelNMDA : ISynapseModel
         k = 0.0224;              // (Volts) second voltage constant used in Boltzmann function, value found in figure 3 of Rothman
 
         double Vmax = 0.1;  // (Volts)
-        Imax = System.Math.Abs(g * (1.0 / (1.0 + System.Math.Exp(-(Vmax - v05) / k))) * (Vmax - Erev));
+        Imax = System.Math.Abs(g * (Vmax - Erev));
         
         voltageThreshold = 0.038;   //Volts
         refireRate = 3.0; // refire at 5%
@@ -68,7 +68,7 @@ public class ModelNMDA : ISynapseModel
         Although the value for g used by the Rothman is 1e-9, an arbitrary value has been chosen that demonstrates synaptic behavior well
         */
 
-        double current = g * (1.0 / (1.0 + System.Math.Exp(-(v-v05) / k))) * System.Math.Exp(-(t - ts) / taud) * (v - Erev);
+        double current = g * System.Math.Exp(-(t - ts) / taud) * (v - Erev);
 
         return current;          
     }
