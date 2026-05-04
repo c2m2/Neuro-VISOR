@@ -10,12 +10,15 @@ namespace C2M2.NeuronalDynamics.Simulation
         {
             get
             {
-                List <NDSimulation> activeSims = new List<NDSimulation>(GameManager.instance.activeSims.Count);
-                foreach(Interactable sim in GameManager.instance.activeSims)
+                lock (GameManager.instance.activeSimsLock)
                 {
-                    activeSims.Add((NDSimulation)sim);
+                    List<NDSimulation> activeSims = new List<NDSimulation>(GameManager.instance.activeSims.Count);
+                    foreach(Interactable sim in GameManager.instance.activeSims)
+                    {
+                        activeSims.Add((NDSimulation)sim);
+                    }
+                    return activeSims;
                 }
-                return activeSims;
             }
         }
 

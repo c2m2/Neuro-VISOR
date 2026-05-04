@@ -38,7 +38,18 @@ public class ONSPAudioSource : MonoBehaviour
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     static void OnBeforeSceneLoadRuntimeMethod()
     {
-        OSP_SetGlobalVoiceLimit(ONSPSettings.Instance.voiceLimit);
+        try
+        {
+            OSP_SetGlobalVoiceLimit(ONSPSettings.Instance.voiceLimit);
+        }
+        catch (System.EntryPointNotFoundException)
+        {
+            Debug.LogWarning("Oculus Spatializer native plugin not found. Spatial audio disabled.");
+        }
+        catch (System.DllNotFoundException)
+        {
+            Debug.LogWarning("Oculus Spatializer native plugin not found. Spatial audio disabled.");
+        }
     }
 
     // Import functions

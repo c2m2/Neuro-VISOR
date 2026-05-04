@@ -25,8 +25,8 @@ namespace C2M2.NeuronalDynamics.Interaction
         public string solverName = "C2M2.NeuronalDynamics.Simulation.SparseSolverTestv1";
         private SomaPositionCalculator calculator = null; // Placeholder default calculator
         public string vrnFileName { get; set; } = "null";
-        public float globalMin = float.PositiveInfinity;
-        public float globalMax = float.NegativeInfinity;
+        public float globalMin = -0.1f;
+        public float globalMax = 0.1f;
         public string lengthScale = "μm";
         public int refinementLevel = 0;
         public double timestepSize = 0.002 * 1e-3;
@@ -56,7 +56,7 @@ namespace C2M2.NeuronalDynamics.Interaction
                 List<NDSimulation> sims = new List<NDSimulation>(GameManager.instance.activeSims.Count);
                 for(int i = 0; i < GameManager.instance.activeSims.Count; i++)
                 {
-                    sims[i] = (NDSimulation)GameManager.instance.activeSims[i];
+                    sims.Add((NDSimulation)GameManager.instance.activeSims[i]);
                 }
                 return sims;
             }
@@ -91,9 +91,6 @@ namespace C2M2.NeuronalDynamics.Interaction
 
             NDSimulation solver = (NDSimulation)solveObj.AddComponent(solverType);
 
-            // Store the new active simulation
-            GameManager.instance.activeSims.Add(solver);
-
             TransferValues();
 
             // make Save button visible
@@ -101,6 +98,12 @@ namespace C2M2.NeuronalDynamics.Interaction
             m.SaveButtonVisible(true);
 
             solver.Initialize();
+
+            // Store the new active simulation after initialization completes
+            lock (GameManager.instance.activeSimsLock)
+            {
+                GameManager.instance.activeSims.Add(solver);
+            }
 
             solver.Manager.FeatState = solver.Manager.FeatState;
 

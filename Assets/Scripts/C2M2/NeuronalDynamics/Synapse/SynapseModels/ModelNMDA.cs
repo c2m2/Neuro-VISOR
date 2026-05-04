@@ -1,6 +1,14 @@
 ﻿using UnityEngine;
 using System;
 
+/*
+Reference:
+
+Rothman, J.S. (2014). Modeling Synapses. In: Jaeger, D., Jung, R. (eds) 
+Encyclopedia of Computational Neuroscience. Springer, New York, NY. 
+https://doi.org/10.1007/978-1-4614-7320-6_240-1
+*/
+
 public class ModelNMDA : ISynapseModel
 {
     private string modelName;
@@ -11,31 +19,31 @@ public class ModelNMDA : ISynapseModel
     private double k;
     private double Imax; 
     private double voltageThreshold;   //Volts
-    private double refireRate; // arbitrarily chosen
+    private double refireRate; // refire at 5%
     private double minRefireTime; // ms
     public ModelNMDA() {
         modelName = "NMDA";
-        Erev = 0;                // (Volts) reversal potential for synapse, Stated explicitly in Rothman's paper to usually be 0 Volts (page 7)
-        taud = 60.0e-3;           // (Seconds) decay constant from function, Stated explicitly in Rothman's paper (figure 2)
+        Erev = 0;                // (Volts) reversal potential for synapse, Stated explicitly in Rothman to usually be 0 Volts (page 7)
+        taud = 60.0e-3;           // (Seconds) decay constant from function, Stated explicitly in Rothman (figure 2)
         g = 17e-9;               // (Siemens) 17 nano Siemens was chosen because it produces a noticeable post synaptic response across
                                         // a single synapse, while still requiring multiple synapses to produce a post-synaptic action potential
                                         // from a single pre-synaptic action potential  
                                         // Each synapse has ~20 receptors of 50 pS each, each arrow is a cluster of 17 synapses
 
-        v05 = -0.0128;           // (Volts) V0.5, first voltage constant used in Boltzmann function for Magnesium block, value found in figure 3 of Rothman paper
-        k = 0.0224;              // (Volts) second voltage constant used in Boltzmann function, value found in figure 3 of rothman paper
+        v05 = -0.0128;           // (Volts) V0.5, first voltage constant used in Boltzmann function for Magnesium block, value found in figure 3 of Rothman
+        k = 0.0224;              // (Volts) second voltage constant used in Boltzmann function, value found in figure 3 of Rothman
 
         double Vmax = 0.1;  // (Volts)
         Imax = System.Math.Abs(g * (1.0 / (1.0 + System.Math.Exp(-(Vmax - v05) / k))) * (Vmax - Erev));
         
         voltageThreshold = 0.038;   //Volts
-        refireRate = 3.0; // arbitrarily chosen
+        refireRate = 3.0; // refire at 5%
         minRefireTime = 1.0e-2; // ms
     }
 
     //Returns the Synaptic Current. Used in SparseSolver.
     /// <summary>
-    /// This is the NMDA Synapse function borrowed from Rothman, Jason S. "Modeling Synapses." (2014).
+    /// This is the NMDA Synapse function borrowed from Rothman.
     /// </summary>
     /// <param name="v"></param> this is the postsynaptic voltage
     /// <param name="t"></param> this is the current simulation time
@@ -57,10 +65,12 @@ public class ModelNMDA : ISynapseModel
 
         EnmdaR is "usually 0 mv" (page 7)
 
-        Although the value for g used by the Rothman paper is 1e-9, an arbitrary value has been chosen that demonstrates synaptic behavior well
+        Although the value for g used by the Rothman is 1e-9, an arbitrary value has been chosen that demonstrates synaptic behavior well
         */
 
-        return g * (1.0 / (1.0 + System.Math.Exp(-(v-v05) / k))) * System.Math.Exp(-(t - ts) / taud) * (v - Erev);          
+        double current = g * (1.0 / (1.0 + System.Math.Exp(-(v-v05) / k))) * System.Math.Exp(-(t - ts) / taud) * (v - Erev);
+
+        return current;          
     }
 
     //Returns the model name
@@ -86,11 +96,11 @@ public class ModelNMDA : ISynapseModel
         return true;
     }
     
-    public bool isActive(double presynVoltage, double presynVoltagePrev, double ActivationTime, double simulationTime)
+    public bool isActive(double presynVoltage, double presynVoltagePrev, double SimulationTime, double ActivationTime)
     {
         bool updateActivation = false;
 
-        if ((presynVoltage >= voltageThreshold) && ((presynVoltagePrev < voltageThreshold) || (simulationTime - ActivationTime > refireRate*taud)) && (simulationTime - ActivationTime > minRefireTime))
+        if ((presynVoltage >= voltageThreshold) && ((presynVoltagePrev < voltageThreshold) || (SimulationTime - ActivationTime > refireRate*taud)) && (SimulationTime - ActivationTime > minRefireTime))
         {
             Debug.Log("Activation Time Updated");
             updateActivation = true;

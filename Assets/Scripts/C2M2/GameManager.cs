@@ -1,5 +1,6 @@
 ﻿#pragma warning disable 0618 // Ignore obsolete script warning
 
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Threading;
@@ -51,6 +52,8 @@ namespace C2M2
         /// </summary>
         public Gradient defaultGradient;
         public List<Interactable> activeSims = new List<Interactable>();
+        public readonly object activeSimsLock = new object();
+        public static bool isQuitting { get; private set; } = false;
         public GameObject clampManagerPrefab = null;
         public GameObject clampManagerL = null;
         public GameObject clampManagerR = null;
@@ -102,7 +105,7 @@ namespace C2M2
 
             if(roomOptions != null && roomOptions.Length > 0)
             {
-                Mathf.Clamp(roomSelected, 0, roomOptions.Length - 1);
+                roomSelected = Mathf.Clamp(roomSelected, 0, roomOptions.Length - 1);
                 // Only enable selected room, disable all others
                 for(int i = 0; i < roomOptions.Length; i++)
                 {
@@ -133,24 +136,18 @@ namespace C2M2
             {
                 Debug.LogError("No cell previewer prefab given!");
             }
+
+            isRunning = true;
         }
 
         private void Update()
         {
-
-            if(logQ != null && logQ.Count > 0)
-            { // print every queued statement
-                foreach (string s in logQ) { Debug.Log(s); }
-                logQ.Clear();
-            }
-            if (eLogQ != null && eLogQ.Count > 0)
-            { // print every queued statement
-                foreach (string s in eLogQ) { Debug.LogError(s); }
-                eLogQ.Clear();
-            }
+            string msg;
+            while (logQ.TryDequeue(out msg)) { Debug.Log(msg); }
+            while (eLogQ.TryDequeue(out msg)) { Debug.LogError(msg); }
         }
 
-        private List<string> logQ = new List<string>();
+        private readonly ConcurrentQueue<string> logQ = new ConcurrentQueue<string>();
         private readonly int logQCap = 100;
         /// <summary>
         /// Allows other threads to submit messages to be printed at the start of the next frame
@@ -165,15 +162,14 @@ namespace C2M2
             {
                 if (logQ.Count > logQCap)
                 {
-                    Debug.LogWarning("Cannot call DebugLogSafe more than [" + logQCap + "] times per frame. New statements will not be added to queue");
                     return;
                 }
-                logQ.Add(s);
+                logQ.Enqueue(s);
             }
         }
         public void DebugLogThreadSafe<T>(T t) => DebugLogSafe(t.ToString());
 
-        private List<string> eLogQ = new List<string>();
+        private readonly ConcurrentQueue<string> eLogQ = new ConcurrentQueue<string>();
         private readonly int eLogQCap = 100;
         /// <summary>
         /// Allows other threads to submit messages to be printed at the start of the next frame
@@ -188,16 +184,16 @@ namespace C2M2
             {
                 if (eLogQ.Count > eLogQCap)
                 {
-                    Debug.LogWarning("Cannot call DebugLogSafe more than [" + logQCap + "] times per frame. New statements will not be added to queue");
                     return;
                 }
-                eLogQ.Add(s);
+                eLogQ.Enqueue(s);
             }
         }
         public void DebugLogErrorThreadSafe<T>(T t) => DebugLogErrorSafe(t.ToString());
 
         private void OnApplicationQuit()
         {
+            isQuitting = true;
             isRunning = false;
         }
         private void OnApplicationPause(bool pause)

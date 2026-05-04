@@ -1,11 +1,11 @@
-﻿using Boo.Lang;
-using C2M2;
+﻿using C2M2;
 using C2M2.NeuronalDynamics.Simulation;
 using C2M2.NeuronalDynamics.UGX;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using UnityEngine;
 public class Synapse : NDInteractables
 {
@@ -21,7 +21,9 @@ public class Synapse : NDInteractables
     public Material NMDAMat;
     public Material AMPAMat;
     public Material GABAMat;
+    private static int nextId = 0;
     public int Id;
+    private bool isBeingDestroyed = false;
 
 
     public double ActivationTime { get; set; }
@@ -34,6 +36,16 @@ public class Synapse : NDInteractables
     {
         get
         {
+            if (simulation == null || simulation.Neuron == null || simulation.Neuron.nodes == null)
+            {
+                Debug.LogWarning("Synapse.NodeData: simulation, Neuron, or nodes is null");
+                return null;
+            }
+            if (FocusVert < 0 || FocusVert >= simulation.Neuron.nodes.Count)
+            {
+                Debug.LogWarning("Synapse.NodeData: FocusVert " + FocusVert + " out of bounds (0.." + (simulation.Neuron.nodes.Count - 1) + ")");
+                return null;
+            }
             return simulation.Neuron.nodes[FocusVert];
         }
     }
@@ -42,21 +54,29 @@ public class Synapse : NDInteractables
     {
         get
         {
+            if (GameManager.instance == null || GameManager.instance.simulationManager == null)
+                return null;
             return GameManager.instance.simulationManager.synapseManager;
         }
     }
 
     private void OnDestroy()
     {
-        SynapseManager.DeleteSyn(SynapseManager.FindSelectedSyn(this));
+        if (GameManager.isQuitting) return;
+        if (isBeingDestroyed) return;
+        isBeingDestroyed = true;
+        var manager = SynapseManager;
+        if (manager == null) return;
+        manager.DeleteSyn(manager.FindSelectedSyn(this));
     }
     
-    // Creates a unique synapse instance 
+    // Creates a unique synapse instance
     public Synapse Clone()
     {
-        System.Random rnd = new System.Random();
         Synapse other = (Synapse) this.MemberwiseClone();
-        other.Id = rnd.Next();
+        other.Id = Interlocked.Increment(ref nextId);
+        // Re-resolve currentModel to avoid sharing the LinkedListNode reference
+        other.currentModel = modelList.Find(currentModel.Value);
         return other;
     }
     public override void Place(int index)

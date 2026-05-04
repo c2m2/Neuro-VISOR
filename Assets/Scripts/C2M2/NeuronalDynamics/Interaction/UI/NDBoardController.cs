@@ -89,9 +89,15 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
                 GameManager.instance.simulationManager.Paused = false;
 
             // delete Synapse scripts under SynapseManager object
-            for (int i = GameManager.instance.simulationManager.synapseManager.synapses.Count - 1; i >= 0; i--)
+            var synapseManager = GameManager.instance.simulationManager != null
+                ? GameManager.instance.simulationManager.synapseManager
+                : null;
+            if (synapseManager != null)
             {
-                GameManager.instance.simulationManager.synapseManager.DeleteSyn(GameManager.instance.simulationManager.synapseManager.synapses[i].Item1);
+                for (int i = synapseManager.synapses.Count - 1; i >= 0; i--)
+                {
+                    synapseManager.DeleteSyn(synapseManager.synapses[i].Item1);
+                }
             }
 
             // disable Save button

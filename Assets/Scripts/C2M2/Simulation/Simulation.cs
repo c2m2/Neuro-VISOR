@@ -9,6 +9,18 @@ using C2M2.NeuronalDynamics.Simulation;
 
 namespace C2M2.Simulation
 {
+    /// <summary>
+    /// Tracks the initialization phase of a Simulation to enforce correct ordering
+    /// </summary>
+    public enum InitState
+    {
+        Uninitialized,
+        PreInitializing,
+        BuildingVisualization,
+        BuildingInteraction,
+        PostInitializing,
+        Initialized
+    }
 
     /// <summary>
     /// Provides an base interface for simulations using a general data type T
@@ -19,6 +31,10 @@ namespace C2M2.Simulation
     /// <typeparam name="GrabType"></typeparam>
     public abstract class Simulation<ValueType, VizType, RaycastType, GrabType> : Interactable
     {
+        /// <summary>
+        /// Current initialization state of this simulation
+        /// </summary>
+        public InitState CurrentInitState { get; private set; } = InitState.Uninitialized;
         [Tooltip("Run simulation code without visualization or interaction features")]
         /// <summary>
         /// Run solve code without visualization or interaction
@@ -103,18 +119,23 @@ namespace C2M2.Simulation
         #region Unity Methods
         public void Initialize()
         {
-            // We should move away from using OnAwakePre, OnAwakePost
-            OnAwakePre(); //this is a mess!! :(
+            CurrentInitState = InitState.PreInitializing;
+            OnAwakePre();
 
             if (!dryRun)
             {
+                CurrentInitState = InitState.BuildingVisualization;
                 Viz = BuildVisualization();
+
+                CurrentInitState = InitState.BuildingInteraction;
                 BuildInteraction();
             }
 
-            // Run child awake methods first
+            CurrentInitState = InitState.PostInitializing;
             OnAwakePost(Viz);
-            StartCoroutine("UpdateVisulizationStep");
+
+            CurrentInitState = InitState.Initialized;
+            StartCoroutine("UpdateVisualizationStep");
             return;
 
             void BuildInteraction()
@@ -138,7 +159,7 @@ namespace C2M2.Simulation
             }
         }
 
-        IEnumerator UpdateVisulizationStep()
+        IEnumerator UpdateVisualizationStep()
         {
             while (!dryRun)
             {
@@ -161,12 +182,23 @@ namespace C2M2.Simulation
 
         protected void OnDestroy()
         {
-            StopCoroutine("updateVisulizationStep");
+            if (GameManager.isQuitting) return;
+
+            StopCoroutine("UpdateVisualizationStep");
             StopSimulation();
+
+            // Remove this simulation from the active simulations list
+            if (GameManager.instance != null)
+            {
+                lock (GameManager.instance.activeSimsLock)
+                {
+                    GameManager.instance.activeSims.Remove(this);
+                }
+            }
         }
         #endregion
 
-        public int curentTimeStep = -1;
+        public int currentTimeStep = -1;
         public double timeStep = 0.008 * 1e-3;
         public double endTime = 1.0;
         public int nT => (int)(endTime / timeStep);
@@ -176,8 +208,14 @@ namespace C2M2.Simulation
         /// </summary>
         public void StartSimulation()
         {
+            if (CurrentInitState != InitState.Initialized && CurrentInitState != InitState.BuildingInteraction)
+            {
+                Debug.LogError("StartSimulation called during invalid init state: " + CurrentInitState);
+                return;
+            }
+
             solveStepSampler = CustomSampler.Create("SolveStep");
-            
+
             solveThread = new Thread(Solve) { IsBackground = true };
             solveThread.Start();
             Debug.Log("Solve() launched on thread " + solveThread.ManagedThreadId);
@@ -190,36 +228,46 @@ namespace C2M2.Simulation
             PreSolve();
 
             GameManager.instance.solveBarrier.AddParticipant();
-            DateTime startStepTime = DateTime.Now;
-            curentTimeStep = 0;
-            while (curentTimeStep < nT)
+            try
             {
-                if (!GameManager.instance.simulationManager.Paused && !GameManager.instance.Loading)
+                DateTime startStepTime = DateTime.Now;
+                currentTimeStep = 0;
+                while (currentTimeStep < nT)
                 {
-                    PreSolveStep(curentTimeStep);
+                    if (!GameManager.instance.simulationManager.Paused && !GameManager.instance.Loading)
+                    {
+                        PreSolveStep(currentTimeStep);
 
-                    solveStepSampler.Begin();
-                    SolveStep(curentTimeStep);
-                    solveStepSampler.End();
+                        solveStepSampler.Begin();
+                        SolveStep(currentTimeStep);
+                        solveStepSampler.End();
 
-                    PostSolveStep(curentTimeStep);
-                    
-                    curentTimeStep++;
+                        PostSolveStep(currentTimeStep);
+
+                        currentTimeStep++;
+                    }
+
+                    GameManager.instance.solveBarrier.SignalAndWait();
+                    float timeChange = (float)(DateTime.Now - startStepTime).TotalSeconds;
+                    resourceUsage = timeChange / minTimeStep;
+                    if (resourceUsage < 1)
+                    {
+                        int millisecondsToWait = (int)(1000 * (minTimeStep-timeChange));
+                        await Task.Delay(millisecondsToWait);
+                    }
+                    if (cts.Token.IsCancellationRequested) break;
+                    startStepTime = DateTime.Now;
                 }
-                
-                GameManager.instance.solveBarrier.SignalAndWait();
-                float timeChange = (float)(DateTime.Now - startStepTime).TotalSeconds;
-                resourceUsage = timeChange / minTimeStep;
-                if (resourceUsage < 1)
-                {
-                    int millisecondsToWait = (int)(1000 * (minTimeStep-timeChange));
-                    await Task.Delay(millisecondsToWait);
-                }
-                if (cts.Token.IsCancellationRequested) break;
-                startStepTime = DateTime.Now;
             }
-            GameManager.instance.solveBarrier.RemoveParticipant();
-            cts.Dispose();
+            catch (Exception ex)
+            {
+                GameManager.instance.DebugLogErrorSafe("Solver thread crashed: " + ex.ToString());
+            }
+            finally
+            {
+                GameManager.instance.solveBarrier.RemoveParticipant();
+                cts.Dispose();
+            }
 
             PostSolve();
 
@@ -228,7 +276,7 @@ namespace C2M2.Simulation
             solveThread = null;
         }
 
-        public sealed override float GetSimulationTime() => curentTimeStep * (float)timeStep;
+        public sealed override float GetSimulationTime() => currentTimeStep * (float)timeStep;
 
         /// <summary>
         /// Called on the solve thread before the simulation for loop is launched

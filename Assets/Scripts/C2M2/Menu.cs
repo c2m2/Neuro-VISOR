@@ -121,7 +121,7 @@ namespace C2M2
                 SparseSolverTestv1 s = (SparseSolverTestv1)gm.activeSims[0];
 
                 // save current time step
-                CurrentTimeStep t = new CurrentTimeStep(s.curentTimeStep);
+                CurrentTimeStep t = new CurrentTimeStep(s.currentTimeStep);
                 string sCurrT = JsonUtility.ToJson(t);
                 sw.Write(sCurrT + ";");
 
@@ -328,7 +328,7 @@ namespace C2M2
                     NeuronClampManager clampMng = sim.clampManager;
 
                     // set current time step
-                    sim.curentTimeStep = t.currentTimeStep;
+                    sim.currentTimeStep = t.currentTimeStep;
 
                     // recreate clamps
                     if (data.clamps.Length > 0)

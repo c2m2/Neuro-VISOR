@@ -107,7 +107,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
         /// <summary>
         /// Includes info like cell species, strain, and archive
         /// </summary>
-        public VrnReader.MetaInfo MetaInfo { get { return (VrnReader.MetaInfo)vrnReader.GetMetaInfo(); } }
+        public VrnReader.MetaInfo MetaInfo { get { return (VrnReader.MetaInfo)VrnReader.GetMetaInfo(); } }
 
         private Grid grid1D = null;
         public Grid Grid1D
@@ -179,10 +179,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 }
                 return mapping;
             }
-            set
-            {
-                mapping = (MappingInfo)MapUtils.BuildMap(Grid1D, Grid2D);
-            }
         }
 
         void ShowInfoPanel(bool show, RaycastHit hit)
@@ -227,15 +223,17 @@ namespace C2M2.NeuronalDynamics.Simulation {
                 }
 
                 //Checks if there are currently any synapses by using the list kept in synapseManager
-                if (Manager.synapseManager.synapses.Count > 0)
+                // Use a snapshot to avoid concurrent modification from main thread
+                List<(Synapse, Synapse)> synapseSnapshot = Manager.synapseManager.GetSynapsesSnapshot();
+                if (synapseSnapshot.Count > 0)
                 {
                     //Creates a list of (Synapse, Synapse) pairs to keep track of corresponding pre- and post-synapses
                     //Note: a Synapse refers to the prefab Synapse, a type of marker attached to a node when it is either the pre- or post- synaptic node
                     List<(Synapse, Synapse)> synapses = new List<(Synapse, Synapse)>(); //pre (Item1) and post (Item2) synapses
-                    
-                    // Iterates through every (Synapse, Synapse) pair in the synapse list kept in the synapse manager
+
+                    // Iterates through the snapshot of synapse pairs
                     // Checks if the neuron attached to this simulation class contains any post-synapse nodes
-                    foreach ((Synapse, Synapse) syn in Manager.synapseManager.synapses)
+                    foreach ((Synapse, Synapse) syn in synapseSnapshot)
                     {
                         Synapse preSynapse = syn.Item1;
                         Synapse postSynapse = syn.Item2;

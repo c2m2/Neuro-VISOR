@@ -20,7 +20,20 @@ public abstract class NDInteractables : MonoBehaviour
     /// </summary>
     public Vector3 FocusPos
     {
-        get { return simulation.Verts1D[FocusVert]; }
+        get
+        {
+            if (simulation == null || simulation.Verts1D == null)
+            {
+                Debug.LogWarning("FocusPos: simulation or Verts1D is null");
+                return Vector3.zero;
+            }
+            if (FocusVert < 0 || FocusVert >= simulation.Verts1D.Length)
+            {
+                Debug.LogWarning("FocusPos: FocusVert " + FocusVert + " out of bounds (0.." + (simulation.Verts1D.Length - 1) + ")");
+                return Vector3.zero;
+            }
+            return simulation.Verts1D[FocusVert];
+        }
     }
 
     public GameObject highlightObj;

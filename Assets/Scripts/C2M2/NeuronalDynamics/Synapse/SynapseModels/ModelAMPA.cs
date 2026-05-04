@@ -1,5 +1,14 @@
 using UnityEngine;
 using System;
+
+/*
+Reference:
+
+Rothman, J.S. (2014). Modeling Synapses. In: Jaeger, D., Jung, R. (eds) 
+Encyclopedia of Computational Neuroscience. Springer, New York, NY. 
+https://doi.org/10.1007/978-1-4614-7320-6_240-1
+*/
+
 public class ModelAMPA : ISynapseModel
 {
     private string modelName;
@@ -7,17 +16,15 @@ public class ModelAMPA : ISynapseModel
     private double g;       //(Siemens) An arbitrary value was chosen that clearly demonstrates AMPA's fast decay behavior, while
                             // still producing a noticeable (but not too large) post synaptic response
                             // 10 pS per receptor, ~40 receptors per synapse, choose # of synapses
-    private double a1;        //(Unitless) Weight of first decay term of at
-    private double a2;        //(Unitless) Weight of second decay term of at
-    private double anorm;       //(Unitless) Used to normalize the decay terms of at such that their summed maximum is always one.
-                            // Since a1 + a2 = 1, anorm is technically not necessary in this case, and has been set to 1
-    private double taud1;  //(Seconds) First decay constant of a(t)
-    private double taud2;   //(Seconds) Second decay constant of a(t)
+    private double anorm;       // (Unitless) Used to normalize the decay terms of at such that their summed maximum is always one.
+    private double sigma;    // (Unitless) Used to scale the noise added to the synaptic current
+    private double taud;  // (Seconds) First decay constant of a(t)
+    private double beta;    // (Unitless) Proportion of taur to taud
     private double taur;   //(Seconds) Decay weight constant
-    private int n;              //(Unitless) Decay weight power
+    private int n;              //(Unitless) Decay weight exponent
     private double Imax;
     private double voltageThreshold;   //Volts
-    private double refireRate; // arbitrarily chosen
+    private double refireRate; // refire at 5%
     private double minRefireTime; // ms
     public ModelAMPA() {
         //Provides the Name and Material for the model
@@ -26,26 +33,26 @@ public class ModelAMPA : ISynapseModel
         g = 25e-9;       //(Siemens) An arbitrary value was chosen that clearly demonstrates AMPA's fast decay behavior, while
                                 // still producing a noticeable (but not too large) post synaptic response
                                 // 10 pS per receptor, ~40 receptors per synapse, choose # of synapses
-        a1 = 0.9;        //(Unitless) Weight of first decay term of at
-        a2 = 0.1;        //(Unitless) Weight of second decay term of at
-        anorm = 1;       //(Unitless) Used to normalize the decay terms of at such that their summed maximum is always one.
-                                // Since a1 + a2 = 1, anorm is technically not necessary in this case, and has been set to 1
-        taud1 = 0.0003;  //(Seconds) First decay constant of a(t)
-        taud2 = 0.002;   //(Seconds) Second decay constant of a(t)
-        taur = 0.0002;   //(Seconds) Decay weight constant
+
+        taud = 4.0e-3;  //(Seconds) Decay constant of a(t)
+        beta = 0.05;    // (Unitless) Proportion of taur to taud
+        taur = beta * taud;   //(Seconds) Decay weight constant
         n = 2;              //(Unitless) Decay weight power
+
+        sigma = 1 / (n * (taud / taur) + 1); // (Unitless) Used to scale the noise added to the synaptic current
+        anorm = System.Math.Pow(1 - sigma, n) * System.Math.Pow(sigma, taur/taud);       //(Unitless) Used to normalize the decay terms of at such that their summed maximum is always one.
 
         double Vmax = 0.1;  // (Volts)
         Imax = System.Math.Abs(g * (Vmax - Erev));
 
         voltageThreshold = 0.038;   //Volts
-        refireRate = 3.0; // arbitrarily chosen
+        refireRate = 3.0; // refire at 5%
         minRefireTime = 1.0e-2; // ms
     }
 
     //Returns the Synaptic Current. Used in SparseSolver.
     /// <summary>
-    /// This is the AMPA Synapse function borrowed from Rothman, Jason S. "Modeling Synapses." (2014).
+    /// This is the AMPA Synapse function borrowed from Rothman.
     /// </summary>
     /// <param name="v"></param> this is the postsynaptic voltage
     /// <param name="t"></param> this is the current simulation time
@@ -57,20 +64,18 @@ public class ModelAMPA : ISynapseModel
         Base Equation:
         Iampar = GampaR * a(t) * (V(m) - Eampar)
 
-        Using equation 6 for a(t), ignoring 'extrasynaptic receptors'
-        [1-exp(-(t-ts)/Tr)]^n * [a1* exp(-(t-ts)/taud) + (a2*exp(-(t-ts)/taud2))]/(anorm)
-
         The following values were pulled directly from figure 2;
-        n=2, taur=0.2ms, a1=0.9, taud1=0.3ms, a2=0.1, taud2=2.0ms
+        n=2
 
         Eampar is "typically 0 mv"
 
-        Although the value for g used by the Rothman paper is 1e-9, an arbitrary value has been chosen that demonstrates synaptic behavior well
+        Although the value for g used by the Rothman is 1e-9, an arbitrary value has been chosen that demonstrates synaptic behavior well
         */
 
-        double at = System.Math.Pow(1 - System.Math.Exp(-(t-ts)/taur), n) * (a1*System.Math.Exp(-(t-ts)/taud1) + a2*System.Math.Exp(-(t-ts)/taud2))/anorm;
+        double at = System.Math.Pow(1 - System.Math.Exp(-(t-ts)/taur), n) * System.Math.Exp(-(t-ts)/taud) / anorm;
+        double current = g*at*(v-Erev);
 
-        return g*at*(v-Erev);
+        return current;
 
     }
 
@@ -95,14 +100,11 @@ public class ModelAMPA : ISynapseModel
         return taud1;
     }
     
-    public bool isActive(double presynVoltage, double presynVoltagePrev, double ActivationTime, double simulationTime)
+    public bool isActive(double presynVoltage, double presynVoltagePrev, double SimulationTime, double ActivationTime)
     {
-        double voltageThreshold = 0.038;   //Volts
-        double refireRate = 3.0; // arbitrarily chosen
-        double minRefireTime = 1.0e-2; // ms
         bool updateActivation = false;
 
-        if ((presynVoltage >= voltageThreshold) && ((presynVoltagePrev < voltageThreshold) || (simulationTime - ActivationTime > refireRate*taud1)) && (simulationTime - ActivationTime > minRefireTime))
+        if ((presynVoltage >= voltageThreshold) && ((presynVoltagePrev < voltageThreshold) || (SimulationTime - ActivationTime > refireRate*taud)) && (SimulationTime - ActivationTime > minRefireTime))
         {
             Debug.Log("Activation Time Updated");
             updateActivation = true;

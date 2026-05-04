@@ -6,7 +6,7 @@ public interface ISynapseModel
     string getModelName();
     double getModelCurrent(double voltage, double t, double ts);
     bool isExcitatory();
-    bool isActive(double presynVoltage, double presynVoltagePrev, double ActivationTime, double simulationTime);
+    bool isActive(double presynVoltage, double presynVoltagePrev, double SimulationTime, double ActivationTime);
     double getImax();
     double getTaud();
 }

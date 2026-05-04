@@ -14,6 +14,18 @@ public class SynapseManager : NDInteractablesManager<Synapse>
     public float placementTimestamp;
     public Synapse synapseInProgress = null; //Contains presynapse when a presynapse has been placed but no post synapse
     public List<(Synapse, Synapse)> synapses = new List<(Synapse, Synapse)>(); //pre (Item1) and post (Item2) synapses
+    public readonly object synapseLock = new object();
+
+    /// <summary>
+    /// Returns a thread-safe snapshot of the synapses list for iteration on the solver thread
+    /// </summary>
+    public List<(Synapse, Synapse)> GetSynapsesSnapshot()
+    {
+        lock (synapseLock)
+        {
+            return new List<(Synapse, Synapse)>(synapses);
+        }
+    }
 
     public override GameObject IdentifyBuildPrefab(NDSimulation sim, int index)
     {
@@ -27,12 +39,17 @@ public class SynapseManager : NDInteractablesManager<Synapse>
 
     private void OnDestroy()
     {
-        foreach ((Synapse, Synapse) synapsePair in synapses)
+        if (GameManager.isQuitting) return;
+
+        lock (synapseLock)
         {
-            Destroy(synapsePair.Item1);
-            Destroy(synapsePair.Item2);
+            foreach ((Synapse, Synapse) synapsePair in synapses)
+            {
+                Destroy(synapsePair.Item1);
+                Destroy(synapsePair.Item2);
+            }
+            synapses.Clear();
         }
-        synapses.Clear();
     }
     
     // Returns the synapse object corresponding to the currently selected synapse 
@@ -68,7 +85,10 @@ public class SynapseManager : NDInteractablesManager<Synapse>
         else //Post Synapse
         {
             Synapse postPlaced = placedSynapse.Clone();
-            synapses.Add((synapseInProgress, postPlaced));
+            lock (synapseLock)
+            {
+                synapses.Add((synapseInProgress, postPlaced));
+            }
             PrePlaceCheck(synapseInProgress);
             synapseInProgress = null;
 
@@ -95,13 +115,17 @@ public class SynapseManager : NDInteractablesManager<Synapse>
 
     public bool DeleteSyn(Synapse syn)
     {
-        if (FindSynapsePair(syn) != null)
+        var pairs = FindSynapsePair(syn);
+        if (pairs != null)
         {
-            foreach ((Synapse, Synapse) pair in FindSynapsePair(syn))
+            foreach ((Synapse, Synapse) pair in pairs)
             {
                 Destroy(pair.Item1.gameObject);
                 Destroy(pair.Item2.gameObject);
-                synapses.Remove(pair);
+                lock (synapseLock)
+                {
+                    synapses.Remove(pair);
+                }
             }
             return true;
         }
@@ -112,20 +136,21 @@ public class SynapseManager : NDInteractablesManager<Synapse>
                 Destroy(syn.gameObject);
             }
             return false;
-        } 
+        }
     }
 
     // Handles assignment of PrePlaceMaterial on Synapses that don't yet have an endpoint
     public bool PrePlaceCheck(Synapse syn)
     {
-        if (FindSynapsePair(syn) == null)
+        var pairs = FindSynapsePair(syn);
+        if (pairs == null)
         {
             syn.SetPrePlace();
             return true;
         }
-        else if (FindSynapsePair(syn) != null)
+        else
         {
-            foreach ((Synapse, Synapse) pair in FindSynapsePair(syn))
+            foreach ((Synapse, Synapse) pair in pairs)
             {
                 pair.Item1.SetToModeMaterial();
                 pair.Item2.SetToModeMaterial();

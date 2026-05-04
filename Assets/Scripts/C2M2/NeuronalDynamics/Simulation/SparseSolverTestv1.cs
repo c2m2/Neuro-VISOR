@@ -67,21 +67,21 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// \f[\bar{g}_{K}n^4(V-V_k)\f]
         /// where \f$n\f$ is the state variable, and \f$V_k\f$ is the reversal potential.
         /// </summary>
-        private double gk = 5.0 * 1.0E1;
+        private double gk = 6.0 * 1.0E1;
         // private double gk = 36;
         /// <summary>
         /// [S/m2] sodium conductance per unit area, this is the Sodium conductance per unit area, it is used in this term
         /// \f[\bar{g}_{Na}m^3h(V-V_{Na})\f]
         /// where \f$m,h\f$ are the state variables, and \f$V_{Na}\f$ is the reversal potential for sodium.
         /// </summary>
-        private double gna = 50.0 * 1.0E1;
+        private double gna = 56.0 * 1.0E1;
         
         /// <summary>
         /// [S/m2] leak conductance per unit area, this is the leak conductance per unit area, it is used in this term
         /// \f[\bar{g}_{l}(V-V_l)\f]
         /// \f$V_l\f$ is the leak reversal potential.
         /// </summary>
-        private double gl = 0.0 * 1.0E1;
+        private double gl = 0.1 * 1.0E1;
         /// <summary>
         /// [V] potassium reversal potential
         /// </summary>
@@ -97,17 +97,21 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// </summary>
         private double el = -70.0 * 1.0E-3;
         /// <summary>
+        /// [V] threshold voltage
+        /// </summary>
+        private static double Vt = -50.0 * 1.0E-3;
+        /// <summary>
         /// [] potassium channel state probability, unitless
         /// </summary>
-        private double ni = 0.0376969;
+        private double ni = 0.0009648121738618698;
         /// <summary>
         /// [] sodium channel state probability, unitless
         /// </summary>
-        private double mi = 0.0147567;
+        private double mi = 0.00016423459289788037;
         /// <summary>
         /// [] sodium channel state probability, unitless  
         /// </summary>
-        private double hi = 0.9959410;
+        private double hi = 0.999975419740687;
         /// <summary>
         /// These are the solution vectors for the voltage <code>U</code>
         /// the state <c>M</c>, state <c>N</c>, and state <c>H</c>
@@ -126,9 +130,11 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// This is for the synaptic current. It contains:
         ///     [0]: The current at the active time step.
         ///     [1]: The current at the previous time step.
-        ///     [2]: The spatial scaling at post-synaptic location for time stepping (1/(cap * area))
         /// </summary>
         private List<Vector> Isyn;
+        /// <summary>
+        /// The spatial scaling at post-synaptic location for time stepping (1/(cap * area))
+        /// </summary>
         private Vector surfaceArea;
         /// <summary>
         /// this is for storing previous states
@@ -151,7 +157,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         List<CoordinateStorage<double>> sparse_stencils;
         CompressedColumnStorage<double> r_csc;              //This is for the rhs sparse matrix
         CompressedColumnStorage<double> l_csc;              //This is for the lhs sparse matrix
-        private SparseLU lu;                                //Initialize the LU factorizaation
+        private SparseLU SBDF_implicit_decomp;                                //Initialize the LU factorizaation
 
         /// <summary>
         /// Send simulation 1D values, this send the current voltage after the solve runs 1 iteration
@@ -163,7 +169,7 @@ namespace C2M2.NeuronalDynamics.Simulation
             /// this initialize the curVals which will be sent back to the VR simulation
             double[] curVals = null;
             /// check if this beginning of the simulation
-            if (curentTimeStep > -1)
+            if (currentTimeStep > -1)
             {
                 Vector curTimeSlice;
                 lock (visualizationValuesLock)
@@ -194,7 +200,11 @@ namespace C2M2.NeuronalDynamics.Simulation
                     // perform a rank1 update solve to properly update with added dirichelet boundary conditions
                     // from a raycast, or voltage clamp. This is done because with a voltage clamp you are imposing
                     // a dirichelet B.C. which requires solving an updated diffusion problem with identity rows.
-                    U_Active = Vector.Build.DenseOfVector(DircheletRank1UpdateSolve(newVal));
+                    Vector result = DircheletRank1UpdateSolve(newVal);
+                    lock (visualizationValuesLock)
+                    {
+                        U_Active = Vector.Build.DenseOfVector(result);
+                    }
                 }
             }
         }
@@ -222,8 +232,8 @@ namespace C2M2.NeuronalDynamics.Simulation
             rj = Vector.Build.DenseOfArray(bj);
             rj.At(newVal.Item1, rj[newVal.Item1] - 1);
 
-            lu.Solve(ej.ToArray(), z);
-            lu.Solve(R.ToArray(), y);
+            SBDF_implicit_decomp.Solve(ej.ToArray(), z);
+            SBDF_implicit_decomp.Solve(R.ToArray(), y);
             
             ZZ = Vector.Build.DenseOfArray(z);
             YY = Vector.Build.DenseOfArray(y);
@@ -285,16 +295,16 @@ namespace C2M2.NeuronalDynamics.Simulation
             double presynVoltage = newVal.Item1.simulation.Get1DValues()[newVal.Item1.FocusVert];
             double presynVoltagePrev = ((SparseSolverTestv1)newVal.Item1.simulation).getUpre()[newVal.Item1.FocusVert];
 
-            if (model.isActive(presynVoltage, presynVoltagePrev, newVal.Item1.ActivationTime, GetSimulationTime()))
+            if (model.isActive(presynVoltage, presynVoltagePrev, GetSimulationTime(), newVal.Item1.ActivationTime))
             {
                 newVal.Item1.ActivationTime = GetSimulationTime();
             }
 
-
             //Adds the synaptic currents for the current and previous timesteps
             Icurrs.Add(model.getModelCurrent(presynVoltage, GetSimulationTime(), newVal.Item1.ActivationTime));
             Icurrs.Add(model.getModelCurrent(presynVoltagePrev, GetSimulationTime() - timeStep, newVal.Item1.ActivationTime));
-            newVal.Item1.ts = newVal.Item1.ActivationTime;
+
+
             return Icurrs;
         }
 
@@ -329,7 +339,7 @@ namespace C2M2.NeuronalDynamics.Simulation
             ///<c>double [] b</c> we define storage for the diffusion solve part
             b = new double[Neuron.nodes.Count];
             ///<c>var lu = SparseLU.Create(l_csc, ColumnOrdering.MinimumDegreeAtA, 0.1);</c> this creates the LU decomposition of the HINES matrix which is defined by <c>l_csc</c>
-            lu = SparseLU.Create(l_csc, ColumnOrdering.MinimumDegreeAtA, 0.1);
+            SBDF_implicit_decomp = SparseLU.Create(l_csc, ColumnOrdering.MinimumDegreeAtA, 0.1);
         }
 
         /// <summary>
@@ -350,7 +360,7 @@ namespace C2M2.NeuronalDynamics.Simulation
             Isyn[1].Multiply(0.0, Isyn[1]);
             surfaceArea.Multiply(0.0, surfaceArea);
             R.Add(Rsyn, R);
-            lu.Solve(R.ToArray(), b);
+            SBDF_implicit_decomp.Solve(R.ToArray(), b);
 
             tempState = N.Clone();
             explicitUpdate(N, Npre, fS(N, an(U_Active), bn(U_Active)), fS(Npre, an(Upre), bn(Upre)), timeStep, 1);
@@ -363,6 +373,10 @@ namespace C2M2.NeuronalDynamics.Simulation
             tempState = H.Clone();
             explicitUpdate(H, Hpre, fS(H, ah(U_Active), bh(U_Active)), fS(Hpre, ah(Upre), bh(Upre)), timeStep, 1);
             Hpre = tempState.Clone();
+
+            N.Map(x => System.Math.Max(0.0, System.Math.Min(1.0, x)), N);
+            M.Map(x => System.Math.Max(0.0, System.Math.Min(1.0, x)), M);
+            H.Map(x => System.Math.Max(0.0, System.Math.Min(1.0, x)), H);
 
             Upre = U_Active.Clone();
             U_Active.SetSubVector(0, Neuron.nodes.Count, Vector.Build.DenseOfArray(b));
@@ -442,7 +456,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         {
             lock (visualizationValuesLock)
             {
-                U = Vector.Build.Dense(Neuron.nodes.Count, 0.0);
+                U = Vector.Build.Dense(Neuron.nodes.Count, -70.0 * 1.0E-3);
                 U_Active = U.Clone();
             }
             Upre = U_Active.Clone();
@@ -461,6 +475,10 @@ namespace C2M2.NeuronalDynamics.Simulation
             surfaceArea = Vector.Build.Dense(Neuron.nodes.Count, 0.0);
 
             Mpre = M.Clone(); Npre = N.Clone(); Hpre = H.Clone();
+
+            // Set color bar range directly on ColorLUT to bypass serialized field defaults
+            ColorLUT.GlobalMin = -0.1f;   // -100 mV
+            ColorLUT.GlobalMax = 0.05f;   //   50 mV
         }
         /// <summary>
         /// This is for constructing the lhs and rhs of system matrix \n
@@ -631,9 +649,31 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// <returns>an</returns> this function returns the rate at the given voltage
         private static Vector an(Vector V)
         {
-            Vector Vin = Vector.Build.DenseOfVector(V);
-            Vin.Multiply(1.0E3, Vin);
-            return (1.0E3) * (0.032) * (15.0 - Vin).PointwiseDivide(((15.0 - Vin) / 5.0).PointwiseExp() - 1.0);
+            var V_arr = Vector.Build.DenseOfVector(V);
+            V_arr.Multiply(1.0E3, V_arr);
+            double Vt_scaled = 1.0E3 * Vt;
+
+            var d_alpha = V_arr - Vt_scaled - 15.0;
+            var alpha = Vector.Build.Dense(V.Count);
+
+            for (int i = 0; i < V.Count; i++)
+            {
+                double da = d_alpha[i];
+
+                if (System.Math.Abs(da) < 1.0E-6)
+                {
+                    // limit form
+                    alpha[i] = 1.0E3 * -0.032 /
+                            ((-1.0 / 5.0) * System.Math.Exp(-da / 5.0));
+                }
+                else
+                {
+                    alpha[i] = 1.0E3 * -0.032 * da /
+                            (System.Math.Exp(-da / 5.0) - 1.0);
+                }
+            }
+
+            return alpha;
         }
         /// <summary>
         /// This is \f$\beta_n\f$ rate function, the rate functions take the form of
@@ -649,7 +689,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         {
             Vector Vin = Vector.Build.DenseOfVector(V);
             Vin.Multiply(1.0E3, Vin);
-            return (1.0E3) * (0.5) * ((10.0 - Vin) / 40.0).PointwiseExp();
+            return (1.0E3) * (0.5) * ((10.0 - Vin + 1.0E3 * Vt) / 40.0).PointwiseExp();
         }
         /// <summary>
         /// This is \f$\alpha_m\f$ rate function, the rate functions take the form of
@@ -663,9 +703,32 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// <returns>am</returns> this function returns the rate at the given voltage
         private static Vector am(Vector V)
         {
-            Vector Vin = Vector.Build.DenseOfVector(V);
-            Vin.Multiply(1.0E3, Vin);
-            return (1.0E3) * (0.32) * (13.0 - Vin).PointwiseDivide(((13.0 - Vin) / 4.0).PointwiseExp() - 1.0);
+            var V_arr = Vector.Build.DenseOfVector(V);
+            V_arr.Multiply(1.0E3, V_arr);
+            double Vt_scaled = 1.0E3 * Vt;
+
+            var d_alpha = V_arr - Vt_scaled - 13.0;
+
+            var alpha = Vector.Build.Dense(V.Count);
+
+            for (int i = 0; i < V.Count; i++)
+            {
+                double da = d_alpha[i];
+
+                if (System.Math.Abs(da) < 1.0E-6)
+                {
+                    // limit form
+                    alpha[i] = -1.0E3 * 0.32 /
+                            ((-1.0 / 4.0) * System.Math.Exp(-da / 4.0));
+                }
+                else
+                {
+                    alpha[i] = -1e3 * 0.32 * da /
+                            (System.Math.Exp(-da / 4.0) - 1.0);
+                }
+            }
+
+            return alpha;
         }
         /// <summary>
         /// This is \f$\beta_m\f$ rate function, the rate functions take the form of
@@ -679,9 +742,32 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// <returns>bm</returns> this function returns the rate at the given voltage
         private static Vector bm(Vector V)
         {
-            Vector Vin = Vector.Build.DenseOfVector(V);
-            Vin.Multiply(1.0E3, Vin);
-            return (1.0E3) * (0.28) * (Vin - 40.0).PointwiseDivide(((Vin - 40.0) / 5.0).PointwiseExp() - 1.0);
+            var V_arr = Vector.Build.DenseOfVector(V);
+            V_arr.Multiply(1.0E3, V_arr);
+            double Vt_scaled = 1.0E3 * Vt;
+
+            var d_beta = V_arr - Vt_scaled - 40.0;
+
+            var beta = Vector.Build.Dense(V.Count);
+
+            for (int i = 0; i < V.Count; i++)
+            {
+                double db = d_beta[i];
+
+                if (System.Math.Abs(db) < 1.0E-6)
+                {
+                    // limit form
+                    beta[i] = 1.0E3 * 0.28 /
+                            ((1.0 / 5.0) * System.Math.Exp(db / 5.0));
+                }
+                else
+                {
+                    beta[i] = 1.0E3 * 0.28 * db /
+                            (System.Math.Exp(db / 5.0) - 1.0);
+                }
+            }
+
+            return beta;
         }
         /// <summary>
         /// This is \f$\alpha_h\f$ rate function, the rate functions take the form of
@@ -697,7 +783,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         {
             Vector Vin = Vector.Build.DenseOfVector(V);
             Vin.Multiply(1.0E3, Vin);
-            return (1.0E3) * (0.128) * ((17.0 - Vin) / 18.0).PointwiseExp();
+            return (1.0E3) * (0.128) * ((17.0 - Vin + 1.0E3 * Vt) / 18.0).PointwiseExp();
         }
         /// <summary>
         /// This is \f$\beta_h\f$ rate function, the rate functions take the form of
@@ -713,7 +799,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         {
             Vector Vin = Vector.Build.DenseOfVector(V);
             Vin.Multiply(1.0E3, Vin);
-            return (1.0E3) * 4.0 / (((40.0 - Vin) / 5.0).PointwiseExp() + 1.0);
+            return (1.0E3) * 4.0 / (((40.0 - Vin + 1.0E3 * Vt) / 5.0).PointwiseExp() + 1.0);
         }
 
         // used by save/load functions in Menu.cs

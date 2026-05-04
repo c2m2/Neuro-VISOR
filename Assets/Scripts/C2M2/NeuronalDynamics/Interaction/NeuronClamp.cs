@@ -33,6 +33,16 @@ namespace C2M2.NeuronalDynamics.Interaction
         {
             get
             {
+                if (simulation == null || simulation.Neuron == null || simulation.Neuron.nodes == null)
+                {
+                    Debug.LogWarning("NeuronClamp.NodeData: simulation, Neuron, or nodes is null");
+                    return null;
+                }
+                if (FocusVert < 0 || FocusVert >= simulation.Neuron.nodes.Count)
+                {
+                    Debug.LogWarning("NeuronClamp.NodeData: FocusVert " + FocusVert + " out of bounds (0.." + (simulation.Neuron.nodes.Count - 1) + ")");
+                    return null;
+                }
                 return simulation.Neuron.nodes[FocusVert];
             }
         }
@@ -71,12 +81,13 @@ namespace C2M2.NeuronalDynamics.Interaction
             // only assign ClampPower if it's not loading; otherwise it will overwrite the loaded value
             if (!GameManager.instance.Loading)
             {
-                ClampPower = (MaxPower - MinPower) / 2;
+                ClampPower = 0.05f; // default clamp power is 50 mV
                 UpdateColor();
             }
         }
         private void OnDestroy()
         {
+            if (GameManager.isQuitting) return;
             lock (simulation.clampLock) ClampManager.clamps.Remove(this);
         }
         #endregion
