@@ -13,7 +13,7 @@ namespace C2M2.NeuronalDynamics.Interaction
     {
         public float MinPower { get { return simulation.ColorLUT.GlobalMin; } }
         public float MaxPower { get { return simulation.ColorLUT.GlobalMax; } }
-        // Sensitivity of the clamp power control. Lower sensitivity means clamp power changes more quickly
+        // Sensitivity of the clamp voltage control. Lower sensitivity means clamp voltage changes more quickly
         public float sensitivity = 5;
         public float Scaler { get { return (MaxPower - MinPower) / sensitivity; } }
 
@@ -81,7 +81,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             // only assign ClampPower if it's not loading; otherwise it will overwrite the loaded value
             if (!GameManager.instance.Loading)
             {
-                ClampPower = 0.05f; // default clamp power is 50 mV
+                ClampPower = 0.05f; // default clamp voltage is 50 mV
                 UpdateColor();
             }
         }
