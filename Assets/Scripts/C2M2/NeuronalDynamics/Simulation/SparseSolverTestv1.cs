@@ -254,16 +254,14 @@ namespace C2M2.NeuronalDynamics.Simulation
             {
                 if ((newVal.Item1 != null) && (newVal.Item2 != null))
                 {
-                    if (newVal.Item1.FocusVert >= 0 && newVal.Item1.FocusVert < Neuron.nodes.Count && newVal.Item2.FocusVert >= 0 && newVal.Item2.FocusVert < Neuron.nodes.Count)
-                    {
-                        //tmp[0] is current synaptic state, and tmp[1] is previous synaptic state
-                        tmp = SynapseCurrentFunction(newVal, newVal.Item1.currentModel.Value);
-                        Isyn[0][newVal.Item2.FocusVert] += tmp[0];
-                        Isyn[1][newVal.Item2.FocusVert] += tmp[1];
-                        newVal.Item2.currentIsyn = Isyn[0][newVal.Item2.FocusVert];
-                        // compute surface area at postsynaptic location and scale for timestepping use
-                        surfaceArea[newVal.Item2.FocusVert] = 1 / (cap * 2 * System.Math.PI * Neuron.nodes[newVal.Item2.FocusVert].NodeRadius * Neuron.TargetEdgeLength * 1e-12);
-                    }
+                    //tmp[0] is current synaptic state, and tmp[1] is previous synaptic state
+                    tmp = SynapseCurrentFunction(newVal, newVal.Item1.currentModel.Value);
+                    Isyn[0][newVal.Item2.FocusVert] += tmp[0];
+                    Isyn[1][newVal.Item2.FocusVert] += tmp[1];
+                    newVal.Item2.currentIsyn = Isyn[0][newVal.Item2.FocusVert];
+                    Debug.Log(Isyn[0][newVal.Item2.FocusVert]);
+                    // compute surface area at postsynaptic location and scale for timestepping use
+                    surfaceArea[newVal.Item2.FocusVert] = 1 / (cap * 2 * System.Math.PI * Neuron.nodes[newVal.Item2.FocusVert].NodeRadius * Neuron.TargetEdgeLength * 1e-12);
                 }
             }
         }

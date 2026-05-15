@@ -69,25 +69,32 @@ public class SynapseManager : NDInteractablesManager<Synapse>
         return null;
     }
 
+    private static double ComputeInitialActivationTime(Synapse syn)
+    {
+        return double.NegativeInfinity;
+    }
+
     /// <summary>
     /// Handles synapse placement
     /// </summary>
     /// <param name="placedSynapse"></param>
     public void SynapticPlacement(Synapse placedSynapse)
     {
-        if (synapseInProgress == null) //Pre Synapse
+        if (synapseInProgress == null) // Pre Synapse
         {
-            Synapse prePlaced = placedSynapse.Clone();
-            prePlaced.SetPrePlace();
-            synapseInProgress = prePlaced;
+            //Synapse prePlaced = placedSynapse.Clone();
+            placedSynapse.SetPrePlace();
+            placedSynapse.ActivationTime = ComputeInitialActivationTime(placedSynapse);
+            synapseInProgress = placedSynapse;
             placementTimestamp = Time.time;
         }
-        else //Post Synapse
+        else // Post Synapse
         {
-            Synapse postPlaced = placedSynapse.Clone();
+            //Synapse postPlaced = placedSynapse.Clone();
+            placedSynapse.ActivationTime = synapseInProgress.ActivationTime; // keep the pair consistent
             lock (synapseLock)
             {
-                synapses.Add((synapseInProgress, postPlaced));
+                synapses.Add((synapseInProgress, placedSynapse));
             }
             PrePlaceCheck(synapseInProgress);
             synapseInProgress = null;

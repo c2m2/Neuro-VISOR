@@ -40,7 +40,7 @@ public class IsynLabelTemp : MonoBehaviour
         double taud = (float)post.currentModel.Value.getTaud();
 
 
-        label.text = "ISyn: " + iSynDivided.ToString("F3") + "\n (t - ts) / taud: " + ((self.simulation.GetSimulationTime() - pre.ts) / taud).ToString("F3");
+        label.text = "ISyn: " + iSynDivided.ToString("F3") + "\n (t - ts) / taud: " + ((self.simulation.GetSimulationTime() - pre.ActivationTime) / taud).ToString("F3");
         label.transform.rotation = Quaternion.LookRotation(Camera.main.transform.forward);
 
 
