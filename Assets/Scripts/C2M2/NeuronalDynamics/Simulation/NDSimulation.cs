@@ -32,6 +32,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
         public new NDSimulationManager Manager { get { return GameManager.instance.simulationManager; } }
         private double visualInflation = 1;
         public CSVWriter csv = null;
+        public SparseSolverTestv1 solver = null;
         public double VisualInflation
         {
             get { return visualInflation; }

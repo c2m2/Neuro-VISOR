@@ -3,6 +3,7 @@ using UnityEngine;
 using C2M2.NeuronalDynamics.Simulation;
 using TMPro;
 using UnityEngine.UI;
+using C2M2.Utils;
 
 namespace C2M2.NeuronalDynamics.Interaction.UI
 {
@@ -23,6 +24,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
 
         private TextMeshProUGUI[] textElements = null;
         CellPreviewerController controller;
+        private CSVWriter csv = null;
 
 
         private bool Minimized
@@ -154,6 +156,21 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
             CellPreviewerController.makePreviewerControlsVisible(false);
             // Ensure cell previewer is not present if board is expanded 
             if (!minimize) GameManager.instance.cellPreviewer.SetActive(false);
+        }
+        
+        public void StartCSV(bool single)
+        {   //restrict user from saving multiple csv files, disable button after clicking
+            csv = GameManager.instance.activeSims[0].gameObject.AddComponent<CSVWriter>();
+            NDSimulation sim = (NDSimulation)GameManager.instance.activeSims[0];
+            sim.solver = (SparseSolverTestv1)GameManager.instance.activeSims[0];
+            sim.csv = csv;
+            csv.single = single;
+            
+        }
+        public void StopCSV()
+        {   
+            NDSimulation sim = (NDSimulation)GameManager.instance.activeSims[0];
+            sim.convert = true;
         }
 
         public void MinimizeToggle()
