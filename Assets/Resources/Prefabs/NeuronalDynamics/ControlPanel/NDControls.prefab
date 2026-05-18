@@ -1174,7 +1174,6 @@ GameObject:
   - component: {fileID: 1294246393439242828}
   - component: {fileID: 2971143989488021056}
   - component: {fileID: 6097540974138418496}
-  - component: {fileID: 3957066377297535957}
   m_Layer: 8
   m_Name: SaveCSV
   m_TagString: Untagged
@@ -1327,18 +1326,6 @@ MonoBehaviour:
   defaultImg: {fileID: 3073170956517824177}
   highlightImg: {fileID: 3785940724078329578}
   highlightSeconds: 0.3
---- !u!114 &3957066377297535957
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1141043379172457604}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 232728db27ee7ea4589ff1a327b602a0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1141149061287977755
 GameObject:
   m_ObjectHideFlags: 0
@@ -2135,8 +2122,6 @@ GameObject:
   - component: {fileID: 7906471499785515167}
   - component: {fileID: 3392474211369804949}
   - component: {fileID: 1202137036546891777}
-  - component: {fileID: 2641685462822331296}
-  - component: {fileID: 7148459033780304872}
   m_Layer: 8
   m_Name: StopCSV
   m_TagString: Untagged
@@ -2222,7 +2207,7 @@ MonoBehaviour:
   onPress:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 7148459033780304872}
+      - m_Target: {fileID: 0}
         m_MethodName: Start
         m_Mode: 1
         m_Arguments:
@@ -2289,31 +2274,6 @@ MonoBehaviour:
   defaultImg: {fileID: 4512452973848612273}
   highlightImg: {fileID: 4775224730284025566}
   highlightSeconds: 0.3
---- !u!114 &2641685462822331296
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3135308048906199403}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 232728db27ee7ea4589ff1a327b602a0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &7148459033780304872
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3135308048906199403}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 85906b1a318b8704da9b4d5e9fd68fff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  single: 0
 --- !u!1 &3203487782819987335
 GameObject:
   m_ObjectHideFlags: 0
@@ -5786,6 +5746,8 @@ MonoBehaviour:
   - {fileID: 8119796243896388919}
   defaultBackground: {fileID: 3280542882723195444}
   minimizedBackground: {fileID: 4667019371935047971}
+  SaveButton: {fileID: 0}
+  StopButton: {fileID: 3135308048906199403}
 --- !u!54 &8985142846071624719
 Rigidbody:
   m_ObjectHideFlags: 0

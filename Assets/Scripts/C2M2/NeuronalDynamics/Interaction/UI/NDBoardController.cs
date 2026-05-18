@@ -21,7 +21,8 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
 
         public GameObject defaultBackground;
         public GameObject minimizedBackground;
-
+        public GameObject SaveButton;
+        public GameObject StopButton;
         private TextMeshProUGUI[] textElements = null;
         CellPreviewerController controller;
         private CSVWriter csv = null;
@@ -40,6 +41,8 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
             textElements = GetComponentsInChildren<TextMeshProUGUI>(true);
 
             StartCoroutine(UpdateColRoutine(0.5f));
+            StopButton = gameObject.transform.GetChild(6).gameObject;
+            StopButton.SetActive(false);
         }
 
         private void UpdateCols()
