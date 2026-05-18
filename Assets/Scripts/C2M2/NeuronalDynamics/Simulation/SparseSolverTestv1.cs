@@ -419,33 +419,6 @@ namespace C2M2.NeuronalDynamics.Simulation
             //GameManager.instance.DebugLogSafe("lower_bound = " + lower_bound.ToString());
             return dt;       
         }
-
-        public void InitializeIonChannel()
-        {
-            int n = Neuron.nodes.Count;
-
-            ionChannels = new List<IonChannel>
-            {
-                IonChannelModels.PotassiumChannel(n, v0),
-                IonChannelModels.SodiumChannel(n, v0),
-                IonChannelModels.LeakageChannel(n, v0),
-                IonChannelModels.CalciumChannel(n, v0),
-                IonChannelModels.SlowPotassiumChannel(n, v0),
-                IonChannelModels.LowThresholdCalciumChannel(n, v0),
-            };
-
-            if (SavedActiveChannelNames == null)
-                SavedActiveChannelNames = new HashSet<string> { "Potassium Channel", "Sodium Channel", "Leakage Channel" };
-
-            activeIonChannels = new List<IonChannel>();
-            foreach (var channel in ionChannels)
-            {
-                if (SavedActiveChannelNames.Contains(channel.Name)) activeIonChannels.Add(channel);
-            }
-
-            leakConductance = ionChannels.Find(ch => ch.Name == "Leakage Channel").Conductance;
-        }
-
         /// <summary>
         /// This function initializes the voltage vector <c>U</c> and the state vectors
         /// <c>M</c>, <c>N</c>, and <c>H</c> \n
@@ -493,6 +466,62 @@ namespace C2M2.NeuronalDynamics.Simulation
             // Set color bar range directly on ColorLUT to bypass serialized field defaults
             ColorLUT.GlobalMin = 0.0f;   // 0 mV
             ColorLUT.GlobalMax = 0.05f;   //   50 mV
+        }
+        /// <summary>
+        /// Initializes activeionchannel list and all ionchannel list.
+        /// This spawns each Ion Channel from IonChannels folder
+        /// </summary>
+        public void InitializeIonChannel()
+        {
+            int n = Neuron.nodes.Count;
+
+            ionChannels = new List<IonChannel>
+            {
+                IonChannelModels.PotassiumChannel(n, v0),
+                IonChannelModels.SodiumChannel(n, v0),
+                IonChannelModels.LeakageChannel(n, v0),
+                IonChannelModels.CalciumChannel(n, v0),
+                IonChannelModels.SlowPotassiumChannel(n, v0),
+                IonChannelModels.LowThresholdCalciumChannel(n, v0),
+            };
+
+            if (SavedActiveChannelNames == null)
+                SavedActiveChannelNames = new HashSet<string> { "Potassium Channel", "Sodium Channel", "Leakage Channel" };
+
+            activeIonChannels = new List<IonChannel>();
+            foreach (var channel in ionChannels)
+            {
+                if (SavedActiveChannelNames.Contains(channel.Name)) activeIonChannels.Add(channel);
+            }
+
+            leakConductance = ionChannels.Find(ch => ch.Name == "Leakage Channel").Conductance;
+        }
+        /// <summary>
+        /// Immediately toggles a channel on or off.
+        /// Turning off removes it from activeIonChannels; state vectors are left intact.
+        /// Turning on adds it back and reinitializes its gating variable states from Probability.
+        /// </summary>
+        public void ToggleChannel(IonChannel channel, bool active)
+        {
+            lock (visualizationValuesLock)
+            {
+                if (active)
+                {
+                    if (!activeIonChannels.Contains(channel))
+                    {
+                        activeIonChannels.Add(channel);
+                        foreach (var gv in channel.GatingVariables)
+                        {
+                            currentStates[gv.Name]  = Vector.Build.Dense(Neuron.nodes.Count, gv.Probability);
+                            previousStates[gv.Name] = currentStates[gv.Name].Clone();
+                        }
+                    }
+                }
+                else
+                {
+                    activeIonChannels.Remove(channel);
+                }
+            }
         }
         /// <summary>
         /// This is for constructing the lhs and rhs of system matrix \n
