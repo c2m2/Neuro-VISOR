@@ -711,6 +711,9 @@ namespace C2M2.NeuronalDynamics.Simulation
                 Isyn.Add(synVector);
             }
             surfaceArea = Vector.Build.Dense(Neuron.nodes.Count, 0.0);
+            // Set color bar range directly on ColorLUT to bypass serialized field defaults
+            ColorLUT.GlobalMin = 0.0f;   // 0 mV
+            ColorLUT.GlobalMax = 0.05f;   //   50 mV
         }
     }
 }
