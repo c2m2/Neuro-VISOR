@@ -1,4 +1,4 @@
-﻿﻿using System;
+﻿using System;
 using System.IO;
 using System.Diagnostics;
 using UnityEngine;
@@ -33,7 +33,8 @@ namespace C2M2.Utils
         private bool append = false;
      
         
-        //Start is called on the frame when a script is enabled just before any of the Update methods are called the first time. This function can be a coroutine.
+        //Start is called on the frame when a script is enabled just before any of the Update 
+        // methods are called the first time. This function can be a coroutine.
         public void Start()
         {   
             gm = GameManager.instance;
@@ -51,12 +52,6 @@ namespace C2M2.Utils
             
             stopwatch = new Stopwatch();
             append = false;
-            
-            
-
-
-
-
         }
 
         public String getFileName()
@@ -80,8 +75,6 @@ namespace C2M2.Utils
                 
               
                     bw.Write(sTime);
-
-           
                     for (int j = 1; j <= times; j++)
                     {
                         for (int i = 0; i < size; i++)
