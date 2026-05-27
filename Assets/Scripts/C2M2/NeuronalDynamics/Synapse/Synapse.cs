@@ -28,9 +28,10 @@ public class Synapse : NDInteractables
 
     public double ActivationTime { get; set; }
 
-    public double currentIsyn { get; set; } = 0;
+    public List<double> currentIsyn = new List<double>();
 
-    public double ts { get; set; } = 0;
+
+    //public double ts { get; set; } = 0;
 
     public Neuron.NodeData NodeData
     {

@@ -2,9 +2,9 @@
 using TMPro;
 public class ArrowUpdate : MonoBehaviour
 {
-    public Transform preSynapse;
+    public Transform preSynapse; //rename to transform 
     public Transform postSynapse;
-    public Synapse pre;
+    public Synapse pre; //synapse data structures
     public Synapse post;
 
     public TextMeshPro nameField;
@@ -61,9 +61,6 @@ public class ArrowUpdate : MonoBehaviour
 
     void Update()
     {
-        //Debug.Log(1f/0f);
-
-        //Debug.Log("exp^5000" + 0.0/0.0);
         if (preSynapse == null || postSynapse == null)
         {
             Destroy(gameObject);
@@ -114,7 +111,6 @@ public class ArrowUpdate : MonoBehaviour
             float synapsePositionPostsynCleft = Mathf.Min(cleftCenterPosition + cleftLength / fullLength * 0.5f, 0.8f); // relative postsynaptic terminal position
             float synapsePositionPostsynVertex = 1f;
 
-            Debug.Log("synapsePositionPresynCleft: " + synapsePositionPresynCleft + "synapsePositionPostsynCleft" + synapsePositionPostsynCleft);
             //this is the radius at the midpoint of the synapse interpolated between pre/post
             float radius = Mathf.Lerp(r_pre, r_post, 0.5f);
 
@@ -282,7 +278,6 @@ public class ArrowUpdate : MonoBehaviour
 
         var shape = particleSystem.shape;
         shape.radius = disk.localScale.x * 0.3f;
-        //Debug.Log(shape.radius);
 
         var main = particleSystem.main;
         particleSize = radius * 0.4f;
@@ -329,87 +324,87 @@ public class ArrowUpdate : MonoBehaviour
         var emissionModule = particleSystem.emission;
         var main = particleSystem.main;
 
-        float iSyn = (float)post.currentIsyn;
-        float iMax = (float)post.currentModel.Value.getImax();
-        //This routine calculates the emissions rate as a function of the Isyn
-        float EmMax = 300f; // Constant for emissions rate
-        float EmissionRate = Mathf.Clamp(Mathf.Abs(iSyn) / iMax, 0.0001f, 1f);
-        //Debug.Log("Isyn over Imax: " + Mathf.Abs(iSyn) / iMax);
-
-
-
-        float traversalTime = 0.5f;
-        float currentSpeed = cleftLength/traversalTime;
-        if (Mathf.Abs(iSyn) > 0f)
+        if (pre.FocusVert == post.currentIsyn[1] && pre.simulation.simID == post.currentIsyn[0])
         {
-            emissionModule.enabled = true;
-            emissionModule.rateOverTime = EmissionRate * EmMax;
-            main.startLifetime = traversalTime;
-            main.startSpeed = currentSpeed;
-        }
-        else
-        {
-            emissionModule.enabled = false;
-        }
+            float iSyn = (float)post.currentIsyn[2];
+            float iMax = (float)post.currentModel.Value.getImax();
+            //This routine calculates the emissions rate as a function of the Isyn
+            float EmMax = 300f; // Constant for emissions rate
+            float EmissionRate = Mathf.Clamp(Mathf.Abs(iSyn) / iMax, 0.0001f, 1f);
 
-       
-        Color32 liveColor;
-        if (iSyn >= 0f)
-        {
-            main.startColor = Color.red;
-        }
+            float traversalTime = 0.5f;
+            float currentSpeed = cleftLength/traversalTime;
+            if (Mathf.Abs(iSyn) > 0f)
+            {
+                emissionModule.enabled = true;
+                emissionModule.rateOverTime = EmissionRate * EmMax;
+                main.startLifetime = traversalTime;
+                main.startSpeed = currentSpeed;
+            }
+            else
+            {
+                emissionModule.enabled = false;
+            }
+
+        
+            Color32 liveColor;
+            if (iSyn >= 0f)
+            {
+                main.startColor = Color.red;
+            }
 
 
-        else
-        {
-            main.startColor = Color.cyan;  
-        }
-    
-        //Particle buffer is allocated
-        if (m_Particles == null || m_Particles.Length < particleSystem.main.maxParticles)
-        {
-            m_Particles = new ParticleSystem.Particle[particleSystem.main.maxParticles];
-        }
+            else
+            {
+                main.startColor = Color.cyan;  
+            }
+        
+            //Particle buffer is allocated
+            if (m_Particles == null || m_Particles.Length < particleSystem.main.maxParticles)
+            {
+                m_Particles = new ParticleSystem.Particle[particleSystem.main.maxParticles];
+            }
 
-        // GetParticles is allocation free because we reuse the m_Particles buffer between updates
-        int numParticlesAlive = particleSystem.GetParticles(m_Particles);
+            // GetParticles is allocation free because we reuse the m_Particles buffer between updates
+            int numParticlesAlive = particleSystem.GetParticles(m_Particles);
 
-        //Particles move uniformly on the x-axis, but have an element of randomness to their movement on the y-axis
-        float target_radius = GetVisualRadius(disk2) * 0.9f; // make bounding cylinder slightly smaller than receiving terminal
-        float jitterStrength = 0.05f * target_radius;
+            //Particles move uniformly on the x-axis, but have an element of randomness to their movement on the y-axis
+            float target_radius = GetVisualRadius(disk2) * 0.9f; // make bounding cylinder slightly smaller than receiving terminal
+            float jitterStrength = 0.05f * target_radius;
 
-        // Change only the particles that are alive
-        for (int i = 0; i < numParticlesAlive; i++)
-        {
+            // Change only the particles that are alive
+            for (int i = 0; i < numParticlesAlive; i++)
+            {
 
-            // non uniform in disk
-            float jitter_r = Random.Range(0.0f, jitterStrength);
-            float jitter_phi = Random.Range(0.0f,2.0f) * Mathf.PI;
-            float xOffset = jitter_r * Mathf.Cos(jitter_phi);
-            float yOffset = jitter_r * Mathf.Sin(jitter_phi);
+                // non uniform in disk
+                float jitter_r = Random.Range(0.0f, jitterStrength);
+                float jitter_phi = Random.Range(0.0f,2.0f) * Mathf.PI;
+                float xOffset = jitter_r * Mathf.Cos(jitter_phi);
+                float yOffset = jitter_r * Mathf.Sin(jitter_phi);
 
-            //yOffset = jitterStrength; // this is for testing
+                //yOffset = jitterStrength; // this is for testing
 
-            Vector3 position = m_Particles[i].position;
-            position.x += xOffset;
-            position.y += yOffset;
+                Vector3 position = m_Particles[i].position;
+                position.x += xOffset;
+                position.y += yOffset;
 
-            float dist_from_center_line = Mathf.Sqrt(Mathf.Pow(position.x, 2) + Mathf.Pow(position.y, 2))+1.0e-12f;
-            float dist_factor = Mathf.Min(target_radius / dist_from_center_line, 1);
-            position.x = position.x * dist_factor;
-            position.y = position.y * dist_factor;
+                float dist_from_center_line = Mathf.Sqrt(Mathf.Pow(position.x, 2) + Mathf.Pow(position.y, 2))+1.0e-12f;
+                float dist_factor = Mathf.Min(target_radius / dist_from_center_line, 1);
+                position.x = position.x * dist_factor;
+                position.y = position.y * dist_factor;
 
-            m_Particles[i].velocity = m_Particles[i].velocity.normalized * currentSpeed;
+                m_Particles[i].velocity = m_Particles[i].velocity.normalized * currentSpeed;
 
-            m_Particles[i].remainingLifetime *= cleftLength / previousCleftLength;
+                m_Particles[i].remainingLifetime *= cleftLength / previousCleftLength;
 
-            m_Particles[i].position = position;
-            m_Particles[i].startSize = particleSize;
-        }
+                m_Particles[i].position = position;
+                m_Particles[i].startSize = particleSize;
+            }
 
-        //Apply the changes
-        particleSystem.SetParticles(m_Particles, numParticlesAlive);
-        previousCleftLength = cleftLength;
+            //Apply the changes
+            particleSystem.SetParticles(m_Particles, numParticlesAlive);
+            previousCleftLength = cleftLength;
+            }
     }
 
 }

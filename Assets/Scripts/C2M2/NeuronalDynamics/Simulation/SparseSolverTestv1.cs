@@ -8,6 +8,7 @@ using CSparse.Double.Factorization;
 using CSparse;
 using C2M2.Utils;
 using C2M2.NeuronalDynamics.UGX;
+
 namespace C2M2.NeuronalDynamics.Simulation
 {
     /// <summary>
@@ -258,11 +259,11 @@ namespace C2M2.NeuronalDynamics.Simulation
                     tmp = SynapseCurrentFunction(newVal, newVal.Item1.currentModel.Value);
                     Isyn[0][newVal.Item2.FocusVert] += tmp[0];
                     Isyn[1][newVal.Item2.FocusVert] += tmp[1];
-                    newVal.Item2.currentIsyn = Isyn[0][newVal.Item2.FocusVert];
-                    Debug.Log(Isyn[0][newVal.Item2.FocusVert]);
+                    // we have the neuron ID, the vertex ID on that neuron, and the current coming from that vertex
+                    newVal.Item2.currentIsyn = new List<double> {newVal.Item1.simulation.simID, newVal.Item1.FocusVert, tmp[0]};
                     // compute surface area at postsynaptic location and scale for timestepping use
                     surfaceArea[newVal.Item2.FocusVert] = 1 / (cap * 2 * System.Math.PI * Neuron.nodes[newVal.Item2.FocusVert].NodeRadius * Neuron.TargetEdgeLength * 1e-12);
-                }
+                }  
             }
         }
 
