@@ -179,6 +179,13 @@ namespace C2M2.Simulation
         protected virtual void OnAwakePost(VizType viz) { }
         protected virtual void OnStart() { }
         protected virtual void OnUpdate() { }
+        protected virtual async void WriteCSV()
+        {   
+        }
+
+        protected virtual void StopCSV()
+        {
+        }
 
         protected void OnDestroy()
         {
@@ -243,6 +250,8 @@ namespace C2M2.Simulation
                         solveStepSampler.End();
 
                         PostSolveStep(currentTimeStep);
+                        WriteCSV();
+                        StopCSV();
 
                         currentTimeStep++;
                     }

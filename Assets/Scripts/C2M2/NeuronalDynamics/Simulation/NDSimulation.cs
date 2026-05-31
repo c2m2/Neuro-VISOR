@@ -359,7 +359,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
         /// </summary>
         /// <returns></returns>
         public abstract double[] Get1DValues ();
-        protected async void WriteCSV()
+        protected override async void WriteCSV()
         {   
             
             if (csv != null)
@@ -370,7 +370,7 @@ namespace C2M2.NeuronalDynamics.Simulation {
 
         public bool convert = false;
 
-        protected async void StopCSV()
+        protected override async void StopCSV()
         {
             if (convert == true)
             {   convert = false;
