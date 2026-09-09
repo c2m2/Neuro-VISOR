@@ -9,6 +9,8 @@ TagManager:
   - Ruler
   - NeuronContainer
   - CellPreviewer
+  - NeuronPivotPoint
+  - SimulatedNeuronCell
   layers:
   - Default
   - TransparentFX

@@ -283,6 +283,26 @@ namespace C2M2.NeuronalDynamics.Interaction
 
             }
 
+            /// <summary>
+            /// Re-scans cellsPath and rebuilds the preview window list from scratch. Destroys every
+            /// previously instantiated "&lt;fileName&gt;Preview" child (see InstantiatePreviewWindow)
+            /// first, since generateCellPreviewer() on its own just appends more windows on top of
+            /// whatever's already there rather than replacing them. Needed because the
+            /// FileSystemWatcher handlers below only update the internal files/newFiles lists and
+            /// never actually rebuild the UI - callers that want a freshly generated .vrn to show up
+            /// (e.g. the in-VR NeuronGenerator flow, on returning to this scene) call this explicitly.
+            /// </summary>
+            public void Refresh()
+            {
+                List<Transform> previews = new List<Transform>();
+                foreach (Transform child in transform)
+                {
+                    if (child.name.EndsWith("Preview")) { previews.Add(child); }
+                }
+                foreach (Transform t in previews) { Destroy(t.gameObject); }
+                generateCellPreviewer();
+            }
+
 
             private void ConfigureFileSystemWatcher(string path)
             {

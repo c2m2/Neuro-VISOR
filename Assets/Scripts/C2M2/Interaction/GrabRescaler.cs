@@ -61,8 +61,14 @@ namespace C2M2.Interaction
             {
                 if (OVRInput.GetDown(LeftX) && !OVRInput.Get(OVRInput.RawButton.Y))
                 {
-                    meshrender.enabled = !meshrender.enabled;
-                    pivotcollider.enabled = !pivotcollider.enabled;
+                    // Not every GrabRescaler instance has a pivot-point-style SphereCollider (e.g.
+                    // the one on the Ruler prefab only has BoxColliders) - this visibility-toggle
+                    // behavior only applies where both are present.
+                    if (meshrender != null && pivotcollider != null)
+                    {
+                        meshrender.enabled = !meshrender.enabled;
+                        pivotcollider.enabled = !pivotcollider.enabled;
+                    }
                     return true;
                 }
             }
@@ -70,8 +76,11 @@ namespace C2M2.Interaction
             {
                 if (Input.GetKeyDown(visibilityToggleKey))
                 {
-                    meshrender.enabled = !meshrender.enabled;
-                    pivotcollider.enabled = !pivotcollider.enabled;
+                    if (meshrender != null && pivotcollider != null)
+                    {
+                        meshrender.enabled = !meshrender.enabled;
+                        pivotcollider.enabled = !pivotcollider.enabled;
+                    }
                     return true;
                 }
             }
@@ -118,7 +127,7 @@ namespace C2M2.Interaction
             // Store all loaded Neurons in the simulation into a list
             neuronList = GameObject.FindGameObjectsWithTag("SimulatedNeuronCell");
             // Check if a Neuron was added since the last frame, then toggle pivotpoint visibility accordingly
-            if (neuronList.Count() - lastNeuronCount >= 1)
+            if (neuronList.Count() - lastNeuronCount >= 1 && meshrender != null && pivotcollider != null)
             {
                 if (lastNeuronCount >= 1)
                 {
@@ -144,7 +153,12 @@ namespace C2M2.Interaction
             GeometricMedian(target);
 
             // If the pivotpoint object is not grabbed but the rescaling keys are pressed, rescale the neurons accordingly
-            if (!grabbable.isGrabbed && median != null)
+            // (median is a Vector3/struct, so "median != null" was always true regardless of state -
+            // the real precondition for all of this is "at least one neuron is actually loaded",
+            // which neuronList.Count() > 0 checks directly; without it, SetNeuronParents' own
+            // neuronList[0] access throws whenever no simulation is running, e.g. right after
+            // startup or while browsing NeuronGeneratorScene with nothing loaded yet)
+            if (!grabbable.isGrabbed && neuronList.Count() > 0)
             {
                 SetNeuronParents(target);
                 pivot.transform.position = median;
@@ -152,7 +166,7 @@ namespace C2M2.Interaction
             }
             // But if the pivotpoint object is grabbed, disable rescaling and allow movement of all neurons as a group
             // TODO: Implement the ability to move all neurons as a group by moving the pivotpoint object on Desktop version; need a workaround because there's no "grabbing" on Desktop
-            if (grabbable.isGrabbed)
+            if (grabbable.isGrabbed && neuronList.Count() > 0)
             {
                 SetNeuronParents(pivot.transform);
             }
@@ -196,6 +210,7 @@ namespace C2M2.Interaction
 
         private void SetNeuronParents(Transform transform)
         {
+            if (neuronList.Length == 0) { return; }
             if (neuronList[0].transform.parent != transform)
             {
                 for (int i = 0; i < neuronList.Count(); i++)

@@ -42,9 +42,15 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
             textElements = GetComponentsInChildren<TextMeshProUGUI>(true);
 
             StartCoroutine(UpdateColRoutine(0.5f));
-            
-            StopButton = gameObject.transform.GetChild(6).gameObject;
-            StopButton.SetActive(false);
+
+            // The NDControls prefab's own child list no longer has a 7th ("Stop") child - nothing
+            // else in this class reads StopButton, so this is left null rather than throwing when
+            // that child doesn't exist.
+            if (gameObject.transform.childCount > 6)
+            {
+                StopButton = gameObject.transform.GetChild(6).gameObject;
+                StopButton.SetActive(false);
+            }
         }
 
         private void UpdateCols()
