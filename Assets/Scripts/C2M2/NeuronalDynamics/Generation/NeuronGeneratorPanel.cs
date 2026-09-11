@@ -26,9 +26,12 @@ namespace C2M2.NeuronalDynamics.Generation
     /// YAML for a whole panel's worth of controls, and makes the layout trivial to rearrange later.
     ///
     /// Per the user's explicit direction, this panel takes over the CellPreviewer wall's own spot
-    /// (anchoring to `GameManager.instance.cellPreviewer.transform`, which NeuronGeneratorButton
-    /// hides before this scene loads) rather than floating wherever the camera happens to be - the
-    /// rest of the main room stays exactly as the player left it.
+    /// (which NeuronGeneratorButton hides before this scene loads) rather than floating wherever the
+    /// camera happens to be - the rest of the main room stays exactly as the player left it. Its
+    /// position/rotation are a fixed constant tuned in-editor for that spot (see Start()), not read
+    /// from the CellPreviewer transform itself - that transform's rotation is identity and doesn't
+    /// face outward into the room, and anything computed from a moving reference (Camera.main, etc.)
+    /// made the panel's orientation depend on wherever the player happened to be standing.
     /// </summary>
     public class NeuronGeneratorPanel : MonoBehaviour
     {
@@ -74,34 +77,17 @@ namespace C2M2.NeuronalDynamics.Generation
         {
             options.method = Methods[methodIndex];
 
-            // Anchor this panel's POSITION exactly where the CellPreviewer wall normally sits
-            // (NeuronGeneratorButton hides GameManager.instance.cellPreviewer before loading this
-            // scene, so this panel visually takes its place there) - but face it toward the camera
-            // rather than blindly inheriting the CellPreviewer transform's own rotation, which
-            // turned out not to face outward into the room at all (confirmed on real hardware: the
-            // panel rendered as a heavily skewed, nearly edge-on sliver instead of a flat, readable
-            // wall panel). This scene deliberately has no camera of its own (an earlier version
-            // did, and that broke mouse clicking entirely - MouseEventSignaler always raycasts from
-            // Camera.main, the rig's own persistent camera, which stays exactly where it was in the
-            // room regardless of which camera actually rendered the screen, so what was visible and
-            // what was clickable were computed from two different viewpoints).
-            Transform anchor = GameManager.instance != null && GameManager.instance.cellPreviewer != null
-                ? GameManager.instance.cellPreviewer.transform
-                : null;
-            Transform cam = Camera.main != null ? Camera.main.transform : null;
-            if (anchor != null)
-            {
-                transform.position = anchor.position;
-                if (cam != null)
-                {
-                    transform.rotation = Quaternion.LookRotation(transform.position - cam.position, Vector3.up);
-                }
-            }
-            else if (cam != null)
-            {
-                transform.position = cam.position + cam.forward * 1.5f;
-                transform.rotation = Quaternion.LookRotation(transform.position - cam.position, Vector3.up);
-            }
+            // Place this panel at a FIXED position and rotation on the CellPreviewer wall, rather
+            // than computing either from a moving reference (the CellPreviewer transform's own
+            // rotation is identity and doesn't face outward into the room at all, its position sits
+            // slightly off from where the panel actually needs to be to read flat and square, and
+            // facing the panel toward Camera.main or any other point made its orientation depend on
+            // wherever the player happened to be standing when this scene loaded - all three produced
+            // a skewed or misplaced panel depending on run). This exact position/rotation pair was
+            // confirmed in-editor (manually dialed in on the Transform component in Play mode) to
+            // render this wall's spot as flat, square, and readable from a normal standing position.
+            transform.position = new Vector3(-1.6f, 1f, 0.75f);
+            transform.rotation = Quaternion.Euler(0, -90, 0);
 
             swcListParent = new GameObject("SwcList");
             swcListParent.transform.SetParent(transform, false);

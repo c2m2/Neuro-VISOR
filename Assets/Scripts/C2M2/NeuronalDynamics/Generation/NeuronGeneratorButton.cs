@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -24,6 +25,19 @@ namespace C2M2.NeuronalDynamics.Generation
     {
         public const string SceneName = "NeuronGeneratorScene";
 
+        // These sit alongside CellPreviewer(Clone) as top-level MainScene siblings, not as its
+        // children (CellPreviewer.cs itself finds "Arrows" this same way, via GameObject.Find, which
+        // wouldn't work if it were one of CellPreviewer's own children) - so hiding
+        // GameManager.instance.cellPreviewer alone leaves every one of these still visible and still
+        // clickable (pointing at a previewer that's now inactive) on top of the generator panel.
+        private static readonly string[] CellPreviewerSiblingUINames =
+            { "Refresh", "Arrows", "Page Counter", "FPS", "SaveLoad" };
+
+        // GameObject.Find only ever finds active objects, so the references we hide here have to be
+        // cached up front - looking them up again by name in OnReturnedFromGenerator would find
+        // nothing, since by then every one of them is the very thing we've just deactivated.
+        private readonly List<GameObject> hiddenSiblingUI = new List<GameObject>();
+
         // RaycastHit parameter matches RaycastPressEvents.onPress's own UnityEvent<RaycastHit>
         // signature (EventDefined persistent-call mode) - the same pattern this project's other
         // RaycastPressEvents.onPress handlers already use (e.g. Menu.cs's LoadThisFile).
@@ -33,6 +47,16 @@ namespace C2M2.NeuronalDynamics.Generation
             if (GameManager.instance != null && GameManager.instance.cellPreviewer != null)
             {
                 GameManager.instance.cellPreviewer.SetActive(false);
+            }
+            hiddenSiblingUI.Clear();
+            foreach (string name in CellPreviewerSiblingUINames)
+            {
+                GameObject go = GameObject.Find(name);
+                if (go != null)
+                {
+                    go.SetActive(false);
+                    hiddenSiblingUI.Add(go);
+                }
             }
             SceneManager.LoadSceneAsync(SceneName, LoadSceneMode.Additive);
         }
@@ -49,6 +73,11 @@ namespace C2M2.NeuronalDynamics.Generation
             {
                 GameManager.instance.cellPreviewer.SetActive(true);
             }
+            foreach (GameObject go in hiddenSiblingUI)
+            {
+                if (go != null) { go.SetActive(true); }
+            }
+            hiddenSiblingUI.Clear();
         }
     }
 }
