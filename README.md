@@ -1,5 +1,7 @@
 # Neuro-VISOR
 
+<img src="neuron_generator_demo.gif" alt="Neuron Generator demo" width="100%">
+
 <img src="https://user-images.githubusercontent.com/18742217/124176541-01268180-da7d-11eb-825c-935e2edb6aa7.jpg" alt="Neuro-VISOR in action" width="19%" align="right">
 
 VISOR (Virtual Interactive Simulation Of Reality) is a research project developed by Temple University's [Center for Computational Mathematics and Modeling (C2M2)](https://c2m2.cst.temple.edu/), College of Science and Technology. The overarching long-term vision of VISOR is to produce novel concepts and software that enable efficient immersed virtual reality (VR) visualization and real-time interaction with simulations of real-world processes described via principled mathematical equations. Unlike traditional high performance computing (HPC) applications, the philosophy of VISOR is that (a) the simulation runs while it is visualized in a virtual environment, and (b) the user can affect and modify the system state or its conditions at runtime, and the simulation reacts instantaneously and seamlessly.
