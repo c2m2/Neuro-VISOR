@@ -1,6 +1,6 @@
 # Neuro-VISOR
 
-<video src="https://media.githubusercontent.com/media/c2m2/Neuro-VISOR/meshgenerator/NeuroVisor-MeshGenerator.mp4" controls width="100%"></video>
+<img src="https://media.githubusercontent.com/media/c2m2/Neuro-VISOR/meshgenerator/NeuroVisor-MeshGenerator.gif" alt="Neuro-VISOR mesh generator demo" width="100%">
 
 <img src="https://user-images.githubusercontent.com/18742217/124176541-01268180-da7d-11eb-825c-935e2edb6aa7.jpg" alt="Neuro-VISOR in action" width="19%" align="right">
 
