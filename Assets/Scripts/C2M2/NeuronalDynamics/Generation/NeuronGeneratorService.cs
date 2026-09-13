@@ -94,11 +94,48 @@ namespace C2M2.NeuronalDynamics.Generation
                 return Task.FromResult(badOptionsResult);
             }
 
-            return Task.Run(() => GenerateBlocking(swcPath, cellName, geometriesDir, vrnPath, scratchDir, options));
+            return Task.Run(() =>
+                GenerateBlocking(swcPath, cellName, geometriesDir, vrnPath, scratchDir, options, options.n, options.delta));
+        }
+
+        /// <summary>
+        /// Generates a throwaway single-level .vrn (written under Application.temporaryCachePath, not
+        /// StreamingAssets/Geometries) at the given preview `level`'s delta, purely so the panel's 1D
+        /// view button can get at real 1D skeleton geometry - unlike GeneratePreviewMeshAsync's
+        /// nm_generate_mesh_file, which explicitly produces surface-only output with no 1D skeleton at
+        /// all (see NeuronMeshNative's own doc comment), nm_generate_vrn_files is the only native entry
+        /// point that writes one. Costs roughly what a real single-level Generate does - unavoidable
+        /// without a native-side "1D only" export - so this is only worth calling from the 1D button,
+        /// not on every level/parameter tweak the way the cheap surface preview is. The caller reads
+        /// the 1D mesh back out via VrnReader (same as NeuronCellPreview.cs already does for real
+        /// saved cells) and is responsible for deleting the returned vrnPath afterward.
+        /// </summary>
+        public static Task<Result> GeneratePreview1DVrnAsync(string swcPath, Options options, int level)
+        {
+            double levelDelta = options.delta / Math.Pow(2.0, level);
+            string cellName = Path.GetFileNameWithoutExtension(swcPath);
+            string geometriesDir = Application.temporaryCachePath;
+            string vrnPath = Path.Combine(geometriesDir, "NeuronPreview1D_" + Guid.NewGuid().ToString("N") + ".vrn");
+            string scratchDir = Path.Combine(Application.temporaryCachePath,
+                "NeuronGeneratorPreview1D_" + Guid.NewGuid().ToString("N"));
+
+            if (options.sphere && options.sphereWeld)
+            {
+                var badOptionsResult = new Result
+                {
+                    success = false,
+                    vrnPath = vrnPath,
+                    errorMessage = "sphere and sphereWeld are mutually exclusive",
+                };
+                return Task.FromResult(badOptionsResult);
+            }
+
+            return Task.Run(() =>
+                GenerateBlocking(swcPath, cellName, geometriesDir, vrnPath, scratchDir, options, nLevels: 1, delta: levelDelta));
         }
 
         private static Result GenerateBlocking(string swcPath, string cellName, string geometriesDir,
-            string vrnPath, string scratchDir, Options options)
+            string vrnPath, string scratchDir, Options options, int nLevels, double delta)
         {
             var result = new Result { vrnPath = vrnPath };
             try
@@ -111,8 +148,8 @@ namespace C2M2.NeuronalDynamics.Generation
                     scratchDir,
                     cellName,
                     options.method,
-                    options.n,
-                    options.delta,
+                    nLevels,
+                    delta,
                     options.p,
                     options.sides,
                     options.repair ? 1 : 0,
