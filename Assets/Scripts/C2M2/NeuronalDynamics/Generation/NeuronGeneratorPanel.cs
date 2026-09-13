@@ -1,11 +1,14 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using C2M2.Interaction;
+using C2M2.Interaction.VR;
 using C2M2.NeuronalDynamics.Interaction;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Grid = C2M2.NeuronalDynamics.UGX.Grid;
+using Edge = C2M2.NeuronalDynamics.UGX.Edge;
 
 namespace C2M2.NeuronalDynamics.Generation
 {
@@ -472,6 +475,67 @@ namespace C2M2.NeuronalDynamics.Generation
             var material = shader != null ? new Material(shader) : new Material(Shader.Find("Standard"));
             material.color = Color.red;
             renderer.material = material;
+
+            AddPreviewGrabInteraction(previewObject, centered, grid.Edges, maxDim);
+        }
+
+        // Capped well below real edge counts (a loaded .swc morphology can have thousands) so a
+        // grab-collider rebuild on every Preview click stays cheap - this is a rough "you can grab
+        // it somewhere along its branches" approximation, not a tight fit to the wireframe.
+        private const int MaxGrabColliders = 300;
+
+        /// <summary>
+        /// Makes the preview wireframe grabbable the same way the real simulation mesh is (a
+        /// kinematic Rigidbody + PublicOVRGrabbable + ObjectMovementControl), but without going
+        /// through VRGrabbableMesh/NonConvexMeshCollider - those need an actual triangulated surface
+        /// to wrap colliders around, and this preview is a MeshTopology.Lines mesh with none. Instead,
+        /// lays a small CapsuleCollider along a subset of edges (stride-sampled down to
+        /// MaxGrabColliders for large morphologies) so there's real physical volume to grab near the
+        /// visible red branches.
+        /// </summary>
+        private void AddPreviewGrabInteraction(GameObject previewObj, Vector3[] localPositions, List<Edge> edges, float maxDim)
+        {
+            // Segments are parented directly on previewObj (one level, not nested under an extra
+            // container) because ObjectMovementControl's desktop-mode click detection walks up
+            // exactly one parent from the hit collider (hit.collider.transform.parent.gameObject) to
+            // find the grabbable object - the same one level MeshSimulation's colliders sit at under
+            // their own mesh GameObject (via NonConvexMeshCollider's single "colliders" child).
+            // Nesting these any deeper silently breaks desktop right-click-drag (VR grab still works
+            // either way, since OVRGrabber searches the whole parent chain).
+            int edgeCount = edges.Count;
+            int stride = edgeCount > MaxGrabColliders ? Mathf.CeilToInt((float)edgeCount / MaxGrabColliders) : 1;
+            float radius = Mathf.Max(maxDim * 0.015f, 1e-4f);
+
+            for (int i = 0; i < edgeCount; i += stride)
+            {
+                Vector3 from = localPositions[edges[i].From.Id];
+                Vector3 to = localPositions[edges[i].To.Id];
+                float length = Vector3.Distance(from, to);
+                if (length < 1e-6f) { continue; }
+
+                var segment = new GameObject("GrabSegment");
+                segment.transform.SetParent(previewObj.transform, false);
+                segment.transform.localPosition = (from + to) * 0.5f;
+                segment.transform.localRotation = Quaternion.FromToRotation(Vector3.up, (to - from).normalized);
+
+                var capsule = segment.AddComponent<CapsuleCollider>();
+                capsule.direction = 1; // local Y axis, matching the rotation set above
+                capsule.height = length + radius; // slight overlap so neighboring segments meet
+                capsule.radius = radius;
+            }
+
+            var rb = previewObj.GetComponent<Rigidbody>();
+            if (rb == null) { rb = previewObj.AddComponent<Rigidbody>(); }
+            C2M2.Utils.RigidbodyUtilities.SetDefaultState(rb);
+
+            var ovr = previewObj.GetComponent<PublicOVRGrabbable>();
+            if (ovr == null) { ovr = previewObj.AddComponent<PublicOVRGrabbable>(); }
+            ovr.M_GrabPoints = previewObj.GetComponentsInChildren<CapsuleCollider>();
+
+            if (previewObj.GetComponent<C2M2.Utils.ObjectMovementControl>() == null)
+            {
+                previewObj.AddComponent<C2M2.Utils.ObjectMovementControl>();
+            }
         }
 
         private void OnBackPressed()
