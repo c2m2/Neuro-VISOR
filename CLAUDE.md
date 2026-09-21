@@ -18,6 +18,43 @@ This is a Unity Editor project, not a typical build-from-source repo — most "d
 - There is no asmdef for the project's own code (`Assets/Scripts/**`) — it all compiles into the default `Assembly-CSharp` assembly. Only the bundled Oculus package has its own asmdefs.
 - No CI config, build scripts, or CLI test runner exist in this repo. "Testing" is done manually in the Editor; a few ad hoc MonoBehaviour test scripts live under `Assets/Scripts/C2M2/Tests` and `Assets/Scripts/C2M2/NeuronalDynamics/Tests` (run by adding them to a scene and pressing Play, not via `dotnet test`/NUnit runner), despite `com.unity.test-framework` being present in `Packages/manifest.json`.
 
+## In-VR mesh generator (this `meshgenerator` branch only)
+
+`Assets/Scripts/C2M2/NeuronalDynamics/Generation/` (`NeuronMeshNative.cs`, `NeuronGeneratorService.cs`,
+`NeuronGeneratorPanel.cs`, `NeuronGeneratorButton.cs`) adds an in-VR panel that turns a `.swc` into a
+`.vrn` directly inside the app, without a separate offline tool. It does this by P/Invoking
+`Assets/Plugins/x86_64/neuronmesh_native.dll` — a native build of the sibling `neuronmesh` C++ repo's
+own mesh-generation pipeline (`NeuronGraph::write_vrn_levels`/`generate_surface_mesh`), exposed
+through the flat C API in that repo's `include/neuronmesh/capi.h`. **The actual meshing algorithm
+(spline resampling, tube sweep, junction capping) lives entirely in that DLL — nothing in this repo
+generates geometry itself.** `NeuronGeneratorService.cs` documents the full parameter set
+(`method`/`delta`/`p`/`sides`/`repair`/`bridgeSamples`/`bridgeInset`/`sphere`/`sphereWeld`/`starOpen`),
+which maps 1:1 onto `capi.h`'s two exports.
+
+### Updating neuronmesh_native.dll
+
+When the `neuronmesh` repo's mesh-generation code changes and you need that change here:
+
+1. In the `neuronmesh` repo (WSL/Linux): `source project_helper.sh && ph_native_plugin` (add `-c` to
+   force a full reconfigure) — see that repo's `native-plugin/README.md` for the full rebuild
+   walkthrough. Output: `build-native-plugin/neuronmesh_native.dll`.
+2. **Close this Unity project first.** Unity loads native plugins into its own process, and Windows
+   keeps a loaded DLL locked, so overwriting it while the Editor is open will fail, or silently leave
+   the old copy in effect until restart either way. Always close before copying.
+3. Copy the new file over `Assets/Plugins/x86_64/neuronmesh_native.dll` in *this* checkout.
+4. Reopen Unity. It should auto-reimport the changed plugin; if not, right-click the file in the
+   Project window → Reimport.
+5. **If `neuronmesh`'s `capi.h` signatures changed** (parameters added/removed/reordered, or a new
+   exported function), update `NeuronMeshNative.cs`'s `[DllImport]` declarations here to match by
+   hand — there's no shared binding generator between the two repos, so a mismatched signature won't
+   fail to compile on either side, it will corrupt the stack or misread arguments at runtime instead.
+   Changes to the *implementation* behind an unchanged signature need no C# changes at all.
+6. Smoke-test via the in-VR Mesh Generator panel (or its cheap single-mesh preview) before trusting
+   the new build.
+7. The updated DLL is a binary asset of *this* repo (tracked via Git LFS, like other binary assets
+   here) — commit/push it from here, not from `neuronmesh` (which has no record of the built `.dll`
+   itself, only the source that produces it).
+
 ## Architecture
 
 All first-party code lives under `Assets/Scripts/C2M2/`, namespaced `C2M2.*`. Third-party code (sparse linear algebra, Oculus SDK, TextMesh Pro, skybox) lives under `Assets/3rdParty/` and `Assets/Oculus/`.
