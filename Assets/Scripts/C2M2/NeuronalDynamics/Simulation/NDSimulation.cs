@@ -240,10 +240,11 @@ namespace C2M2.NeuronalDynamics.Simulation {
                         Synapse postSynapse = syn.Item2;
                         if (this == postSynapse.simulation)
                         {
-                            // Set the synapse voltage to what the voltage is at the 1D vertex
-                            preSynapse.ActivationTime = 0.0;
-                            postSynapse.ActivationTime = 0.0;
-
+                            // ActivationTime is initialized ONCE, when the synapse is placed
+                            // (Synapse.Place), and updated only on a genuine upward threshold
+                            // crossing (SynapseCurrentFunction) - it must NOT be reset here every
+                            // step, which previously wiped out the crossing-detection logic's own
+                            // result before the next step could ever see it.
                             synapses.Add((preSynapse, postSynapse));
                         }
                     }

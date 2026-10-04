@@ -147,7 +147,19 @@ namespace C2M2.NeuronalDynamics.Simulation
         List<CoordinateStorage<double>> sparse_stencils;
         CompressedColumnStorage<double> r_csc;              //This is for the rhs sparse matrix
         CompressedColumnStorage<double> l_csc;              //This is for the lhs sparse matrix
-        private SparseLU lu;  
+        private SparseLU lu;
+        /// <summary>
+        /// Factorization of the IMEX-Euler (SBDF1) start-up matrix I - timeStep*A,
+        /// used for the very first solve step only (see SolveStep's t==0 branch) -
+        /// SBDF2 needs two past voltage/gating levels, but at t=0 only V^0 exists;
+        /// starting it with V^(-1)=V^0 instead makes the whole run first order in
+        /// time (paper Sec. 3.1.2). makeSparseStencils already scales its matrix by
+        /// (2/3)*its dt argument, so passing 1.5*timeStep below gives exactly
+        /// I - timeStep*A, with no separate matrix-building code needed - the same
+        /// trick NeuroVISOR-CSharpStudies/src/csharp/Sbdf2Solver.cs's
+        /// FactorStartup uses.
+        /// </summary>
+        private SparseLU luStartup;
 
         /// <summary>
         /// Send simulation 1D values, this send the current voltage after the solve runs 1 iteration
@@ -248,6 +260,22 @@ namespace C2M2.NeuronalDynamics.Simulation
         }
                 
         /// <summary>
+        /// Control-volume membrane length [um, unconverted] at a node: half the SUM of
+        /// incident edge lengths - the same value makeSparseStencils' avgEdgeLengths computes
+        /// per node (post item-6 fix), so a synapse's injected current density doesn't depend
+        /// on local mesh spacing (paper item 14), unlike the previous global Neuron.TargetEdgeLength.
+        /// </summary>
+        private double MembraneLengthMicrons(int nodeIndex)
+        {
+            double sum = 0.0;
+            foreach (var kvp in Neuron.nodes[nodeIndex].AdjacencyList)
+            {
+                sum += kvp.Value;
+            }
+            return 0.5 * sum;
+        }
+
+        /// <summary>
         /// This computes the explicit update for the Isynaptic current
         /// the input is a tuple (presyn, postsyn) = (item1, item2) respectively
         /// each synapse contains information
@@ -258,27 +286,30 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// <returns></returns>
         public double SynapseExplicitSBDF((Synapse, Synapse) newVal)
         {
-            double area = new double();
-            List<double> Icurrs = new List<double>();
-
-            // compute surface area at postsynaptic location
-            area = 2 * System.Math.PI * Neuron.nodes[newVal.Item2.FocusVert].NodeRadius * Neuron.TargetEdgeLength * 1e-12;
+            // Surface area at the POSTsynaptic location, using the same control-volume
+            // membrane length the matrix itself uses at that node (item 14).
+            double area = 2 * System.Math.PI * Neuron.nodes[newVal.Item2.FocusVert].NodeRadius
+                * MembraneLengthMicrons(newVal.Item2.FocusVert) * 1e-12;
 
             //Icurrs[0] is current synaptic state, and Icurrs[1] is previous synaptic state
-            Icurrs = SynapseCurrentFunction(newVal, newVal.Item1.currentModel.Value);
+            List<double> Icurrs = SynapseCurrentFunction(newVal, newVal.Item1.currentModel.Value);
 
-            // If the user should use unrealistic biological parameters, this will check the current and set the current appropriately if the current goes beyond
-            // biologically accurate currents
-            // The upper bound has been chosen to be an arbitrarily large value of 30 nano Siemens. Since this is larger than any of the max capacitance for each synapse,
-            // Current should not be greater than this under normal circumstances.
-            if (Double.IsNaN(Icurrs[0]) || Double.IsNaN(Icurrs[1]) || (Icurrs[0] > 30e-9) || (Icurrs[1] > 30e-9))
+            // Only guard against a genuine computational error (NaN/Infinity) - the previous
+            // "clip anything over 30 nS to ~0" silently corrupted any legitimately large but
+            // valid current instead of actually preventing instability (item 15). The real
+            // limit is a stability bound on conductance per membrane area (paper Sec. 2.8);
+            // enforcing that belongs at synapse placement time (a UI decision), not here.
+            if (Double.IsNaN(Icurrs[0]) || Double.IsNaN(Icurrs[1]) || Double.IsInfinity(Icurrs[0]) || Double.IsInfinity(Icurrs[1]))
             {
-                Debug.Log("CURRENT OUT OF RANGE");
-                Icurrs[0] = 1.0e-16; Icurrs[1] = 0.9e-16;
+                Debug.LogWarning("Synaptic current was NaN/Infinity - clamping to 0 for this step.");
+                Icurrs[0] = 0.0; Icurrs[1] = 0.0;
             }
 
-            // this is the SBDF calculation using the Icurr of the current state, and Icurr of the previous state
-            return (2.0 / 3.0) * timeStep / (cap * area) * (2.0 * Icurrs[0] - Icurrs[1]);
+            // SBDF calculation using the Icurr of the current state, and Icurr of the previous
+            // state. Subtracted (not added): Icurrs is an OUTWARD-positive current, same sign
+            // convention reactF already uses for the Na/K/leak currents (item 10) - an outward
+            // current should DECREASE voltage, not increase it.
+            return -(2.0 / 3.0) * timeStep / (cap * area) * (2.0 * Icurrs[0] - Icurrs[1]);
         }
 
         /// <summary>
@@ -292,61 +323,42 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// <returns></returns>
         public List<double> SynapseCurrentFunction((Synapse, Synapse) newVal, ISynapseModel model)
         {
-            //List contains the current synaptic current at index 0 and previous synaptic current at index 1
-            List<double> Icurrs = new List<double>();
-
-            // Explanation of local variables:
-            // newVal is the (Synapse, Synapse) pair that refers to the superstructure of synapse
-            // Item1 refers to the presynaptic node, Item2 refers to the postsynaptic node
-            // Calling Item1.simulation grabs the SparseSolver attached to the neuron containing the presynaptic node
-            // From here, we either use .Get1DValues() for current timestep Vm array, or getUpre for previous timestep Vm array
-            // newVal.Item1.FocusVert refers to the index of the node on the neuron which the pre- or postsynapse is placed
-            // Since getUpre() isn't a virtual method declared in the abstract class NDSimulation.cs, the solver obtained
-            // from the presynaptic neuron must be cast as a SparseSolverTestv1 class
-
-            // get the pre-synaptic voltage at current and previous timeStep
+            // Presynaptic voltage: used ONLY to detect the upward threshold crossing that sets
+            // ActivationTime below - never fed into the current formula itself (item 9).
             double presynVoltage = newVal.Item1.simulation.Get1DValues()[newVal.Item1.FocusVert];
             double presynVoltagePrev = ((SparseSolverTestv1)newVal.Item1.simulation).getUpre()[newVal.Item1.FocusVert];
-            double voltageThreshold;
 
-            voltageThreshold = 0.038;   //Volts
+            // Postsynaptic voltage: b(V)*(V-E) is evaluated at the synapse's OWN (postsynaptic)
+            // node, per the paper and NeuroVISOR-CSharpStudies' NmdaSynapse.cs/GabaSynapse.cs
+            // (item 9 - this was the presynaptic voltage before).
+            double postsynVoltage = newVal.Item2.simulation.Get1DValues()[newVal.Item2.FocusVert];
+            double postsynVoltagePrev = ((SparseSolverTestv1)newVal.Item2.simulation).getUpre()[newVal.Item2.FocusVert];
 
-            //Used to update the activation time of the Synapse. This occurs on the timeStep in which the presynaptic membrane potential
-            //crosses the voltageThreshold
+            // [V] Spike-detection threshold (paper Sec. 3.1.5) - re-checked against the
+            // -70 mV/-55 mV frame (items 1-2): still comfortably inside this model's ~40-50 mV
+            // spike peak (item 13).
+            const double voltageThreshold = 0.038;
+
+            // One activation per upward threshold crossing (item 12) - a later crossing
+            // re-activates. No longer reset every 0.3 ms, and no longer zeroed merely because
+            // the presynaptic voltage has since fallen back below threshold (both removed -
+            // see NDSimulation.cs's ActivationTime comment for why that silently discarded
+            // every crossing this detected).
             if ((presynVoltage >= voltageThreshold) && (presynVoltagePrev < voltageThreshold))
-            { 
-                Debug.Log("Activation Time Updated");
-                newVal.Item1.ActivationTime = GetSimulationTime(); 
+            {
+                newVal.Item1.ActivationTime = GetSimulationTime();
             }
 
-            // if the presynapse is below a threshold, then the synapse is INACTIVE
-            if (presynVoltage <= voltageThreshold)
-            {
-                Icurrs = new List<double>
-                {
-                    0.0,    // zero current at postsynapse while INACTIVE
-                    0.0     // zero current at postsynapse while INACTIVE
-                };
-            }
+            double tCur = GetSimulationTime();
+            double tPrev = tCur - timeStep;
+            double ts = newVal.Item1.ActivationTime;
 
-            else // if the presynaptic voltage is above threshold, then do not update activation time and compute the new current
-            {
-                //If sufficient time (3.0e-4 sec = 0.3 ms) has passed since the action potential started and the presynaptic membrane potential has remained above the
-                //action potential threshold, then it updates activation to reset the decay of the synaptic current function
-                if (GetSimulationTime() > (newVal.Item1.ActivationTime + 3.0e-4))
-                {
-                    newVal.Item1.ActivationTime = GetSimulationTime();
-                }
+            // Silent (0 current) at any sample time before ts - including every step before the
+            // very first activation ever, when ts is still Synapse.Place's +infinity sentinel.
+            double iCur = (tCur >= ts) ? model.getModelCurrent(postsynVoltage, tCur, ts) : 0.0;
+            double iPrev = (tPrev >= ts) ? model.getModelCurrent(postsynVoltagePrev, tPrev, ts) : 0.0;
 
-                Icurrs = new List<double>();
-
-                //Adds the synaptic currents for the current and previous timesteps
-                Icurrs.Add(model.getModelCurrent(presynVoltage, GetSimulationTime(), newVal.Item1.ActivationTime));
-                Icurrs.Add(model.getModelCurrent(presynVoltagePrev, GetSimulationTime() - timeStep, newVal.Item1.ActivationTime));
-                }
-            ;
-
-            return Icurrs;
+            return new List<double> { iCur, iPrev };
         }
 
         /// <summary>
@@ -383,7 +395,13 @@ namespace C2M2.NeuronalDynamics.Simulation
             b = new double[Neuron.nodes.Count];
             ///<c>var lu = SparseLU.Create(l_csc, ColumnOrdering.MinimumDegreeAtA, 0.1);</c> this creates the LU decomposition of the HINES matrix which is defined by <c>l_csc</c>
             lu = SparseLU.Create(l_csc, ColumnOrdering.MinimumDegreeAtA, 0.1);
-            
+
+            /// IMEX-Euler start-up factorization I - timeStep*A for SolveStep's t==0
+            /// branch - see luStartup's doc comment.
+            var startupStencils = makeSparseStencils(Neuron, res, cap, 1.5 * timeStep);
+            var startupLcsc = CompressedColumnStorage<double>.OfIndexed(startupStencils[1]);
+            luStartup = SparseLU.Create(startupLcsc, ColumnOrdering.MinimumDegreeAtA, 0.1);
+
         }
 
         /// <summary>
@@ -392,7 +410,42 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// is for the reaction terms and state variables
         /// </summary>     
         protected override void SolveStep(int t)
-        {            
+        {
+            if (t == 0)
+            {
+                // IMEX-Euler (SBDF1) start-up step - see luStartup's doc comment.
+                // Forward Euler for the gating variables and
+                // (I - timeStep*A) V^1 = V^0 + timeStep*B(V^0) for the voltage,
+                // solved against luStartup instead of the regular SBDF2 matrix.
+                U_Active.Multiply(1.0, R);
+                R.Add(reactF(activeIonChannels, U_Active, currentStates, cap).Multiply(timeStep), R);
+
+                R.Add(Isyn, R);
+                Isyn.Multiply(0.0, Isyn);
+
+                luStartup.Solve(R.ToArray(), b);
+
+                foreach (var channel in activeIonChannels)
+                {
+                    foreach (var gatingVariable in channel.GatingVariables)
+                    {
+                        if (!gatingVariable.IsInstant)
+                        {
+                            tempState = currentStates[gatingVariable.Name].Clone();
+                            currentStates[gatingVariable.Name].Add(
+                                fS(currentStates[gatingVariable.Name], gatingVariable.Alpha(U_Active), gatingVariable.Beta(U_Active)).Multiply(timeStep),
+                                currentStates[gatingVariable.Name]
+                            );
+                            previousStates[gatingVariable.Name] = tempState.Clone();
+                        }
+                    }
+                }
+                Upre = U_Active.Clone();
+
+                U_Active.SetSubVector(0, Neuron.nodes.Count, Vector.Build.DenseOfArray(b));
+                return;
+            }
+
             U_Active.Multiply(4.0 / 3.0, R);
             R.Add(reactF(activeIonChannels, U_Active, currentStates, cap).Multiply((4.0 / 3.0) * timeStep), R);
             R.Add(Upre.Multiply(-1.0 / 3.0), R);
@@ -414,7 +467,7 @@ namespace C2M2.NeuronalDynamics.Simulation
                             currentStates[gatingVariable.Name],
                             previousStates[gatingVariable.Name],
                             fS(currentStates[gatingVariable.Name], gatingVariable.Alpha(U_Active), gatingVariable.Beta(U_Active)),
-                            fS(previousStates[gatingVariable.Name], gatingVariable.Alpha(Upre), gatingVariable.Beta(Upre)), 
+                            fS(previousStates[gatingVariable.Name], gatingVariable.Alpha(Upre), gatingVariable.Beta(Upre)),
                             timeStep
                         );
 
@@ -473,7 +526,11 @@ namespace C2M2.NeuronalDynamics.Simulation
             /// we want to avoid using dtmin; therefore I compute the upper bound (and lower bound for reference)
             // double dtmin = 2e-6;
             // double dtmax = 5.0e-5;
-            double dtmax = 50e-6;
+            // Paper Sec. 2.6.1: SBDF2 diverges on the test cell at dt >= 50us; dt <= 32us
+            // is recommended. This was the only place dt was actually decided (this
+            // function's own result unconditionally overwrites whatever the loader or
+            // Simulation.cs otherwise defaulted to), so 32us is set here, once.
+            double dtmax = 32e-6;
             double dt;
 
             double gll = gl; double scf = 1E-6; // to convert to micrometer of edgelengths and radii don't forget this!!!!
@@ -503,7 +560,7 @@ namespace C2M2.NeuronalDynamics.Simulation
                 { "Potassium Channel",     true  },
                 { "Sodium Channel",        true  },  // true to activate chanenl in simulation
                 { "Calcium Channel",       false },  // false to deactive channel in simulation
-                { "Leakage Channel",       false },
+                { "Leakage Channel",       true  },
                 { "Low Threshold Calcium Channel",  false },
                 { "Slow Potassium Channel",         false },
             };
@@ -541,7 +598,7 @@ namespace C2M2.NeuronalDynamics.Simulation
         {
             lock (visualizationValuesLock)
             {
-                U = Vector.Build.Dense(Neuron.nodes.Count, 0.0); // Here is where initial voltage is set, i.e. -0.07 implies a start voltage of -70 mV for all vectors
+                U = Vector.Build.Dense(Neuron.nodes.Count, IonChannelModels.VStart); // Initial voltage: -70 mV resting potential (matches the gating variables' own equilibrium - see IonChannelModels.VStart)
                 U_Active = U.Clone();
             }
             Upre = U_Active.Clone();
@@ -625,8 +682,11 @@ namespace C2M2.NeuronalDynamics.Simulation
                     edgelengths.Add(tempEdgeLen);
                     sumRecip = sumRecip + 1 / (tempEdgeLen * tempRadius * ((1 / (myCell.nodes[nghbrIds].NodeRadius*scf* myCell.nodes[nghbrIds].NodeRadius*scf)) + (1 / (tempRadius * tempRadius))));
                 }
-                /// get the average edge lengths of neighbors \n
-                avgEdgeLengths = edgelengths.Average();
+                /// Control-volume membrane length at node j: half the SUM of incident edge
+                /// lengths (not their mean - the mean gives end nodes a full edge and branch
+                /// nodes sum/3, which drops the spatial discretization to first order; see
+                /// NeuroVISOR-CSharpStudies/src/csharp/Sbdf2Solver.cs's HalfEdgeMembraneLength).
+                avgEdgeLengths = 0.5 * edgelengths.Sum();
                 /// set main diagonal entries using <c>rhs.At()</c>
                 /// this is BE method, no oscillations but not as accurate!
                 rhs.At(j, j, 1.0);

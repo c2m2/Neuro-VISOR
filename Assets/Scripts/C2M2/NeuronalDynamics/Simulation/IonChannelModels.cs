@@ -10,6 +10,28 @@ namespace C2M2.NeuronalDynamics.Simulation
     public static class IonChannelModels
     {
         /// <summary>
+        /// [V] Resting potential used as both the solver's initial voltage
+        /// (SparseSolverTestv1.InitializeNeuronCell) and the voltage at which
+        /// the gating variables' initial probabilities below are evaluated,
+        /// so the cell always starts at its own true equilibrium - see
+        /// NeuroVISOR-CSharpStudies/src/csharp/SimParams.cs's VStart (same
+        /// value, same role).
+        /// </summary>
+        public const double VStart = -70.0 * 1.0E-3;
+
+        /// <summary>
+        /// [mV] Threshold shift V_T of the Pospischil et al. (2008) rate
+        /// functions below, which are written in terms of V - V_T. -55 mV is
+        /// the value in the authors' own NEURON model (ModelDB #123623,
+        /// sPY_template) and matches NeuroVISOR-CSharpStudies/src/csharp/SimParams.cs's
+        /// VTraub. Given directly in mV (not volts * 1e-3 like ek/gk/el
+        /// below) because alpha_n/beta_n/alpha_m/etc. convert their voltage
+        /// argument to mV first (`Vin.Multiply(1.0E3, Vin)`) and then combine
+        /// it with vT directly in that already-mV expression.
+        /// </summary>
+        private const double vTraubMv = -55.0;
+
+        /// <summary>
         /// Potassium Channel
         /// gK = 5.0e1, eK = -90e-3
         /// Rate equations taken from Pospischil et al., 2008
@@ -27,9 +49,10 @@ namespace C2M2.NeuronalDynamics.Simulation
             /// </summary>
             double ek = -90.0 * 1.0E-3;
             /// <summary>
-            /// [V] voltage threshold
+            /// [mV] voltage threshold - see vTraubMv's doc comment for why this
+            /// is in mV rather than volts.
             /// </summary>
-            double vT = 0.0 * 1.0E-3;
+            double vT = vTraubMv;
             /// Declare new ion channel, "potassiumChannel"
             IonChannel potassiumChannel = new IonChannel("Potassium Channel", gk, ek);
             /// <summary>
@@ -57,10 +80,18 @@ namespace C2M2.NeuronalDynamics.Simulation
                 Vin.Multiply(1.0E3, Vin);
                 return (1.0E3) * (0.5) * ((10.0 + vT - Vin) / 40.0).PointwiseExp();
             };
+            /// Initial probability n_inf(VStart) = alpha_n/(alpha_n+beta_n) at V = VStart,
+            /// computed from the rate functions above rather than hardcoded (see VStart's
+            /// doc comment) so the cell always starts at its own true resting equilibrium.
+            Vector vStartVec = Vector.Build.Dense(1, VStart);
+            double an0 = alpha_n(vStartVec)[0];
+            double bn0 = beta_n(vStartVec)[0];
+            double nInit = an0 / (an0 + bn0);
+
             /// Format for returning gating variables
             /// new GatingVariable("variable name", alpha_function, beta_function, exponenet, initial probability, nodeCount)
             potassiumChannel.AddGatingVariable(
-                new GatingVariable("n", alpha_n, beta_n, 4, 0.0376969, nodeCount)
+                new GatingVariable("n", alpha_n, beta_n, 4, nInit, nodeCount)
             );
             return potassiumChannel;
         }
@@ -83,9 +114,10 @@ namespace C2M2.NeuronalDynamics.Simulation
             /// </summary>
             double ena = 50.0 * 1.0E-3;
             /// <summary>
-            /// [V] voltage threshold
+            /// [mV] voltage threshold - see vTraubMv's doc comment for why this
+            /// is in mV rather than volts.
             /// </summary>
-            double vT = 0.0 * 1.0E-3;
+            double vT = vTraubMv;
             /// Declaration of new ion channel sodiumChannel.
             /// Declared with the struct: (Name, Coductance, Reversal)
             IonChannel sodiumChannel = new IonChannel("Sodium Channel", gna, ena);
@@ -137,13 +169,23 @@ namespace C2M2.NeuronalDynamics.Simulation
                 Vin.Multiply(1.0E3, Vin);
                 return (1.0E3) * 4.0 / (((40.0 + vT - Vin) / 5.0).PointwiseExp() + 1.0);
             };
+            /// Initial probabilities at V = VStart, computed from the rate functions
+            /// above rather than hardcoded - see PotassiumChannel's nInit for why.
+            Vector vStartVec = Vector.Build.Dense(1, VStart);
+            double am0 = alpha_m(vStartVec)[0];
+            double bm0 = beta_m(vStartVec)[0];
+            double mInit = am0 / (am0 + bm0);
+            double ah0 = alpha_h(vStartVec)[0];
+            double bh0 = beta_h(vStartVec)[0];
+            double hInit = ah0 / (ah0 + bh0);
+
             /// Format for returning gating variables
             /// new GatingVariable("variable name", alpha_function, beta_function, exponenet, initial probability, nodeCount)
             sodiumChannel.AddGatingVariable(
-                new GatingVariable("m", alpha_m, beta_m, 3, 0.0147567, nodeCount)
+                new GatingVariable("m", alpha_m, beta_m, 3, mInit, nodeCount)
             );
             sodiumChannel.AddGatingVariable(
-                new GatingVariable("h", alpha_h, beta_h, 1, 0.9959410, nodeCount)
+                new GatingVariable("h", alpha_h, beta_h, 1, hInit, nodeCount)
             );
 
             return sodiumChannel;

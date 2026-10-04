@@ -15,10 +15,15 @@ public class ModelGABA : ISynapseModel
     /// <returns></returns>
     public double getModelCurrent(double v, double t, double ts)
     {
-        double Erev = -0.065;           // (Volts) Reversal potential of GABA synapses, stated on page 9 of Rothman's paper
-        double taud = 3.0e-4;           // (Seconds) decay constant from function, found in figure 2 of Rothman's Paper
-        double g = -1e-9;               // (Siemens) a chosen arbitrary value that produces a noticeable, but not too great, inhibitory response.
-                                        // Rothman's paper does not provide any examples for max capacitance of GABA synapses
+        // Erev = -80 mV (Destexhe, Mainen & Sejnowski 1998, Sec. 1.4.3's fit to whole-cell
+        // GABA_A currents), below the -70 mV rest so the synapse hyperpolarizes. tau_d = 6.5 ms
+        // (Kraushaar & Jonas 2000, as given by Roth & van Rossum 2009, Sec. 6.1). g is positive -
+        // the outward-current sign is now handled once, correctly, at the call site (see
+        // SynapseExplicitSBDF), not compensated here with a negative conductance (see
+        // NeuroVISOR-CSharpStudies/src/csharp/GabaSynapse.cs).
+        double Erev = -0.080;           // (Volts) GABA_A reversal potential
+        double taud = 6.5e-3;           // (Seconds) decay constant
+        double g = 1e-9;                // (Siemens) peak conductance
 
         return g * System.Math.Exp(-(t - ts) / taud) * (v - Erev);      
     }

@@ -35,10 +35,11 @@ public class ModelNMDA : ISynapseModel
         */
 
         double Erev = 0;                // (Volts) reversal potential for synapse, Stated explicitly in Rothman's paper to usually be 0 Volts (page 7)
-        double taud = 3.0e-4;           // (Seconds) decay constant from function, Stated explicitly in Rothman's paper (figure 2)
-        double g = 17e-9;               // (Siemens) 17 nano Siemens was chosen because it produces a noticeable post synaptic response across
-                                        // a single synapse, while still requiring multiple synapses to produce a post-synaptic action potential
-                                        // from a single pre-synaptic action potential  
+        // tau_d = 50 ms (Rothman & Silver 2014, Sec. 2's 30-70 ms NMDAR decay range), not the
+        // 0.3 ms previously here - that is an AMPAR-range decay, not NMDA's. g = 1 nS, Rothman's
+        // own published conductance (see NeuroVISOR-CSharpStudies/src/csharp/NmdaSynapse.cs).
+        double taud = 50.0e-3;          // (Seconds) decay constant
+        double g = 1e-9;                // (Siemens) peak conductance
 
         double v05 = -0.0128;           // (Volts) V0.5, first voltage constant used in Boltzmann function for Magnesium block, value found in figure 3 of Rothman paper
         double k = 0.0224;              // (Volts) second voltage constant used in Boltzmann function, value found in figure 3 of rothman paper

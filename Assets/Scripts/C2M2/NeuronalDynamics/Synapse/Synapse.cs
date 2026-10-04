@@ -54,6 +54,11 @@ public class Synapse : NDInteractables
     }
     public override void Place(int index)
     {
+        // "Not yet activated" sentinel: GetSimulationTime() (>= 0) is always less than
+        // +infinity, so the synapse stays silent until the first genuine upward threshold
+        // crossing sets this to a real, finite simulation time (SynapseCurrentFunction).
+        // Initialized once here, not reset every step (see NDSimulation.PostSolveStep).
+        ActivationTime = double.PositiveInfinity;
         transform.localPosition = FocusPos;
         float currentVisualizationScale = (float)simulation.VisualInflation;
         float radiusScalingValue = 3f * (float)NodeData.NodeRadius;
