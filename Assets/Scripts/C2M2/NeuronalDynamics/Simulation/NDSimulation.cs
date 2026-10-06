@@ -485,6 +485,28 @@ namespace C2M2.NeuronalDynamics.Simulation {
 
         public int GetNearestPoint(RaycastHit hit)
         {
+            return GetNearestPoint(hit, out _);
+        }
+
+        /// <summary>
+        /// Same as <see cref="GetNearestPoint(RaycastHit)"/>, but also reports the LOCAL radius
+        /// of the rendered dendrite surface at the returned vertex, via
+        /// <paramref name="localSurfaceRadius"/>. This has no fixed relationship to the solver's
+        /// own NodeData.NodeRadius: the rendered surface comes from a separate, pre-baked/
+        /// pre-inflated mesh file (see Update2DGrid), not a live NodeRadius*factor computation,
+        /// so interactables that size themselves from NodeRadius alone (e.g. a voltage clamp)
+        /// can end up smaller than the real surface and render hidden inside it.
+        ///
+        /// The radius is the MAXIMUM distance from the winning 1D vertex to every 3D surface
+        /// vertex mapped to it (Map[i].v1/.v2 == that index), not just the single nearest
+        /// candidate near the click point - a thick/irregular section (soma, branch points) is
+        /// not necessarily a symmetric cylinder around the 1D centerline, so sampling from
+        /// wherever the user happened to click only gives the radius in ONE direction; the far
+        /// side of an uneven bulge could still poke through a clamp sized from that one sample.
+        /// </summary>
+        public int GetNearestPoint(RaycastHit hit, out float localSurfaceRadius)
+        {
+            localSurfaceRadius = 0f;
             if (mf == null) return -1;
 
             // Get 3D mesh vertices from hit triangle
@@ -512,6 +534,26 @@ namespace C2M2.NeuronalDynamics.Simulation {
                     nearestDist = dist;
                     nearestVert1D = vert;
                 }
+            }
+
+            if (nearestVert1D != -1)
+            {
+                Vector3 axisPoint = Verts1D[nearestVert1D];
+                Mesh mesh = mf.mesh;
+                Vector3[] vertices = mesh.vertices;
+                float maxDist = 0f;
+                for (int i = 0; i < vertices.Length; i++)
+                {
+                    Vert3D1DPair pair = Map[i];
+                    if (pair.v1 == nearestVert1D || pair.v2 == nearestVert1D)
+                    {
+                        float dist = Vector3.Distance(axisPoint, vertices[i]);
+                        if (dist > maxDist) maxDist = dist;
+                    }
+                }
+                // Fall back to the single-sample distance on the off chance nothing else maps
+                // to this vertex (shouldn't normally happen, but keeps this never worse than before).
+                localSurfaceRadius = maxDist > 0f ? maxDist : nearestDist;
             }
 
             return nearestVert1D;

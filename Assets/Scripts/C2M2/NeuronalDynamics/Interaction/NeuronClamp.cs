@@ -17,8 +17,10 @@ namespace C2M2.NeuronalDynamics.Interaction
         public float sensitivity = 5;
         public float Scaler { get { return (MaxPower - MinPower) / sensitivity; } }
 
-        public float radiusRatio = 3f;
+        public float radiusRatio = 3.6f; // fallback-only multiplier now, see SetScale - used when no LocalMeshRadius sample exists (e.g. a restored clamp)
         public float heightRatio = 1f;
+        [Tooltip("Safety margin on top of the measured local mesh-surface radius (LocalMeshRadius), so the clamp clearly wraps the surface instead of just touching it")]
+        public float surfaceClearanceMargin = 1.35f;
         [Tooltip("The highlight sphere's radius is some real multiple of the clamp's radius")]
         public float highlightSphereScale = 3f;
         private bool somaClamp = false;
@@ -90,8 +92,19 @@ namespace C2M2.NeuronalDynamics.Interaction
         {
             currentVisualizationScale = (float)simulation.VisualInflation;
 
-            float radiusScalingValue = radiusRatio * (float)cellNodeData.NodeRadius;
-            float heightScalingValue = heightRatio * simulation.AverageDendriteRadius; 
+            // The visible dendrite surface is loaded from a separate, pre-baked/pre-inflated
+            // mesh file (NDSimulation.Update2DGrid), with no fixed relationship to the solver's
+            // own NodeData.NodeRadius - so a clamp sized purely from NodeRadius*radiusRatio
+            // could end up smaller than the real rendered surface and appear hidden inside it.
+            // LocalMeshRadius (set in AttachToSimulation, sampled from the actual hit point
+            // against the real mesh when this clamp was placed) is the true local surface
+            // radius; surfaceClearanceMargin keeps the clamp clearly wrapping it rather than
+            // just touching it. Falls back to the old NodeRadius-based estimate only when no
+            // sample exists (LocalMeshRadius == 0), e.g. a clamp restored from a save file.
+            float radiusScalingValue = LocalMeshRadius > 0f
+                ? LocalMeshRadius * surfaceClearanceMargin
+                : radiusRatio * (float)cellNodeData.NodeRadius;
+            float heightScalingValue = heightRatio * simulation.AverageDendriteRadius;
 
             //Ensures clamp is always at least as wide as tall when Visual Inflation is 1
             float radiusLength = Math.Max(radiusScalingValue, heightScalingValue) * currentVisualizationScale;

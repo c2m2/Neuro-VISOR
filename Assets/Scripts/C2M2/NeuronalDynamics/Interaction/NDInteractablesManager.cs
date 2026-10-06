@@ -103,8 +103,9 @@ public abstract class NDInteractablesManager<T> : MonoBehaviour
             // Destroy any existing preview
             DestroyPreview();
 
-            // Find the 1D vertex that we hit
-            int index = currentSimulation.GetNearestPoint(hit);
+            // Find the 1D vertex that we hit, and the real local radius of the rendered
+            // surface there (see NDSimulation.GetNearestPoint's doc comment / NeuronClamp.SetScale).
+            int index = currentSimulation.GetNearestPoint(hit, out float localSurfaceRadius);
 
             if (VertexAvailable(currentSimulation, index))
             {
@@ -113,7 +114,7 @@ public abstract class NDInteractablesManager<T> : MonoBehaviour
                 //TODO remove this
                 if (typeof(T).Equals(typeof(NDGraph))) interact = Instantiate(prefab).GetComponent<T>();
                 else interact = Instantiate(prefab, currentSimulation.transform).GetComponent<T>();
-                interact.AttachToSimulation(currentSimulation, index);
+                interact.AttachToSimulation(currentSimulation, index, localSurfaceRadius);
                 return interact;
             }
         }

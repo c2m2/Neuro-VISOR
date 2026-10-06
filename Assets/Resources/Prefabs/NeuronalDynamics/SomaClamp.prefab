@@ -773,7 +773,7 @@ MonoBehaviour:
   previewMaterial: {fileID: 2100000, guid: 1b9e22857f37d024a8aa6aa336a12219, type: 2}
   destroyMaterial: {fileID: 2100000, guid: cdb984a62adddda4f96228000d103b50, type: 2}
   highlightObj: {fileID: 5775996226698500373}
-  radiusRatio: 3
+  radiusRatio: 3.6
   heightRatio: 3
   highlightSphereScale: 3
   inactiveMaterial: {fileID: 2100000, guid: b5682c8bb520e8a46bbeab52c1a74097, type: 2}

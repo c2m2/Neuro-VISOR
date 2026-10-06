@@ -9,6 +9,15 @@ public abstract class NDInteractables : MonoBehaviour
     public int FocusVert { get; set; } = -1;
     public MeshRenderer meshRenderer;
 
+    /// <summary>
+    /// The real local radius of the rendered dendrite surface at FocusVert, sampled from the
+    /// actual RaycastHit at placement time (NDSimulation.GetNearestPoint's out param) - 0 if
+    /// this interactable was attached without a hit (e.g. restored from a save file via
+    /// Menu.cs, with AttachToSimulation's radius parameter left at its default). See
+    /// NeuronClamp.SetScale for why this exists instead of just using NodeData.NodeRadius.
+    /// </summary>
+    public float LocalMeshRadius { get; private set; } = 0f;
+
     public Material defaultMaterial = null;
     public Material previewMaterial = null;
     public Material destroyMaterial = null;
@@ -34,12 +43,13 @@ public abstract class NDInteractables : MonoBehaviour
     /// <summary>
     /// Attempt to latch onto a given simulation
     /// </summary>
-    public void AttachToSimulation(NDSimulation sim, int index)
+    public void AttachToSimulation(NDSimulation sim, int index, float localMeshRadius = 0f)
     {
         if (simulation == null)
         {
             simulation = sim;
             FocusVert = index;
+            LocalMeshRadius = localMeshRadius;
             Place(index);
         }
     }
