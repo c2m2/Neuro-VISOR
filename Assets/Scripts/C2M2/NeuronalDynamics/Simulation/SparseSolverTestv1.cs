@@ -5,6 +5,7 @@ using System;
 using SysMath = System.Math;
 using UnityEngine;
 using Vector = MathNet.Numerics.LinearAlgebra.Vector<double>;
+using Matrix = MathNet.Numerics.LinearAlgebra.Matrix<double>;
 using CSparse.Storage;
 using CSparse.Double.Factorization;
 using CSparse;
@@ -194,15 +195,35 @@ namespace C2M2.NeuronalDynamics.Simulation
         /// <param name="newValues"></param>
         public override void Set1DValues((int, double)[] newValues)
         {
+            // De-duplicate by vertex (last entry wins, matching the old per-call-overwrite
+            // behavior if the same vertex appears twice in one batch), while preserving
+            // insertion order so a later duplicate still wins predictably.
+            var valid = new Dictionary<int, double>();
             foreach ((int, double) newVal in newValues)
             {
                 if (newVal.Item1 >= 0 && newVal.Item1 < Neuron.nodes.Count)
                 {
-                    // perform a rank1 update solve to properly update with added dirichelet boundary conditions
-                    // from a raycast, or voltage clamp. This is done because with a voltage clamp you are imposing
-                    // a dirichelet B.C. which requires solving an updated diffusion problem with identity rows.
-                    U_Active = Vector.Build.DenseOfVector(DircheletRank1UpdateSolve(newVal));
+                    valid[newVal.Item1] = newVal.Item2;
                 }
+            }
+            if (valid.Count == 0) return;
+
+            if (valid.Count == 1)
+            {
+                // single Dirichlet row: the plain Sherman-Morrison rank-1 solve is already
+                // exact on its own, no need for the more general rank-r machinery below.
+                foreach (var kv in valid)
+                {
+                    U_Active = Vector.Build.DenseOfVector(DircheletRank1UpdateSolve((kv.Key, kv.Value)));
+                }
+            }
+            else
+            {
+                // r >= 2 simultaneous Dirichlet rows (multiple clamps, multiple direct-
+                // stimulation hits, or both together): solve them all AT ONCE via the
+                // Sherman-Morrison-Woodbury rank-r update (paper Sec. 6.3, eqn:woodbury),
+                // so every one of them is exact - not just the last one applied (item 18).
+                U_Active = Vector.Build.DenseOfVector(DircheletRankRUpdateSolve(valid));
             }
         }
 
@@ -236,6 +257,72 @@ namespace C2M2.NeuronalDynamics.Simulation
             YY = Vector.Build.DenseOfArray(y);
 
             return YY.Add(ZZ.Multiply(rj.DotProduct(YY) / (1 - rj.DotProduct(ZZ))));
+        }
+
+        /// <summary>
+        /// Rank-r generalization of <see cref="DircheletRank1UpdateSolve"/>: imposes Dirichlet
+        /// boundary conditions at r &gt;= 2 distinct vertices SIMULTANEOUSLY and exactly, via the
+        /// Sherman-Morrison-Woodbury formula (paper Sec. 6.3, eqn:woodbury) - fixes item 18
+        /// ("more than one simultaneous clamp is not imposed correctly"): calling the rank-1
+        /// solve once per vertex only leaves the LAST one exact, because each call re-derives
+        /// its correction from the original (unclamped) matrix M, so any earlier row
+        /// replacement is forgotten; the row only looks clamped because its accumulated R
+        /// entry still holds the target voltage, which the original (non-identity) row then
+        /// merely forces M*x = R at - not x = R - leaving that clamp off by its own residual.
+        ///
+        /// Letting M' be M with rows k_1..k_r each replaced by an identity row e_{k_i}^T:
+        ///   M' = M - E C^T,  E = [e_{k_1} .. e_{k_r}],  C[:,i] = (row k_i of M)^T - e_{k_i}
+        /// Woodbury:
+        ///   x = M'^{-1} R = y + Z (I_r - C^T Z)^{-1} C^T y,  where Z = M^{-1} E,  y = M^{-1} R
+        /// which needs r+1 solves against the existing LU factorization of M (one per clamped
+        /// vertex's unit column, plus one for R), plus one small r x r dense solve - no
+        /// refactorization of M itself, so this costs the same r+1 sparse solves as the old
+        /// per-vertex loop (which did one solve for z and one for y EACH call, i.e. 2r), while
+        /// actually being correct for every row at once.
+        /// </summary>
+        /// <param name="newVals">vertex -> target Dirichlet voltage, r >= 2 distinct vertices</param>
+        public Vector DircheletRankRUpdateSolve(IReadOnlyDictionary<int, double> newVals)
+        {
+            int n = Neuron.nodes.Count;
+            int r = newVals.Count;
+            int[] idx = newVals.Keys.ToArray();
+
+            // R is the shared reaction RHS vector; stamp every clamped vertex's target
+            // voltage into it, same role as the single-clamp case's R.At(j, v).
+            foreach (var kv in newVals) R.At(kv.Key, kv.Value);
+
+            // C[:, i] = (row idx[i] of M)^T - e_{idx[i]}, and Z[:, i] = M^{-1} e_{idx[i]} -
+            // the same "rj"/"z" vectors DircheletRank1UpdateSolve computes for a single
+            // vertex, just one column per clamped vertex here.
+            Matrix C = Matrix.Build.Dense(n, r);
+            Matrix Z = Matrix.Build.Dense(n, r);
+            double[] ejArr = new double[n];
+            double[] rowI = new double[n];
+            double[] zi = new double[n];
+            for (int i = 0; i < r; i++)
+            {
+                System.Array.Clear(ejArr, 0, n);
+                ejArr[idx[i]] = 1.0;
+
+                (l_csc.Transpose()).Multiply(ejArr, rowI);
+                rowI[idx[i]] -= 1.0;
+                C.SetColumn(i, rowI);
+
+                lu.Solve(ejArr, zi);
+                Z.SetColumn(i, zi);
+            }
+
+            double[] yArr = new double[n];
+            lu.Solve(R.ToArray(), yArr);
+            Vector y = Vector.Build.DenseOfArray(yArr);
+
+            // S = I_r - C^T Z  (r x r, dense);  rhs = C^T y  (r-vector)
+            Matrix S = Matrix.Build.DenseIdentity(r) - C.TransposeThisAndMultiply(Z);
+            Vector rhs = C.TransposeThisAndMultiply(y);
+            Vector alpha = S.Solve(rhs);
+
+            // x = y + Z*alpha
+            return y.Add(Z.Multiply(alpha));
         }
 
         /// <summary>

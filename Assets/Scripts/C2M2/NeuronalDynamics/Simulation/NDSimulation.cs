@@ -211,21 +211,36 @@ namespace C2M2.NeuronalDynamics.Simulation {
             SetOutputValues();
             void ApplyInteractionVals()
             {
-                /// Apply clamp values, if there are any clamps
+                /// Clamps and direct-stimulation raycast hits both impose Dirichlet rows on
+                /// the SAME matrix, so they must be solved as one joint set (item 18) - two
+                /// separate Set1DValues calls would each re-derive their correction from the
+                /// original matrix, leaving whichever group is applied first merely
+                /// approximate (its row's residual, not exactly clamped) once the second
+                /// call runs. Gather both into one combined list and solve them together.
+                List<(int, double)> dirichletValues = new List<(int, double)>();
                 lock(clampLock)
                 {
                     if(clampManager.clamps.Count > 0)
                     {
-                        List<(int, double)> clampValues = new List<(int, double)>();
                         for(int i = 0; i < clampManager.clamps.Count; i++)
                         {
                             if(clampManager.clamps[i] != null && clampManager.clamps[i].FocusVert != -1 && clampManager.clamps[i].ClampLive)
                             {
-                                clampValues.Add((clampManager.clamps[i].FocusVert, clampManager.clamps[i].ClampPower));
+                                dirichletValues.Add((clampManager.clamps[i].FocusVert, clampManager.clamps[i].ClampPower));
                             }
                         }
-                        Set1DValues(clampValues.ToArray<(int, double)>());
                     }
+                }
+                // Appended after clamps, so a raycast hit at the same vertex as a clamp wins
+                // the tie (Set1DValues de-duplicates by vertex, last entry wins) - matching
+                // the previous call order (raycast applied after clamps).
+                if (raycastHits.Length > 0)
+                {
+                    dirichletValues.AddRange(raycastHits);
+                }
+                if (dirichletValues.Count > 0)
+                {
+                    Set1DValues(dirichletValues.ToArray());
                 }
 
                 /// Apply synapse values, if there are any synapses
@@ -251,12 +266,6 @@ namespace C2M2.NeuronalDynamics.Simulation {
 
                     // Set the post synaptic current for each pair of pre/post synapses i.e. each tuple (Synapse,Synapse)
                     SetSynapseCurrent(synapses);
-                }
-                
-                // Apply raycast values
-                if (raycastHits.Length > 0)
-                {
-                    Set1DValues(raycastHits);
                 }
             }
         }
